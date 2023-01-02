@@ -1,13 +1,13 @@
 //---------------------------------------------------------------------------
-// Mac Tool Layer Uni v4 script.
+// Windows Tool Layer Uni v4 script.
 //
 // The layer is accessed by holding down the Tool key:
 //
 // Tool Layer:
-//     Tab   Alt  Ctrl _____ _____   VolUp <-Del    Up Del->  Home  PgUp
-//   Shift  CmdZ  CmdX  CmdC  CmdV   VolDn  Left  Down Right   End  PgDn
+//     Tab  Ctrl   Win _____ _____   VolUp <-Del    Up Del->  Home  PgUp
+//   Shift CtrlZ CtrlX CtrlC CtrlV   VolDn  Left  Down Right   End  PgDn
 //
-//              [Tool]   Cmd [Swi]   _____ Space   Esc
+//              [Tool]   Alt [Swi]   _____ Space   Esc
 //
 // [Swi] Switches between embedded steno and gemini protocol.
 //
@@ -340,21 +340,21 @@ func handleRelease(stenoKey, toolScanCode) {
   }
 }
 
-func handleMetaPress(stenoKey, toolScanCode) {
+func handleCtrlPress(stenoKey, toolScanCode) {
   if (layer == STENO_LAYER) {
     pressStenoKey(stenoKey);
   } else {
-    pressScanCode(SC_L_META);
+    pressScanCode(SC_L_CTRL);
     pressScanCode(toolScanCode);
   }
 }
-func handleMetaRelease(stenoKey, toolScanCode) {
+func handleCtrlRelease(stenoKey, toolScanCode) {
   if (layer == STENO_LAYER) {
     releaseStenoKey(stenoKey);
   } else {
     releaseScanCode(toolScanCode);
-    if (!isButtonPressed(23)) {
-      releaseScanCode(SC_L_META);
+    if (!isButtonPressed(1)) {
+      releaseScanCode(SC_L_CTRL);
     }
   }
 }
@@ -362,11 +362,11 @@ func handleMetaRelease(stenoKey, toolScanCode) {
 func onPress0() { handlePress(SK_S1, SC_TAB); }
 func onRelease0() { handleRelease(SK_S1, SC_TAB); }
 
-func onPress1() { handlePress(SK_TL, SC_L_ALT); }
-func onRelease1() { handleRelease(SK_TL, SC_L_ALT); }
+func onPress1() { handlePress(SK_TL, SC_L_CTRL); }
+func onRelease1() { handleRelease(SK_TL, SC_L_CTRL); }
 
-func onPress2() { handlePress(SK_PL, SC_L_CTRL); }
-func onRelease2() { handleRelease(SK_PL, SC_L_CTRL); }
+func onPress2() { handlePress(SK_PL, SC_L_META); }
+func onRelease2() { handleRelease(SK_PL, SC_L_META); }
 
 func onPress3() { handlePress(SK_HL, 0); }
 func onRelease3() { handleRelease(SK_HL, 0); }
@@ -395,17 +395,17 @@ func onRelease10() { handleRelease(SK_DR, SC_PAGE_UP); }
 func onPress11() { handlePress(SK_S2, SC_L_SHIFT); }
 func onRelease11() { handleRelease(SK_S2, SC_L_SHIFT); }
 
-func onPress12() { handleMetaPress(SK_KL, SC_Z); }
-func onRelease12() { handleMetaRelease(SK_KL, SC_Z); }
+func onPress12() { handleCtrlPress(SK_KL, SC_Z); }
+func onRelease12() { handleCtrlRelease(SK_KL, SC_Z); }
 
-func onPress13() { handleMetaPress(SK_WL, SC_X); }
-func onRelease13() { handleMetaRelease(SK_WL, SC_X); }
+func onPress13() { handleCtrlPress(SK_WL, SC_X); }
+func onRelease13() { handleCtrlRelease(SK_WL, SC_X); }
 
-func onPress14() { handleMetaPress(SK_RL, SC_C); }
-func onRelease14() { handleMetaRelease(SK_RL, SC_C); }
+func onPress14() { handleCtrlPress(SK_RL, SC_C); }
+func onRelease14() { handleCtrlRelease(SK_RL, SC_C); }
 
-func onPress15() { handleMetaPress(SK_STAR3, SC_V); }
-func onRelease15() { handleMetaRelease(SK_STAR3, SC_V); }
+func onPress15() { handleCtrlPress(SK_STAR3, SC_V); }
+func onRelease15() { handleCtrlRelease(SK_STAR3, SC_V); }
 
 func onPress16() { handlePress(SK_STAR4, SC_VOLUME_DOWN); }
 func onRelease16() { handleRelease(SK_STAR4, SC_VOLUME_DOWN); }
@@ -437,8 +437,8 @@ func onRelease22() {
   layer = STENO_LAYER;
 }
 
-func onPress23() { handlePress(SK_A, SC_L_META); }
-func onRelease23() { handleRelease(SK_A, SC_L_META); }
+func onPress23() { handlePress(SK_A, SC_L_ALT); }
+func onRelease23() { handleRelease(SK_A, SC_L_ALT); }
 
 func onPress24() {
   if (layer == STENO_LAYER) {
