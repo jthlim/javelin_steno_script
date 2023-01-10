@@ -402,26 +402,30 @@ class IfStatementAstNode extends AstNode {
         whenFalse?.addInstructions(builder);
       }
     } else {
-      final endNop = NopScriptInstruction();
-      final elseNop = NopScriptInstruction();
       condition.addInstructions(builder);
 
       final lastInstruction = builder.instructions.last;
+      late final JumpScriptInstructionBase jumpInstruction;
       if (lastInstruction is OpcodeScriptInstruction &&
           lastInstruction.opcode == ScriptOpCode.not) {
         builder.instructions.removeLast();
-        builder.addInstruction(JumpIfNotZeroScriptInstruction(elseNop));
+        jumpInstruction = JumpIfNotZeroScriptInstruction();
       } else {
-        builder.addInstruction(JumpIfZeroScriptInstruction(elseNop));
+        jumpInstruction = JumpIfZeroScriptInstruction();
       }
+      final elseNop = jumpInstruction.target;
+      builder.addInstruction(jumpInstruction);
 
       whenTrue.addInstructions(builder);
+      NopScriptInstruction? endNop;
       if (whenFalse != null) {
-        builder.addInstruction(JumpScriptInstruction(endNop));
+        final jumpInstruction = JumpScriptInstruction();
+        endNop = jumpInstruction.target;
+        builder.addInstruction(jumpInstruction);
       }
       builder.addInstruction(elseNop);
       whenFalse?.addInstructions(builder);
-      if (whenFalse != null) {
+      if (endNop != null) {
         builder.addInstruction(endNop);
       }
     }

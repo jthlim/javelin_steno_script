@@ -1,3 +1,5 @@
+import 'dart:collection';
+
 import 'byte_code_builder.dart';
 
 enum ScriptOpCode {
@@ -25,8 +27,12 @@ enum ScriptOpCode {
   final int value;
 }
 
-abstract class ScriptInstruction {
+abstract class ScriptInstruction extends LinkedListEntry<ScriptInstruction> {
   int get byteCodeLength;
+
+  bool get implicitNext => true;
+
+  bool get hasReference => previous?.implicitNext ?? false;
 
   int layoutFirstPass(int offset) {
     _firstPassOffset = offset;
@@ -42,6 +48,33 @@ abstract class ScriptInstruction {
 
   var _firstPassOffset = 0;
   var offset = 0;
+
+  void replaceWith(ScriptInstruction replacement) {
+    insertAfter(replacement);
+    unlink();
+  }
+
+  @override
+  int get hashCode => toString().hashCode;
+
+  @override
+  bool operator ==(Object other) => toString() == other.toString();
+
+  ScriptInstruction get nextNonNopInstruction {
+    var instruction = this;
+    while (instruction is NopScriptInstruction) {
+      instruction = instruction.next!;
+    }
+    return instruction;
+  }
+
+  ScriptInstruction? get previousNonNopInstruction {
+    ScriptInstruction? instruction = this;
+    while (instruction is NopScriptInstruction) {
+      instruction = instruction.previous;
+    }
+    return instruction;
+  }
 }
 
 class LoadParamInstruction extends ScriptInstruction {
@@ -185,8 +218,71 @@ class CallFunctionInstruction extends ScriptInstruction {
   String toString() => '  call $functionName';
 }
 
+abstract class JumpFunctionScriptInstructionBase extends ScriptInstruction {
+  JumpFunctionScriptInstructionBase(this.functionName);
+
+  @override
+  int get byteCodeLength => 3;
+
+  @override
+  void addByteCode(ScriptByteCodeBuilder builder) {
+    final function = builder.functions[functionName]!;
+    final offset = function.offset;
+
+    builder.bytesBuilder.addByte(opcode);
+    builder.bytesBuilder.addByte(offset);
+    builder.bytesBuilder.addByte(offset >> 8);
+  }
+
+  int get opcode;
+
+  final String functionName;
+}
+
+class JumpFunctionScriptInstruction extends JumpFunctionScriptInstructionBase {
+  JumpFunctionScriptInstruction(super.functionName);
+
+  @override
+  bool get implicitNext => false;
+  @override
+  int get opcode => 0xc6;
+
+  @override
+  String toString() => '  jmp $functionName';
+}
+
+class JumpIfZeroFunctionScriptInstruction
+    extends JumpFunctionScriptInstructionBase {
+  JumpIfZeroFunctionScriptInstruction(super.functionName);
+
+  @override
+  int get opcode => 0xc7;
+
+  @override
+  String toString() => '  jz $functionName';
+}
+
+class JumpIfNotZeroFunctionScriptInstruction
+    extends JumpFunctionScriptInstructionBase {
+  JumpIfNotZeroFunctionScriptInstruction(super.functionName);
+
+  @override
+  int get opcode => 0xc8;
+
+  @override
+  String toString() => '  jz $functionName';
+}
+
 abstract class JumpScriptInstructionBase extends ScriptInstruction {
-  JumpScriptInstructionBase(this.target);
+  JumpScriptInstructionBase() {
+    target = NopScriptInstruction(this);
+  }
+
+  @override
+  void unlink() {
+    target.unlink();
+    super.unlink();
+  }
 
   @override
   int get byteCodeLength {
@@ -219,70 +315,58 @@ abstract class JumpScriptInstructionBase extends ScriptInstruction {
     return 3;
   }
 
-  final ScriptInstruction target;
-}
-
-class JumpScriptInstruction extends JumpScriptInstructionBase {
-  JumpScriptInstruction(super.target);
-
   @override
   void addByteCode(ScriptByteCodeBuilder builder) {
     int delta = target.offset - offset;
     if (delta == 0) {
       return;
     } else if (2 <= delta && delta <= 33) {
-      builder.bytesBuilder.addByte(0x60 + delta - 2);
+      builder.bytesBuilder.addByte(shortOpcode + delta - 2);
     } else {
       final targetOffset = target.offset;
-      builder.bytesBuilder.addByte(0xc6);
+      builder.bytesBuilder.addByte(longOpcode);
       builder.bytesBuilder.addByte(targetOffset);
       builder.bytesBuilder.addByte(targetOffset >> 8);
     }
   }
+
+  int get shortOpcode;
+  int get longOpcode;
+
+  late final NopScriptInstruction target;
+}
+
+class JumpScriptInstruction extends JumpScriptInstructionBase {
+  @override
+  bool get implicitNext => false;
+
+  @override
+  int get shortOpcode => 0x60;
+
+  @override
+  int get longOpcode => 0xc6;
 
   @override
   String toString() => '  jump 0x${target.offset.toRadixString(16)}';
 }
 
 class JumpIfZeroScriptInstruction extends JumpScriptInstructionBase {
-  JumpIfZeroScriptInstruction(super.target);
+  @override
+  int get shortOpcode => 0x80;
 
   @override
-  void addByteCode(ScriptByteCodeBuilder builder) {
-    int delta = target.offset - offset;
-    if (delta == 0) {
-      return;
-    } else if (2 <= delta && delta <= 33) {
-      builder.bytesBuilder.addByte(0x80 + delta - 2);
-    } else {
-      final targetOffset = target.offset;
-      builder.bytesBuilder.addByte(0xc7);
-      builder.bytesBuilder.addByte(targetOffset);
-      builder.bytesBuilder.addByte(targetOffset >> 8);
-    }
-  }
+  int get longOpcode => 0xc7;
 
   @override
   String toString() => '  jz 0x${target.offset.toRadixString(16)}';
 }
 
 class JumpIfNotZeroScriptInstruction extends JumpScriptInstructionBase {
-  JumpIfNotZeroScriptInstruction(super.target);
+  @override
+  int get shortOpcode => 0xa0;
 
   @override
-  void addByteCode(ScriptByteCodeBuilder builder) {
-    int delta = target.offset - offset;
-    if (delta == 0) {
-      return;
-    } else if (2 <= delta && delta <= 33) {
-      builder.bytesBuilder.addByte(0xa0 + delta - 2);
-    } else {
-      final targetOffset = target.offset;
-      builder.bytesBuilder.addByte(0xc8);
-      builder.bytesBuilder.addByte(targetOffset);
-      builder.bytesBuilder.addByte(targetOffset >> 8);
-    }
-  }
+  int get longOpcode => 0xc8;
 
   @override
   String toString() => '  jnz 0x${target.offset.toRadixString(16)}';
@@ -361,11 +445,18 @@ class PushIntValueScriptInstruction extends ScriptInstruction {
 }
 
 class NopScriptInstruction extends ScriptInstruction {
+  NopScriptInstruction(this.reference);
+
   @override
   int get byteCodeLength => 0;
 
   @override
+  bool get hasReference => true;
+
+  @override
   void addByteCode(ScriptByteCodeBuilder builder) {}
+
+  final ScriptInstruction reference;
 
   @override
   String toString() => ' 0x${offset.toRadixString(16)}:';
@@ -393,6 +484,9 @@ class ReturnScriptInstruction extends ScriptInstruction {
   int get byteCodeLength => 1;
 
   @override
+  bool get implicitNext => false;
+
+  @override
   void addByteCode(ScriptByteCodeBuilder builder) {
     builder.bytesBuilder.addByte(0xc4);
   }
@@ -401,11 +495,20 @@ class ReturnScriptInstruction extends ScriptInstruction {
   String toString() => '  ret';
 }
 
-class FunctionStartPlaceholderScriptInstruction extends NopScriptInstruction {
+class FunctionStartPlaceholderScriptInstruction extends ScriptInstruction {
   FunctionStartPlaceholderScriptInstruction(this.functionName);
 
-  String functionName;
+  final String functionName;
 
   @override
-  String toString() => '$functionName (0x${offset.toRadixString(16)}): ';
+  bool get hasReference => true;
+
+  @override
+  int get byteCodeLength => 0;
+
+  @override
+  void addByteCode(ScriptByteCodeBuilder builder) {}
+
+  @override
+  String toString() => '\n$functionName (0x${offset.toRadixString(16)}): ';
 }

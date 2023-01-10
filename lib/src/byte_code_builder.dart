@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'instruction.dart';
+import 'instruction_list.dart';
 import 'module.dart';
 
 class ScriptByteCodeBuilder {
@@ -10,7 +11,7 @@ class ScriptByteCodeBuilder {
   final ScriptModule module;
 
   final bytesBuilder = BytesBuilder();
-  final instructions = <ScriptInstruction>[];
+  final instructions = InstructionList();
   final functions = <String, FunctionStartPlaceholderScriptInstruction>{};
   final stringTable = <String, int>{};
 
@@ -53,6 +54,8 @@ class ScriptByteCodeBuilder {
         addInstruction(ReturnScriptInstruction());
       }
     }
+
+    instructions.optimize();
   }
 
   void _measureByteCode(int buttonCount) {
