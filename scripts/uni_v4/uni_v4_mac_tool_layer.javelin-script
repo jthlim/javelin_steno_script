@@ -252,9 +252,9 @@ const SK_RES2 = 41;
 //
 //  * func releaseAll()
 //    - releases all pressed scan codes and steno keys.
-//  * func pressAll() 
+//  * func pressAll()
 //    - call all press scripts for buttons that are pressed.
-//  * func isButtonPressed(buttonIndex) var 
+//  * func isButtonPressed(buttonIndex) var
 //    - Returns 1 if the physical button is pressed.
 //  * func checkButtonState("01 10") var
 //    - Returns if the current button state matches the string.
