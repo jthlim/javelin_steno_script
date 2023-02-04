@@ -291,6 +291,8 @@ const SK_RES2 = 41;
 //
 //            22  23  24    25  26  27
 //
+// Bootsel Button (B button on the back of the Uni) is button 28.
+//
 //---------------------------------------------------------------------------
 // Example global variable:
 //   var layers = 0;
@@ -416,3 +418,6 @@ func onRelease26() { releaseStenoKey(SK_U); }
 
 func onPress27() { pressStenoKey(SK_NUM2); updateStenoMode(); }
 func onRelease27() { releaseStenoKey(SK_NUM2); }
+
+func onPress28() { console("launch_bootrom"); }
+func onRelease28() {}

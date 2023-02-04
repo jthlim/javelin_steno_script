@@ -510,5 +510,5 @@ class FunctionStartPlaceholderScriptInstruction extends ScriptInstruction {
   void addByteCode(ScriptByteCodeBuilder builder) {}
 
   @override
-  String toString() => '\n$functionName (0x${offset.toRadixString(16)}): ';
+  String toString() => '\n$functionName (0x${offset.toRadixString(16)}):';
 }
