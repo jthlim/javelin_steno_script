@@ -165,6 +165,14 @@ class Tokenizer {
               line: _line,
               column: _column,
             );
+          } else if (_offset < _length && _input.codeUnitAt(_offset) == 0x3c) {
+            ++_offset;
+            ++_column;
+            yield Token(
+              type: TokenType.shiftLeft,
+              line: _line,
+              column: _column,
+            );
           } else {
             yield Token(type: TokenType.lessThan, line: _line, column: _column);
           }
@@ -189,6 +197,24 @@ class Tokenizer {
               line: _line,
               column: _column,
             );
+          } else if (_offset < _length && _input.codeUnitAt(_offset) == 0x3e) {
+            ++_offset;
+            ++_column;
+            if (_offset < _length && _input.codeUnitAt(_offset) == 0x3e) {
+              ++_offset;
+              ++_column;
+              yield Token(
+                type: TokenType.logicalShiftRight,
+                line: _line,
+                column: _column,
+              );
+            } else {
+              yield Token(
+                type: TokenType.arithmeticShiftRight,
+                line: _line,
+                column: _column,
+              );
+            }
           } else {
             yield Token(
               type: TokenType.greaterThan,
@@ -257,6 +283,7 @@ class Tokenizer {
           const identifierToTokenContentMap = {
             'const': TokenType.constKeyword,
             'else': TokenType.elseKeyword,
+            'for': TokenType.forKeyword,
             'func': TokenType.funcKeyword,
             'if': TokenType.ifKeyword,
             'return': TokenType.returnKeyword,

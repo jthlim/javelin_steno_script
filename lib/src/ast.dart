@@ -236,6 +236,39 @@ class BitwiseXorAstNode extends BinaryOperatorAstNode {
   ScriptOpCode get opcode => ScriptOpCode.bitwiseXor;
 }
 
+class BitShiftLeftAstNode extends BinaryOperatorAstNode {
+  BitShiftLeftAstNode(super.statementA, super.statementB);
+
+  @override
+  int constantValue() =>
+      statementA.constantValue() << statementB.constantValue();
+
+  @override
+  ScriptOpCode get opcode => ScriptOpCode.shiftLeft;
+}
+
+class ArithmeticBitShiftRightAstNode extends BinaryOperatorAstNode {
+  ArithmeticBitShiftRightAstNode(super.statementA, super.statementB);
+
+  @override
+  int constantValue() =>
+      statementA.constantValue() >> statementB.constantValue();
+
+  @override
+  ScriptOpCode get opcode => ScriptOpCode.arithmeticShiftRight;
+}
+
+class LogicalBitShiftRightAstNode extends BinaryOperatorAstNode {
+  LogicalBitShiftRightAstNode(super.statementA, super.statementB);
+
+  @override
+  int constantValue() =>
+      statementA.constantValue() >>> statementB.constantValue();
+
+  @override
+  ScriptOpCode get opcode => ScriptOpCode.logicalShiftRight;
+}
+
 class LogicalAndAstNode extends BinaryOperatorAstNode {
   LogicalAndAstNode(super.statementA, super.statementB);
 
@@ -378,6 +411,58 @@ class NopAstNode extends AstNode {
 
   @override
   void addInstructions(ScriptByteCodeBuilder builder) {}
+}
+
+class ForStatementAstNode extends AstNode {
+  ForStatementAstNode({
+    this.initialization,
+    required this.condition,
+    this.update,
+    required this.body,
+  });
+
+  final AstNode? initialization;
+  final AstNode condition;
+  final AstNode? update;
+  final AstNode body;
+
+  @override
+  bool isConstant() => false;
+
+  @override
+  int constantValue() => 0;
+
+  @override
+  void addInstructions(ScriptByteCodeBuilder builder) {
+    // Layout is:
+    //   initialization:
+    //  condition:
+    //   condition -> end
+    //   body
+    //   update
+    //   jmp condition
+    //  end:
+
+    initialization?.addInstructions(builder);
+    final jumpToConditionInstruction = JumpScriptInstruction();
+    builder.addInstruction(jumpToConditionInstruction.target);
+    condition.addInstructions(builder);
+
+    final lastInstruction = builder.instructions.last;
+    late final JumpScriptInstructionBase jumpToEndInstruction;
+    if (lastInstruction is OpcodeScriptInstruction &&
+        lastInstruction.opcode == ScriptOpCode.not) {
+      builder.instructions.removeLast();
+      jumpToEndInstruction = JumpIfNotZeroScriptInstruction();
+    } else {
+      jumpToEndInstruction = JumpIfZeroScriptInstruction();
+    }
+    builder.addInstruction(jumpToEndInstruction);
+    body.addInstructions(builder);
+    update?.addInstructions(builder);
+    builder.addInstruction(jumpToConditionInstruction);
+    builder.addInstruction(jumpToEndInstruction.target);
+  }
 }
 
 class IfStatementAstNode extends AstNode {

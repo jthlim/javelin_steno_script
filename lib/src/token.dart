@@ -1,6 +1,7 @@
 enum TokenType {
   constKeyword,
   elseKeyword,
+  forKeyword,
   funcKeyword,
   ifKeyword,
   returnKeyword,
@@ -35,6 +36,9 @@ enum TokenType {
   and,
   or,
   eof,
+  shiftLeft,
+  arithmeticShiftRight,
+  logicalShiftRight,
 }
 
 class Token {

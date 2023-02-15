@@ -358,6 +358,35 @@ class Parser {
     return termsExpression.simplify();
   }
 
+  AstNode _parseBitShift() {
+    const bitShiftTokenTypes = {
+      TokenType.shiftLeft,
+      TokenType.arithmeticShiftRight,
+      TokenType.logicalShiftRight,
+    };
+
+    var result = _parseTerm();
+    while (bitShiftTokenTypes.contains(_currentToken.type)) {
+      final type = _currentToken.type;
+      _nextToken();
+      switch (type) {
+        case TokenType.shiftLeft:
+          result = BitShiftLeftAstNode(result, _parseTerm()).simplify();
+          break;
+        case TokenType.arithmeticShiftRight:
+          result =
+              ArithmeticBitShiftRightAstNode(result, _parseTerm()).simplify();
+          break;
+        case TokenType.logicalShiftRight:
+          result = LogicalBitShiftRightAstNode(result, _parseTerm()).simplify();
+          break;
+        default:
+          throw Exception('Internal error');
+      }
+    }
+    return result;
+  }
+
   AstNode _parseComparison() {
     const comparisonTokenTypes = {
       TokenType.equals,
@@ -368,7 +397,7 @@ class Parser {
       TokenType.greaterThanOrEqualTo,
     };
 
-    final result = _parseTerm();
+    final result = _parseBitShift();
 
     if (!comparisonTokenTypes.contains(_currentToken.type)) {
       return result;
@@ -378,17 +407,17 @@ class Parser {
     _nextToken();
     switch (type) {
       case TokenType.equals:
-        return EqualsAstNode(result, _parseTerm()).simplify();
+        return EqualsAstNode(result, _parseBitShift()).simplify();
       case TokenType.notEquals:
-        return NotEqualsAstNode(result, _parseTerm()).simplify();
+        return NotEqualsAstNode(result, _parseBitShift()).simplify();
       case TokenType.lessThan:
-        return LessThanAstNode(result, _parseTerm()).simplify();
+        return LessThanAstNode(result, _parseBitShift()).simplify();
       case TokenType.lessThanOrEqualTo:
-        return LessThanOrEqualToAstNode(result, _parseTerm()).simplify();
+        return LessThanOrEqualToAstNode(result, _parseBitShift()).simplify();
       case TokenType.greaterThan:
-        return GreaterThanAstNode(result, _parseTerm()).simplify();
+        return GreaterThanAstNode(result, _parseBitShift()).simplify();
       case TokenType.greaterThanOrEqualTo:
-        return GreaterThanOrEqualToAstNode(result, _parseTerm()).simplify();
+        return GreaterThanOrEqualToAstNode(result, _parseBitShift()).simplify();
       default:
         throw Exception('Internal error');
     }
@@ -493,10 +522,12 @@ class Parser {
     );
   }
 
-  AstNode _parseAssignment(String name) {
+  AstNode _parseAssignment(String name, {bool requireSemicolon = true}) {
     _assertToken(TokenType.assign);
     final value = _parseExpression();
-    _assertToken(TokenType.semiColon);
+    if (requireSemicolon) {
+      _assertToken(TokenType.semiColon);
+    }
 
     // Assignment can be to global or local.
     // Find out index.
@@ -537,14 +568,14 @@ class Parser {
     return result;
   }
 
-  AstNode _parseAssignOrFunctionCall() {
+  AstNode _parseAssignOrFunctionCall({bool requireSemicolon = true}) {
     final nameToken = _currentToken;
     _assertToken(TokenType.identifier);
     final name = nameToken.stringValue!;
 
     switch (_currentToken.type) {
       case TokenType.assign:
-        return _parseAssignment(name);
+        return _parseAssignment(name, requireSemicolon: requireSemicolon);
 
       case TokenType.openParen:
         final parameters = _parseParameterList();
@@ -574,6 +605,60 @@ class Parser {
     return ReturnAstNode(expression);
   }
 
+  AstNode _parseForStatement() {
+    // Start a new scope.
+    _assertToken(TokenType.forKeyword);
+    _assertToken(TokenType.openParen);
+
+    _function?.beginLocalScope();
+    AstNode? initialization;
+
+    switch (_currentToken.type) {
+      case TokenType.varKeyword:
+        initialization = _parseLocalVar();
+        break;
+      case TokenType.identifier:
+        initialization = _parseAssignOrFunctionCall();
+        break;
+      case TokenType.semiColon:
+        _assertToken(TokenType.semiColon);
+        break;
+      default:
+        throw FormatException(
+          'Expected if-initialization statement, found $_currentToken',
+        );
+    }
+
+    final condition = _parseExpression();
+    _assertToken(TokenType.semiColon);
+
+    AstNode? update;
+    switch (_currentToken.type) {
+      case TokenType.identifier:
+        update = _parseAssignOrFunctionCall(requireSemicolon: false);
+        break;
+      case TokenType.closeParen:
+        break;
+      default:
+        throw FormatException(
+          'Expected if-update statement, found $_currentToken',
+        );
+    }
+
+    _assertToken(TokenType.closeParen);
+
+    final body = _parseBlock();
+
+    _function?.endLocalScope();
+
+    return ForStatementAstNode(
+      initialization: initialization,
+      condition: condition,
+      update: update,
+      body: body,
+    );
+  }
+
   AstNode _parseStatement() {
     switch (_currentToken.type) {
       case TokenType.openBrace:
@@ -586,6 +671,8 @@ class Parser {
         return _parseAssignOrFunctionCall();
       case TokenType.returnKeyword:
         return _parseReturn();
+      case TokenType.forKeyword:
+        return _parseForStatement();
       default:
         throw FormatException('Expected statement, found $_currentToken');
     }

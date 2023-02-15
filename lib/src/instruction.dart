@@ -20,7 +20,10 @@ enum ScriptOpCode {
   bitwiseOr(0x4e),
   bitwiseXor(0x4f),
   logicalAnd(0x50),
-  logicalOr(0x51);
+  logicalOr(0x51),
+  shiftLeft(0x52),
+  arithmeticShiftRight(0x53),
+  logicalShiftRight(0x54);
 
   const ScriptOpCode(this.value);
 
