@@ -24,7 +24,8 @@ enum InBuiltScriptFunction implements ScriptFunctionDefinition {
   console('console', 1, false, 11),
   checkButtonState('checkButtonState', 1, true, 12),
   isInPressAll('isInPressAll', 0, true, 13),
-  setPixel('setPixel', 4, false, 14);
+  setPixel('setPixel', 4, false, 14),
+  getTime('getTime', 0, true, 15);
 
   const InBuiltScriptFunction(
     this.functionName,

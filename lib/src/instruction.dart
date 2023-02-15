@@ -152,11 +152,16 @@ class LoadGlobalValueInstruction extends ScriptInstruction {
   LoadGlobalValueInstruction(this.index);
 
   @override
-  int get byteCodeLength => 1;
+  int get byteCodeLength => index < 4 ? 1 : 2;
 
   @override
   void addByteCode(ScriptByteCodeBuilder builder) {
-    builder.bytesBuilder.addByte(0xe8 + index);
+    if (index < 4) {
+      builder.bytesBuilder.addByte(0xe8 + index);
+    } else {
+      builder.bytesBuilder.addByte(0xca);
+      builder.bytesBuilder.addByte(index);
+    }
   }
 
   final int index;
@@ -169,11 +174,16 @@ class StoreGlobalValueInstruction extends ScriptInstruction {
   StoreGlobalValueInstruction(this.index);
 
   @override
-  int get byteCodeLength => 1;
+  int get byteCodeLength => index < 4 ? 1 : 2;
 
   @override
   void addByteCode(ScriptByteCodeBuilder builder) {
-    builder.bytesBuilder.addByte(0xec + index);
+    if (index < 4) {
+      builder.bytesBuilder.addByte(0xec + index);
+    } else {
+      builder.bytesBuilder.addByte(0xcb);
+      builder.bytesBuilder.addByte(index);
+    }
   }
 
   final int index;
@@ -321,9 +331,16 @@ abstract class JumpScriptInstructionBase extends ScriptInstruction {
   @override
   void addByteCode(ScriptByteCodeBuilder builder) {
     int delta = target.offset - offset;
-    if (delta == 0) {
+    int layoutDelta = target._firstPassOffset - _firstPassOffset;
+    if (layoutDelta == 0) {
+      if (delta != 0) {
+        throw Exception('Internal error on $this');
+      }
       return;
-    } else if (2 <= delta && delta <= 33) {
+    } else if (2 <= layoutDelta && layoutDelta <= 33) {
+      if (delta < 2 || delta > 33) {
+        throw Exception('Internal error on $this');
+      }
       builder.bytesBuilder.addByte(shortOpcode + delta - 2);
     } else {
       final targetOffset = target.offset;

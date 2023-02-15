@@ -88,7 +88,7 @@ class ScriptByteCodeBuilder {
     for (final instruction in instructions) {
       if (instruction.offset != bytesBuilder.length) {
         throw Exception(
-          'Internal error: byte code offset mismatch at $instruction',
+          'Internal error: byte code offset (${instruction.offset} vs ${bytesBuilder.length}) mismatch at $instruction',
         );
       }
       instruction.addByteCode(this);

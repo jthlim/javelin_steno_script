@@ -4,6 +4,8 @@ import 'token.dart';
 import 'tokenizer.dart';
 
 class Parser {
+  static const maximumGlobalVariableCount = 64;
+
   factory Parser({required String input, required String filename}) {
     return Parser.tokenizer(Tokenizer(input, filename));
   }
@@ -166,6 +168,11 @@ class Parser {
     _assertUniqueName(name);
 
     final index = _module.globals.length;
+
+    if (index >= maximumGlobalVariableCount) {
+      throw FormatException('Too many global varialbes near $_currentToken');
+    }
+
     _module.globals[name] = ScriptGlobal(
       name: name,
       index: index,
@@ -438,10 +445,10 @@ class Parser {
         case TokenType.bitwiseAnd:
           result = BitwiseAndAstNode(result, _parseComparison()).simplify();
           break;
-        case TokenType.quotient:
+        case TokenType.bitwiseOr:
           result = BitwiseOrAstNode(result, _parseComparison()).simplify();
           break;
-        case TokenType.remainder:
+        case TokenType.bitwiseXor:
           result = BitwiseXorAstNode(result, _parseComparison()).simplify();
           break;
         default:
