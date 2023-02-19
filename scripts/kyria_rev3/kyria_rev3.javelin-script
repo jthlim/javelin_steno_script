@@ -11,10 +11,12 @@
 // |--------+------+------+------+------+------+-------------.  ,-------------+------+------+------+------+------+--------|
 // |        |      |      |      |      |      |      |CapsLk|  |F-keys|      |      |      |      |      |      |        |
 // `----------------------+------+------+------+------+------|  |------+------+------+------+------+----------------------'
-//                        |Steno |  #1  |   A  |   O  | Nav  |  | Sym  |  E   |   U  |  #2  |      |
+//                        |QWERTY|  #1  |   A  |   O  | Nav  |  | Sym  |  E   |   U  |  #2  |      |
 //                        |      |      |      |      |      |  |      |      |      |      |      |
 //                        `----------------------------------'  `----------------------------------'
 //
+// * Tapping QWERTY key will switch to QWERTY mode
+// * Holding it down and pressing other buttons will cause the keyboard to return to steno mode when releasing it.
 
 // QWERTY
 //
@@ -25,7 +27,7 @@
 // |--------+------+------+------+------+------+-------------.  ,-------------+------+------+------+------+------+--------|
 // | LShift |   Z  |   X  |   C  |   V  |   B  | [ {  |CapsLk|  |F-keys|  ] } |   N  |   M  | ,  < | . >  | /  ? | RShift |
 // `----------------------+------+------+------+------+------|  |------+------+------+------+------+----------------------'
-//                        |QWERTY| LGUI | LAlt/| Space| Nav  |  | Sym  | Space| RAlt/| RGUI |      |
+//                        |Steno | LGUI | LAlt/| Space| Nav  |  | Sym  | Space| RAlt/| RGUI |      |
 //                        |      |      | Enter|      |      |  |      |      | Enter|      |      |
 //                        `----------------------------------'  `----------------------------------'
 //
@@ -46,6 +48,20 @@
 //
 
 //
+// Function
+//
+// ,-------------------------------------------.                              ,-------------------------------------------.
+// |        |  F9  | F10  | F11  | F12  |      |                              |      |      |      |      |      |        |
+// |--------+------+------+------+------+------|                              |------+------+------+------+------+--------|
+// |        |  F5  |  F6  |  F7  |  F8  |      |                              |      | Shift| Ctrl |  Alt |  GUI |        |
+// |--------+------+------+------+------+------+-------------.  ,-------------+------+------+------+------+------+--------|
+// |        |  F1  |  F2  |  F3  |  F4  |      |      |      |  |      |      |      |      |      |      |      |        |
+// `----------------------+------+------+------+------+------|  |------+------+------+------+------+----------------------'
+//                        |      |      |      |      |      |  |      |      |      |      |      |
+//                        |      |      |      |      |      |  |      |      |      |      |      |
+//                        `----------------------------------'  `----------------------------------'
+
+//
 // Navigation/Media
 //
 // ,-------------------------------------------.                              ,-------------------------------------------.
@@ -55,7 +71,7 @@
 // |--------+------+------+------+------+------+-------------.  ,-------------+------+------+------+------+------+--------|
 // |        |      |      |      |      |      |      |      |  |      |      | Mute |      |      |      |      |        |
 // `----------------------+------+------+------+------+------|  |------+------+------+------+------+----------------------'
-//                        |      |      |      |      |      |  |      |      |      |      |      |
+//                        |      |      |      |      |      |  |      | Space| Enter|      |      |
 //                        |      |      |      |      |      |  |      |      |      |      |      |
 //                        `----------------------------------'  `----------------------------------'
 //
@@ -358,6 +374,9 @@ const SK_RES2 = 41;
 //     24  25  26  27  28  29  30  31  |  32  33  34  35  36  37  38  39
 //                 40  41  42  43  44  |  45  46  47  48  49
 //
+// RGB indices follow button indices, with underglow lights defined from
+//  50-61
+//
 //---------------------------------------------------------------------------
 // Example global variable:
 //   var layers = 0;
@@ -393,7 +412,75 @@ var layer = STENO_MASK;
 var otherPressCount = 0;
 
 const SYM_SHIFT = 0x100;
-const TAP_THRESHOLD = 150; // milliseconds for keys that have alternates
+const TAP_THRESHOLD = 200; // milliseconds for keys that have alternates
+
+func init() {
+  setPixel(0, 0, 88, 16);
+  setPixel(1, 0, 87, 18);
+  setPixel(2, 0, 86, 20);
+  setPixel(3, 0, 85, 22);
+  setPixel(4, 0, 84, 24);
+  setPixel(5, 0, 83, 26);
+  setPixel(6, 57, 26, 26);
+  setPixel(7, 60, 24, 24);
+  setPixel(8, 63, 22, 22);
+  setPixel(9, 66, 20, 20);
+  setPixel(10, 69, 18, 18);
+  setPixel(11, 72, 16, 16);
+  setPixel(12, 0, 82, 28);
+  setPixel(13, 0, 81, 30);
+  setPixel(14, 0, 80, 32);
+  setPixel(15, 0, 79, 34);
+  setPixel(16, 0, 78, 36);
+  setPixel(17, 0, 77, 38);
+  setPixel(18, 39, 38, 38);
+  setPixel(19, 42, 36, 36);
+  setPixel(20, 45, 34, 34);
+  setPixel(21, 48, 32, 32);
+  setPixel(22, 51, 30, 30);
+  setPixel(23, 54, 28, 28);
+  setPixel(24, 0, 76, 40);
+  setPixel(25, 0, 75, 42);
+  setPixel(26, 0, 74, 44);
+  setPixel(27, 0, 73, 46);
+  setPixel(28, 0, 72, 48);
+  setPixel(29, 0, 71, 50);
+  setPixel(30, 0, 70, 52);
+  setPixel(31, 0, 69, 54);
+  setPixel(32, 15, 54, 54);
+  setPixel(33, 18, 52, 52);
+  setPixel(34, 21, 50, 50);
+  setPixel(35, 24, 48, 48);
+  setPixel(36, 27, 46, 46);
+  setPixel(37, 30, 44, 44);
+  setPixel(38, 33, 42, 42);
+  setPixel(39, 36, 40, 40);
+  setPixel(40, 0, 68, 56);
+  setPixel(41, 0, 67, 58);
+  setPixel(42, 0, 66, 60);
+  setPixel(43, 0, 65, 62);
+  setPixel(44, 0, 64, 64);
+  setPixel(45, 0, 64, 64);
+  setPixel(46, 3, 62, 62);
+  setPixel(47, 6, 60, 60);
+  setPixel(48, 9, 58, 58);
+  setPixel(49, 12, 56, 56);
+  updateRgb();
+}
+
+func setUnderglow(r, g, b) {
+  for(var i = 50; i < 62; i = i + 1) {
+    setPixel(i, r, g, b);
+  }
+}
+
+func updateRgb() {
+  if (layer & STENO_MASK) {
+    setUnderglow(64, 64, 64);
+  } else {
+    setUnderglow(64, 0, 16);
+  }
+}
 
 func handlePress(qwertyKey, stenoKey, symbolsKey, functionKey, navKey) {
   otherPressCount = otherPressCount + 1;
@@ -480,7 +567,7 @@ func onRelease12() {
 
 func onPress13() { handlePress(SC_A, SK_S2, SC_1 | SYM_SHIFT, SC_F5, SC_L_META); }
 func onRelease13() { handleRelease(SC_A, SK_S2, SC_1 | SYM_SHIFT, SC_F5, SC_L_META); }
- 
+
 func onPress14() { handlePress(SC_S, SK_KL, SC_2 | SYM_SHIFT, SC_F6, SC_L_ALT); }
 func onRelease14() { handleRelease(SC_S, SK_KL, SC_2 | SYM_SHIFT, SC_F6, SC_L_ALT); }
 
@@ -558,6 +645,7 @@ func onPress32() {
 
   releaseAll();
   layer = layer | FUNCTION_MASK;
+  pressAll();
 }
 
 func onRelease32() {
@@ -589,14 +677,24 @@ func onPress39() { handlePress(SC_R_SHIFT, SK_NONE, SC_SLASH | SYM_SHIFT, SC_NON
 func onRelease39() { handleRelease(SC_R_SHIFT, SK_NONE, SC_SLASH | SYM_SHIFT, SC_NONE, SC_NONE); }
 
 func onPress40() {
-  if (layer >> 1) return;
   if (isInPressAll()) return;
+  if (layer >> 1) return;
 
   releaseAll();
   layer = layer ^ STENO_MASK;
+  otherPressCount = 0;
   pressAll();
+  updateRgb();
 }
-func onRelease40() { }
+func onRelease40() {
+  if (otherPressCount == 0) return;
+  if (layer >> 1) return;
+  if (layer & STENO_MASK) return;
+
+  releaseAll();
+  layer = layer ^ STENO_MASK;
+  updateRgb();
+}
 
 func onPress41() { handlePress(SC_L_META, SK_NUM1, SC_NONE, SC_NONE, SC_NONE); }
 func onRelease41() { handleRelease(SC_L_META, SK_NUM1, SC_NONE, SC_NONE, SC_NONE); }
@@ -622,6 +720,7 @@ func onPress44() {
 
   releaseAll();
   layer = layer | NAV_MASK;
+  pressAll();
 }
 
 func onRelease44() {
@@ -645,17 +744,17 @@ func onRelease45() {
   }
 }
 
-func onPress46() { handlePress(SC_SPACE, SK_E, SC_NONE, SC_NONE, SC_NONE); }
-func onRelease46() { handleRelease(SC_SPACE, SK_E, SC_NONE, SC_NONE, SC_NONE); }
+func onPress46() { handlePress(SC_SPACE, SK_E, SC_NONE, SC_NONE, SC_SPACE); }
+func onRelease46() { handleRelease(SC_SPACE, SK_E, SC_NONE, SC_NONE, SC_SPACE); }
 
 var timer47;
 func onPress47() {
-  handlePress(SC_R_ALT, SK_U, SC_NONE, SC_NONE, SC_NONE);
+  handlePress(SC_R_ALT, SK_U, SC_NONE, SC_NONE, SC_ENTER);
   timer47 = getTime();
   otherPressCount = 0;
 }
 func onRelease47() {
-  handleRelease(SC_R_ALT, SK_U, SC_NONE, SC_NONE, SC_NONE);
+  handleRelease(SC_R_ALT, SK_U, SC_NONE, SC_NONE, SC_ENTER);
   if ((layer | otherPressCount) == 0 && getTime() - timer47 < TAP_THRESHOLD) {
     tapScanCode(SC_ENTER);
   }
