@@ -760,8 +760,8 @@ func onRelease47() {
   }
 }
 
-func onPress48() { handlePress(SC_ENTER, SK_NUM2, SC_NONE, SC_NONE, SC_NONE); }
-func onRelease48() { handleRelease(SC_ENTER, SK_NUM2, SC_NONE, SC_NONE, SC_NONE); }
+func onPress48() { handlePress(SC_R_META, SK_NUM2, SC_NONE, SC_NONE, SC_NONE); }
+func onRelease48() { handleRelease(SC_R_META, SK_NUM2, SC_NONE, SC_NONE, SC_NONE); }
 
 func onPress49() { }
 func onRelease49() { }
