@@ -12,7 +12,6 @@
 // |        |      |      |      |      |      |      |CapsLk|  |F-keys|      |      |      |      |      |      |        |
 // `----------------------+------+------+------+------+------|  |------+------+------+------+------+----------------------'
 //                        |QWERTY|  #1  |   A  |   O  | Nav  |  | Sym  |  E   |   U  |  #2  |      |
-//                        |      |      |      |      |      |  |      |      |      |      |      |
 //                        `----------------------------------'  `----------------------------------'
 //
 // * Tapping QWERTY key will switch to QWERTY mode
@@ -42,8 +41,7 @@
 // |--------+------+------+------+------+------+-------------.  ,-------------+------+------+------+------+------+--------|
 // |    |   |   \  |  :   |  ;   |  -   |  [   |  {   |      |  |      |   }  |   ]  |  _   |  ,   |  .   |  /   |   ?    |
 // `----------------------+------+------+------+------+------|  |------+------+------+------+------+----------------------'
-//                        |      |      |      |      |      |  |      |      |      |      |      |
-//                        |      |      |      |      |      |  |      |      |      |      |      |
+//                        |      | LGUI | LAlt | LCtrl|      |  |      |      |      |      |      |
 //                        `----------------------------------'  `----------------------------------'
 //
 
@@ -58,7 +56,6 @@
 // |        |  F1  |  F2  |  F3  |  F4  |      |      |      |  |      |      |      |      |      |      |      |        |
 // `----------------------+------+------+------+------+------|  |------+------+------+------+------+----------------------'
 //                        |      |      |      |      |      |  |      |      |      |      |      |
-//                        |      |      |      |      |      |  |      |      |      |      |      |
 //                        `----------------------------------'  `----------------------------------'
 
 //
@@ -72,7 +69,6 @@
 // |        |      |      |      |      |      |      |      |  |      |      | Mute |      |      |      |      |        |
 // `----------------------+------+------+------+------+------|  |------+------+------+------+------+----------------------'
 //                        |      |      |      |      |      |  |      | Space| Enter|      |      |
-//                        |      |      |      |      |      |  |      |      |      |      |      |
 //                        `----------------------------------'  `----------------------------------'
 //
 
@@ -374,8 +370,7 @@ const SK_RES2 = 41;
 //     24  25  26  27  28  29  30  31  |  32  33  34  35  36  37  38  39
 //                 40  41  42  43  44  |  45  46  47  48  49
 //
-// RGB indices follow button indices, with underglow lights defined from
-//  50-61
+// RGB indices follow button indices, with underglow lights defined from 50-61.
 //
 //---------------------------------------------------------------------------
 // Example global variable:
@@ -696,24 +691,24 @@ func onRelease40() {
   updateRgb();
 }
 
-func onPress41() { handlePress(SC_L_META, SK_NUM1, SC_NONE, SC_NONE, SC_NONE); }
-func onRelease41() { handleRelease(SC_L_META, SK_NUM1, SC_NONE, SC_NONE, SC_NONE); }
+func onPress41() { handlePress(SC_L_META, SK_NUM1, SC_L_META, SC_NONE, SC_NONE); }
+func onRelease41() { handleRelease(SC_L_META, SK_NUM1, SC_L_META, SC_NONE, SC_NONE); }
 
 var timer42;
 func onPress42() {
-  handlePress(SC_L_ALT, SK_A, SC_NONE, SC_NONE, SC_NONE);
+  handlePress(SC_L_ALT, SK_A, SC_L_ALT, SC_NONE, SC_NONE);
   timer42 = getTime();
   otherPressCount = 0;
 }
 func onRelease42() {
-  handleRelease(SC_L_ALT, SK_A, SC_NONE, SC_NONE, SC_NONE);
+  handleRelease(SC_L_ALT, SK_A, SC_L_ALT, SC_NONE, SC_NONE);
   if ((layer | otherPressCount) == 0 && getTime() - timer42 < TAP_THRESHOLD) {
     tapScanCode(SC_ENTER);
   }
 }
 
-func onPress43() { handlePress(SC_SPACE, SK_O, SC_NONE, SC_NONE, SC_NONE); }
-func onRelease43() { handleRelease(SC_SPACE, SK_O, SC_NONE, SC_NONE, SC_NONE); }
+func onPress43() { handlePress(SC_SPACE, SK_O, SC_L_CTRL, SC_NONE, SC_NONE); }
+func onRelease43() { handleRelease(SC_SPACE, SK_O, SC_L_CTRL, SC_NONE, SC_NONE); }
 
 func onPress44() {
   if (layer >> 1) return;
