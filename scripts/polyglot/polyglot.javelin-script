@@ -15,7 +15,9 @@
 //                        `--------------------'        `--------------------'
 //
 // * Tapping QWERTY key will switch to QWERTY mode
-// * Holding it down and pressing other buttons will cause the keyboard to return to steno mode when releasing it.
+// * Holding it down and pressing other buttons will cause the keyboard to return to steno mode when
+//   releasing it. This will also give access to the Symbols, Navigation and Function layers by
+//   pressing those keys on the QWERTY layer.
 
 // QWERTY
 //
@@ -26,7 +28,7 @@
 // |--------+------+------+------+------+------|        |------+------+------+------+------+--------|
 // |Shf/Sten|   Z  |   X  |   C  |   V  |   B  |        |   N  |   M  | ,  < | .  > | /  ? | RShift |
 // `----------------------+------+------+------+        |------+------+------+----------------------'
-//                        | Meta |Alt/Sp|  Nav |        |  Sym | Space|Fun/En|
+//                        | Meta |Alt/Sp|  Nav |        |  Sym | Space|Fn/Ent|
 //                        `--------------------'        `--------------------'
 //
 // For keys marked with two options, holding or pressing with other keys will cause the first option
@@ -564,22 +566,43 @@ func onRelease23() {
 // 3rd row
 
 var timer24;
+var wasSteno24;
 func onPress24() {
-  handlePress(SC_L_SHIFT, SK_NONE, SC_NONE, SC_NONE, SC_NONE);
-
-  if(layer & STENO_MASK) {
+  if (isInPressAll()) {
+    return;
+  }
+  if (layer >> 1) {
+    return;
+  }
+  wasSteno24 = layer & STENO_MASK;
+  if (wasSteno24) {
     releaseAll();
     layer = layer ^ STENO_MASK;
+    otherPressCount = 0;
+    pressAll();
   } else {
-    timer24 = getTime();
+    pressScanCode(SC_L_SHIFT);
     otherPressCount = 0;
   }
+
+  timer24 = getTime();
 }
 func onRelease24() {
-  handleRelease(SC_L_SHIFT, SK_NONE, SC_NONE, SC_NONE, SC_NONE);
-  if ((layer | otherPressCount) == 0 && getTime() - timer24 < TAP_THRESHOLD) {
-    releaseAll();
-    layer = layer | STENO_MASK;
+  if (wasSteno24) {
+    // If the keypress was in steno mode, and other keys were pressed, drop
+    // immediately back to steno mode, and drop all masks.
+    if (otherPressCount) {
+      releaseAll();
+      layer = STENO_MASK;
+    }
+  } else {
+    releaseScanCode(SC_L_SHIFT);
+
+    // A tap of the key turns on steno mode.
+    if ((layer | otherPressCount) == 0 && getTime() - timer24 < TAP_THRESHOLD) {
+      releaseAll();
+      layer = layer | STENO_MASK;
+    }
   }
 }
 
