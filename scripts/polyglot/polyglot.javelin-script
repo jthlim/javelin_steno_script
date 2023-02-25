@@ -342,7 +342,7 @@ const SK_RES2 = 41;
 //      - Press X
 //      - Release X
 //      - etc.
-//  * func setPixel(id, r, g, b)
+//  * func setRgb(id, r, g, b)
 //    - For boards with rgb lights, this can control individual lights.
 //  * func getTime() var
 //    - Returns milliseconds since launch.
@@ -588,6 +588,11 @@ func onPress24() {
   timer24 = getTime();
 }
 func onRelease24() {
+  // Exit early if this was triggered from a releaseAll() script.
+  if (isButtonPressed(24)) {
+    return;
+  }
+
   if (wasSteno24) {
     // If the keypress was in steno mode, and other keys were pressed, drop
     // immediately back to steno mode, and drop all masks.
@@ -661,6 +666,7 @@ func onPress38() {
   if (layer != 0) {
     handlePress(SC_NONE, SK_O | KEY_STENO, SC_L_CTRL, SC_NONE, SC_NONE);
   } else {
+    otherPressCount = otherPressCount + 1;
     releaseAll();
     layer = layer | NAV_MASK;
     pressAll();
@@ -680,6 +686,7 @@ func onPress39() {
   if (layer != 0) {
     handlePress(SC_NONE, SK_E | KEY_STENO, SC_NONE, SC_NONE, SC_NONE);
   } else {
+    otherPressCount = otherPressCount + 1;
     releaseAll();
     layer = layer | SYMBOL_MASK;
     pressAll();

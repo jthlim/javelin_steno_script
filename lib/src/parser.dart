@@ -90,6 +90,15 @@ class Parser {
       );
     }
     initFunction.statements.statements.insertAll(0, globalInitializers);
+
+    // Create tick function if it doesn't exist.
+    var tickFunction = _module.functions['tick'] as ScriptFunction?;
+    if (tickFunction == null) {
+      tickFunction = ScriptFunction('tick');
+      tickFunction.statements = StatementListAstNode();
+      _module.functions['tick'] = tickFunction;
+    }
+
     return _module;
   }
 

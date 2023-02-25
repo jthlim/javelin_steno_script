@@ -60,8 +60,8 @@ class ScriptByteCodeBuilder {
 
   void _measureByteCode(int buttonCount) {
     // Starting offset is:
-    // magic + 2 (init) + buttonCount * 2 (press/release) * 2 (bytes per offset)
-    final startingOffset = 4 + 2 + buttonCount * 4;
+    // magic + 2 (init) + 2 (tick) + buttonCount * 2 (press/release) * 2 (bytes per offset)
+    final startingOffset = 4 + 2 + 2 + 4 * buttonCount;
     var offset = startingOffset;
     for (final instruction in instructions) {
       offset += instruction.layoutFirstPass(offset);
@@ -79,6 +79,7 @@ class ScriptByteCodeBuilder {
   void _createByteCode(int buttonCount) {
     bytesBuilder.add('JSS0'.codeUnits);
     addFunctionOffset('init');
+    addFunctionOffset('tick');
 
     for (var i = 0; i < buttonCount; ++i) {
       addFunctionOffset('onPress$i');

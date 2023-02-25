@@ -16,6 +16,7 @@
 //
 // * Tapping QWERTY key will switch to QWERTY mode
 // * Holding it down and pressing other buttons will cause the keyboard to return to steno mode when releasing it.
+// * To press modifier keys from Steno mode, it is recommended to use the Nav shortcut.
 
 // QWERTY
 //
@@ -339,10 +340,14 @@ const SK_RES2 = 41;
 //      - Press X
 //      - Release X
 //      - etc.
-//  * func setPixel(id, r, g, b)
+//  * func setRgb(id, r, g, b)
 //    - For boards with rgb lights, this can control individual lights.
 //  * func getTime() var
 //    - Returns milliseconds since launch.
+//  * func setGpioPin(pin, value)
+//    - Controls a pin of the gpio directly.
+//  * func getLedStatus(id) var
+//    - Returns whether the led statues is on. See LED_STATUS constants.
 //
 // releaseAll() and pressAll() are useful for changing modes/layers, e.g.:
 //
@@ -359,6 +364,17 @@ const SK_RES2 = 41;
 // to prevent infinite recursion, since the onPress will be re-run even for the
 // current key. The easiest way to do this is using isInPressAll() function.
 //
+
+const LED_STATUS_NUM_LOCK = 0;
+const LED_STATUS_CAPS_LOCK = 1;
+const LED_STATUS_SCROLL_LOCK = 2;
+const LED_STATUS_COMPOSE = 3;
+const LED_STATUS_KANA = 4;
+
+const AUTO_DRAW_NONE = 0;
+const AUTO_DRAW_PAPER_TAPE = 1;
+const AUTO_DRAW_STENO_LAYOUT = 2;
+
 //---------------------------------------------------------------------------
 //
 // Kyria rev3 button layout:
@@ -410,62 +426,79 @@ const SYM_SHIFT = 0x100;
 const TAP_THRESHOLD = 200; // milliseconds for keys that have alternates
 
 func init() {
-  setPixel(0, 0, 88, 16);
-  setPixel(1, 0, 87, 18);
-  setPixel(2, 0, 86, 20);
-  setPixel(3, 0, 85, 22);
-  setPixel(4, 0, 84, 24);
-  setPixel(5, 0, 83, 26);
-  setPixel(6, 57, 26, 26);
-  setPixel(7, 60, 24, 24);
-  setPixel(8, 63, 22, 22);
-  setPixel(9, 66, 20, 20);
-  setPixel(10, 69, 18, 18);
-  setPixel(11, 72, 16, 16);
-  setPixel(12, 0, 82, 28);
-  setPixel(13, 0, 81, 30);
-  setPixel(14, 0, 80, 32);
-  setPixel(15, 0, 79, 34);
-  setPixel(16, 0, 78, 36);
-  setPixel(17, 0, 77, 38);
-  setPixel(18, 39, 38, 38);
-  setPixel(19, 42, 36, 36);
-  setPixel(20, 45, 34, 34);
-  setPixel(21, 48, 32, 32);
-  setPixel(22, 51, 30, 30);
-  setPixel(23, 54, 28, 28);
-  setPixel(24, 0, 76, 40);
-  setPixel(25, 0, 75, 42);
-  setPixel(26, 0, 74, 44);
-  setPixel(27, 0, 73, 46);
-  setPixel(28, 0, 72, 48);
-  setPixel(29, 0, 71, 50);
-  setPixel(30, 0, 70, 52);
-  setPixel(31, 0, 69, 54);
-  setPixel(32, 15, 54, 54);
-  setPixel(33, 18, 52, 52);
-  setPixel(34, 21, 50, 50);
-  setPixel(35, 24, 48, 48);
-  setPixel(36, 27, 46, 46);
-  setPixel(37, 30, 44, 44);
-  setPixel(38, 33, 42, 42);
-  setPixel(39, 36, 40, 40);
-  setPixel(40, 0, 68, 56);
-  setPixel(41, 0, 67, 58);
-  setPixel(42, 0, 66, 60);
-  setPixel(43, 0, 65, 62);
-  setPixel(44, 0, 64, 64);
-  setPixel(45, 0, 64, 64);
-  setPixel(46, 3, 62, 62);
-  setPixel(47, 6, 60, 60);
-  setPixel(48, 9, 58, 58);
-  setPixel(49, 12, 56, 56);
+  setRgb(0, 0, 88, 16);
+  setRgb(1, 0, 87, 18);
+  setRgb(2, 0, 86, 20);
+  setRgb(3, 0, 85, 22);
+  setRgb(4, 0, 84, 24);
+  setRgb(5, 0, 83, 26);
+  setRgb(6, 57, 26, 26);
+  setRgb(7, 60, 24, 24);
+  setRgb(8, 63, 22, 22);
+  setRgb(9, 66, 20, 20);
+  setRgb(10, 69, 18, 18);
+  setRgb(11, 72, 16, 16);
+  setRgb(12, 0, 82, 28);
+  setRgb(13, 0, 81, 30);
+  setRgb(14, 0, 80, 32);
+  setRgb(15, 0, 79, 34);
+  setRgb(16, 0, 78, 36);
+  setRgb(17, 0, 77, 38);
+  setRgb(18, 39, 38, 38);
+  setRgb(19, 42, 36, 36);
+  setRgb(20, 45, 34, 34);
+  setRgb(21, 48, 32, 32);
+  setRgb(22, 51, 30, 30);
+  setRgb(23, 54, 28, 28);
+  setRgb(24, 0, 76, 40);
+  setRgb(25, 0, 75, 42);
+  setRgb(26, 0, 74, 44);
+  setRgb(27, 0, 73, 46);
+  setRgb(28, 0, 72, 48);
+  setRgb(29, 0, 71, 50);
+  setRgb(30, 0, 70, 52);
+  setRgb(31, 0, 69, 54);
+  setRgb(32, 15, 54, 54);
+  setRgb(33, 18, 52, 52);
+  setRgb(34, 21, 50, 50);
+  setRgb(35, 24, 48, 48);
+  setRgb(36, 27, 46, 46);
+  setRgb(37, 30, 44, 44);
+  setRgb(38, 33, 42, 42);
+  setRgb(39, 36, 40, 40);
+  setRgb(40, 0, 68, 56);
+  setRgb(41, 0, 67, 58);
+  setRgb(42, 0, 66, 60);
+  setRgb(43, 0, 65, 62);
+  setRgb(44, 0, 64, 64);
+  setRgb(45, 0, 64, 64);
+  setRgb(46, 3, 62, 62);
+  setRgb(47, 6, 60, 60);
+  setRgb(48, 9, 58, 58);
+  setRgb(49, 12, 56, 56);
   updateRgb();
+
+  // Uncomment the following line to disable liatris power light.
+  // The updated script will need to be uploaded to each side to turn both
+  // lights on if you're using two liatris controllers.
+  // setGpioPin(24, 1);
+
+  // Set up OLED.
+  setAutoDraw(0, AUTO_DRAW_PAPER_TAPE);
+  setAutoDraw(1, AUTO_DRAW_STENO_LAYOUT);
+}
+
+func tick() {
+  if (getLedStatus(LED_STATUS_CAPS_LOCK)) {
+    setRgb(31, 64, 64, 64);
+  } else {
+    setRgb(31, 0, 69, 54);
+  }
 }
 
 func setUnderglow(r, g, b) {
   for(var i = 50; i < 62; i = i + 1) {
-    setPixel(i, r, g, b);
+    setRgb(i, r, g, b);
   }
 }
 
@@ -679,9 +712,18 @@ func onPress40() {
   layer = layer ^ STENO_MASK;
   otherPressCount = 0;
   pressAll();
-  updateRgb();
+
+  // Only update for steno, since temporary QWERTY mode will cause distracting
+  // flicker.
+  if (layer & STENO_MASK) {
+    updateRgb();
+  }
 }
 func onRelease40() {
+  // Updating here and below won't cause flicker because the RGB update only
+  // occurs once all the button scripts complete updating.
+  updateRgb();
+
   if (otherPressCount == 0) return;
   if (layer >> 1) return;
   if (layer & STENO_MASK) return;
@@ -730,6 +772,7 @@ func onPress45() {
 
   releaseAll();
   layer = layer | SYMBOL_MASK;
+  pressAll();
 }
 
 func onRelease45() {

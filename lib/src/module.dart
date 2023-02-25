@@ -10,6 +10,7 @@ abstract class ScriptFunctionDefinition {
 }
 
 enum InBuiltScriptFunction implements ScriptFunctionDefinition {
+  // Direct functions, using one byte opcodes.
   pressScanCode('pressScanCode', 1, false, 0),
   releaseScanCode('releaseScanCode', 1, false, 1),
   tapScanCode('tapScanCode', 1, false, 2),
@@ -24,8 +25,20 @@ enum InBuiltScriptFunction implements ScriptFunctionDefinition {
   console('console', 1, false, 11),
   checkButtonState('checkButtonState', 1, true, 12),
   isInPressAll('isInPressAll', 0, true, 13),
-  setPixel('setPixel', 4, false, 14),
-  getTime('getTime', 0, true, 15);
+  setRgb('setRgb', 4, false, 14),
+  getTime('getTime', 0, true, 15),
+
+  // Extended functions, using two byte 0xcc opcode.
+  getLedStatus('getLedStatus', 1, true, 0x100),
+  setGpioPin('setGpioPin', 2, false, 0x101),
+  clearDisplay('clearDisplay', 1, false, 0x102),
+  setAutoDraw('setAutoDraw', 2, false, 0x103),
+  turnOnDisplay('turnOnDisplay', 1, false, 0x104),
+  turnOffDisplay('turnOffDisplay', 1, false, 0x105),
+  drawPixel('drawPixel', 4, false, 0x106),
+  drawLine('drawLine', 6, false, 0x107),
+  drawImage('drawImage', 6, false, 0x108),
+  drawText('drawText', 5, false, 0x109);
 
   const InBuiltScriptFunction(
     this.functionName,

@@ -196,11 +196,16 @@ class CallInBuiltFunctionInstruction extends ScriptInstruction {
   CallInBuiltFunctionInstruction(this.functionIndex);
 
   @override
-  int get byteCodeLength => 1;
+  int get byteCodeLength => functionIndex >= 0x100 ? 2 : 1;
 
   @override
   void addByteCode(ScriptByteCodeBuilder builder) {
-    builder.bytesBuilder.addByte(0xf0 + functionIndex);
+    if (functionIndex >= 0x100) {
+      builder.bytesBuilder.addByte(0xcc);
+      builder.bytesBuilder.addByte(functionIndex & 0xff);
+    } else {
+      builder.bytesBuilder.addByte(0xf0 + functionIndex);
+    }
   }
 
   final int functionIndex;
