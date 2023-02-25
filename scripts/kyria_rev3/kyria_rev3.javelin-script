@@ -16,7 +16,6 @@
 //
 // * Tapping QWERTY key will switch to QWERTY mode
 // * Holding it down and pressing other buttons will cause the keyboard to return to steno mode when releasing it.
-// * To press modifier keys from Steno mode, it is recommended to use the Nav shortcut.
 
 // QWERTY
 //
@@ -67,9 +66,9 @@
 // |--------+------+------+------+------+------|                              |------+------+------+------+------+--------|
 // |        |  GUI |  Alt | Ctrl | Shift|      |                              | Vol- |  ←   |   ↓  |   →  | PgDn |   End  |
 // |--------+------+------+------+------+------+-------------.  ,-------------+------+------+------+------+------+--------|
-// |        |      |      |      |      |      |      |      |  |      |      | Mute |      |      |      |      |        |
+// |        |      |      |      |      |      |      |      |  |      |      | Mute |Brght+|      |      |      |        |
 // `----------------------+------+------+------+------+------|  |------+------+------+------+------+----------------------'
-//                        |      |      |      |      |      |  |      | Space| Enter|      |      |
+//                        |      |      |      |      |      |  |      | Space| Enter|Brght-|      |
 //                        `----------------------------------'  `----------------------------------'
 //
 
@@ -344,8 +343,6 @@ const SK_RES2 = 41;
 //    - For boards with rgb lights, this can control individual lights.
 //  * func getTime() var
 //    - Returns milliseconds since launch.
-//  * func setGpioPin(pin, value)
-//    - Controls a pin of the gpio directly.
 //  * func getLedStatus(id) var
 //    - Returns whether the led statues is on. See LED_STATUS constants.
 //
@@ -421,88 +418,105 @@ const NAV_MASK = 8;
 
 var layer = STENO_MASK;
 var otherPressCount = 0;
+var brightness = 6;
+var lastActionTime = 0;
 
 const SYM_SHIFT = 0x100;
-const TAP_THRESHOLD = 200; // milliseconds for keys that have alternates
+const TAP_THRESHOLD = 200; // milliseconds for keys that have alternates.
+const SCREEN_OFF_TIMEOUT = 30000; // 30 seconds.
 
 func init() {
-  setRgb(0, 0, 88, 16);
-  setRgb(1, 0, 87, 18);
-  setRgb(2, 0, 86, 20);
-  setRgb(3, 0, 85, 22);
-  setRgb(4, 0, 84, 24);
-  setRgb(5, 0, 83, 26);
-  setRgb(6, 57, 26, 26);
-  setRgb(7, 60, 24, 24);
-  setRgb(8, 63, 22, 22);
-  setRgb(9, 66, 20, 20);
-  setRgb(10, 69, 18, 18);
-  setRgb(11, 72, 16, 16);
-  setRgb(12, 0, 82, 28);
-  setRgb(13, 0, 81, 30);
-  setRgb(14, 0, 80, 32);
-  setRgb(15, 0, 79, 34);
-  setRgb(16, 0, 78, 36);
-  setRgb(17, 0, 77, 38);
-  setRgb(18, 39, 38, 38);
-  setRgb(19, 42, 36, 36);
-  setRgb(20, 45, 34, 34);
-  setRgb(21, 48, 32, 32);
-  setRgb(22, 51, 30, 30);
-  setRgb(23, 54, 28, 28);
-  setRgb(24, 0, 76, 40);
-  setRgb(25, 0, 75, 42);
-  setRgb(26, 0, 74, 44);
-  setRgb(27, 0, 73, 46);
-  setRgb(28, 0, 72, 48);
-  setRgb(29, 0, 71, 50);
-  setRgb(30, 0, 70, 52);
-  setRgb(31, 0, 69, 54);
-  setRgb(32, 15, 54, 54);
-  setRgb(33, 18, 52, 52);
-  setRgb(34, 21, 50, 50);
-  setRgb(35, 24, 48, 48);
-  setRgb(36, 27, 46, 46);
-  setRgb(37, 30, 44, 44);
-  setRgb(38, 33, 42, 42);
-  setRgb(39, 36, 40, 40);
-  setRgb(40, 0, 68, 56);
-  setRgb(41, 0, 67, 58);
-  setRgb(42, 0, 66, 60);
-  setRgb(43, 0, 65, 62);
-  setRgb(44, 0, 64, 64);
-  setRgb(45, 0, 64, 64);
-  setRgb(46, 3, 62, 62);
-  setRgb(47, 6, 60, 60);
-  setRgb(48, 9, 58, 58);
-  setRgb(49, 12, 56, 56);
-  updateRgb();
+  updateKeyRgb();
+  updateUnderglowRgb();
+  updateScreenContrast();
 
-  // Uncomment the following line to disable liatris power light.
-  // The updated script will need to be uploaded to each side to turn both
-  // lights on if you're using two liatris controllers.
-  // setGpioPin(24, 1);
+  // Disable liatris power light.
+  setGpioPin(24, 1);
 
-  // Set up OLED.
   setAutoDraw(0, AUTO_DRAW_PAPER_TAPE);
   setAutoDraw(1, AUTO_DRAW_STENO_LAYOUT);
 }
 
 func tick() {
+  var screenOn = getTime() - lastActionTime <= SCREEN_OFF_TIMEOUT;
+  setScreenOn(0, screenOn);
+  setScreenOn(1, screenOn);
+
+  updateCapsLockRgb();
+}
+
+func updateCapsLockRgb() {
   if (getLedStatus(LED_STATUS_CAPS_LOCK)) {
     setRgb(31, 64, 64, 64);
   } else {
-    setRgb(31, 0, 69, 54);
+    applyRgb(31, 0, 69, 54);
   }
+}
+
+func applyRgb(id, r, g, b) {
+  setRgb(id, (r * brightness) >> 3, (g * brightness) >> 3, (b * brightness) >> 3);
+}
+
+func updateKeyRgb() {
+  applyRgb(0, 0, 88, 16);
+  applyRgb(1, 0, 87, 18);
+  applyRgb(2, 0, 86, 20);
+  applyRgb(3, 0, 85, 22);
+  applyRgb(4, 0, 84, 24);
+  applyRgb(5, 0, 83, 26);
+  applyRgb(6, 57, 26, 26);
+  applyRgb(7, 60, 24, 24);
+  applyRgb(8, 63, 22, 22);
+  applyRgb(9, 66, 20, 20);
+  applyRgb(10, 69, 18, 18);
+  applyRgb(11, 72, 16, 16);
+  applyRgb(12, 0, 82, 28);
+  applyRgb(13, 0, 81, 30);
+  applyRgb(14, 0, 80, 32);
+  applyRgb(15, 0, 79, 34);
+  applyRgb(16, 0, 78, 36);
+  applyRgb(17, 0, 77, 38);
+  applyRgb(18, 39, 38, 38);
+  applyRgb(19, 42, 36, 36);
+  applyRgb(20, 45, 34, 34);
+  applyRgb(21, 48, 32, 32);
+  applyRgb(22, 51, 30, 30);
+  applyRgb(23, 54, 28, 28);
+  applyRgb(24, 0, 76, 40);
+  applyRgb(25, 0, 75, 42);
+  applyRgb(26, 0, 74, 44);
+  applyRgb(27, 0, 73, 46);
+  applyRgb(28, 0, 72, 48);
+  applyRgb(29, 0, 71, 50);
+  applyRgb(30, 0, 70, 52);
+  updateCapsLockRgb();
+  applyRgb(32, 15, 54, 54);
+  applyRgb(33, 18, 52, 52);
+  applyRgb(34, 21, 50, 50);
+  applyRgb(35, 24, 48, 48);
+  applyRgb(36, 27, 46, 46);
+  applyRgb(37, 30, 44, 44);
+  applyRgb(38, 33, 42, 42);
+  applyRgb(39, 36, 40, 40);
+  applyRgb(40, 0, 68, 56);
+  applyRgb(41, 0, 67, 58);
+  applyRgb(42, 0, 66, 60);
+  applyRgb(43, 0, 65, 62);
+  applyRgb(44, 0, 64, 64);
+  applyRgb(45, 0, 64, 64);
+  applyRgb(46, 3, 62, 62);
+  applyRgb(47, 6, 60, 60);
+  applyRgb(48, 9, 58, 58);
+  applyRgb(49, 12, 56, 56);
 }
 
 func setUnderglow(r, g, b) {
   for(var i = 50; i < 62; i = i + 1) {
-    setRgb(i, r, g, b);
+    applyRgb(i, r, g, b);
   }
 }
 
-func updateRgb() {
+func updateUnderglowRgb() {
   if (layer & STENO_MASK) {
     setUnderglow(64, 64, 64);
   } else {
@@ -510,7 +524,15 @@ func updateRgb() {
   }
 }
 
+func updateScreenContrast() {
+  var contrast = 16 + 30 * brightness;
+  setScreenContrast(0, contrast);
+  setScreenContrast(1, contrast);
+}
+
+
 func handlePress(qwertyKey, stenoKey, symbolsKey, functionKey, navKey) {
+  lastActionTime = getTime();
   otherPressCount = otherPressCount + 1;
   if (layer & NAV_MASK) {
     pressScanCode(navKey);
@@ -528,6 +550,7 @@ func handlePress(qwertyKey, stenoKey, symbolsKey, functionKey, navKey) {
   }
 }
 func handleRelease(qwertyKey, stenoKey, symbolsKey, functionKey, navKey) {
+  lastActionTime = getTime();
   if (layer & NAV_MASK) {
     releaseScanCode(navKey);
   } if (layer & FUNCTION_MASK) {
@@ -658,17 +681,20 @@ func onPress30() { handlePress(SC_L_BRACKET, SK_NONE, SC_L_BRACKET | SYM_SHIFT, 
 func onRelease30() { handleRelease(SC_L_BRACKET, SK_NONE, SC_L_BRACKET | SYM_SHIFT, SC_NONE, SC_NONE); }
 
 func onPress31() {
+  lastActionTime = getTime();
   if (layer >> 1) return;
 
   pressScanCode(SC_CAPS);
 }
 func onRelease31() {
+  lastActionTime = getTime();
   if (layer >> 1) return;
 
   releaseScanCode(SC_CAPS);
 }
 
 func onPress32() {
+  lastActionTime = getTime();
   if (layer >> 1) return;
 
   releaseAll();
@@ -677,6 +703,7 @@ func onPress32() {
 }
 
 func onRelease32() {
+  lastActionTime = getTime();
   if (layer & FUNCTION_MASK) {
     releaseAll();
     layer = layer ^ FUNCTION_MASK;
@@ -689,7 +716,18 @@ func onRelease33() { handleRelease(SC_R_BRACKET, SK_NONE, SC_R_BRACKET | SYM_SHI
 func onPress34() { handlePress(SC_N, SK_NONE, SC_R_BRACKET, SC_NONE, SC_MUTE); }
 func onRelease34() { handleRelease(SC_N, SK_NONE, SC_R_BRACKET, SC_NONE, SC_MUTE); }
 
-func onPress35() { handlePress(SC_M, SK_NONE, SC_MINUS | SYM_SHIFT, SC_NONE, SC_NONE); }
+func onPress35() {
+  handlePress(SC_M, SK_NONE, SC_MINUS | SYM_SHIFT, SC_NONE, SC_NONE);
+
+  if (layer & NAV_MASK) {
+    if (brightness < 8) {
+      brightness = brightness + 1;
+      updateKeyRgb();
+      updateUnderglowRgb();
+      updateScreenContrast();
+    }
+  }
+}
 func onRelease35() { handleRelease(SC_M, SK_NONE, SC_MINUS | SYM_SHIFT, SC_NONE, SC_NONE); }
 
 func onPress36() { handlePress(SC_COMMA, SK_NONE, SC_COMMA, SC_NONE, SC_NONE); }
@@ -705,6 +743,7 @@ func onPress39() { handlePress(SC_R_SHIFT, SK_NONE, SC_SLASH | SYM_SHIFT, SC_NON
 func onRelease39() { handleRelease(SC_R_SHIFT, SK_NONE, SC_SLASH | SYM_SHIFT, SC_NONE, SC_NONE); }
 
 func onPress40() {
+  lastActionTime = getTime();
   if (isInPressAll()) return;
   if (layer >> 1) return;
 
@@ -716,13 +755,14 @@ func onPress40() {
   // Only update for steno, since temporary QWERTY mode will cause distracting
   // flicker.
   if (layer & STENO_MASK) {
-    updateRgb();
+    updateUnderglowRgb();
   }
 }
 func onRelease40() {
+  lastActionTime = getTime();
   // Updating here and below won't cause flicker because the RGB update only
   // occurs once all the button scripts complete updating.
-  updateRgb();
+  updateUnderglowRgb();
 
   if (otherPressCount == 0) return;
   if (layer >> 1) return;
@@ -730,7 +770,7 @@ func onRelease40() {
 
   releaseAll();
   layer = layer ^ STENO_MASK;
-  updateRgb();
+  updateUnderglowRgb();
 }
 
 func onPress41() { handlePress(SC_L_META, SK_NUM1, SC_L_META, SC_NONE, SC_NONE); }
@@ -753,6 +793,7 @@ func onPress43() { handlePress(SC_SPACE, SK_O, SC_L_CTRL, SC_NONE, SC_NONE); }
 func onRelease43() { handleRelease(SC_SPACE, SK_O, SC_L_CTRL, SC_NONE, SC_NONE); }
 
 func onPress44() {
+  lastActionTime = getTime();
   if (layer >> 1) return;
 
   releaseAll();
@@ -761,6 +802,7 @@ func onPress44() {
 }
 
 func onRelease44() {
+  lastActionTime = getTime();
   if (layer & NAV_MASK) {
     releaseAll();
     layer = layer ^ NAV_MASK;
@@ -768,6 +810,7 @@ func onRelease44() {
 }
 
 func onPress45() {
+  lastActionTime = getTime();
   if (layer >> 1) return;
 
   releaseAll();
@@ -776,6 +819,7 @@ func onPress45() {
 }
 
 func onRelease45() {
+  lastActionTime = getTime();
   if (layer & SYMBOL_MASK) {
     releaseAll();
     layer = layer ^ SYMBOL_MASK;
@@ -798,8 +842,23 @@ func onRelease47() {
   }
 }
 
-func onPress48() { handlePress(SC_R_META, SK_NUM2, SC_NONE, SC_NONE, SC_NONE); }
+func onPress48() {
+  handlePress(SC_R_META, SK_NUM2, SC_NONE, SC_NONE, SC_NONE);
+
+  if (layer & NAV_MASK) {
+    if (brightness > 0) {
+      brightness = brightness - 1;
+      updateKeyRgb();
+      updateUnderglowRgb();
+      updateScreenContrast();
+    }
+  }
+}
 func onRelease48() { handleRelease(SC_R_META, SK_NUM2, SC_NONE, SC_NONE, SC_NONE); }
 
-func onPress49() { }
-func onRelease49() { }
+func onPress49() {
+  lastActionTime = getTime();
+}
+func onRelease49() {
+  lastActionTime = getTime();
+}
