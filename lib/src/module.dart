@@ -37,7 +37,7 @@ enum InBuiltScriptFunction implements ScriptFunctionDefinition {
   setScreenContrast('setScreenContrast', 2, false, 0x105),
   drawPixel('drawPixel', 4, false, 0x106),
   drawLine('drawLine', 6, false, 0x107),
-  drawImage('drawImage', 6, false, 0x108),
+  drawImage('drawImage', 4, false, 0x108),
   drawText('drawText', 5, false, 0x109);
 
   const InBuiltScriptFunction(

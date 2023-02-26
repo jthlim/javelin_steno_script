@@ -427,13 +427,43 @@ const SYM_SHIFT = 0x100;
 const TAP_THRESHOLD = 200; // milliseconds for keys that have alternates.
 const SCREEN_OFF_TIMEOUT = 30000; // 30 seconds.
 
+const SHIFT_IMAGE = [[
+  10 10
+  00 01 80 01 c0 01 e0 01 f0 7f f8 7f fc 7f fe 7f
+  fe 7f fc 7f f8 7f f0 7f e0 01 c0 01 80 01 00 01
+]];
+
+const CONTROL_IMAGE = [[
+  10 10
+  00 00 00 00 40 00 60 00 30 00 18 00 0c 00 06 00
+  06 00 0c 00 18 00 30 00 60 00 40 00 00 00 00 00
+]];
+
+const ALT_IMAGE = [[
+  10 10
+  00 00 00 30 00 30 00 30 00 30 00 38 00 1e 80 07
+  e0 01 78 30 1c 30 0c 30 0c 30 0c 30 0c 30 00 00
+]];
+
+const COMMAND_IMAGE = [[
+  10 10
+  00 00 3c 3c 7e 7e 66 66 66 66 fe 7f fc 3f 60 06
+  60 06 fc 3f fe 7f 66 66 66 66 7e 7e 3c 3c 00 00
+]];
+
+const CAPS_LOCK_IMAGE = [[
+  10 10
+  00 01 80 01 c0 01 e0 01 f0 67 f8 67 fc 67 fe 67
+  fe 67 fc 67 f8 67 f0 67 e0 01 c0 01 80 01 00 01
+]];
+
 func init() {
   updateKeyRgb();
   updateUnderglowRgb();
   updateScreenContrast();
 
   // Disable liatris power light.
-  setGpioPin(24, 1);
+  // setGpioPin(24, 1);
 
   updateDisplay0();
   setAutoDraw(1, AUTO_DRAW_WPM);
@@ -448,6 +478,7 @@ func tick() {
   if (capsLockStatus != lastCapsLockStatus)  {
     lastCapsLockStatus = capsLockStatus;
     updateCapsLockRgb();
+    updateDisplay0();
   }
 }
 
@@ -537,11 +568,27 @@ func updateScreenContrast() {
 }
 
 func drawDisplay0NonSteno(layerName) {
-    setAutoDraw(0, AUTO_DRAW_NONE);
-    clearDisplay(0);
-    drawText(0, 0, 10, 0, "Kyria (Javelin)");
-    drawLine(0, 0, 12, 80, 12, 1);
-    drawText(0, 0, 40, 0, layerName);
+  setAutoDraw(0, AUTO_DRAW_NONE);
+  clearDisplay(0);
+  drawText(0, 0, 10, 0, "Kyria (Javelin)");
+  drawLine(0, 0, 12, 80, 12, 1);
+  drawText(0, 0, 32, 0, layerName);
+
+  if (isScanCodePressed(SC_L_SHIFT) || isScanCodePressed(SC_R_SHIFT)) {
+    drawImage(0, 0, 48, SHIFT_IMAGE);
+  }
+  if (isScanCodePressed(SC_L_CTRL) || isScanCodePressed(SC_R_CTRL)) {
+    drawImage(0, 16, 48, CONTROL_IMAGE);
+  }
+  if (isScanCodePressed(SC_L_ALT) || isScanCodePressed(SC_R_ALT)) {
+    drawImage(0, 32, 48, ALT_IMAGE);
+  }
+  if (isScanCodePressed(SC_L_META) || isScanCodePressed(SC_R_META)) {
+    drawImage(0, 48, 48, COMMAND_IMAGE);
+  }
+  if (getLedStatus(LED_STATUS_CAPS_LOCK)) {
+    drawImage(0, 112, 48, CAPS_LOCK_IMAGE);
+  }
 }
 
 func updateDisplay0() {
@@ -558,39 +605,65 @@ func updateDisplay0() {
   }
 }
 
+func isDisplayUpdateScanCode(scanCode) var {
+  return scanCode == SC_L_SHIFT
+    || scanCode == SC_R_SHIFT
+    || scanCode == SC_L_CTRL
+    || scanCode == SC_R_CTRL
+    || scanCode == SC_L_ALT
+    || scanCode == SC_R_ALT
+    || scanCode == SC_L_META
+    || scanCode == SC_R_META;
+}
+
+func pressScanCodeAndUpdateDisplay(scanCode) {
+  pressScanCode(scanCode);
+  if (isDisplayUpdateScanCode(scanCode)) {
+    updateDisplay0();
+  }
+}
+
+func releaseScanCodeAndUpdateDisplay(scanCode) {
+  releaseScanCode(scanCode);
+  if (isDisplayUpdateScanCode(scanCode)) {
+    updateDisplay0();
+  }
+}
+
 func handlePress(qwertyKey, stenoKey, symbolsKey, functionKey, navKey) {
   lastActionTime = getTime();
   otherPressCount = otherPressCount + 1;
   if (layer & NAV_MASK) {
-    pressScanCode(navKey);
+    pressScanCodeAndUpdateDisplay(navKey);
   } else if (layer & FUNCTION_MASK) {
-    pressScanCode(functionKey);
+    pressScanCodeAndUpdateDisplay(functionKey);
   } else if (layer & SYMBOL_MASK) {
     if (symbolsKey & SYM_SHIFT) {
       pressScanCode(SC_L_SHIFT);
     }
-    pressScanCode(symbolsKey & 0xff);
+    pressScanCodeAndUpdateDisplay(symbolsKey & 0xff);
   } else if (layer & STENO_MASK) {
     pressStenoKey(stenoKey);
   } else {
-    pressScanCode(qwertyKey);
+    pressScanCodeAndUpdateDisplay(qwertyKey);
   }
 }
+
 func handleRelease(qwertyKey, stenoKey, symbolsKey, functionKey, navKey) {
   lastActionTime = getTime();
   if (layer & NAV_MASK) {
-    releaseScanCode(navKey);
+    releaseScanCodeAndUpdateDisplay(navKey);
   } if (layer & FUNCTION_MASK) {
-    releaseScanCode(functionKey);
+    releaseScanCodeAndUpdateDisplay(functionKey);
   } else if (layer & SYMBOL_MASK) {
-    releaseScanCode(symbolsKey & 0xff);
+    releaseScanCodeAndUpdateDisplay(symbolsKey & 0xff);
     if (symbolsKey & SYM_SHIFT) {
       releaseScanCode(SC_L_SHIFT);
     }
   } else if (layer & STENO_MASK) {
     releaseStenoKey(stenoKey);
   } else {
-    releaseScanCode(qwertyKey);
+    releaseScanCodeAndUpdateDisplay(qwertyKey);
   }
 }
 
@@ -840,6 +913,12 @@ func onRelease44() {
     releaseAll();
     layer = layer ^ NAV_MASK;
     updateDisplay0();
+  }
+  if (checkButtonState("00001100000000000000000000000000000000000000000000")) {
+    console("launch_bootrom");
+  }
+  if (checkButtonState("00110000000000000000000000000000000000000000000000")) {
+    console("launch_slave_bootrom");
   }
 }
 
