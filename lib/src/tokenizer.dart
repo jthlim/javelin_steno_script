@@ -258,6 +258,24 @@ class Tokenizer {
           yield Token(type: TokenType.closeBrace, line: _line, column: _column);
           continue;
 
+        case 0x5b: // '['
+          if (_offset < _length && _input.codeUnitAt(_offset) == 0x5b) {
+            ++_column;
+            ++_offset;
+            yield Token(
+              type: TokenType.stringValue,
+              line: _line,
+              column: _column,
+              stringValue: _parseData(),
+            );
+          } else {
+            throw FormatException(
+              'Unexpected value in input \'${String.fromCharCode(c)}\' '
+              '$locator',
+            );
+          }
+          continue;
+
         default:
           if (_isDigit(c)) {
             yield _parseNumber(c);
@@ -311,6 +329,7 @@ class Tokenizer {
 
   String _parseString({required int closingCharacter}) {
     final buffer = StringBuffer();
+    buffer.write('S'); // Marker for strings.
     while (true) {
       if (_offset >= _length) {
         throw FormatException('Unmatched quote in file $locator');
@@ -416,6 +435,62 @@ class Tokenizer {
     }
 
     buffer.writeCharCode(value);
+  }
+
+  String _parseData() {
+    final buffer = StringBuffer();
+    buffer.write('D'); // Marker for data.
+    while (true) {
+      if (_offset >= _length) {
+        throw FormatException('Unmatched start data in file $locator');
+      }
+
+      final c = _input.codeUnitAt(_offset++);
+      _column++;
+      if (c == 0x5d) {
+        final c = _input.codeUnitAt(_offset++);
+        _column++;
+        if (c != 0x5d) {
+          throw FormatException(
+              'Expected ]] to end data section in file $locator');
+        }
+        return buffer.toString();
+      }
+
+      switch (c) {
+        case 0x5d: // ']'
+          final c = _input.codeUnitAt(_offset++);
+          _column++;
+          if (c != 0x5d) {
+            throw FormatException(
+                'Expected ]] to end data section in file $locator');
+          }
+          return buffer.toString();
+
+        case 0x0a: // LF
+          ++_line;
+          _column = 0;
+          break;
+
+        case 0x20: // ' '
+        case 0x09: // tab
+        case 0x0d: // CR
+          break;
+
+        default:
+          if (_hexValue(c) == -1) {
+            throw FormatException(
+              'Invalid hex character \'${String.fromCharCode(c)}\' $locator',
+            );
+          }
+
+          // Push the byte back for _parseHexCharCode.
+          --_offset;
+          --_column;
+          _parseHexCharCode(buffer, 2);
+          break;
+      }
+    }
   }
 
   Token _parseNumber(int firstCodeUnit) {

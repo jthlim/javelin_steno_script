@@ -72,7 +72,17 @@ class ScriptByteCodeBuilder {
     }
     for (final string in stringTable.keys) {
       stringTable[string] = offset;
-      offset += utf8.encode(string).length + 1;
+
+      // Strings either start with 'S' (string) or 'D' (data).
+      int marker = string.codeUnitAt(0);
+
+      if (marker == 0x53 /* 'S' */) {
+        offset += utf8.encode(string.substring(1)).length + 1;
+      } else if (marker == 0x44 /* 'D' */) {
+        offset += string.length - 1;
+      } else {
+        throw Exception('Internal error: Unhandled string marker');
+      }
     }
   }
 
@@ -101,8 +111,19 @@ class ScriptByteCodeBuilder {
           'Internal error: byte code offset mismatch at string $string',
         );
       }
-      bytesBuilder.add(utf8.encode(string));
-      bytesBuilder.addByte(0);
+
+      // Strings either start with 'S' (string) or 'D' (data).
+      int marker = string.codeUnitAt(0);
+      if (marker == 0x53 /* 'S' */) {
+        bytesBuilder.add(utf8.encode(string.substring(1)));
+        bytesBuilder.addByte(0);
+      } else if (marker == 0x44 /* 'D' */) {
+        for (final byte in string.codeUnits.skip(1)) {
+          bytesBuilder.addByte(byte);
+        }
+      } else {
+        throw Exception('Internal error: Unhandled string marker');
+      }
     }
   }
 
