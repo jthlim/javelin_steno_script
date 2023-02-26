@@ -371,6 +371,7 @@ const LED_STATUS_KANA = 4;
 const AUTO_DRAW_NONE = 0;
 const AUTO_DRAW_PAPER_TAPE = 1;
 const AUTO_DRAW_STENO_LAYOUT = 2;
+const AUTO_DRAW_WPM = 3;
 
 //---------------------------------------------------------------------------
 //
@@ -420,6 +421,7 @@ var layer = STENO_MASK;
 var otherPressCount = 0;
 var brightness = 6;
 var lastActionTime = 0;
+var lastCapsLockStatus = 0;
 
 const SYM_SHIFT = 0x100;
 const TAP_THRESHOLD = 200; // milliseconds for keys that have alternates.
@@ -433,8 +435,8 @@ func init() {
   // Disable liatris power light.
   setGpioPin(24, 1);
 
-  setAutoDraw(0, AUTO_DRAW_PAPER_TAPE);
-  setAutoDraw(1, AUTO_DRAW_STENO_LAYOUT);
+  updateDisplay0();
+  setAutoDraw(1, AUTO_DRAW_WPM);
 }
 
 func tick() {
@@ -442,7 +444,11 @@ func tick() {
   setScreenOn(0, screenOn);
   setScreenOn(1, screenOn);
 
-  updateCapsLockRgb();
+  var capsLockStatus = getLedStatus(LED_STATUS_CAPS_LOCK);
+  if (capsLockStatus != lastCapsLockStatus)  {
+    lastCapsLockStatus = capsLockStatus;
+    updateCapsLockRgb();
+  }
 }
 
 func updateCapsLockRgb() {
@@ -530,6 +536,27 @@ func updateScreenContrast() {
   setScreenContrast(1, contrast);
 }
 
+func drawDisplay0NonSteno(layerName) {
+    setAutoDraw(0, AUTO_DRAW_NONE);
+    clearDisplay(0);
+    drawText(0, 0, 10, 0, "Kyria (Javelin)");
+    drawLine(0, 0, 12, 80, 12, 1);
+    drawText(0, 0, 40, 0, layerName);
+}
+
+func updateDisplay0() {
+  if (layer & NAV_MASK) {
+    drawDisplay0NonSteno("Layer: Navigation");
+  } else if (layer & FUNCTION_MASK) {
+    drawDisplay0NonSteno("Layer: Function");
+  } else if (layer & SYMBOL_MASK) {
+    drawDisplay0NonSteno("Layer: Symbol");
+  } else if (layer & STENO_MASK) {
+    setAutoDraw(0, AUTO_DRAW_PAPER_TAPE);
+  } else {
+    drawDisplay0NonSteno("Layer: QWERTY");
+  }
+}
 
 func handlePress(qwertyKey, stenoKey, symbolsKey, functionKey, navKey) {
   lastActionTime = getTime();
@@ -700,6 +727,8 @@ func onPress32() {
   releaseAll();
   layer = layer | FUNCTION_MASK;
   pressAll();
+
+  updateDisplay0();
 }
 
 func onRelease32() {
@@ -707,6 +736,7 @@ func onRelease32() {
   if (layer & FUNCTION_MASK) {
     releaseAll();
     layer = layer ^ FUNCTION_MASK;
+    updateDisplay0();
   }
 }
 
@@ -751,6 +781,7 @@ func onPress40() {
   layer = layer ^ STENO_MASK;
   otherPressCount = 0;
   pressAll();
+  updateDisplay0();
 
   // Only update for steno, since temporary QWERTY mode will cause distracting
   // flicker.
@@ -771,6 +802,7 @@ func onRelease40() {
   releaseAll();
   layer = layer ^ STENO_MASK;
   updateUnderglowRgb();
+  updateDisplay0();
 }
 
 func onPress41() { handlePress(SC_L_META, SK_NUM1, SC_L_META, SC_NONE, SC_NONE); }
@@ -799,6 +831,7 @@ func onPress44() {
   releaseAll();
   layer = layer | NAV_MASK;
   pressAll();
+  updateDisplay0();
 }
 
 func onRelease44() {
@@ -806,6 +839,7 @@ func onRelease44() {
   if (layer & NAV_MASK) {
     releaseAll();
     layer = layer ^ NAV_MASK;
+    updateDisplay0();
   }
 }
 
@@ -816,6 +850,7 @@ func onPress45() {
   releaseAll();
   layer = layer | SYMBOL_MASK;
   pressAll();
+  updateDisplay0();
 }
 
 func onRelease45() {
@@ -823,6 +858,7 @@ func onRelease45() {
   if (layer & SYMBOL_MASK) {
     releaseAll();
     layer = layer ^ SYMBOL_MASK;
+    updateDisplay0();
   }
 }
 
