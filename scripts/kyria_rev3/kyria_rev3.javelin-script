@@ -11,7 +11,7 @@
 // |--------+------+------+------+------+------+-------------.  ,-------------+------+------+------+------+------+--------|
 // |        |      |      |      |      |      |      |CapsLk|  |F-keys|      |      |      |      |      |      |        |
 // `----------------------+------+------+------+------+------|  |------+------+------+------+------+----------------------'
-//                        |QWERTY|  #1  |   A  |   O  | Nav  |  | Sym  |  E   |   U  |  #2  |      |
+//                        |QWERTY|  #1  |   A  |   O  | Nav  |  | Sym  |  E   |   U  |  #2  |Settin|
 //                        `----------------------------------'  `----------------------------------'
 //
 // * Tapping QWERTY key will switch to QWERTY mode
@@ -26,8 +26,8 @@
 // |--------+------+------+------+------+------+-------------.  ,-------------+------+------+------+------+------+--------|
 // | LShift |   Z  |   X  |   C  |   V  |   B  | [ {  |CapsLk|  |F-keys|  ] } |   N  |   M  | ,  < | . >  | /  ? | RShift |
 // `----------------------+------+------+------+------+------|  |------+------+------+------+------+----------------------'
-//                        |Steno | LGUI | LAlt/| Space| Nav  |  | Sym  | Space| RAlt/| RGUI |      |
-//                        |      |      | Enter|      |      |  |      |      | Enter|      |      |
+//                        |Steno | LGUI | LAlt/| Space| Nav  |  | Sym  | Space| RAlt/| RGUI |Settin|
+//                        |      |      | Enter|      |      |  |      |      | Enter|      |    gs|
 //                        `----------------------------------'  `----------------------------------'
 //
 
@@ -66,9 +66,23 @@
 // |--------+------+------+------+------+------|                              |------+------+------+------+------+--------|
 // |        |  GUI |  Alt | Ctrl | Shift|      |                              | Vol- |  ←   |   ↓  |   →  | PgDn |   End  |
 // |--------+------+------+------+------+------+-------------.  ,-------------+------+------+------+------+------+--------|
-// |        |      |      |      |      |      |      |      |  |      |      | Mute |Brght+|      |      |      |        |
+// |        |      |      |      |      |      |      |      |  |      |      | Mute |      |      |      |      |        |
 // `----------------------+------+------+------+------+------|  |------+------+------+------+------+----------------------'
-//                        |      |      |      |      |      |  |      | Space| Enter|Brght-|      |
+//                        |      |      |      |      |      |  |      | Space| Enter|      |      |
+//                        `----------------------------------'  `----------------------------------'
+//
+
+//
+// Settings
+//
+// ,-------------------------------------------.                              ,-------------------------------------------.
+// |        |      |      |Embedd|      |      |                              |      |      |Brght+|      |      |        |
+// |--------+------+------+------+------+------|                              |------+------+------+------+------+--------|
+// |        |      |      |Gemini|      |      |                              |      |      |Brght-|      |      |        |
+// |--------+------+------+------+------+------+-------------.  ,-------------+------+------+------+------+------+--------|
+// |        |      |      |PloHID|      |      |      |      |  |      |      |      |      |      |      |      |        |
+// `----------------------+------+------+------+------+------|  |------+------+------+------+------+----------------------'
+//                        |      |      |      |      |      |  |      |      |      |      |      |
 //                        `----------------------------------'  `----------------------------------'
 //
 
@@ -416,6 +430,7 @@ const STENO_MASK = 1;
 const SYMBOL_MASK = 2;
 const FUNCTION_MASK = 4;
 const NAV_MASK = 8;
+const SETTINGS_MASK = 16;
 
 var layer = STENO_MASK;
 var otherPressCount = 0;
@@ -455,6 +470,144 @@ const CAPS_LOCK_IMAGE = [[
   10 10
   00 01 80 01 c0 01 e0 01 f0 67 f8 67 fc 67 fe 67
   fe 67 fc 67 f8 67 f0 67 e0 01 c0 01 80 01 00 01
+]];
+
+const FUNCTION_IMAGE = [[
+  20 20
+  f0 ff ff 0f f8 ff ff 1f 0c 00 00 30 06 00 00 60
+  03 00 00 c0 03 00 06 c0 03 00 06 c0 03 c0 ff c7
+  03 e0 ff c7 03 60 06 c0 03 60 06 c0 03 00 00 c0
+  03 00 fe c7 03 00 fe c7 03 00 0c c0 03 00 06 c0
+  03 00 0e c0 03 00 fc c7 03 00 f8 c7 03 00 00 c0
+  03 00 00 c0 03 00 00 c0 03 00 00 c0 03 00 00 c0
+  03 00 00 c0 03 00 00 c0 03 00 00 c0 03 00 00 c0
+  06 00 00 60 0c 00 00 30 f8 ff ff 1f f0 ff ff 0f
+]];
+
+const QWERTY_IMAGE = [[
+  40 10 f0 01 f8 03 fc 07 0e 36 06 3c 02 1c 02 1c
+  06 1c 0e 36 fc 77 f8 73 f2 61 1e 60 fe 30 f2 07
+  c0 07 f0 00 7e 00 fe 00 f0 01 c0 07 f2 07 7e 00
+  0e 00 02 00 02 04 fe 07 fe 07 62 04 62 04 f2 04
+  06 06 0e 07 00 00 02 04 fe 07 fe 07 62 04 e2 00
+  f6 05 be 07 1c 07 00 04 0e 00 06 00 02 04 02 04
+  fe 07 fe 07 02 04 02 04 06 00 0e 00 02 00 06 00
+  0e 00 3e 04 fa 04 f0 07 e0 07 7a 04 1e 04 06 00
+  02 00
+]];
+
+const SYMBOL_IMAGE = [[
+  20 20
+  00 00 00 00 00 00 00 00 00 00 00 00 0c 30 ff 0d
+  0c 30 ff 0d fe 3f 00 00 fe 3f f8 1f 00 30 fc 3f
+  00 30 0e 70 00 00 e7 67 00 00 f3 ef 18 30 3b cc
+  1c 38 1b ce 0e 3c fb c7 06 3e f3 cf 06 37 07 cc
+  8e 33 0e 0c fc 31 fc 07 f8 30 f8 03 00 00 00 00
+  00 00 80 01 00 18 98 01 0c 18 98 0f 8e 31 f8 0f
+  86 31 ff 01 86 31 9f 0f c6 31 f8 0f fe 3b ff 01
+  7c 1f 9f 01 00 0e 98 01 00 00 18 00 00 00 00 00
+]];
+
+const NAVIGATION_IMAGE = [[
+  20 20
+  00 00 00 00 00 80 01 00 00 40 02 00 00 20 04 00
+  00 10 08 00 00 08 10 00 00 3c 3c 00 00 20 04 00
+  00 20 04 00 00 20 04 00 40 20 04 02 60 e0 07 06
+  50 00 00 0a c8 0f f0 13 04 08 10 20 02 08 10 40
+  02 08 10 40 04 08 10 20 c8 0f f0 13 50 00 00 0a
+  60 e0 07 06 40 20 04 02 00 20 04 00 00 20 04 00
+  00 20 04 00 00 3c 3c 00 00 08 10 00 00 10 08 00
+  00 20 04 00 00 40 02 00 00 80 01 00 00 00 00 00
+]];
+
+const SETTINGS_IMAGE = [[
+  20 20 00 00 00 00 00 c0 03 00 00 e0 07 00 00 e0
+  07 00 c0 e0 07 03 e0 f3 cf 07 f0 ff ff 0f f0 ff
+  ff 0f e0 ff ff 07 e0 ff ff 07 c0 ff ff 03 c0 7f
+  fe 03 e0 1f f8 07 fc 0f f0 3f fe 0f f0 7f fe 07
+  e0 7f fe 07 e0 7f fe 0f f0 7f fc 0f f0 3f e0 1f
+  f8 07 c0 7f fe 03 c0 ff ff 03 e0 ff ff 07 e0 ff
+  ff 07 f0 ff ff 0f f0 ff ff 0f e0 f3 cf 07 c0 e0
+  07 03 00 e0 07 00 00 e0 07 00 00 c0 03 00 00 00
+  00 00
+]];
+
+const BRIGHTNESS_IMAGE = [[
+  10 10 80 01 86 61 8e 71 1c 38 d8 1b e0 07 70 0e
+  37 ec 37 ec 70 0e e0 07 d8 1b 1c 38 8e 71 86 61
+  80 01
+]];
+
+const BAR_000_IMAGE = [[
+  40 08 3c 42 81 81 81 81 81 81 81 81 81 81 81 81
+  81 81 81 81 81 81 81 81 81 81 81 81 81 81 81 81
+  81 81 81 81 81 81 81 81 81 81 81 81 81 81 81 81
+  81 81 81 81 81 81 81 81 81 81 81 81 81 81 81 81
+  42 3c
+]];
+
+const BAR_125_IMAGE = [[
+  40 08 3c 7e ff ff ff ff ff ff 81 81 81 81 81 81
+  81 81 81 81 81 81 81 81 81 81 81 81 81 81 81 81
+  81 81 81 81 81 81 81 81 81 81 81 81 81 81 81 81
+  81 81 81 81 81 81 81 81 81 81 81 81 81 81 81 81
+  42 3c
+]];
+
+const BAR_250_IMAGE = [[
+  40 08 3c 7e ff ff ff ff ff ff ff ff ff ff ff ff
+  ff ff 81 81 81 81 81 81 81 81 81 81 81 81 81 81
+  81 81 81 81 81 81 81 81 81 81 81 81 81 81 81 81
+  81 81 81 81 81 81 81 81 81 81 81 81 81 81 81 81
+  42 3c
+]];
+
+const BAR_375_IMAGE = [[
+  40 08 3c 7e ff ff ff ff ff ff ff ff ff ff ff ff
+  ff ff ff ff ff ff ff ff ff ff 81 81 81 81 81 81
+  81 81 81 81 81 81 81 81 81 81 81 81 81 81 81 81
+  81 81 81 81 81 81 81 81 81 81 81 81 81 81 81 81
+  42 3c
+]];
+
+const BAR_500_IMAGE = [[
+  40 08 3c 7e ff ff ff ff ff ff ff ff ff ff ff ff
+  ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+  ff ff 81 81 81 81 81 81 81 81 81 81 81 81 81 81
+  81 81 81 81 81 81 81 81 81 81 81 81 81 81 81 81
+  42 3c
+]];
+
+const BAR_625_IMAGE = [[
+  40 08 3c 7e ff ff ff ff ff ff ff ff ff ff ff ff
+  ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+  ff ff ff ff ff ff ff ff ff ff 81 81 81 81 81 81
+  81 81 81 81 81 81 81 81 81 81 81 81 81 81 81 81
+  42 3c
+]];
+
+const BAR_750_IMAGE = [[
+  40 08 3c 7e ff ff ff ff ff ff ff ff ff ff ff ff
+  ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+  ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+  ff ff 81 81 81 81 81 81 81 81 81 81 81 81 81 81
+  42 3c
+]];
+
+const BAR_875_IMAGE = [[
+  40 08 3c 7e ff ff ff ff ff ff ff ff ff ff ff ff
+  ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+  ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+  ff ff ff ff ff ff ff ff ff ff 81 81 81 81 81 81
+  42 3c
+]];
+
+const BAR_1000_IMAGE = [[
+  40 08 3c 7e ff ff ff ff ff ff ff ff ff ff ff ff
+  ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+  ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+  ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+  7e 3c
 ]];
 
 func init() {
@@ -529,12 +682,12 @@ func updateKeyRgb() {
   updateCapsLockRgb();
   applyRgb(32, 15, 54, 54);
   applyRgb(33, 18, 52, 52);
-  applyRgb(34, 21, 50, 50);
+  applyRgb(34, 21, 50, 32);
   applyRgb(35, 24, 48, 48);
   applyRgb(36, 27, 46, 46);
   applyRgb(37, 30, 44, 44);
   applyRgb(38, 33, 42, 42);
-  applyRgb(39, 36, 40, 40);
+  applyRgb(39, 36, 40, 32);
   applyRgb(40, 0, 68, 56);
   applyRgb(41, 0, 67, 58);
   applyRgb(42, 0, 66, 60);
@@ -567,53 +720,86 @@ func updateScreenContrast() {
   setScreenContrast(1, contrast);
 }
 
-func drawDisplay0NonSteno(layerName) {
+func drawDisplay0NonSteno(layerImage, x, y) {
   setAutoDraw(0, AUTO_DRAW_NONE);
   clearDisplay(0);
-  drawText(0, 0, 10, 0, "Kyria (Javelin)");
-  drawLine(0, 0, 12, 80, 12, 1);
-  drawText(0, 0, 32, 0, layerName);
+  drawImage(0, x, y, layerImage);
+
+  var iconCount = (isScanCodePressed(SC_L_SHIFT) || isScanCodePressed(SC_R_SHIFT))
+    + (isScanCodePressed(SC_L_CTRL) || isScanCodePressed(SC_R_CTRL))
+    + (isScanCodePressed(SC_L_ALT) || isScanCodePressed(SC_R_ALT))
+    + (isScanCodePressed(SC_L_META) || isScanCodePressed(SC_R_META));
+
+  var iconXOffset = 66 - iconCount * 10;
 
   if (isScanCodePressed(SC_L_SHIFT) || isScanCodePressed(SC_R_SHIFT)) {
-    drawImage(0, 0, 48, SHIFT_IMAGE);
+    drawImage(0, iconXOffset, 48, SHIFT_IMAGE);
+    iconXOffset = iconXOffset + 20;
   }
   if (isScanCodePressed(SC_L_CTRL) || isScanCodePressed(SC_R_CTRL)) {
-    drawImage(0, 16, 48, CONTROL_IMAGE);
+    drawImage(0, iconXOffset, 48, CONTROL_IMAGE);
+    iconXOffset = iconXOffset + 20;
   }
   if (isScanCodePressed(SC_L_ALT) || isScanCodePressed(SC_R_ALT)) {
-    drawImage(0, 32, 48, ALT_IMAGE);
+    drawImage(0, iconXOffset, 48, ALT_IMAGE);
+    iconXOffset = iconXOffset + 20;
   }
   if (isScanCodePressed(SC_L_META) || isScanCodePressed(SC_R_META)) {
-    drawImage(0, 48, 48, COMMAND_IMAGE);
+    drawImage(0, iconXOffset, 48, COMMAND_IMAGE);
   }
+
   if (getLedStatus(LED_STATUS_CAPS_LOCK)) {
     drawImage(0, 112, 48, CAPS_LOCK_IMAGE);
   }
 }
 
 func updateDisplay0() {
-  if (layer & NAV_MASK) {
-    drawDisplay0NonSteno("Layer: Navigation");
+  if (layer & SETTINGS_MASK) {
+    drawDisplay0NonSteno(SETTINGS_IMAGE, 48, 8);
+  } else if (layer & NAV_MASK) {
+    drawDisplay0NonSteno(NAVIGATION_IMAGE, 48, 8);
   } else if (layer & FUNCTION_MASK) {
-    drawDisplay0NonSteno("Layer: Function");
+    drawDisplay0NonSteno(FUNCTION_IMAGE, 48, 8);
   } else if (layer & SYMBOL_MASK) {
-    drawDisplay0NonSteno("Layer: Symbol");
+    drawDisplay0NonSteno(SYMBOL_IMAGE, 48, 8);
   } else if (layer & STENO_MASK) {
     setAutoDraw(0, AUTO_DRAW_PAPER_TAPE);
   } else {
-    drawDisplay0NonSteno("Layer: QWERTY");
+    drawDisplay0NonSteno(QWERTY_IMAGE, 32, 16);
   }
 }
 
+func drawBrightness() {
+  updateDisplay0();
+  drawImage(0, 18, 48, BRIGHTNESS_IMAGE);
+  if (brightness <= 0) {
+    drawImage(0, 40, 52, BAR_000_IMAGE);
+  } else if (brightness <= 1) {
+    drawImage(0, 40, 52, BAR_125_IMAGE);
+  } else if (brightness <= 2) {
+    drawImage(0, 40, 52, BAR_250_IMAGE);
+  } else if (brightness <= 3) {
+    drawImage(0, 40, 52, BAR_375_IMAGE);
+  } else if (brightness <= 4) {
+    drawImage(0, 40, 52, BAR_500_IMAGE);
+  } else if (brightness <= 5) {
+    drawImage(0, 40, 52, BAR_625_IMAGE);
+  } else if (brightness <= 6) {
+    drawImage(0, 40, 52, BAR_750_IMAGE);
+  } else if (brightness <= 7) {
+    drawImage(0, 40, 52, BAR_875_IMAGE);
+  } else {
+    drawImage(0, 40, 52, BAR_1000_IMAGE);
+  }
+}
+
+func setLayer(value) {
+  layer = value;
+  updateDisplay0();
+}
+
 func isDisplayUpdateScanCode(scanCode) var {
-  return scanCode == SC_L_SHIFT
-    || scanCode == SC_R_SHIFT
-    || scanCode == SC_L_CTRL
-    || scanCode == SC_R_CTRL
-    || scanCode == SC_L_ALT
-    || scanCode == SC_R_ALT
-    || scanCode == SC_L_META
-    || scanCode == SC_R_META;
+  return SC_L_CTRL <= scanCode && scanCode <= SC_R_META;
 }
 
 func pressScanCodeAndUpdateDisplay(scanCode) {
@@ -633,7 +819,9 @@ func releaseScanCodeAndUpdateDisplay(scanCode) {
 func handlePress(qwertyKey, stenoKey, symbolsKey, functionKey, navKey) {
   lastActionTime = getTime();
   otherPressCount = otherPressCount + 1;
-  if (layer & NAV_MASK) {
+  if (layer & SETTINGS_MASK) {
+    // Do nothing!
+  } else if (layer & NAV_MASK) {
     pressScanCodeAndUpdateDisplay(navKey);
   } else if (layer & FUNCTION_MASK) {
     pressScanCodeAndUpdateDisplay(functionKey);
@@ -651,7 +839,9 @@ func handlePress(qwertyKey, stenoKey, symbolsKey, functionKey, navKey) {
 
 func handleRelease(qwertyKey, stenoKey, symbolsKey, functionKey, navKey) {
   lastActionTime = getTime();
-  if (layer & NAV_MASK) {
+  if (layer & SETTINGS_MASK) {
+    // Do nothing!
+  } else if (layer & NAV_MASK) {
     releaseScanCodeAndUpdateDisplay(navKey);
   } if (layer & FUNCTION_MASK) {
     releaseScanCodeAndUpdateDisplay(functionKey);
@@ -676,7 +866,14 @@ func onRelease1() { handleRelease(SC_Q, SK_S1, SC_1, SC_F9, SC_NONE); }
 func onPress2() { handlePress(SC_W, SK_TL, SC_2, SC_F10, SC_NONE); }
 func onRelease2() { handleRelease(SC_W, SK_TL, SC_2, SC_F10, SC_NONE); }
 
-func onPress3() { handlePress(SC_E, SK_PL, SC_3, SC_F11, SC_NONE); }
+func onPress3() {
+  handlePress(SC_E, SK_PL, SC_3, SC_F11, SC_NONE);
+  if (layer & SETTINGS_MASK) {
+    console("set_steno_mode embedded");
+    updateDisplay0();
+    drawText(0, 34, 60, 0, "Embedded");
+  }
+}
 func onRelease3() { handleRelease(SC_E, SK_PL, SC_3, SC_F11, SC_NONE); }
 
 func onPress4() { handlePress(SC_R, SK_HL, SC_4, SC_F12, SC_NONE); }
@@ -691,7 +888,19 @@ func onRelease6() { handleRelease(SC_Y, SK_STAR2, SC_6, SC_NONE, SC_VOLUME_UP); 
 func onPress7() { handlePress(SC_U, SK_FR, SC_7, SC_NONE, SC_BACKSPACE); }
 func onRelease7() { handleRelease(SC_U, SK_FR, SC_7, SC_NONE, SC_BACKSPACE); }
 
-func onPress8() { handlePress(SC_I, SK_PR, SC_8, SC_NONE, SC_UP); }
+func onPress8() {
+  handlePress(SC_I, SK_PR, SC_8, SC_NONE, SC_UP);
+
+  if (layer & SETTINGS_MASK) {
+    if (brightness < 8) {
+      brightness = brightness + 1;
+      updateKeyRgb();
+      updateUnderglowRgb();
+      updateScreenContrast();
+    }
+    drawBrightness();
+  }
+}
 func onRelease8() { handleRelease(SC_I, SK_PR, SC_8, SC_NONE, SC_UP); }
 
 func onPress9() { handlePress(SC_O, SK_LR, SC_9, SC_NONE, SC_DELETE); }
@@ -712,6 +921,7 @@ func onPress12() {
 func onRelease12() {
   handleRelease(SC_L_CTRL, SK_NONE, SC_GRAVE | SYM_SHIFT, SC_NONE, SC_NONE);
   if ((layer | otherPressCount) == 0 && getTime() - timer12 < TAP_THRESHOLD) {
+    otherPressCount = otherPressCount + 1;
     tapScanCode(SC_ESC);
   }
 }
@@ -722,7 +932,14 @@ func onRelease13() { handleRelease(SC_A, SK_S2, SC_1 | SYM_SHIFT, SC_F5, SC_L_ME
 func onPress14() { handlePress(SC_S, SK_KL, SC_2 | SYM_SHIFT, SC_F6, SC_L_ALT); }
 func onRelease14() { handleRelease(SC_S, SK_KL, SC_2 | SYM_SHIFT, SC_F6, SC_L_ALT); }
 
-func onPress15() { handlePress(SC_D, SK_WL, SC_3 | SYM_SHIFT, SC_F7, SC_L_CTRL); }
+func onPress15() {
+  handlePress(SC_D, SK_WL, SC_3 | SYM_SHIFT, SC_F7, SC_L_CTRL);
+  if (layer & SETTINGS_MASK) {
+    console("set_steno_mode gemini");
+    updateDisplay0();
+    drawText(0, 34, 60, 0, "Gemini PR");
+  }
+}
 func onRelease15() { handleRelease(SC_D, SK_WL, SC_3 | SYM_SHIFT, SC_F7, SC_L_CTRL); }
 
 func onPress16() { handlePress(SC_F, SK_RL, SC_4 | SYM_SHIFT, SC_F8, SC_L_SHIFT); }
@@ -737,7 +954,19 @@ func onRelease18() { handleRelease(SC_H, SK_STAR4, SC_6 | SYM_SHIFT, SC_NONE, SC
 func onPress19() { handlePress(SC_J, SK_RR, SC_7 | SYM_SHIFT, SC_L_SHIFT, SC_LEFT); }
 func onRelease19() { handleRelease(SC_J, SK_RR, SC_7 | SYM_SHIFT, SC_L_SHIFT, SC_LEFT); }
 
-func onPress20() { handlePress(SC_K, SK_BR, SC_8 | SYM_SHIFT, SC_L_CTRL, SC_DOWN); }
+func onPress20() {
+  handlePress(SC_K, SK_BR, SC_8 | SYM_SHIFT, SC_L_CTRL, SC_DOWN);
+
+  if (layer & SETTINGS_MASK) {
+    if (brightness > 0) {
+      brightness = brightness - 1;
+      updateKeyRgb();
+      updateUnderglowRgb();
+      updateScreenContrast();
+    }
+    drawBrightness();
+  }
+}
 func onRelease20() { handleRelease(SC_K, SK_BR, SC_8 | SYM_SHIFT, SC_L_CTRL, SC_DOWN); }
 
 func onPress21() { handlePress(SC_L, SK_GR, SC_9 | SYM_SHIFT, SC_L_ALT, SC_RIGHT); }
@@ -755,6 +984,7 @@ func onPress23() {
 func onRelease23() {
   handleRelease(SC_R_CTRL, SK_ZR, SC_EQUAL | SYM_SHIFT, SC_NONE, SC_END);
   if ((layer | otherPressCount) == 0 && getTime() - timer23 < TAP_THRESHOLD) {
+    otherPressCount = otherPressCount + 1;
     tapScanCode(SC_APOSTROPHE);
   }
 }
@@ -768,7 +998,14 @@ func onRelease25() { handleRelease(SC_Z, SK_NONE, SC_BACKSLASH, SC_F1, SC_NONE);
 func onPress26() { handlePress(SC_X, SK_NONE, SC_SEMICOLON | SYM_SHIFT, SC_F2, SC_NONE); }
 func onRelease26() { handleRelease(SC_X, SK_NONE, SC_SEMICOLON | SYM_SHIFT, SC_F2, SC_NONE); }
 
-func onPress27() { handlePress(SC_C, SK_NONE, SC_SEMICOLON, SC_F3, SC_NONE); }
+func onPress27() {
+  handlePress(SC_C, SK_NONE, SC_SEMICOLON, SC_F3, SC_NONE);
+  if (layer & SETTINGS_MASK) {
+    console("set_steno_mode plover_hid");
+    updateDisplay0();
+    drawText(0, 34, 60, 0, "Plover HID");
+  }
+}
 func onRelease27() { handleRelease(SC_C, SK_NONE, SC_SEMICOLON, SC_F3, SC_NONE); }
 
 func onPress28() { handlePress(SC_V, SK_NONE, SC_MINUS, SC_F4, SC_NONE); }
@@ -798,18 +1035,15 @@ func onPress32() {
   if (layer >> 1) return;
 
   releaseAll();
-  layer = layer | FUNCTION_MASK;
+  setLayer(layer | FUNCTION_MASK);
   pressAll();
-
-  updateDisplay0();
 }
 
 func onRelease32() {
   lastActionTime = getTime();
   if (layer & FUNCTION_MASK) {
     releaseAll();
-    layer = layer ^ FUNCTION_MASK;
-    updateDisplay0();
+    setLayer(layer ^ FUNCTION_MASK);
   }
 }
 
@@ -819,18 +1053,7 @@ func onRelease33() { handleRelease(SC_R_BRACKET, SK_NONE, SC_R_BRACKET | SYM_SHI
 func onPress34() { handlePress(SC_N, SK_NONE, SC_R_BRACKET, SC_NONE, SC_MUTE); }
 func onRelease34() { handleRelease(SC_N, SK_NONE, SC_R_BRACKET, SC_NONE, SC_MUTE); }
 
-func onPress35() {
-  handlePress(SC_M, SK_NONE, SC_MINUS | SYM_SHIFT, SC_NONE, SC_NONE);
-
-  if (layer & NAV_MASK) {
-    if (brightness < 8) {
-      brightness = brightness + 1;
-      updateKeyRgb();
-      updateUnderglowRgb();
-      updateScreenContrast();
-    }
-  }
-}
+func onPress35() { handlePress(SC_M, SK_NONE, SC_MINUS | SYM_SHIFT, SC_NONE, SC_NONE); }
 func onRelease35() { handleRelease(SC_M, SK_NONE, SC_MINUS | SYM_SHIFT, SC_NONE, SC_NONE); }
 
 func onPress36() { handlePress(SC_COMMA, SK_NONE, SC_COMMA, SC_NONE, SC_NONE); }
@@ -851,10 +1074,9 @@ func onPress40() {
   if (layer >> 1) return;
 
   releaseAll();
-  layer = layer ^ STENO_MASK;
+  setLayer(layer ^ STENO_MASK);
   otherPressCount = 0;
   pressAll();
-  updateDisplay0();
 
   // Only update for steno, since temporary QWERTY mode will cause distracting
   // flicker.
@@ -873,9 +1095,8 @@ func onRelease40() {
   if (layer & STENO_MASK) return;
 
   releaseAll();
-  layer = layer ^ STENO_MASK;
+  setLayer(layer ^ STENO_MASK);
   updateUnderglowRgb();
-  updateDisplay0();
 }
 
 func onPress41() { handlePress(SC_L_META, SK_NUM1, SC_L_META, SC_NONE, SC_NONE); }
@@ -890,6 +1111,7 @@ func onPress42() {
 func onRelease42() {
   handleRelease(SC_L_ALT, SK_A, SC_L_ALT, SC_NONE, SC_NONE);
   if ((layer | otherPressCount) == 0 && getTime() - timer42 < TAP_THRESHOLD) {
+    otherPressCount = otherPressCount + 1;
     tapScanCode(SC_ENTER);
   }
 }
@@ -902,23 +1124,15 @@ func onPress44() {
   if (layer >> 1) return;
 
   releaseAll();
-  layer = layer | NAV_MASK;
+  setLayer(layer | NAV_MASK);
   pressAll();
-  updateDisplay0();
 }
 
 func onRelease44() {
   lastActionTime = getTime();
   if (layer & NAV_MASK) {
     releaseAll();
-    layer = layer ^ NAV_MASK;
-    updateDisplay0();
-  }
-  if (checkButtonState("00001100000000000000000000000000000000000000000000")) {
-    console("launch_bootrom");
-  }
-  if (checkButtonState("00110000000000000000000000000000000000000000000000")) {
-    console("launch_slave_bootrom");
+    setLayer(layer ^ NAV_MASK);
   }
 }
 
@@ -927,17 +1141,15 @@ func onPress45() {
   if (layer >> 1) return;
 
   releaseAll();
-  layer = layer | SYMBOL_MASK;
+  setLayer(layer | SYMBOL_MASK);
   pressAll();
-  updateDisplay0();
 }
 
 func onRelease45() {
   lastActionTime = getTime();
   if (layer & SYMBOL_MASK) {
     releaseAll();
-    layer = layer ^ SYMBOL_MASK;
-    updateDisplay0();
+    setLayer(layer ^ SYMBOL_MASK);
   }
 }
 
@@ -953,27 +1165,26 @@ func onPress47() {
 func onRelease47() {
   handleRelease(SC_R_ALT, SK_U, SC_NONE, SC_NONE, SC_ENTER);
   if ((layer | otherPressCount) == 0 && getTime() - timer47 < TAP_THRESHOLD) {
+    otherPressCount = otherPressCount + 1;
     tapScanCode(SC_ENTER);
   }
 }
 
-func onPress48() {
-  handlePress(SC_R_META, SK_NUM2, SC_NONE, SC_NONE, SC_NONE);
-
-  if (layer & NAV_MASK) {
-    if (brightness > 0) {
-      brightness = brightness - 1;
-      updateKeyRgb();
-      updateUnderglowRgb();
-      updateScreenContrast();
-    }
-  }
-}
+func onPress48() { handlePress(SC_R_META, SK_NUM2, SC_NONE, SC_NONE, SC_NONE); }
 func onRelease48() { handleRelease(SC_R_META, SK_NUM2, SC_NONE, SC_NONE, SC_NONE); }
 
 func onPress49() {
   lastActionTime = getTime();
+  if (layer >> 1) return;
+
+  releaseAll();
+  setLayer(layer | SETTINGS_MASK);
+  pressAll();
 }
 func onRelease49() {
   lastActionTime = getTime();
+  if (layer & SETTINGS_MASK) {
+    releaseAll();
+    setLayer(layer ^ SETTINGS_MASK);
+  }
 }

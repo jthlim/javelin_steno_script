@@ -35,10 +35,12 @@ enum InBuiltScriptFunction implements ScriptFunctionDefinition {
   setAutoDraw('setAutoDraw', 2, false, 0x103),
   setScreenOn('setScreenOn', 2, false, 0x104),
   setScreenContrast('setScreenContrast', 2, false, 0x105),
-  drawPixel('drawPixel', 4, false, 0x106),
-  drawLine('drawLine', 6, false, 0x107),
+  drawPixel('drawPixel', 3, false, 0x106),
+  drawLine('drawLine', 5, false, 0x107),
   drawImage('drawImage', 4, false, 0x108),
-  drawText('drawText', 5, false, 0x109);
+  drawText('drawText', 5, false, 0x109),
+  setDrawColor('setDrawColor', 2, false, 0x10a),
+  drawRect('drawRect', 5, false, 0x10b);
 
   const InBuiltScriptFunction(
     this.functionName,
