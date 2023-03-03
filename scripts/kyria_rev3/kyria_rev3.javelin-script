@@ -35,11 +35,11 @@
 // Symbols
 //
 // ,-------------------------------------------.                              ,-------------------------------------------.
-// |    `   |  1   |  2   |  3   |  4   |  5   |                              |   6  |  7   |  8   |  9   |  0   |   =    |
+// |    `   |   1  |   2  |   3  |   4  |   5  |                              |   6  |   7  |   8  |   9  |   0  |   =    |
 // |--------+------+------+------+------+------|                              |------+------+------+------+------+--------|
-// |    ~   |  !   |  @   |  #   |  $   |  %   |                              |   ^  |  &   |  *   |  (   |  )   |   +    |
+// |    ~   |   !  |   @  |   #  |   $  |   %  |                              |   ^  |   &  |   *  |   (  |   )  |   +    |
 // |--------+------+------+------+------+------+-------------.  ,-------------+------+------+------+------+------+--------|
-// |    |   |   \  |  :   |  ;   |  -   |  [   |  {   |      |  |      |   }  |   ]  |  _   |  ,   |  .   |  /   |   ?    |
+// |    |   |   \  |   :  |   ;  |   -  |   [  |   {  |      |  |      |   }  |   ]  |   _  |   ,  |   .  |   /  |   ?    |
 // `----------------------+------+------+------+------+------|  |------+------+------+------+------+----------------------'
 //                        |      | LGUI | LAlt | LCtrl|      |  |      |      |      |      |      |
 //                        `----------------------------------'  `----------------------------------'
@@ -382,10 +382,25 @@ const LED_STATUS_SCROLL_LOCK = 2;
 const LED_STATUS_COMPOSE = 3;
 const LED_STATUS_KANA = 4;
 
+//---------------------------------------------------------------------------
+// Drawing methods:
+//  * func clearDisplay(displayId)
+//  * func setAutoDraw(displayId, autoDrawId)
+//  * func setDrawColor(displayId, color)
+//  * func drawPixel(displayId, x, y)
+//  * func drawLine(displayId, x1, y1, x2, y2)
+//  * func drawRect(displayId, left, top, right, bottom)
+//  * func drawImage(displayId, x, y, image)
+//  * func drawText(displayId, x, y, fontId, alignment, text)
+
 const AUTO_DRAW_NONE = 0;
 const AUTO_DRAW_PAPER_TAPE = 1;
 const AUTO_DRAW_STENO_LAYOUT = 2;
 const AUTO_DRAW_WPM = 3;
+
+const TEXT_ALIGNMENT_LEFT = 0;
+const TEXT_ALIGNMENT_MIDDLE = 1;
+const TEXT_ALIGNMENT_RIGHT = 2;
 
 //---------------------------------------------------------------------------
 //
@@ -871,7 +886,7 @@ func onPress3() {
   if (layer & SETTINGS_MASK) {
     console("set_steno_mode embedded");
     updateDisplay0();
-    drawText(0, 34, 60, 0, "Embedded");
+    drawText(0, 64, 60, 0, TEXT_ALIGNMENT_MIDDLE, "Embedded");
   }
 }
 func onRelease3() { handleRelease(SC_E, SK_PL, SC_3, SC_F11, SC_NONE); }
@@ -937,7 +952,7 @@ func onPress15() {
   if (layer & SETTINGS_MASK) {
     console("set_steno_mode gemini");
     updateDisplay0();
-    drawText(0, 34, 60, 0, "Gemini PR");
+    drawText(0, 64, 60, 0, TEXT_ALIGNMENT_MIDDLE, "Gemini PR");
   }
 }
 func onRelease15() { handleRelease(SC_D, SK_WL, SC_3 | SYM_SHIFT, SC_F7, SC_L_CTRL); }
@@ -1003,7 +1018,7 @@ func onPress27() {
   if (layer & SETTINGS_MASK) {
     console("set_steno_mode plover_hid");
     updateDisplay0();
-    drawText(0, 34, 60, 0, "Plover HID");
+    drawText(0, 64, 60, 0, TEXT_ALIGNMENT_MIDDLE, "Plover HID");
   }
 }
 func onRelease27() { handleRelease(SC_C, SK_NONE, SC_SEMICOLON, SC_F3, SC_NONE); }

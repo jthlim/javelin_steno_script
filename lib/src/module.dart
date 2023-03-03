@@ -38,7 +38,7 @@ enum InBuiltScriptFunction implements ScriptFunctionDefinition {
   drawPixel('drawPixel', 3, false, 0x106),
   drawLine('drawLine', 5, false, 0x107),
   drawImage('drawImage', 4, false, 0x108),
-  drawText('drawText', 5, false, 0x109),
+  drawText('drawText', 6, false, 0x109),
   setDrawColor('setDrawColor', 2, false, 0x10a),
   drawRect('drawRect', 5, false, 0x10b);
 
