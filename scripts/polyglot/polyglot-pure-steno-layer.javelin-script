@@ -1,5 +1,8 @@
 //---------------------------------------------------------------------------
-// Default Polyglot script.
+// Pure Steno Layer Polyglot script.
+//
+// This is identical to the default, with non-steno keys removed from the steno
+// layer.
 //
 // Pressing the four corner keys in steno mode will switch between Embedded
 // and Gemini modes.
