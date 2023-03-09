@@ -303,16 +303,7 @@ abstract class JumpScriptInstructionBase extends ScriptInstruction {
   }
 
   @override
-  int get byteCodeLength {
-    int delta = target.offset - offset;
-    if (delta == 0) {
-      return 0;
-    }
-    if (2 <= delta && delta <= 33) {
-      return 1;
-    }
-    return 3;
-  }
+  int get byteCodeLength => throw Exception('Should not be called');
 
   @override
   int layoutFirstPass(int offset) {
@@ -323,11 +314,11 @@ abstract class JumpScriptInstructionBase extends ScriptInstruction {
   @override
   int layoutFinalPass(int finalOffset) {
     offset = finalOffset;
-    int delta = target._firstPassOffset - _firstPassOffset;
-    if (delta == 3) {
+    int layoutDelta = target._firstPassOffset - _firstPassOffset;
+    if (layoutDelta == 3) {
       return 0;
     }
-    if (4 <= delta && delta <= 35) {
+    if (4 <= layoutDelta && layoutDelta <= 35) {
       return 1;
     }
     return 3;
@@ -337,12 +328,12 @@ abstract class JumpScriptInstructionBase extends ScriptInstruction {
   void addByteCode(ScriptByteCodeBuilder builder) {
     int delta = target.offset - offset;
     int layoutDelta = target._firstPassOffset - _firstPassOffset;
-    if (layoutDelta == 0) {
+    if (layoutDelta == 3) {
       if (delta != 0) {
         throw Exception('Internal error on $this');
       }
       return;
-    } else if (2 <= layoutDelta && layoutDelta <= 33) {
+    } else if (4 <= layoutDelta && layoutDelta <= 35) {
       if (delta < 2 || delta > 33) {
         throw Exception('Internal error on $this');
       }

@@ -17,9 +17,9 @@ class InstructionList extends Iterable<ScriptInstruction> {
   Iterator<ScriptInstruction> get iterator => instructions.iterator;
 
   void optimize() {
+    optimizeJumpTarget();
     optimizeRightFactor();
     optimizeCallReturn();
-    optimizeJumpTarget();
     optimizeDeadCode();
   }
 
@@ -35,8 +35,7 @@ class InstructionList extends Iterable<ScriptInstruction> {
         if (reference is JumpScriptInstruction) {
           final previousInstruction =
               instruction.previous?.previousNonNopInstruction;
-          final previousReferenceInstruction =
-              reference.previous?.previousNonNopInstruction;
+          final previousReferenceInstruction = reference.previous;
 
           if (previousInstruction != null &&
               previousReferenceInstruction != null &&
