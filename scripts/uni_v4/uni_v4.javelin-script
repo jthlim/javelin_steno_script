@@ -267,6 +267,12 @@ const SK_RES2 = 41;
 //      - Press X
 //      - Release X
 //      - etc.
+//  * func setRgb(id, r, g, b)
+//    - For boards with rgb lights, this can control individual lights.
+//  * func getTime() var
+//    - Returns milliseconds since launch.
+//  * func getLedStatus(id) var
+//    - Returns whether the led statues is on. See LED_STATUS constants.
 //
 // releaseAll() and pressAll() are useful for changing modes/layers, e.g.:
 //
@@ -283,6 +289,13 @@ const SK_RES2 = 41;
 // to prevent infinite recursion, since the onPress will be re-run even for the
 // current key.
 //
+
+const LED_STATUS_NUM_LOCK = 0;
+const LED_STATUS_CAPS_LOCK = 1;
+const LED_STATUS_SCROLL_LOCK = 2;
+const LED_STATUS_COMPOSE = 3;
+const LED_STATUS_KANA = 4;
+
 //---------------------------------------------------------------------------
 //
 // UniV4 button layout:

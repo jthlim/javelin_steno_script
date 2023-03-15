@@ -275,6 +275,12 @@ const SK_RES2 = 41;
 //      - Press X
 //      - Release X
 //      - etc.
+//  * func setRgb(id, r, g, b)
+//    - For boards with rgb lights, this can control individual lights.
+//  * func getTime() var
+//    - Returns milliseconds since launch.
+//  * func getLedStatus(id) var
+//    - Returns whether the led statues is on. See LED_STATUS constants.
 //
 // releaseAll() and pressAll() are useful for changing modes/layers, e.g.:
 //

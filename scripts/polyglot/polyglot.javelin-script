@@ -349,6 +349,8 @@ const SK_RES2 = 41;
 //    - For boards with rgb lights, this can control individual lights.
 //  * func getTime() var
 //    - Returns milliseconds since launch.
+//  * func getLedStatus(id) var
+//    - Returns whether the led statues is on. See LED_STATUS constants.
 //
 // releaseAll() and pressAll() are useful for changing modes/layers, e.g.:
 //
@@ -423,7 +425,7 @@ var stenoMode = STENO_MODE_EMBEDDED;
 
 func updateStenoMode() {
   // Four corner keys are 0, 11, 36, 41.
-  if ((layer & STENO_MASK) 
+  if ((layer & STENO_MASK)
       && checkButtonState("100000000001000000000000000000000000100001")) {
     stenoMode = (stenoMode + 1) % 2;
     if (stenoMode == 0) {
@@ -530,7 +532,7 @@ func onPress10() { handlePress(SC_P, SK_TR | KEY_STENO, SC_0, SC_NONE, SC_PAGE_U
 func onRelease10() { handleRelease(SC_P, SK_TR | KEY_STENO, SC_0, SC_NONE, SC_PAGE_UP); }
 
 func onPress11() {
-  handlePress(SC_BACKSPACE, SK_DR | KEY_STENO, SC_EQUAL, SC_NONE, SC_HOME); 
+  handlePress(SC_BACKSPACE, SK_DR | KEY_STENO, SC_EQUAL, SC_NONE, SC_HOME);
   updateStenoMode();
 }
 func onRelease11() { handleRelease(SC_BACKSPACE, SK_DR | KEY_STENO, SC_EQUAL, SC_NONE, SC_HOME); }
