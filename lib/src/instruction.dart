@@ -23,7 +23,9 @@ enum ScriptOpCode {
   logicalOr(0x51),
   shiftLeft(0x52),
   arithmeticShiftRight(0x53),
-  logicalShiftRight(0x54);
+  logicalShiftRight(0x54),
+  byteLookup(0x55),
+  wordLookup(0x56);
 
   const ScriptOpCode(this.value);
 

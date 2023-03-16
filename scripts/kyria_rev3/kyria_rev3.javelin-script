@@ -76,9 +76,9 @@
 // Settings
 //
 // ,-------------------------------------------.                              ,-------------------------------------------.
-// |        |      |      |Embedd|      |      |                              |      |      |Brght+|      |      |        |
+// |        |      |      |Embedd|      |      |                              |      |      |Brght+| Sat+ |      |        |
 // |--------+------+------+------+------+------|                              |------+------+------+------+------+--------|
-// |        |      |      |Gemini|      |      |                              |      |      |Brght-|      |      |        |
+// |        |      |      |Gemini|      |      |                              |      |      |Brght-| Sat- |      |        |
 // |--------+------+------+------+------+------+-------------.  ,-------------+------+------+------+------+------+--------|
 // |        |      |      |PloHID|      |      |      |      |  |      |      |      |      |      |      |      |        |
 // `----------------------+------+------+------+------+------|  |------+------+------+------+------+----------------------'
@@ -354,7 +354,12 @@ const SK_RES2 = 41;
 //      - Release X
 //      - etc.
 //  * func setRgb(id, r, g, b)
-//    - For boards with rgb lights, this can control individual lights.
+//    - For boards with rgb lights, sets an individual light to the r, g, b.
+//  * func setHsv(id, h, s, v)
+//    - For boards with rgb lights, sets an individua light to h, s, v.
+//      - h = hue,        0-65536 represents 0°  - 360°
+//      - s = saturation, 0-256   represents 0.0 - 1.0
+//      - v = value,      0-255   represents 0.0 - 1.0
 //  * func getTime() var
 //    - Returns milliseconds since launch.
 //  * func getLedStatus(id) var
@@ -450,6 +455,7 @@ const SETTINGS_MASK = 16;
 var layer = STENO_MASK;
 var otherPressCount = 0;
 var brightness = 3;
+var saturation = 6;
 var lastActionTime = 0;
 var lastCapsLockStatus = 0;
 
@@ -593,6 +599,12 @@ const BRIGHTNESS_IMAGE = [[
   80 01
 ]];
 
+const CONTRAST_IMAGE = [[
+  10 10 e0 07 f8 1f 3c 3c 0e 70 06 60 07 e0 03 c0
+  03 c0 ff ff ff ff ff ff fe 7f fe 7f fc 3f f8 1f
+  e0 07
+]];
+
 const BAR_000_IMAGE = [[
   40 08 3c 42 81 81 81 81 81 81 81 81 81 81 81 81
   81 81 81 81 81 81 81 81 81 81 81 81 81 81 81 81
@@ -677,87 +689,58 @@ func init() {
   setAutoDraw(1, AUTO_DRAW_WPM);
 }
 
+const RGB_UPDATE_TIME = 40;
+var lastRgbUpdateTime = 0;
+
 func tick() {
-  var screenOn = getTime() - lastActionTime <= SCREEN_OFF_TIMEOUT;
+  var time = getTime();
+  var screenOn = time - lastActionTime <= SCREEN_OFF_TIMEOUT;
   setScreenOn(0, screenOn);
   setScreenOn(1, screenOn);
+
+  if(time - lastRgbUpdateTime >= RGB_UPDATE_TIME) {
+    lastRgbUpdateTime = time;
+    updateKeyRgb();
+  }
 
   var capsLockStatus = getLedStatus(LED_STATUS_CAPS_LOCK);
   if (capsLockStatus != lastCapsLockStatus)  {
     lastCapsLockStatus = capsLockStatus;
-    updateCapsLockRgb();
+    updateKeyRgb();
     updateDisplay0();
   }
 }
 
-func updateCapsLockRgb() {
+const RGB_ORDER = [[
+  00 01 02 03 04 05
+  0c 0d 0e 0f 10 11
+  18 19 1a 1b 1c 1d 1e 1f
+  28 29 2a 2b 2c
+  2d 2e 2f 30 31
+  20 21 22 23 24 25 26 27
+  12 13 14 15 16 17
+  06 07 08 09 0a 0b
+]];
+
+func updateKeyRgb() {
+  var hueShift = getTime() << 2;
+  var sat = saturation * 32;
+  var value = brightness * 16;
+  for (var i = 0; i < 50; i = i + 1) {
+    setHsv(RGB_ORDER[i], 0x300*i + hueShift, sat, value);
+  }
+
   if (getLedStatus(LED_STATUS_CAPS_LOCK)) {
     setRgb(31, 128, 128, 128);
-  } else {
-    applyRgb(31, 0, 138, 108);
   }
 }
 
-func applyRgb(id, r, g, b) {
-  setRgb(id, (r * brightness) >> 3, (g * brightness) >> 3, (b * brightness) >> 3);
-}
-
-func updateKeyRgb() {
-  applyRgb(0, 0, 176, 32);
-  applyRgb(1, 0, 174, 36);
-  applyRgb(2, 0, 172, 40);
-  applyRgb(3, 0, 170, 44);
-  applyRgb(4, 0, 168, 48);
-  applyRgb(5, 0, 166, 52);
-  applyRgb(6, 114, 52, 52);
-  applyRgb(7, 120, 48, 48);
-  applyRgb(8, 126, 44, 44);
-  applyRgb(9, 132, 40, 40);
-  applyRgb(10, 138, 36, 36);
-  applyRgb(11, 144, 32, 32);
-  applyRgb(12, 0, 164, 56);
-  applyRgb(13, 0, 162, 60);
-  applyRgb(14, 0, 160, 64);
-  applyRgb(15, 0, 158, 68);
-  applyRgb(16, 0, 156, 72);
-  applyRgb(17, 0, 154, 76);
-  applyRgb(18, 78, 76, 76);
-  applyRgb(19, 84, 72, 72);
-  applyRgb(20, 90, 68, 68);
-  applyRgb(21, 96, 64, 64);
-  applyRgb(22, 102, 60, 60);
-  applyRgb(23, 108, 56, 56);
-  applyRgb(24, 0, 152, 80);
-  applyRgb(25, 0, 150, 84);
-  applyRgb(26, 0, 148, 88);
-  applyRgb(27, 0, 146, 92);
-  applyRgb(28, 0, 144, 96);
-  applyRgb(29, 0, 142, 100);
-  applyRgb(30, 0, 140, 104);
-  updateCapsLockRgb();
-  applyRgb(32, 30, 108, 108);
-  applyRgb(33, 36, 104, 104);
-  applyRgb(34, 42, 100, 100);
-  applyRgb(35, 48, 96, 96);
-  applyRgb(36, 54, 92, 92);
-  applyRgb(37, 60, 88, 88);
-  applyRgb(38, 66, 84, 84);
-  applyRgb(39, 72, 80, 80);
-  applyRgb(40, 0, 136, 112);
-  applyRgb(41, 0, 134, 116);
-  applyRgb(42, 0, 132, 120);
-  applyRgb(43, 0, 130, 124);
-  applyRgb(44, 0, 128, 128);
-  applyRgb(45, 0, 128, 128);
-  applyRgb(46, 6, 124, 124);
-  applyRgb(47, 12, 120, 120);
-  applyRgb(48, 18, 116, 116);
-  applyRgb(49, 24, 112, 112);
-}
-
 func setUnderglow(r, g, b) {
+  var finalR = r * brightness >> 3;
+  var finalG = g * brightness >> 3;
+  var finalB = b * brightness >> 3;
   for(var i = 50; i < 62; i = i + 1) {
-    applyRgb(i, r, g, b);
+    setRgb(i, finalR, finalG, finalB);
   }
 }
 
@@ -824,28 +807,38 @@ func updateDisplay0() {
   }
 }
 
-func drawBrightness() {
-  updateDisplay0();
-  drawImage(0, 18, 48, BRIGHTNESS_IMAGE);
-  if (brightness <= 0) {
+func drawBar(barValue) {
+  if (barValue <= 0) {
     drawImage(0, 40, 52, BAR_000_IMAGE);
-  } else if (brightness <= 1) {
+  } else if (barValue <= 1) {
     drawImage(0, 40, 52, BAR_125_IMAGE);
-  } else if (brightness <= 2) {
+  } else if (barValue <= 2) {
     drawImage(0, 40, 52, BAR_250_IMAGE);
-  } else if (brightness <= 3) {
+  } else if (barValue <= 3) {
     drawImage(0, 40, 52, BAR_375_IMAGE);
-  } else if (brightness <= 4) {
+  } else if (barValue <= 4) {
     drawImage(0, 40, 52, BAR_500_IMAGE);
-  } else if (brightness <= 5) {
+  } else if (barValue <= 5) {
     drawImage(0, 40, 52, BAR_625_IMAGE);
-  } else if (brightness <= 6) {
+  } else if (barValue <= 6) {
     drawImage(0, 40, 52, BAR_750_IMAGE);
-  } else if (brightness <= 7) {
+  } else if (barValue <= 7) {
     drawImage(0, 40, 52, BAR_875_IMAGE);
   } else {
     drawImage(0, 40, 52, BAR_1000_IMAGE);
   }
+}
+
+func drawBrightness() {
+  updateDisplay0();
+  drawImage(0, 18, 48, BRIGHTNESS_IMAGE);
+  drawBar(brightness);
+}
+
+func drawSaturation() {
+  updateDisplay0();
+  drawImage(0, 18, 48, CONTRAST_IMAGE);
+  drawBar(saturation);
 }
 
 func setLayer(value) {
@@ -958,7 +951,17 @@ func onPress8() {
 }
 func onRelease8() { handleRelease(SC_I, SK_PR, SC_8, SC_NONE, SC_UP); }
 
-func onPress9() { handlePress(SC_O, SK_LR, SC_9, SC_NONE, SC_DELETE); }
+func onPress9() {
+  handlePress(SC_O, SK_LR, SC_9, SC_NONE, SC_DELETE);
+
+  if (layer & SETTINGS_MASK) {
+    if (saturation < 8) {
+      saturation = saturation + 1;
+      updateKeyRgb();
+    }
+    drawSaturation();
+  }
+}
 func onRelease9() { handleRelease(SC_O, SK_LR, SC_9, SC_NONE, SC_DELETE); }
 
 func onPress10() { handlePress(SC_P, SK_TR, SC_0, SC_NONE, SC_PAGE_UP); }
@@ -1024,7 +1027,17 @@ func onPress20() {
 }
 func onRelease20() { handleRelease(SC_K, SK_BR, SC_8 | SYM_SHIFT, SC_L_CTRL, SC_DOWN); }
 
-func onPress21() { handlePress(SC_L, SK_GR, SC_9 | SYM_SHIFT, SC_L_ALT, SC_RIGHT); }
+func onPress21() {
+  handlePress(SC_L, SK_GR, SC_9 | SYM_SHIFT, SC_L_ALT, SC_RIGHT);
+
+  if (layer & SETTINGS_MASK) {
+    if (saturation > 0) {
+      saturation = saturation - 1;
+      updateKeyRgb();
+    }
+    drawSaturation();
+  }
+}
 func onRelease21() { handleRelease(SC_L, SK_GR, SC_9 | SYM_SHIFT, SC_L_ALT, SC_RIGHT); }
 
 func onPress22() { handlePress(SC_SEMICOLON, SK_SR, SC_0 | SYM_SHIFT, SC_L_META, SC_PAGE_DOWN); }
@@ -1123,34 +1136,42 @@ func onRelease38() { handleRelease(SC_SLASH, SK_NONE, SC_SLASH, SC_NONE, SC_NONE
 func onPress39() { handlePress(SC_R_SHIFT, SK_NONE, SC_SLASH | SYM_SHIFT, SC_NONE, SC_NONE); }
 func onRelease39() { handleRelease(SC_R_SHIFT, SK_NONE, SC_SLASH | SYM_SHIFT, SC_NONE, SC_NONE); }
 
+var wasStenoLayer40;
 func onPress40() {
-  lastActionTime = getTime();
   if (isInPressAll()) return;
+
+  lastActionTime = getTime();
+  wasStenoLayer40 = 0;
+
   if (layer >> 1) return;
 
-  releaseAll();
-  setLayer(layer ^ STENO_MASK);
+  wasStenoLayer40 = layer & STENO_MASK;
   otherPressCount = 0;
-  pressAll();
-
-  // Only update for steno, since temporary QWERTY mode will cause distracting
-  // flicker.
-  if (layer & STENO_MASK) {
-    updateUnderglowRgb();
+  if (wasStenoLayer40) {
+    releaseAll();
+    setLayer(layer ^ STENO_MASK);
+    pressAll();
   }
 }
 func onRelease40() {
   lastActionTime = getTime();
-  // Updating here and below won't cause flicker because the RGB update only
-  // occurs once all the button scripts complete updating.
-  updateUnderglowRgb();
 
-  if (otherPressCount == 0) return;
-  if (layer >> 1) return;
-  if (layer & STENO_MASK) return;
+  if (otherPressCount == 0 && (layer >> 1) == 0) {
+    // Do the toggle.
+    if (!wasStenoLayer40) {
+      releaseAll();
+      setLayer(layer ^ STENO_MASK);
+      pressAll();
+    }
+  } else {
+    // Return to the original
+    if (wasStenoLayer40) {
+      releaseAll();
+      setLayer(layer ^ STENO_MASK);
+      pressAll();
+    }
+  }
 
-  releaseAll();
-  setLayer(layer ^ STENO_MASK);
   updateUnderglowRgb();
 }
 

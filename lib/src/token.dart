@@ -14,6 +14,8 @@ enum TokenType {
   comma,
   openBrace,
   closeBrace,
+  openSquareBracket,
+  closeSquareBracket,
   identifier,
   minus,
   plus,

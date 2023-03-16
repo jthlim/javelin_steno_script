@@ -269,11 +269,20 @@ class Tokenizer {
               stringValue: _parseData(),
             );
           } else {
-            throw FormatException(
-              'Unexpected value in input \'${String.fromCharCode(c)}\' '
-              '$locator',
+            yield Token(
+              type: TokenType.openSquareBracket,
+              line: _line,
+              column: _column,
             );
           }
+          continue;
+
+        case 0x5d: // ']'
+          yield Token(
+            type: TokenType.closeSquareBracket,
+            line: _line,
+            column: _column,
+          );
           continue;
 
         default:

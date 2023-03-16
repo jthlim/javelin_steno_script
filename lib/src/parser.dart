@@ -298,22 +298,41 @@ class Parser {
     }
   }
 
+  AstNode _parseSubscript() {
+    final result = _parsePrimary();
+    switch (_currentToken.type) {
+      case TokenType.openSquareBracket:
+        _nextToken();
+        if (result is StringValueAstNode) {
+          final indexExpression = _parseExpression();
+          _assertToken(TokenType.closeSquareBracket);
+          return StringIndexAstNode(result, indexExpression);
+        } else {
+          throw FormatException(
+            'Unexpected subscript on $result near $_currentToken',
+          );
+        }
+      default:
+        return result;
+    }
+  }
+
   AstNode _parseUnary() {
     switch (_currentToken.type) {
       case TokenType.minus:
         _nextToken();
-        return NegateAstNode(_parsePrimary());
+        return NegateAstNode(_parseSubscript());
 
       case TokenType.not:
         _nextToken();
-        return NotAstNode(_parsePrimary());
+        return NotAstNode(_parseSubscript());
 
       case TokenType.plus:
         _nextToken();
-        return _parsePrimary();
+        return _parseSubscript();
 
       default:
-        return _parsePrimary();
+        return _parseSubscript();
     }
   }
 

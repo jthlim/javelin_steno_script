@@ -35,6 +35,29 @@ class StringValueAstNode extends AstNode {
   final String value;
 }
 
+class StringIndexAstNode extends AstNode {
+  StringIndexAstNode(this.stringValue, this.index);
+
+  // Do NOT mark this as constant, otherwise integer folding instructions
+  // will be attempted.
+  @override
+  bool isConstant() => false;
+
+  @override
+  int constantValue() => 0;
+
+  @override
+  void addInstructions(ScriptByteCodeBuilder builder) {
+    stringValue.addInstructions(builder);
+    index.addInstructions(builder);
+
+    builder.addInstruction(OpcodeScriptInstruction(ScriptOpCode.byteLookup));
+  }
+
+  final StringValueAstNode stringValue;
+  final AstNode index;
+}
+
 class IntValueAstNode extends AstNode {
   IntValueAstNode(this.value);
 

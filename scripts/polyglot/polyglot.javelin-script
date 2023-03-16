@@ -346,7 +346,12 @@ const SK_RES2 = 41;
 //      - Release X
 //      - etc.
 //  * func setRgb(id, r, g, b)
-//    - For boards with rgb lights, this can control individual lights.
+//    - For boards with rgb lights, sets an individual light to the r, g, b.
+//  * func setHsv(id, h, s, v)
+//    - For boards with rgb lights, sets an individua light to h, s, v.
+//      - h = hue,        0-65536 represents 0°  - 360°
+//      - s = saturation, 0-256   represents 0.0 - 1.0
+//      - v = value,      0-255   represents 0.0 - 1.0
 //  * func getTime() var
 //    - Returns milliseconds since launch.
 //  * func getLedStatus(id) var
@@ -367,6 +372,13 @@ const SK_RES2 = 41;
 // to prevent infinite recursion, since the onPress will be re-run even for the
 // current key. The easiest way to do this is using isInPressAll() function.
 //
+
+const LED_STATUS_NUM_LOCK = 0;
+const LED_STATUS_CAPS_LOCK = 1;
+const LED_STATUS_SCROLL_LOCK = 2;
+const LED_STATUS_COMPOSE = 3;
+const LED_STATUS_KANA = 4;
+
 //---------------------------------------------------------------------------
 //
 // Polyglot button layout:

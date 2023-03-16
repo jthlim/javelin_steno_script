@@ -40,7 +40,8 @@ enum InBuiltScriptFunction implements ScriptFunctionDefinition {
   drawImage('drawImage', 4, false, 0x108),
   drawText('drawText', 6, false, 0x109),
   setDrawColor('setDrawColor', 2, false, 0x10a),
-  drawRect('drawRect', 5, false, 0x10b);
+  drawRect('drawRect', 5, false, 0x10b),
+  setHsv('setHsv', 4, false, 0x10c);
 
   const InBuiltScriptFunction(
     this.functionName,
