@@ -689,7 +689,7 @@ func init() {
   setAutoDraw(1, AUTO_DRAW_WPM);
 }
 
-const RGB_UPDATE_TIME = 40;
+const RGB_UPDATE_TIME = 20;
 var lastRgbUpdateTime = 0;
 
 func tick() {
@@ -919,7 +919,7 @@ func onPress3() {
   if (layer & SETTINGS_MASK) {
     console("set_steno_mode embedded");
     updateDisplay0();
-    drawText(0, 64, 60, 0, TEXT_ALIGNMENT_MIDDLE, "Embedded");
+    drawText(0, 64, 60, 0, TEXT_ALIGNMENT_MIDDLE, "Embedded Steno");
   }
 }
 func onRelease3() { handleRelease(SC_E, SK_PL, SC_3, SC_F11, SC_NONE); }
@@ -1137,11 +1137,13 @@ func onPress39() { handlePress(SC_R_SHIFT, SK_NONE, SC_SLASH | SYM_SHIFT, SC_NON
 func onRelease39() { handleRelease(SC_R_SHIFT, SK_NONE, SC_SLASH | SYM_SHIFT, SC_NONE, SC_NONE); }
 
 var wasStenoLayer40;
+var timer40;
 func onPress40() {
   if (isInPressAll()) return;
 
   lastActionTime = getTime();
   wasStenoLayer40 = 0;
+  timer40 = getTime();
 
   if (layer >> 1) return;
 
@@ -1156,7 +1158,7 @@ func onPress40() {
 func onRelease40() {
   lastActionTime = getTime();
 
-  if (otherPressCount == 0 && (layer >> 1) == 0) {
+  if ((otherPressCount | (layer >> 1)) == 0 && getTime() - timer40 < TAP_THRESHOLD) {
     // Do the toggle.
     if (!wasStenoLayer40) {
       releaseAll();
