@@ -303,15 +303,9 @@ class Parser {
     switch (_currentToken.type) {
       case TokenType.openSquareBracket:
         _nextToken();
-        if (result is StringValueAstNode) {
-          final indexExpression = _parseExpression();
-          _assertToken(TokenType.closeSquareBracket);
-          return StringIndexAstNode(result, indexExpression);
-        } else {
-          throw FormatException(
-            'Unexpected subscript on $result near $_currentToken',
-          );
-        }
+        final indexExpression = _parseExpression();
+        _assertToken(TokenType.closeSquareBracket);
+        return ByteIndexAstNode(result, indexExpression);
       default:
         return result;
     }

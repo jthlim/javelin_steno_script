@@ -130,8 +130,7 @@ class Tokenizer {
               ++_column;
 
               while (_offset < _length) {
-                final c = _input.codeUnitAt(_offset);
-                ++_offset;
+                final c = _input.codeUnitAt(_offset++);
                 if (c == 0x0a) break;
               }
               _column = 0;
@@ -475,6 +474,21 @@ class Tokenizer {
                 'Expected ]] to end data section in file $locator');
           }
           return buffer.toString();
+
+        case 0x2f: // '//' -- skip to end of line.
+          final c = _input.codeUnitAt(_offset++);
+          _column++;
+          if (c != 0x2f) {
+            throw FormatException('Expected comment near $locator');
+          }
+
+          while (_offset < _length) {
+            final c = _input.codeUnitAt(_offset++);
+            if (c == 0x0a) break;
+          }
+          _column = 0;
+          ++_line;
+          break;
 
         case 0x0a: // LF
           ++_line;

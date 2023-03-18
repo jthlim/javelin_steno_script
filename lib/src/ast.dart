@@ -35,8 +35,8 @@ class StringValueAstNode extends AstNode {
   final String value;
 }
 
-class StringIndexAstNode extends AstNode {
-  StringIndexAstNode(this.stringValue, this.index);
+class ByteIndexAstNode extends AstNode {
+  ByteIndexAstNode(this.byteValue, this.index);
 
   // Do NOT mark this as constant, otherwise integer folding instructions
   // will be attempted.
@@ -48,13 +48,13 @@ class StringIndexAstNode extends AstNode {
 
   @override
   void addInstructions(ScriptByteCodeBuilder builder) {
-    stringValue.addInstructions(builder);
+    byteValue.addInstructions(builder);
     index.addInstructions(builder);
 
     builder.addInstruction(OpcodeScriptInstruction(ScriptOpCode.byteLookup));
   }
 
-  final StringValueAstNode stringValue;
+  final AstNode byteValue;
   final AstNode index;
 }
 
@@ -171,6 +171,36 @@ class TermsAstNode extends AstNode {
 
   @override
   void addInstructions(ScriptByteCodeBuilder builder) {
+    if (terms.length == 2) {
+      // Detect 1 + x
+      if (terms[0].mode == TermMode.add &&
+          terms[0].statement.isConstant() &&
+          terms[1].mode == TermMode.add &&
+          terms[0].statement.constantValue() == 1) {
+        terms[1].statement.addInstructions(builder);
+        builder.addInstruction(OpcodeScriptInstruction(ScriptOpCode.increment));
+        return;
+      }
+
+      // Detect x + 1 and x - 1
+      if (terms[0].mode == TermMode.add &&
+          terms[1].mode == TermMode.add &&
+          terms[1].statement.constantValue() == 1) {
+        terms[0].statement.addInstructions(builder);
+        switch (terms[1].mode) {
+          case TermMode.add:
+            builder.addInstruction(
+                OpcodeScriptInstruction(ScriptOpCode.increment));
+            break;
+          case TermMode.subtract:
+            builder.addInstruction(
+                OpcodeScriptInstruction(ScriptOpCode.decrement));
+            break;
+        }
+        return;
+      }
+    }
+
     bool isFirst = true;
     for (final term in terms) {
       term.statement.addInstructions(builder);

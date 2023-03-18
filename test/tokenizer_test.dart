@@ -42,7 +42,7 @@ void main() {
             type: TokenType.identifier,
             line: 1,
             column: 16,
-            stringValue: 'test',
+            byteValue: 'test',
           ),
         ],
       );
@@ -82,7 +82,7 @@ void main() {
             type: TokenType.identifier,
             line: 1,
             column: 23,
-            stringValue: "myValue",
+            byteValue: "myValue",
           ),
           const Token(
             type: TokenType.intValue,
