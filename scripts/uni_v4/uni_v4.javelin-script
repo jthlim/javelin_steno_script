@@ -270,7 +270,7 @@ const SK_RES2 = 41;
 //  * func setRgb(id, r, g, b)
 //    - For boards with rgb lights, sets an individual light to the r, g, b.
 //  * func setHsv(id, h, s, v)
-//    - For boards with rgb lights, sets an individua light to h, s, v.
+//    - For boards with rgb lights, sets an individual light to h, s, v.
 //      - h = hue,        0-65536 represents 0°  - 360°
 //      - s = saturation, 0-256   represents 0.0 - 1.0
 //      - v = value,      0-255   represents 0.0 - 1.0

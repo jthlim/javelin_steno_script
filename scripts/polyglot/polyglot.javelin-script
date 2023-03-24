@@ -348,7 +348,7 @@ const SK_RES2 = 41;
 //  * func setRgb(id, r, g, b)
 //    - For boards with rgb lights, sets an individual light to the r, g, b.
 //  * func setHsv(id, h, s, v)
-//    - For boards with rgb lights, sets an individua light to h, s, v.
+//    - For boards with rgb lights, sets an individual light to h, s, v.
 //      - h = hue,        0-65536 represents 0°  - 360°
 //      - s = saturation, 0-256   represents 0.0 - 1.0
 //      - v = value,      0-255   represents 0.0 - 1.0
@@ -426,6 +426,13 @@ const NAV_MASK = 8;
 var layer = STENO_MASK;
 var otherPressCount = 0;
 
+var underglowMode = layer;
+var speed = 3;
+var hueSpread = 4;
+var hueShift = 0;
+var brightness = 3;
+var saturation = 5;
+
 const KEY_STENO = 0x200;
 const KEY_SHIFT = 0x100;
 const TAP_THRESHOLD = 200; // milliseconds for keys that have alternates
@@ -434,6 +441,59 @@ const STENO_MODE_EMBEDDED = 0;
 const STENO_MODE_GEMINI = 1;
 
 var stenoMode = STENO_MODE_EMBEDDED;
+
+func init() {
+  updateUnderglowRgb();
+}
+
+const RGB_UPDATE_TIME = 20;
+var lastRgbUpdateTime = 0;
+
+func tick() {
+  var time = getTime();
+  if (time - lastRgbUpdateTime >= RGB_UPDATE_TIME) {
+    lastRgbUpdateTime = time;
+    updateUnderglowRgb();
+  }
+}
+
+const SPEED_VALUES      = [[ 00 04 08 0c 10 18 20 30 40 ]];
+const HUE_SPREAD_VALUES = [[ 00 10 20 28 30 38 40 48 50 ]];
+const SATURATION_VALUES = [[ 00 20 40 50 60 68 70 78 80 ]];
+const BRIGHTNESS_VALUES = [[ 00 08 10 20 30 40 50 60 80 ]];
+
+func updateUnderglowRgbHueCycle(hShift, sat, spreadMultiplier, value) {
+  for (var i = 0; i < 32; i = i + 1) {
+    setHsv(
+      i,
+      spreadMultiplier*i + hShift,
+      sat,
+      value
+    );
+  }
+}
+
+func updateUnderglowRgbConstant(r, g, b) {
+  var finalR = r * brightness >> 3;
+  var finalG = g * brightness >> 3;
+  var finalB = b * brightness >> 3;
+  for (var i = 0; i < 32; i = i + 1) {
+    setRgb(i, finalR, finalG, finalB);
+  }
+}
+
+func updateUnderglowRgb() {
+  if (underglowMode == 0) {
+    updateUnderglowRgbConstant(64, 64, 64);
+  } else {
+    updateUnderglowRgbHueCycle(
+      getTime() * SPEED_VALUES[speed] + hueShift,
+      SATURATION_VALUES[saturation] * 2,
+      HUE_SPREAD_VALUES[hueSpread] * 64,
+      BRIGHTNESS_VALUES[brightness]
+    );
+  }
+}
 
 func updateStenoMode() {
   // Four corner keys are 0, 11, 36, 41.
@@ -652,6 +712,7 @@ func onRelease24() {
       layer = layer | STENO_MASK;
     }
   }
+  underglowMode = layer & STENO_MASK;
 }
 
 func onPress25() { handlePress(SC_Z, SC_L_SHIFT, SC_BACKSLASH | KEY_SHIFT, SC_F1, SC_NONE); }

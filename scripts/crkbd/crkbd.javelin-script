@@ -1,8 +1,5 @@
 //---------------------------------------------------------------------------
-// Pure Steno Layer Polyglot script.
-//
-// This is identical to the default, with non-steno keys removed from the steno
-// layer.
+// Default Corne script.
 //
 // Pressing the four corner keys in steno mode will switch between Embedded
 // and Gemini modes.
@@ -351,7 +348,7 @@ const SK_RES2 = 41;
 //  * func setRgb(id, r, g, b)
 //    - For boards with rgb lights, sets an individual light to the r, g, b.
 //  * func setHsv(id, h, s, v)
-//    - For boards with rgb lights, sets an individual light to h, s, v.
+//    - For boards with rgb lights, sets an individua light to h, s, v.
 //      - h = hue,        0-65536 represents 0°  - 360°
 //      - s = saturation, 0-256   represents 0.0 - 1.0
 //      - v = value,      0-255   represents 0.0 - 1.0
@@ -384,16 +381,15 @@ const LED_STATUS_KANA = 4;
 
 //---------------------------------------------------------------------------
 //
-// Polyglot button layout:
+// Corne button layout:
 //
 // Button indexes
 //
-//      0   1   2   3   4   5  |   6   7   8   9  10  11
-//     12  13  14  15  16  17  |  18  19  20  21  22  23
-//     24  25  26  27  28  29  |  30  31  32  33  34  35
-//                 36  37  38  |  39  40  41
+//      0   1   2   3   4   5    |     6   7   8   9  10  11
+//     12  13  14  15  16  17    |    18  19  20  21  22  23
+//     24  25  26  27  28  29    |    30  31  32  33  34  35
+//                   36  37  38  |  39  40  41
 //
-// Bootsel Button (B button on the back of the Polyglot) is button 42.
 //
 //---------------------------------------------------------------------------
 // Example global variable:
@@ -428,13 +424,12 @@ const NAV_MASK = 8;
 
 var layer = STENO_MASK;
 var otherPressCount = 0;
-
-var underglowMode = layer;
-var speed = 3;
+var speed = 1;
 var hueSpread = 4;
 var hueShift = 0;
 var brightness = 3;
 var saturation = 5;
+var lastCapsLockStatus = 0;
 
 const KEY_STENO = 0x200;
 const KEY_SHIFT = 0x100;
@@ -446,7 +441,15 @@ const STENO_MODE_GEMINI = 1;
 var stenoMode = STENO_MODE_EMBEDDED;
 
 func init() {
+  updateKeyRgb();
   updateUnderglowRgb();
+  // updateScreenContrast();
+
+  // Disable liatris power light.
+  // setGpioPin(24, 1);
+
+  // updateDisplay0();
+  // setAutoDraw(1, AUTO_DRAW_WPM);
 }
 
 const RGB_UPDATE_TIME = 20;
@@ -454,21 +457,54 @@ var lastRgbUpdateTime = 0;
 
 func tick() {
   var time = getTime();
+  // var screenOn = time - lastActionTime <= SCREEN_OFF_TIMEOUT;
+  // setScreenOn(0, screenOn);
+  // setScreenOn(1, screenOn);
+
   if (time - lastRgbUpdateTime >= RGB_UPDATE_TIME) {
     lastRgbUpdateTime = time;
-    updateUnderglowRgb();
+    updateKeyRgb();
+  }
+
+  var capsLockStatus = getLedStatus(LED_STATUS_CAPS_LOCK);
+  if (capsLockStatus != lastCapsLockStatus)  {
+    lastCapsLockStatus = capsLockStatus;
+    updateKeyRgb();
+    // updateDisplay0();
   }
 }
+
+const HUE_CYCLE_RGB_ORDER = [[
+  00
+  0c 01
+  18 0d 02
+  19 0e 03
+  1a 0f 04
+  1b 10 05
+  24 1c 11
+  25 1d
+  26
+
+  27
+  28 1e
+  29 1f 12
+  20 13 06
+  21 14 07
+  22 15 08
+  23 16 09
+  17 0a
+  0b
+]];
 
 const SPEED_VALUES      = [[ 00 04 08 0c 10 18 20 30 40 ]];
 const HUE_SPREAD_VALUES = [[ 00 10 20 28 30 38 40 48 50 ]];
 const SATURATION_VALUES = [[ 00 20 40 50 60 68 70 78 80 ]];
 const BRIGHTNESS_VALUES = [[ 00 08 10 20 30 40 50 60 80 ]];
 
-func updateUnderglowRgbHueCycle(hShift, sat, spreadMultiplier, value) {
-  for (var i = 0; i < 32; i = i + 1) {
+func updateKeyRgbHueCycle(hShift, sat, spreadMultiplier, value) {
+  for (var i = 0; i < 42; i = i + 1) {
     setHsv(
-      i,
+      HUE_CYCLE_RGB_ORDER[i],
       spreadMultiplier*i + hShift,
       sat,
       value
@@ -476,25 +512,33 @@ func updateUnderglowRgbHueCycle(hShift, sat, spreadMultiplier, value) {
   }
 }
 
-func updateUnderglowRgbConstant(r, g, b) {
+func updateKeyRgb() {
+  updateKeyRgbHueCycle(
+    getTime() * SPEED_VALUES[speed] + hueShift,
+    SATURATION_VALUES[saturation] * 2,
+    HUE_SPREAD_VALUES[hueSpread] * 16,
+    BRIGHTNESS_VALUES[brightness]
+  );
+
+  // if (getLedStatus(LED_STATUS_CAPS_LOCK)) {
+  //   setRgb(31, 128, 128, 128);
+  // }
+}
+
+func setUnderglow(r, g, b) {
   var finalR = r * brightness >> 3;
   var finalG = g * brightness >> 3;
   var finalB = b * brightness >> 3;
-  for (var i = 0; i < 32; i = i + 1) {
+  for(var i = 42; i < 54; i = i + 1) {
     setRgb(i, finalR, finalG, finalB);
   }
 }
 
 func updateUnderglowRgb() {
-  if (underglowMode == 0) {
-    updateUnderglowRgbConstant(64, 64, 64);
+  if (layer & STENO_MASK) {
+    setUnderglow(64, 64, 64);
   } else {
-    updateUnderglowRgbHueCycle(
-      getTime() * SPEED_VALUES[speed] + hueShift,
-      SATURATION_VALUES[saturation] * 2,
-      HUE_SPREAD_VALUES[hueSpread] * 64,
-      BRIGHTNESS_VALUES[brightness]
-    );
+    setUnderglow(53, 32, 64);
   }
 }
 
@@ -715,7 +759,7 @@ func onRelease24() {
       layer = layer | STENO_MASK;
     }
   }
-  underglowMode = layer & STENO_MASK;
+  updateUnderglowRgb();
 }
 
 func onPress25() { handlePress(SC_Z, SC_NONE, SC_BACKSLASH | KEY_SHIFT, SC_F1, SC_NONE); }
