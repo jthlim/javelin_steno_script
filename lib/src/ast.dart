@@ -88,6 +88,10 @@ abstract class UnaryOperatorAstNode extends AstNode {
 
   @override
   void addInstructions(ScriptByteCodeBuilder builder) {
+    if (isConstant()) {
+      builder.addInstruction(PushIntValueScriptInstruction(constantValue()));
+      return;
+    }
     statement.addInstructions(builder);
     builder.addInstruction(OpcodeScriptInstruction(opcode));
   }
