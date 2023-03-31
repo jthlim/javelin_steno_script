@@ -881,9 +881,9 @@ func onPress38() {
     pressCount = pressCount + 1;
     releaseAll();
     layer = layer | NAV_MASK;
+    pressAll();
     timer38 = getTime();
     pressCount38 = pressCount;
-    pressAll();
   }
 }
 func onRelease38() {
@@ -908,11 +908,11 @@ func onPress40() {
   handlePress(SC_NONE, SK_U | KEY_STENO, SC_NONE, SC_NONE, SC_ENTER);
   if ((layer | SYMBOL_MASK) == SYMBOL_MASK) {
     pressCount = pressCount + 1;
-    timer40 = getTime();
     releaseAll();
     layer = layer | FUNCTION_MASK;
-    pressCount40 = pressCount;
     pressAll();
+    timer40 = getTime();
+    pressCount40 = pressCount;
   }
 }
 func onRelease40() {

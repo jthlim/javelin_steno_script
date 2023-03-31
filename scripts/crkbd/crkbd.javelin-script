@@ -679,6 +679,14 @@ const GEMINI_IMAGE = [[
   00 00
 ]];
 
+const PLOVER_HID_IMAGE = [[
+  20 10 00 00 00 00 00 00 ff 00 11 00 11 00 0e 00
+  00 00 ff 00 00 00 78 fe 84 10 84 10 78 fe 00 00
+  3c fe c0 00 3c fe 00 82 78 82 a4 7c 94 00 48 00
+  00 00 fc 00 08 00 04 00 08 00 00 00 00 00 00 00
+  00 00
+]];
+
 func init() {
   updateKeyRgb();
   updateUnderglowRgb();
@@ -1223,7 +1231,15 @@ func onRelease25() { handleRelease(SC_Z, SC_NONE, SC_BACKSLASH, SC_F1, SC_NONE);
 func onPress26() { handlePress(SC_X, SC_NONE, SC_BACKSLASH | KEY_SHIFT, SC_F2, SC_NONE); }
 func onRelease26() { handleRelease(SC_X, SC_NONE, SC_BACKSLASH | KEY_SHIFT, SC_F2, SC_NONE); }
 
-func onPress27() { handlePress(SC_C, SC_NONE, SC_MINUS, SC_F3, SC_NONE); }
+func onPress27() {
+  handlePress(SC_C, SC_NONE, SC_MINUS, SC_F3, SC_NONE);
+
+  if (isSettingsLayer()) {
+    console("set_steno_mode plover_hid");
+    updateDisplay0();
+    drawImage(0, 0, 112, PLOVER_HID_IMAGE);
+  }
+}
 func onRelease27() { handleRelease(SC_C, SC_NONE, SC_MINUS, SC_F3, SC_NONE); }
 
 func onPress28() { handlePress(SC_V, SC_NONE, SC_L_BRACKET, SC_F4, SC_NONE); }
@@ -1278,9 +1294,9 @@ func onPress38() {
     pressCount = pressCount + 1;
     releaseAll();
     setLayer(layer | NAV_MASK);
+    pressAll();
     timer38 = getTime();
     pressCount38 = pressCount;
-    pressAll();
   }
 }
 func onRelease38() {
@@ -1305,11 +1321,11 @@ func onPress40() {
   handlePress(SC_NONE, SK_U | KEY_STENO, SC_NONE, SC_NONE, SC_ENTER);
   if ((layer | SYMBOL_MASK) == SYMBOL_MASK) {
     pressCount = pressCount + 1;
-    timer40 = getTime();
     releaseAll();
     setLayer(layer | FUNCTION_MASK);
-    pressCount40 = pressCount;
     pressAll();
+    timer40 = getTime();
+    pressCount40 = pressCount;
   }
 }
 func onRelease40() {
@@ -1342,4 +1358,3 @@ func onRelease41() {
     handleRelease(SC_NONE, SK_NUM2 | KEY_STENO, SC_L_CTRL, SC_NONE, SC_NONE);
   }
 }
-
