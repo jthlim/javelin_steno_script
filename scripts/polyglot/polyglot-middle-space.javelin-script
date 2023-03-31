@@ -18,6 +18,9 @@
 //                        `-----------------------------------------'
 //
 // * Tapping QWERTY key will switch to QWERTY mode
+// * Holding it down and pressing other buttons will cause the keyboard to return to steno mode when
+//   releasing it. This will also give access to the Symbols, Navigation and Function layers by
+//   pressing those keys on the QWERTY layer.
 
 // QWERTY
 //
