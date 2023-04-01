@@ -900,6 +900,10 @@ func isWordKey(key) var {
   return SC_A <= key && key <= SC_Z;
 }
 
+func isDigitKey(key) var {
+  return SC_1 <= key && key <= SC_0;
+}
+
 func press(key) {
   if (key == SC_NONE || key == SK_NONE) {
     return;
@@ -921,7 +925,8 @@ func press(key) {
         display0NeedsUpdate = 1;
       } else if (!isModifierKey(key)
           && key != (SC_MINUS | KEY_SHIFT)
-          && key != SC_BACKSPACE) {
+          && key != SC_BACKSPACE
+          && !isDigitKey(key)) {
         wordCaps = 0;
         display0NeedsUpdate = 1;
       }
@@ -1430,3 +1435,4 @@ func onRelease41() {
     handleRelease(SC_NONE, SK_NUM2 | KEY_STENO, SC_L_CTRL, SC_NONE, SC_NONE);
   }
 }
+
