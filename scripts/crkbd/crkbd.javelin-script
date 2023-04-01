@@ -33,6 +33,9 @@
 //
 // For keys marked with two options, holding or pressing with other keys will cause the first option
 // to be used, tapping briefly will trigger the second.
+//
+// Tapping right shift twice will turn on single word capitalization.
+// Tapping right shift three times will turn on and off caps lock.
 
 //
 // Symbols
@@ -472,6 +475,7 @@ const SCREEN_OFF_TIMEOUT = 30000; // 30 seconds.
 const STENO_MODE_EMBEDDED = 0;
 const STENO_MODE_GEMINI = 1;
 
+var wordCaps = 0;
 var stenoMode = STENO_MODE_EMBEDDED;
 
 const SHIFT_IMAGE = [[
@@ -830,7 +834,10 @@ func drawDisplay0NonSteno(layerImage) {
     drawImage(0, positions[0], positions[1], COMMAND_IMAGE);
   }
 
-  if (getLedStatus(LED_STATUS_CAPS_LOCK)) {
+  if (wordCaps) {
+    drawImage(0, 8, 128-16, SHIFT_IMAGE);
+  }
+  else if (getLedStatus(LED_STATUS_CAPS_LOCK)) {
     drawImage(0, 8, 128-16, CAPS_LOCK_IMAGE);
   }
 }
@@ -889,6 +896,10 @@ func isModifierKey(key) var {
   return SC_L_CTRL <= key && key <= SC_R_META;
 }
 
+func isWordKey(key) var {
+  return SC_A <= key && key <= SC_Z;
+}
+
 func press(key) {
   if (key == SC_NONE || key == SK_NONE) {
     return;
@@ -903,14 +914,26 @@ func press(key) {
   if (key & KEY_STENO) {
     pressStenoKey(key & 0xff);
   } else {
+    var display0NeedsUpdate = 0;
+    if (wordCaps) {
+      if (isWordKey(key) && (key & KEY_SHIFT) == 0) {
+        pressScanCode(SC_L_SHIFT);
+        display0NeedsUpdate = 1;
+      } else if (!isModifierKey(key)
+          && key != (SC_MINUS | KEY_SHIFT)
+          && key != SC_BACKSPACE) {
+        wordCaps = 0;
+        display0NeedsUpdate = 1;
+      }
+    }
     if (key & KEY_SHIFT) {
       pressScanCode(SC_L_SHIFT);
-      updateDisplay0();
+      display0NeedsUpdate = 1;
     }
     var scanCode = key & 0xff;
     pressScanCode(scanCode);
 
-    if (isModifierKey(scanCode)) {
+    if (display0NeedsUpdate || isModifierKey(scanCode)) {
       updateDisplay0();
     }
   }
@@ -924,17 +947,29 @@ func release(key) {
   if (key & KEY_STENO) {
     releaseStenoKey(key & 0xff);
   } else {
+    var display0NeedsUpdate = 0;
+    if (wordCaps) {
+      if (isWordKey(key) && (key & KEY_SHIFT) == 0) {
+        releaseScanCode(SC_L_SHIFT);
+        display0NeedsUpdate = 1;
+      }
+    }
     if (key & KEY_SHIFT) {
       releaseScanCode(SC_L_SHIFT);
-      updateDisplay0();
+      display0NeedsUpdate = 1;
     }
     var scanCode = key & 0xff;
     releaseScanCode(scanCode);
 
-    if (isModifierKey(scanCode)) {
+    if (display0NeedsUpdate || isModifierKey(scanCode)) {
       updateDisplay0();
     }
   }
+}
+
+func tap(key) {
+  press(key);
+  release(key);
 }
 
 func isSettingsLayer() var {
@@ -1079,7 +1114,7 @@ func onPress12() {
 func onRelease12() {
   handleRelease(SC_L_CTRL, SK_NONE, SC_GRAVE | KEY_SHIFT, SC_NONE, SC_NONE);
   if (layer == 0 && pressCount12 == pressCount && getTime() - timer12 < TAP_THRESHOLD) {
-    tapScanCode(SC_ESC);
+    tap(SC_ESC);
   }
 }
 
@@ -1162,7 +1197,7 @@ func onPress22() {
 func onRelease22() { handleRelease(SC_SEMICOLON, SK_SR | KEY_STENO, SC_0 | KEY_SHIFT, SC_L_META, SC_PAGE_DOWN); }
 
 func onPress23() {
-  handlePress(SC_APOSTROPHE, SK_ZR | KEY_STENO, SC_EQUAL | KEY_SHIFT, SC_NONE, SC_END); 
+  handlePress(SC_APOSTROPHE, SK_ZR | KEY_STENO, SC_EQUAL | KEY_SHIFT, SC_NONE, SC_END);
 
   if (isSettingsLayer()) {
     if (hueSpread > 0) {
@@ -1263,8 +1298,45 @@ func onRelease33() { handleRelease(SC_DOT, SC_NONE, SC_DOT, SC_NONE, SC_NONE); }
 func onPress34() { handlePress(SC_SLASH, SC_NONE, SC_SLASH, SC_NONE, SC_NONE); }
 func onRelease34() { handleRelease(SC_SLASH, SC_NONE, SC_SLASH, SC_NONE, SC_NONE); }
 
-func onPress35() { handlePress(SC_R_SHIFT, SC_NONE, SC_NONE, SC_NONE, SC_NONE); }
-func onRelease35() { handleRelease(SC_R_SHIFT, SC_NONE, SC_NONE, SC_NONE, SC_NONE); }
+var timer35;
+var releaseTimer35;
+var tapCount35;
+var pressCount35;
+var capsPressed;
+func onPress35() {
+  handlePress(SC_R_SHIFT, SC_NONE, SC_NONE, SC_NONE, SC_NONE);
+
+  capsPressed = 0;
+  if (layer == 0) {
+    timer35 = getTime();
+    pressCount35 = pressCount;
+    if (timer35 - releaseTimer35 < TAP_THRESHOLD) {
+      tapCount35 = tapCount35 + 1;
+      if (tapCount35 == 1) {
+        wordCaps = wordCaps ^ 1;
+        updateDisplay0();
+      } else if (tapCount35 == 2) {
+        pressScanCode(SC_CAPS);
+        wordCaps = 0;
+        capsPressed = 1;
+      }
+    } else {
+      tapCount35 = 0;
+    }
+  }
+}
+func onRelease35() {
+  handleRelease(SC_R_SHIFT, SC_NONE, SC_NONE, SC_NONE, SC_NONE);
+
+  if (capsPressed) {
+    capsPressed = 0;
+    releaseScanCode(SC_CAPS);
+  }
+
+  if (layer == 0 && pressCount35 == pressCount && getTime() - timer35 < TAP_THRESHOLD) {
+    releaseTimer35 = getTime();
+  }
+}
 
 // 4th row
 
@@ -1281,7 +1353,7 @@ func onPress37() {
 func onRelease37() {
   handleRelease(SC_L_ALT, SK_A | KEY_STENO, SC_L_ALT, SC_NONE, SC_NONE);
   if (layer == 0 && pressCount37 == pressCount && getTime() - timer37 < TAP_THRESHOLD) {
-    tapScanCode(SC_ENTER);
+    tap(SC_ENTER);
   }
 }
 
@@ -1305,7 +1377,7 @@ func onRelease38() {
     setLayer(layer ^ NAV_MASK);
 
     if (layer == 0 && pressCount38 == pressCount && getTime() - timer38 < TAP_THRESHOLD) {
-      tapScanCode(SC_SPACE);
+      tap(SC_SPACE);
     }
   } else {
     handleRelease(SC_NONE, SK_O | KEY_STENO, SC_L_CTRL, SC_NONE, SC_NONE);
@@ -1332,7 +1404,7 @@ func onRelease40() {
   handleRelease(SC_NONE, SK_U | KEY_STENO, SC_NONE, SC_NONE, SC_ENTER);
   if (layer & FUNCTION_MASK) {
     if (pressCount40 == pressCount && getTime() - timer40 < TAP_THRESHOLD) {
-      tapScanCode(SC_ENTER);
+      tap(SC_ENTER);
     }
     releaseAll();
     setLayer(layer ^ FUNCTION_MASK);
