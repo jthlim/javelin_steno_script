@@ -2,6 +2,7 @@ import 'dart:collection';
 
 import 'byte_code_builder.dart';
 import 'module.dart';
+import 'string_data.dart';
 
 enum ScriptOpCode {
   not(0x40),
@@ -409,7 +410,7 @@ class PushStringValueScriptInstruction extends ScriptInstruction {
   }
 
   @override
-  String toString() => '  push offset_of("$value")';
+  String toString() => '  push offset_of ${formatStringData(value)}';
 
   final String value;
 }

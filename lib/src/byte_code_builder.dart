@@ -113,7 +113,7 @@ class ScriptByteCodeBuilder {
       }
 
       // Strings either start with 'S' (string) or 'D' (data).
-      int marker = string.codeUnitAt(0);
+      final marker = string.codeUnitAt(0);
       if (marker == 0x53 /* 'S' */) {
         bytesBuilder.add(utf8.encode(string.substring(1)));
         bytesBuilder.addByte(0);

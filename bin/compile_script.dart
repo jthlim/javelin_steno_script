@@ -35,7 +35,10 @@ void main(List<String> arguments) {
     print('\n\nString table');
     print('------------');
     builder.stringTable.forEach((key, value) {
-      print('${value.toRadixString(16).padLeft(4, '0')}: "$key"');
+      print(
+        '${value.toRadixString(16).padLeft(4, '0')}: '
+        '${formatStringData(key)}',
+      );
     });
   }
 
