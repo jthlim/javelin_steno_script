@@ -676,7 +676,7 @@ class CallFunctionAstNode extends AstNode {
 
     if (definition is InBuiltScriptFunction) {
       builder.addInstruction(
-        CallInBuiltFunctionInstruction(definition.functionIndex),
+        CallInBuiltFunctionInstruction(definition),
       );
     } else {
       builder.addInstruction(CallFunctionInstruction(name));

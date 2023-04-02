@@ -82,7 +82,7 @@
 // Settings - pressing both Sym and Fn together.
 //
 // ,-------------------------------------------.        ,-------------------------------------------.
-// |        |      |      |Embedd|      |      |        |Speed+|      |Brght+| Sat+ | Hue+ |HueSprd+|
+// |StrkCnt |      |      |Embedd|      |      |        |Speed+|      |Brght+| Sat+ | Hue+ |HueSprd+|
 // |--------+------+------+------+------+------|        |------+------+------+------+------+--------|
 // |        |      |      |Gemini|      |      |        |Speed-|      |Brght-| Sat- | Hue- |HueSprd-|
 // |--------+------+------+------+------+------+        +------+------+------+------+------+--------|
@@ -1014,7 +1014,13 @@ func handleRelease(qwertyKey, stenoKey, symbolsKey, functionKey, navKey) {
   }
 }
 
-func onPress0() { handlePress(SC_TAB, SK_NONE, SC_GRAVE, SC_NONE, SC_NONE); }
+func onPress0() {
+  handlePress(SC_TAB, SK_NONE, SC_GRAVE, SC_NONE, SC_NONE);
+
+  if (isSettingsLayer()) {
+    sendText(console("get_parameter stroke_count"));
+  }
+}
 func onRelease0() { handleRelease(SC_TAB, SK_NONE, SC_GRAVE, SC_NONE, SC_NONE); }
 
 func onPress1() { handlePress(SC_Q, SK_S1 | KEY_STENO, SC_1, SC_F9, SC_NONE); }
@@ -1435,4 +1441,3 @@ func onRelease41() {
     handleRelease(SC_NONE, SK_NUM2 | KEY_STENO, SC_L_CTRL, SC_NONE, SC_NONE);
   }
 }
-

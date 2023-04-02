@@ -1,6 +1,7 @@
 import 'dart:collection';
 
 import 'byte_code_builder.dart';
+import 'module.dart';
 
 enum ScriptOpCode {
   not(0x40),
@@ -197,25 +198,26 @@ class StoreGlobalValueInstruction extends ScriptInstruction {
 }
 
 class CallInBuiltFunctionInstruction extends ScriptInstruction {
-  CallInBuiltFunctionInstruction(this.functionIndex);
+  CallInBuiltFunctionInstruction(this.function);
 
   @override
-  int get byteCodeLength => functionIndex >= 0x100 ? 2 : 1;
+  int get byteCodeLength => function.functionIndex >= 0x100 ? 2 : 1;
 
   @override
   void addByteCode(ScriptByteCodeBuilder builder) {
-    if (functionIndex >= 0x100) {
+    if (function.functionIndex >= 0x100) {
       builder.bytesBuilder.addByte(0xcc);
-      builder.bytesBuilder.addByte(functionIndex & 0xff);
+      builder.bytesBuilder.addByte(function.functionIndex & 0xff);
     } else {
-      builder.bytesBuilder.addByte(0xf0 + functionIndex);
+      builder.bytesBuilder.addByte(0xf0 + function.functionIndex);
     }
   }
 
-  final int functionIndex;
+  final InBuiltScriptFunction function;
 
   @override
-  String toString() => '  call in-built-$functionIndex';
+  String toString() => '  call in-built-${function.functionIndex} '
+      '(${function.functionName})';
 }
 
 class CallFunctionInstruction extends ScriptInstruction {

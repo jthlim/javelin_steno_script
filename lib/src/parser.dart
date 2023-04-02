@@ -97,6 +97,15 @@ class Parser {
       tickFunction = ScriptFunction('tick');
       tickFunction.statements = StatementListAstNode();
       _module.functions['tick'] = tickFunction;
+    } else {
+      if (tickFunction.hasReturnValue) {
+        throw const FormatException('tick function should not return a value');
+      }
+      if (tickFunction.numberOfParameters > 0) {
+        throw const FormatException(
+          'tick function should not take any parameters',
+        );
+      }
     }
 
     return _module;
@@ -128,19 +137,24 @@ class Parser {
 
   void _assertUniqueName(String name) {
     if (_module.constants.containsKey(name)) {
-      throw Exception('$name already defined as a cosntant');
+      throw Exception(
+          '$name already defined as a constant near $_currentToken');
     }
     if (_module.globals.containsKey(name)) {
-      throw Exception('$name already defined as a global');
+      throw Exception('$name already defined as a global near $_currentToken');
     }
     if (_module.functions.containsKey(name)) {
-      throw Exception('$name already defined as a function');
+      throw Exception(
+        '$name already defined as a function near $_currentToken',
+      );
     }
     if (_function?.parameters.containsKey(name) ?? false) {
-      throw Exception('$name already defined as a parameter');
+      throw Exception(
+        '$name already defined as a parameter near $_currentToken',
+      );
     }
     if (_function?.locals.containsKey(name) ?? false) {
-      throw Exception('$name already defined as a local');
+      throw Exception('$name already defined as a local near $_currentToken');
     }
   }
 
@@ -156,7 +170,7 @@ class Parser {
     _assertUniqueName(name);
 
     if (!expression.isConstant() && expression is! StringValueAstNode) {
-      throw Exception('$name not a constant value');
+      throw Exception('$name not a constant value near $_currentToken');
     }
 
     _module.constants[nameToken.stringValue!] = expression;
@@ -288,7 +302,7 @@ class Parser {
             return constantValue;
           }
 
-          throw FormatException('Unknown identifier $name');
+          throw FormatException('Unknown identifier $name near $_currentToken');
         }
 
       default:
@@ -352,7 +366,7 @@ class Parser {
           result = RemainderAstNode(result, _parseUnary()).simplify();
           break;
         default:
-          throw Exception('Internal error');
+          throw Exception('Internal error near $_currentToken');
       }
     }
     return result;
@@ -380,7 +394,7 @@ class Parser {
           termsExpression.terms.add(Term(TermMode.subtract, _parseFactor()));
           break;
         default:
-          throw Exception('Internal error');
+          throw Exception('Internal error near $_currentToken');
       }
     }
 
@@ -410,7 +424,7 @@ class Parser {
           result = LogicalBitShiftRightAstNode(result, _parseTerm()).simplify();
           break;
         default:
-          throw Exception('Internal error');
+          throw Exception('Internal error near $_currentToken');
       }
     }
     return result;
@@ -448,7 +462,7 @@ class Parser {
       case TokenType.greaterThanOrEqualTo:
         return GreaterThanOrEqualToAstNode(result, _parseBitShift()).simplify();
       default:
-        throw Exception('Internal error');
+        throw Exception('Internal error near $_currentToken');
     }
   }
 
@@ -474,7 +488,7 @@ class Parser {
           result = BitwiseXorAstNode(result, _parseComparison()).simplify();
           break;
         default:
-          throw Exception('Internal error');
+          throw Exception('Internal error near $_currentToken');
       }
     }
     return result;
@@ -570,7 +584,7 @@ class Parser {
       isGlobal = false;
       index = _function!.locals[name]!;
     } else {
-      throw FormatException('Unknown variable $name');
+      throw FormatException('Unknown variable $name near $_currentToken');
     }
 
     return StoreValueAstNode(

@@ -22,7 +22,7 @@ enum InBuiltScriptFunction implements ScriptFunctionDefinition {
   isButtonPressed('isButtonPressed', 1, true, 8),
   pressAll('pressAll', 0, false, 9),
   sendText('sendText', 1, false, 10),
-  console('console', 1, false, 11),
+  console('console', 1, true, 11),
   checkButtonState('checkButtonState', 1, true, 12),
   isInPressAll('isInPressAll', 0, true, 13),
   setRgb('setRgb', 4, false, 14),
@@ -41,7 +41,8 @@ enum InBuiltScriptFunction implements ScriptFunctionDefinition {
   drawText('drawText', 6, false, 0x109),
   setDrawColor('setDrawColor', 2, false, 0x10a),
   drawRect('drawRect', 5, false, 0x10b),
-  setHsv('setHsv', 4, false, 0x10c);
+  setHsv('setHsv', 4, false, 0x10c),
+  rand('rand', 0, true, 0x10d);
 
   const InBuiltScriptFunction(
     this.functionName,
