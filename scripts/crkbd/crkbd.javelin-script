@@ -546,7 +546,7 @@ const CAPS_LOCK_IMAGE = [[
   00 01 80 01 c0 01 e0 01 f0 67 f8 67 fc 67 fe 67
   fe 67 fc 67 f8 67 f0 67 e0 01 c0 01 80 01 00 01
 ]];
- op op
+
 const STENO_IMAGE = [[
   20 20 fe ff 1f 00 fe ff 7f 00 fe ff ff 01 fe ff
   ff 03 fe ff ff 07 fe ff ff 0f fe f9 f3 1f fe f0
