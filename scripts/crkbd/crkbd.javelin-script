@@ -469,10 +469,16 @@ var lastCapsLockStatus = 0;
 
 // Layer Tap Forgiveness.
 //
-// To avoid unintended navigation/function layer presses, any keypress on a
-// layer within 100ms of pressing that layer, and where the layer button is
-// released within 50ms of the key still being held, will result in the qwerty
-// key being triggered.
+// To avoid unintended navigation/function layer presses, the following
+// sequence of events is interpreted as a press on the qwerty layer instead:
+//
+//     Layer key press        Key press        Layer key release
+//            |                   |                     |
+//   t ---------------------------------------------------------->
+//           T0                  T1                    T2
+//
+// For this to happen, the time between T0 and T1 has to be less than 100 ms,
+// and the time between T1 and T2 has to be less than 50 ms.
 //
 // Mechanics:
 //  1. When a layer button is pressed, record a layerPressTimestamp.
@@ -540,7 +546,7 @@ const CAPS_LOCK_IMAGE = [[
   00 01 80 01 c0 01 e0 01 f0 67 f8 67 fc 67 fe 67
   fe 67 fc 67 f8 67 f0 67 e0 01 c0 01 80 01 00 01
 ]];
-
+ op op
 const STENO_IMAGE = [[
   20 20 fe ff 1f 00 fe ff 7f 00 fe ff ff 01 fe ff
   ff 03 fe ff ff 07 fe ff ff 0f fe f9 f3 1f fe f0
@@ -1532,3 +1538,4 @@ func onRelease41() {
     handleRelease(SC_NONE, SK_NUM2 | KEY_STENO, SC_L_CTRL, SC_NONE, SC_NONE);
   }
 }
+
