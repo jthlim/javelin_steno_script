@@ -467,32 +467,38 @@ var saturation = 5;
 var lastActionTime = 0;
 var lastCapsLockStatus = 0;
 
-// To avoid unintended navigation layer presses, any navigation keypress within
-// 100ms of pressing nav/space, and where nav/space is released within 50ms of
-// the key still being held, will result in the non-nav key being triggered.
+// Layer Tap Forgiveness.
+//
+// To avoid unintended navigation/function layer presses, any keypress on a
+// layer within 100ms of pressing that layer, and where the layer button is
+// released within 50ms of the key still being held, will result in the qwerty
+// key being triggered.
+//
 // Mechanics:
-//  1. When nav/space is pressed, record a navLayerPressTimestamp.
-//  2. When a nav layer key is pressed within 100ms and there is no recorded
-//     keypress, then the nav key and non-nav key are recorded with
-//     navKeyPressTimestamp. If there is already a recorded keypress, press the
-//     deferred nav key and immediately press the newer key. If a keypress
+//  1. When a layer button is pressed, record a layerPressTimestamp.
+//  2. When a key is pressed within 100ms and there is no recorded
+//     keypress, then the layer and qwerty key are recorded with
+//     qwertyPressTimestamp. If there is already a recorded keypress, press the
+//     deferred layer key and immediately press the newer key. If a keypress
 //     occurs outside of 100ms, process normally.
-//  2. When nav/space is released, if there is a deferredNonNavKey recorded
-//     timestamp within 50ms of navKeyPressTimestamp, then press space then
-//     the non-nav key. This is detected in release when NAV_MASK is on, but
-//     isButtonPressed(38) returns false;
-//  3. When a nav layer key is released, if it is the deferred nav key, press
-//     it first.
-//  4. On tick update, if more than 50ms after navKeyPressTimestamp has elapsed,
-//     then issue the deferred navKey.
-const NAV_PRESS_TO_KEY_PRESS_THRESHOLD = 100;
-const KEY_PRESS_TO_NAV_RELEASE_THRESHOLD = 50;
+//  2. When the layer button is released, if there is a deferredQwertyKey
+//     recorded timestamp within 50ms of qwertyPressTimestamp, then press space
+//     then the non-nav key. This is detected in release when NAV_MASK is on,
+//     but isButtonPressed(38) returns false, and the key is emitted in the
+//     release script for the layer key.
+//  3. When a key is released, if there is a deferred key, press it first.
+//  4. On tick update, if more than 50ms after qwertyPressTimestamp has elapsed,
+//     then issue the deferredQwertyKey.
+const LAYER_PRESS_TO_KEY_PRESS_THRESHOLD = 100;
+const KEY_PRESS_TO_LAYER_RELEASE_THRESHOLD = 50;
 const NAV_BUTTON = 38;
+const FUNCTION_BUTTON = 40;
 
-var deferredNavKey = 0;
-var deferredNonNavKey = 0;
+var deferredLayerKey = 0;
+var deferredQwertyKey = 0;
 var navLayerPressTimestamp;
-var navKeyPressTimestamp;
+var functionLayerPressTimestamp;
+var qwertyPressTimestamp;
 
 const KEY_STENO = 0x200;
 const KEY_SHIFT = 0x100;
@@ -752,11 +758,11 @@ func tick() {
     updateDisplay0();
   }
 
-  if (deferredNavKey) {
-    if (getTime() - navKeyPressTimestamp >= KEY_PRESS_TO_NAV_RELEASE_THRESHOLD) {
-      press(deferredNavKey);
-      deferredNavKey = 0;
-      deferredNonNavKey = 0;
+  if (deferredLayerKey) {
+    if (getTime() - qwertyPressTimestamp >= KEY_PRESS_TO_LAYER_RELEASE_THRESHOLD) {
+      press(deferredLayerKey);
+      deferredLayerKey = 0;
+      deferredQwertyKey = 0;
     }
   }
 }
@@ -1021,22 +1027,35 @@ func handlePress(qwertyKey, stenoKey, symbolsKey, functionKey, navKey) {
   if (isSettingsLayer()) {
     return;
   } else if (layer & NAV_MASK) {
-    if (deferredNavKey) {
-      press(deferredNavKey);
+    if (deferredLayerKey) {
+      press(deferredLayerKey);
 
-      deferredNavKey = 0;
-      deferredNonNavKey = 0;
+      deferredLayerKey = 0;
+      deferredQwertyKey = 0;
 
       press(navKey);
-    } else if (getTime() - navLayerPressTimestamp < NAV_PRESS_TO_KEY_PRESS_THRESHOLD) {
-      deferredNavKey = navKey;
-      deferredNonNavKey = qwertyKey;
-      navKeyPressTimestamp = getTime();
+    } else if (getTime() - navLayerPressTimestamp < LAYER_PRESS_TO_KEY_PRESS_THRESHOLD) {
+      deferredLayerKey = navKey;
+      deferredQwertyKey = qwertyKey;
+      qwertyPressTimestamp = getTime();
     } else {
       press(navKey);
     }
   } else if (layer & FUNCTION_MASK) {
-    press(functionKey);
+    if (deferredLayerKey) {
+      press(deferredLayerKey);
+
+      deferredLayerKey = 0;
+      deferredQwertyKey = 0;
+
+      press(functionKey);
+    } else if (getTime() - functionLayerPressTimestamp < LAYER_PRESS_TO_KEY_PRESS_THRESHOLD) {
+      deferredLayerKey = functionKey;
+      deferredQwertyKey = qwertyKey;
+      qwertyPressTimestamp = getTime();
+    } else {
+      press(functionKey);
+    }
   } else if (layer & SYMBOL_MASK) {
     press(symbolsKey);
   } else if (layer & STENO_MASK) {
@@ -1050,16 +1069,24 @@ func handleRelease(qwertyKey, stenoKey, symbolsKey, functionKey, navKey) {
   if (isSettingsLayer()) {
     return;
   } else if (layer & NAV_MASK) {
-    if (deferredNavKey) {
+    if (deferredLayerKey) {
       if (isButtonPressed(NAV_BUTTON)) {
-        press(deferredNavKey);
-        deferredNavKey = 0;
-        deferredNonNavKey = 0;
+        press(deferredLayerKey);
+        deferredLayerKey = 0;
+        deferredQwertyKey = 0;
       }
     }
 
     release(navKey);
   } else if (layer & FUNCTION_MASK) {
+    if (deferredLayerKey) {
+      if (isButtonPressed(FUNCTION_BUTTON)) {
+        press(deferredLayerKey);
+        deferredLayerKey = 0;
+        deferredQwertyKey = 0;
+      }
+    }
+
     release(functionKey);
   } else if (layer & SYMBOL_MASK) {
     release(symbolsKey);
@@ -1445,9 +1472,9 @@ func onRelease38() {
     if (layer == 0 && pressCount38 == pressCount && getTime() - navLayerPressTimestamp < TAP_THRESHOLD) {
       tap(SC_SPACE);
     }
-    tap(deferredNonNavKey);
-    deferredNavKey = 0;
-    deferredNonNavKey = 0;
+    tap(deferredQwertyKey);
+    deferredLayerKey = 0;
+    deferredQwertyKey = 0;
   } else {
     handleRelease(SC_NONE, SK_O | KEY_STENO, SC_L_CTRL, SC_NONE, SC_NONE);
   }
@@ -1456,7 +1483,6 @@ func onRelease38() {
 func onPress39() { handlePress(SC_SPACE, SK_E | KEY_STENO, SC_NONE, SC_NONE, SC_SPACE); }
 func onRelease39() { handleRelease(SC_SPACE, SK_E | KEY_STENO, SC_NONE, SC_NONE, SC_SPACE); }
 
-var timer40;
 var pressCount40;
 func onPress40() {
   handlePress(SC_NONE, SK_U | KEY_STENO, SC_NONE, SC_NONE, SC_ENTER);
@@ -1465,18 +1491,25 @@ func onPress40() {
     releaseAll();
     setLayer(layer | FUNCTION_MASK);
     pressAll();
-    timer40 = getTime();
+    functionLayerPressTimestamp = getTime();
     pressCount40 = pressCount;
   }
 }
 func onRelease40() {
   handleRelease(SC_NONE, SK_U | KEY_STENO, SC_NONE, SC_NONE, SC_ENTER);
   if (layer & FUNCTION_MASK) {
-    if (pressCount40 == pressCount && getTime() - timer40 < TAP_THRESHOLD) {
-      tap(SC_ENTER);
-    }
     releaseAll();
     setLayer(layer ^ FUNCTION_MASK);
+
+    if (layer == 0) {
+      if (pressCount40 == pressCount && getTime() - functionLayerPressTimestamp < TAP_THRESHOLD) {
+        tap(SC_ENTER);
+      }
+
+      tap(deferredQwertyKey);
+    }
+    deferredLayerKey = 0;
+    deferredQwertyKey = 0;
   }
 }
 
@@ -1499,4 +1532,3 @@ func onRelease41() {
     handleRelease(SC_NONE, SK_NUM2 | KEY_STENO, SC_L_CTRL, SC_NONE, SC_NONE);
   }
 }
-
