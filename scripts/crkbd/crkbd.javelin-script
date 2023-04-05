@@ -334,7 +334,8 @@ const SK_RES2 = 41;
 // Other functions:
 //
 //  * func releaseAll()
-//    - releases all pressed scan codes and steno keys.
+//    - releases all pressed scan codes and steno keys. This does NOT call
+//      any release scripts.
 //  * func pressAll()
 //    - call all press scripts for buttons that are pressed.
 //  * func isInPressAll() var
@@ -1330,6 +1331,9 @@ var wasSteno24;
 var pressCount24;
 func onPress24() {
   if (isInPressAll()) {
+    if (layer == 0 && !wasSteno24) {
+      press(SC_L_SHIFT);
+    }
     return;
   }
   lastActionTime = getTime();
@@ -1349,11 +1353,6 @@ func onPress24() {
   timer24 = getTime();
 }
 func onRelease24() {
-  // Exit early if this was triggered from a releaseAll() script.
-  if (isButtonPressed(24)) {
-    return;
-  }
-
   lastActionTime = getTime();
 
   if (wasSteno24) {
@@ -1489,10 +1488,13 @@ func onPress38() {
 }
 func onRelease38() {
   if (layer & NAV_MASK) {
+    var startPressCount = pressCount;
+
     releaseAll();
     setLayer(layer ^ NAV_MASK);
+    pressAll();
 
-    if (layer == 0 && pressCount38 == pressCount && getTime() - navLayerPressTimestamp < TAP_THRESHOLD) {
+    if (layer == 0 && pressCount38 == startPressCount && getTime() - navLayerPressTimestamp < TAP_THRESHOLD) {
       tap(SC_SPACE);
     }
     tap(deferredQwertyKey);
@@ -1522,6 +1524,7 @@ func onRelease40() {
   handleRelease(SC_NONE, SK_U | KEY_STENO, SC_NONE, SC_NONE, SC_ENTER);
   if (layer & FUNCTION_MASK) {
     var startPressCount = pressCount;
+
     releaseAll();
     setLayer(layer ^ FUNCTION_MASK);
     pressAll();
@@ -1553,6 +1556,7 @@ func onRelease41() {
   if (layer & SYMBOL_MASK) {
     releaseAll();
     setLayer(layer ^ SYMBOL_MASK);
+    pressAll();
   } else {
     handleRelease(SC_NONE, SK_NUM2 | KEY_STENO, SC_L_CTRL, SC_NONE, SC_NONE);
   }

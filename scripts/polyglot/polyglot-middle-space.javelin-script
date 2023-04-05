@@ -337,7 +337,8 @@ const SK_RES2 = 41;
 // Other functions:
 //
 //  * func releaseAll()
-//    - releases all pressed scan codes and steno keys.
+//    - releases all pressed scan codes and steno keys. This does NOT call
+//      any release scripts.
 //  * func pressAll()
 //    - call all press scripts for buttons that are pressed.
 //  * func isInPressAll() var
@@ -902,6 +903,9 @@ var wasSteno24;
 var pressCount24;
 func onPress24() {
   if (isInPressAll()) {
+    if (layer == 0 && !wasSteno24) {
+      press(SC_L_SHIFT);
+    }
     return;
   }
   if (layer >> 1) {
@@ -920,11 +924,6 @@ func onPress24() {
   timer24 = getTime();
 }
 func onRelease24() {
-  // Exit early if this was triggered from a releaseAll() script.
-  if (isButtonPressed(24)) {
-    return;
-  }
-
   if (wasSteno24) {
     // If the keypress was in steno mode, and other keys were pressed, drop
     // immediately back to steno mode, and drop all masks.
