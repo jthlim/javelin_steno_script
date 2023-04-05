@@ -414,6 +414,11 @@ const TEXT_ALIGNMENT_LEFT = 0;
 const TEXT_ALIGNMENT_MIDDLE = 1;
 const TEXT_ALIGNMENT_RIGHT = 2;
 
+const FONT_ID_NORMAL = 0;
+const FONT_ID_SMALL_DIGITS = 1;
+const FONT_ID_MEDIUM_DIGITS = 2;
+const FONT_ID_LARGE_DIGITS = 3;
+
 //---------------------------------------------------------------------------
 //
 // Corne button layout:
@@ -728,6 +733,12 @@ const PLOVER_HID_IMAGE = [[
   3c fe c0 00 3c fe 00 82 78 82 a4 7c 94 00 48 00
   00 00 fc 00 08 00 04 00 08 00 00 00 00 00 00 00
   00 00
+]];
+
+const STROKES_IMAGE = [[
+  20 08 4c 92 92 64 00 02 fe 02 00 fe 12 12 ec 00
+  7c 82 82 7c 00 fe 10 28 c6 00 fe 92 82 00 4c 92
+  92 64
 ]];
 
 func init() {
@@ -1107,7 +1118,9 @@ func onPress0() {
   handlePress(SC_TAB, SK_NONE, SC_GRAVE, SC_NONE, SC_NONE);
 
   if (isSettingsLayer()) {
-    sendText(console("get_parameter stroke_count"));
+    updateDisplay0();
+    drawImage(0, 0, 96, STROKES_IMAGE);
+    drawText(0, 16, 116, FONT_ID_SMALL_DIGITS, TEXT_ALIGNMENT_MIDDLE, console("get_parameter stroke_count"));
   }
 }
 func onRelease0() { handleRelease(SC_TAB, SK_NONE, SC_GRAVE, SC_NONE, SC_NONE); }
@@ -1208,8 +1221,10 @@ var timer12;
 var pressCount12;
 func onPress12() {
   handlePress(SC_L_CTRL, SK_NONE, SC_GRAVE | KEY_SHIFT, SC_NONE, SC_NONE);
-  timer12 = getTime();
-  pressCount12 = pressCount;
+  if (!isInPressAll()) {
+    timer12 = getTime();
+    pressCount12 = pressCount;
+  }
 }
 func onRelease12() {
   handleRelease(SC_L_CTRL, SK_NONE, SC_GRAVE | KEY_SHIFT, SC_NONE, SC_NONE);
@@ -1447,12 +1462,14 @@ var timer37;
 var pressCount37;
 func onPress37() {
   handlePress(SC_L_ALT, SK_A | KEY_STENO, SC_L_ALT, SC_NONE, SC_NONE);
-  timer37 = getTime();
-  pressCount37 = pressCount37;
+  if (!isInPressAll()) {
+    timer37 = getTime();
+    pressCount37 = pressCount37;
+  }
 }
 func onRelease37() {
   handleRelease(SC_L_ALT, SK_A | KEY_STENO, SC_L_ALT, SC_NONE, SC_NONE);
-  if (layer == 0 && pressCount37 == pressCount && getTime() - timer37 < TAP_THRESHOLD) {
+  if (!isInPressAll() && layer == 0 && pressCount37 == pressCount && getTime() - timer37 < TAP_THRESHOLD) {
     tap(SC_ENTER);
   }
 }
@@ -1492,7 +1509,7 @@ func onRelease39() { handleRelease(SC_SPACE, SK_E | KEY_STENO, SC_NONE, SC_NONE,
 var pressCount40;
 func onPress40() {
   handlePress(SC_NONE, SK_U | KEY_STENO, SC_NONE, SC_NONE, SC_ENTER);
-  if ((layer | SYMBOL_MASK) == SYMBOL_MASK) {
+  if (!isInPressAll() && (layer | SYMBOL_MASK) == SYMBOL_MASK) {
     pressCount = pressCount + 1;
     releaseAll();
     setLayer(layer | FUNCTION_MASK);
@@ -1504,11 +1521,13 @@ func onPress40() {
 func onRelease40() {
   handleRelease(SC_NONE, SK_U | KEY_STENO, SC_NONE, SC_NONE, SC_ENTER);
   if (layer & FUNCTION_MASK) {
+    var startPressCount = pressCount;
     releaseAll();
     setLayer(layer ^ FUNCTION_MASK);
+    pressAll();
 
     if (layer == 0) {
-      if (pressCount40 == pressCount && getTime() - functionLayerPressTimestamp < TAP_THRESHOLD) {
+      if (pressCount40 == startPressCount && getTime() - functionLayerPressTimestamp < TAP_THRESHOLD) {
         tap(SC_ENTER);
       }
 
@@ -1538,4 +1557,3 @@ func onRelease41() {
     handleRelease(SC_NONE, SK_NUM2 | KEY_STENO, SC_L_CTRL, SC_NONE, SC_NONE);
   }
 }
-

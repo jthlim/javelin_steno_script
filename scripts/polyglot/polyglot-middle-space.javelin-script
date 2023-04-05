@@ -803,8 +803,10 @@ var timer12;
 var pressCount12;
 func onPress12() {
   handlePress(SC_L_CTRL, SK_NONE, SC_GRAVE | KEY_SHIFT, SC_NONE, SC_NONE);
-  timer12 = getTime();
-  pressCount12 = pressCount;
+  if (!isInPressAll()) {
+    timer12 = getTime();
+    pressCount12 = pressCount;
+  }
 }
 func onRelease12() {
   handleRelease(SC_L_CTRL, SK_NONE, SC_GRAVE | KEY_SHIFT, SC_NONE, SC_NONE);
@@ -1027,12 +1029,14 @@ var timer37;
 var pressCount37;
 func onPress37() {
   handlePress(SC_L_ALT, SK_A | KEY_STENO, SC_L_ALT, SC_NONE, SC_NONE);
-  timer37 = getTime();
-  pressCount37 = pressCount37;
+  if (!isInPressAll()) {
+    timer37 = getTime();
+    pressCount37 = pressCount37;
+  }
 }
 func onRelease37() {
   handleRelease(SC_L_ALT, SK_A | KEY_STENO, SC_L_ALT, SC_NONE, SC_NONE);
-  if (layer == 0 && pressCount37 == pressCount && getTime() - timer37 < TAP_THRESHOLD) {
+  if (!isInPressAll() && layer == 0 && pressCount37 == pressCount && getTime() - timer37 < TAP_THRESHOLD) {
     tap(SC_ENTER);
   }
 }
@@ -1072,7 +1076,7 @@ func onRelease39() { handleRelease(SC_SPACE, SK_E | KEY_STENO, SC_NONE, SC_NONE,
 var pressCount40;
 func onPress40() {
   handlePress(SC_NONE, SK_U | KEY_STENO, SC_NONE, SC_NONE, SC_ENTER);
-  if ((layer | SYMBOL_MASK) == SYMBOL_MASK) {
+  if (!isInPressAll() && (layer | SYMBOL_MASK) == SYMBOL_MASK) {
     pressCount = pressCount + 1;
     releaseAll();
     layer = layer | FUNCTION_MASK;
@@ -1084,11 +1088,13 @@ func onPress40() {
 func onRelease40() {
   handleRelease(SC_NONE, SK_U | KEY_STENO, SC_NONE, SC_NONE, SC_ENTER);
   if (layer & FUNCTION_MASK) {
+    var startPressCount = pressCount;
     releaseAll();
     layer = layer ^ FUNCTION_MASK;
+    pressAll();
 
     if (layer == 0) {
-      if (pressCount40 == pressCount && getTime() - functionLayerPressTimestamp < TAP_THRESHOLD) {
+      if (pressCount40 == startPressCount && getTime() - functionLayerPressTimestamp < TAP_THRESHOLD) {
         tap(SC_ENTER);
       }
 
