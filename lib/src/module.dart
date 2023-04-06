@@ -42,7 +42,9 @@ enum InBuiltScriptFunction implements ScriptFunctionDefinition {
   setDrawColor('setDrawColor', 2, false, 0x10a),
   drawRect('drawRect', 5, false, 0x10b),
   setHsv('setHsv', 4, false, 0x10c),
-  rand('rand', 0, true, 0x10d);
+  rand('rand', 0, true, 0x10d),
+  isUsbConnected('isUsbConnected', 0, true, 0x10e),
+  isUsbSuspended('isUsbSuspended', 0, true, 0x10f);
 
   const InBuiltScriptFunction(
     this.functionName,
