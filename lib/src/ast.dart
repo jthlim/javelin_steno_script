@@ -28,7 +28,7 @@ class StringValueAstNode extends AstNode {
 
   @override
   void addInstructions(ScriptByteCodeBuilder builder) {
-    builder.stringTable[value] = 0;
+    builder.strings.add(value);
     builder.addInstruction(PushStringValueScriptInstruction(value));
   }
 

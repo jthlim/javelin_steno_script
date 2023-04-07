@@ -44,7 +44,8 @@ enum InBuiltScriptFunction implements ScriptFunctionDefinition {
   setHsv('setHsv', 4, false, 0x10c),
   rand('rand', 0, true, 0x10d),
   isUsbConnected('isUsbConnected', 0, true, 0x10e),
-  isUsbSuspended('isUsbSuspended', 0, true, 0x10f);
+  isUsbSuspended('isUsbSuspended', 0, true, 0x10f),
+  getParameter('getParameter', 1, true, 0x110);
 
   const InBuiltScriptFunction(
     this.functionName,

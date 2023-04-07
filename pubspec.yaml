@@ -13,4 +13,5 @@ dev_dependencies:
   lints: ^2.0.0
   test: ^1.16.0
 dependencies:
+  crclib: 3.0.0
   image: ^4.0.15
