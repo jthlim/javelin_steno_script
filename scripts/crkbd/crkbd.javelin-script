@@ -521,7 +521,6 @@ const STENO_MODE_EMBEDDED = 0;
 const STENO_MODE_GEMINI = 1;
 
 var wordCaps = 0;
-var stenoMode = STENO_MODE_EMBEDDED;
 
 const SHIFT_IMAGE = [[
   10 10

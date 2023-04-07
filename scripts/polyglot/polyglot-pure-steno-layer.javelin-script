@@ -443,8 +443,6 @@ const TAP_THRESHOLD = 200; // milliseconds for keys that have alternates
 const STENO_MODE_EMBEDDED = 0;
 const STENO_MODE_GEMINI = 1;
 
-var stenoMode = STENO_MODE_EMBEDDED;
-
 func init() {
   updateUnderglowRgb();
 }
@@ -502,8 +500,7 @@ func updateStenoMode() {
   // Four corner keys are 0, 11, 36, 41.
   if ((layer & STENO_MASK)
       && checkButtonState("100000000001000000000000000000000000100001")) {
-    stenoMode = (stenoMode + 1) % 2;
-    if (stenoMode == 0) {
+    if (getParameter("steno_mode") != "embedded") {
       console("set_steno_mode embedded");
     } else {
       console("set_steno_mode gemini");
