@@ -558,7 +558,7 @@ func updateUnderglowRgb() {
       HUE_SPREAD_VALUES[hueSpread] * 64,
       BRIGHTNESS_VALUES[brightness]
     );
-  }
+}
 }
 
 func isModifierKey(key) var {
@@ -900,6 +900,7 @@ func onRelease23() { handleRelease(SC_APOSTROPHE, SK_ZR | KEY_STENO, SC_EQUAL | 
 var timer24;
 var wasSteno24;
 var pressCount24;
+var wasInLayer24;
 func onPress24() {
   if (isInPressAll()) {
     if (layer == 0 && !wasSteno24) {
@@ -907,13 +908,16 @@ func onPress24() {
     }
     return;
   }
+  lastActionTime = getTime();
   if (layer >> 1) {
+    wasInLayer24 = 1;
     return;
   }
+  wasInLayer24 = 0;
   wasSteno24 = layer & STENO_MASK;
   if (wasSteno24) {
     releaseAll();
-    layer = layer ^ STENO_MASK;
+    setLayer(layer ^ STENO_MASK);
     pressCount24 = pressCount;
     pressAll();
   } else {
@@ -923,6 +927,10 @@ func onPress24() {
   timer24 = getTime();
 }
 func onRelease24() {
+  if (wasInLayer24) {
+    return;
+  }
+
   if (wasSteno24) {
     // If the keypress was in steno mode, and other keys were pressed, drop
     // immediately back to steno mode, and drop all masks.
@@ -1054,10 +1062,13 @@ func onPress38() {
 }
 func onRelease38() {
   if (layer & NAV_MASK) {
+    var startPressCount = pressCount;
+
     releaseAll();
     layer = layer ^ NAV_MASK;
+    pressAll();
 
-    if (layer == 0 && pressCount38 == pressCount && getTime() - navLayerPressTimestamp < TAP_THRESHOLD) {
+    if (layer == 0 && pressCount38 == startPressCount && getTime() - navLayerPressTimestamp < TAP_THRESHOLD) {
       tap(SC_SPACE);
     }
     tap(deferredQwertyKey);
@@ -1074,7 +1085,7 @@ func onRelease39() { handleRelease(SC_SPACE, SK_E | KEY_STENO, SC_NONE, SC_NONE,
 var pressCount40;
 func onPress40() {
   handlePress(SC_NONE, SK_U | KEY_STENO, SC_NONE, SC_NONE, SC_ENTER);
-  if (!isInPressAll() && (layer | SYMBOL_MASK) == SYMBOL_MASK) {
+  if ((layer | SYMBOL_MASK) == SYMBOL_MASK) {
     pressCount = pressCount + 1;
     releaseAll();
     layer = layer | FUNCTION_MASK;
@@ -1087,6 +1098,7 @@ func onRelease40() {
   handleRelease(SC_NONE, SK_U | KEY_STENO, SC_NONE, SC_NONE, SC_ENTER);
   if (layer & FUNCTION_MASK) {
     var startPressCount = pressCount;
+
     releaseAll();
     layer = layer ^ FUNCTION_MASK;
     pressAll();
@@ -1118,6 +1130,7 @@ func onRelease41() {
   if (layer & SYMBOL_MASK) {
     releaseAll();
     layer = layer ^ SYMBOL_MASK;
+    pressAll();
   } else {
     handleRelease(SC_NONE, SK_NUM2 | KEY_STENO, SC_L_CTRL, SC_NONE, SC_NONE);
   }

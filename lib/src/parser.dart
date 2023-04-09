@@ -4,7 +4,7 @@ import 'token.dart';
 import 'tokenizer.dart';
 
 class Parser {
-  static const maximumGlobalVariableCount = 64;
+  static const maximumGlobalVariableCount = 256;
 
   factory Parser({required String input, required String filename}) {
     return Parser.tokenizer(Tokenizer(input, filename));
@@ -181,10 +181,25 @@ class Parser {
     final nameToken = _currentToken;
     _assertToken(TokenType.identifier);
     final name = nameToken.stringValue!;
+
+    int? arraySize;
     AstNode? initializer;
-    if (_currentToken.type == TokenType.assign) {
-      _assertToken(TokenType.assign);
-      initializer = _parseExpression();
+    if (_currentToken.type == TokenType.openSquareBracket) {
+      _assertToken(TokenType.openSquareBracket);
+      arraySize = _currentToken.intValue;
+      _assertToken(TokenType.intValue);
+      _assertToken(TokenType.closeSquareBracket);
+
+      if (arraySize! <= 0) {
+        throw FormatException(
+          'Array size must be greater than 0 near $_currentToken',
+        );
+      }
+    } else {
+      if (_currentToken.type == TokenType.assign) {
+        _assertToken(TokenType.assign);
+        initializer = _parseExpression();
+      }
     }
     _assertToken(TokenType.semiColon);
 
@@ -193,14 +208,35 @@ class Parser {
     final index = _module.globals.length;
 
     if (index >= maximumGlobalVariableCount) {
-      throw FormatException('Too many global varialbes near $_currentToken');
+      throw FormatException('Too many global variables near $_currentToken');
     }
 
     _module.globals[name] = ScriptGlobal(
       name: name,
       index: index,
+      arraySize: arraySize,
       initializer: initializer,
     );
+
+    // Populate dummy names for current global accounting.
+    if (arraySize != null) {
+      for (var i = 1; i < arraySize; ++i) {
+        final index = _module.globals.length;
+
+        if (index >= maximumGlobalVariableCount) {
+          throw FormatException(
+              'Too many global variables near $_currentToken');
+        }
+
+        final dummyName = 'name\$$i';
+        _module.globals[dummyName] = ScriptGlobal(
+          name: dummyName,
+          index: index + i,
+          arraySize: null,
+          initializer: null,
+        );
+      }
+    }
   }
 
   void _parseFunc() {
@@ -290,10 +326,19 @@ class Parser {
 
           // Check globals
           if (_module.globals.containsKey(name)) {
-            return LoadValueAstNode(
-              isGlobal: true,
-              index: _module.globals[name]!.index,
-            );
+            final global = _module.globals[name]!;
+            final arraySize = global.arraySize;
+            if (arraySize != null) {
+              return LoadGlobalValueArrayAstNode(
+                name: global.name,
+                index: global.index,
+              );
+            } else {
+              return LoadValueAstNode(
+                isGlobal: true,
+                index: global.index,
+              );
+            }
           }
 
           // Check constants
@@ -319,6 +364,9 @@ class Parser {
         _nextToken();
         final indexExpression = _parseExpression();
         _assertToken(TokenType.closeSquareBracket);
+        if (result is LoadGlobalValueArrayAstNode) {
+          return LoadIndexedGlobalValueAstNode(result, indexExpression);
+        }
         return ByteIndexAstNode(result, indexExpression);
       default:
         return result;
@@ -566,6 +614,12 @@ class Parser {
   }
 
   AstNode _parseAssignment(String name, {bool requireSemicolon = true}) {
+    AstNode? indexExpression;
+    if (_currentToken.type == TokenType.openSquareBracket) {
+      _assertToken(TokenType.openSquareBracket);
+      indexExpression = _parseExpression();
+      _assertToken(TokenType.closeSquareBracket);
+    }
     _assertToken(TokenType.assign);
     final value = _parseExpression();
     if (requireSemicolon) {
@@ -574,24 +628,39 @@ class Parser {
 
     // Assignment can be to global or local.
     // Find out index.
-    bool isGlobal;
-    int index = 0;
-
     if (_module.globals.containsKey(name)) {
-      isGlobal = true;
-      index = _module.globals[name]!.index;
+      final global = _module.globals[name]!;
+      if (global.arraySize != null) {
+        if (indexExpression == null) {
+          throw FormatException(
+            '$name is an array and requirs an index near $_currentToken',
+          );
+        }
+        return StoreIndexedGlobalValueAstNode(
+          globalValueIndex: global.index,
+          indexExpression: indexExpression,
+          expression: value,
+        );
+      } else {
+        if (indexExpression != null) {
+          throw FormatException('$name is not an array near $_currentToken');
+        }
+        return StoreValueAstNode(
+          isGlobal: true,
+          index: global.index,
+          expression: value,
+        );
+      }
     } else if (_function!.locals.containsKey(name)) {
-      isGlobal = false;
-      index = _function!.locals[name]!;
+      final index = _function!.locals[name]!;
+      return StoreValueAstNode(
+        isGlobal: false,
+        index: index,
+        expression: value,
+      );
     } else {
       throw FormatException('Unknown variable $name near $_currentToken');
     }
-
-    return StoreValueAstNode(
-      isGlobal: isGlobal,
-      index: index,
-      expression: value,
-    );
   }
 
   List<AstNode> _parseParameterList() {
@@ -618,6 +687,7 @@ class Parser {
 
     switch (_currentToken.type) {
       case TokenType.assign:
+      case TokenType.openSquareBracket:
         return _parseAssignment(name, requireSemicolon: requireSemicolon);
 
       case TokenType.openParen:

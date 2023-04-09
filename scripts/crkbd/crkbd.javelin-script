@@ -473,6 +473,14 @@ var saturation = 5;
 var lastActionTime = 0;
 var lastCapsLockStatus = 0;
 
+const COLOR_MODE_HUE_CYCLE = 0;
+const COLOR_MODE_RANDOM = 1;
+const COLOR_MODE_RANDOM_CHANGE_ON_PRESS = 2;
+const COLOR_MODE_COUNT = 2;
+
+var colorMode = COLOR_MODE_HUE_CYCLE;
+var keyColorData[42];
+
 // Layer Tap Forgiveness.
 //
 // To avoid unintended navigation/function layer presses, the following
@@ -742,12 +750,14 @@ const STROKES_IMAGE = [[
 ]];
 
 func init() {
+  setColorMode(colorMode);
+
   updateKeyRgb();
   updateUnderglowRgb();
   updateScreenContrast();
 
   // Disable liatris power light.
-  setGpioPin(24, 1);
+  // setGpioPin(24, 1);
 
   updateDisplay0();
   setAutoDraw(0, AUTO_DRAW_NONE);
@@ -828,6 +838,27 @@ func updateKeyConstantColor(r, g, b) {
   }
 }
 
+func updateKeyRandomColor() {
+  var b = BRIGHTNESS_VALUES[brightness];
+  for (var i = 0; i < 42; i = i + 1) {
+    var v = keyColorData[i];
+    if ((v >>> 24) < 32) {
+      v = v + 0x1000000;
+      keyColorData[i] = v;
+    }
+    setHsv(i, v, (v >> 16) & 0xff, b * (v >>> 24) >> 5);
+  }
+}
+
+func updateKeyRandomColorContinuousUpdate() {
+  var b = BRIGHTNESS_VALUES[brightness];
+  for (var i = 0; i < 42; i = i + 1) {
+    var v = keyColorData[i];
+    setHsv(i, v, (v >> 16) & 0xff, b);
+  }
+  updateButtonColor((rand() >>> 1) % 42);
+}
+
 // 256 step sine table.
 const SINE_TABLE = [[ 80 83 86 89 8c 8f 92 95 98 9b 9e a2 a5 a7 aa ad b0 b3 b6 b9 bc be c1 c4 c6 c9 cb ce d0 d3 d5 d7 da dc de e0 e2 e4 e6 e8 ea eb ed ee f0 f1 f3 f4 f5 f6 f8 f9 fa fa fb fc fd fd fe fe fe ff ff ff ff ff ff ff fe fe fe fd fd fc fb fa fa f9 f8 f6 f5 f4 f3 f1 f0 ee ed eb ea e8 e6 e4 e2 e0 de dc da d7 d5 d3 d0 ce cb c9 c6 c4 c1 be bc b9 b6 b3 b0 ad aa a7 a5 a2 9e 9b 98 95 92 8f 8c 89 86 83 80 7c 79 76 73 70 6d 6a 67 64 61 5d 5a 58 55 52 4f 4c 49 46 43 41 3e 3b 39 36 34 31 2f 2c 2a 28 25 23 21 1f 1d 1b 19 17 15 14 12 11 0f 0e 0c 0b 0a 09 07 06 05 05 04 03 02 02 01 01 01 00 00 00 00 00 00 00 01 01 01 02 02 03 04 05 05 06 07 09 0a 0b 0c 0e 0f 11 12 14 15 17 19 1b 1d 1f 21 23 25 28 2a 2c 2f 31 34 36 39 3b 3e 41 43 46 49 4c 4f 52 55 58 5a 5d 61 64 67 6a 6d 70 73 76 79 7c ]];
 func updateKeyBreatheCycle() {
@@ -840,13 +871,17 @@ func updateKeyBreatheCycle() {
 func updateKeyRgb() {
   if (isUsbSuspended()) {
     updateKeyBreatheCycle();
-  } else {
+  } else if (colorMode == COLOR_MODE_HUE_CYCLE) {
     updateKeyRgbHueCycle(
       getTime() * SPEED_VALUES[speed] + hueShift,
       SATURATION_VALUES[saturation] * 2,
       HUE_SPREAD_VALUES[hueSpread] * 16,
       BRIGHTNESS_VALUES[brightness]
     );
+  } else if (colorMode == COLOR_MODE_RANDOM) {
+    updateKeyRandomColorContinuousUpdate();
+  } else if (colorMode == COLOR_MODE_RANDOM_CHANGE_ON_PRESS) {
+    updateKeyRandomColor();
   }
 
   // if (getLedStatus(LED_STATUS_CAPS_LOCK)) {
@@ -1057,7 +1092,23 @@ func isSettingsLayer() var {
   return (layer & (SYMBOL_MASK | FUNCTION_MASK)) == (SYMBOL_MASK | FUNCTION_MASK);
 }
 
-func handlePress(qwertyKey, stenoKey, symbolsKey, functionKey, navKey) {
+func updateButtonColor(buttonIndex) {
+  if (colorMode == COLOR_MODE_RANDOM || colorMode == COLOR_MODE_RANDOM_CHANGE_ON_PRESS) {
+    keyColorData[buttonIndex] = (rand() & 0xffff) | (((rand() & 0x1f) + 0xe0) << 16);
+  }
+}
+
+func setColorMode(newColorMode) {
+  // Avoid negative values using (x + n) % n
+  colorMode = (newColorMode + COLOR_MODE_COUNT) % COLOR_MODE_COUNT;
+
+  for (var i = 0; i < 42; i = i + 1) {
+    updateButtonColor(i);
+  }
+}
+
+func handlePress(buttonIndex, qwertyKey, stenoKey, symbolsKey, functionKey, navKey) {
+  updateButtonColor(buttonIndex);
   lastActionTime = getTime();
   if (isSettingsLayer()) {
     return;
@@ -1133,7 +1184,7 @@ func handleRelease(qwertyKey, stenoKey, symbolsKey, functionKey, navKey) {
 }
 
 func onPress0() {
-  handlePress(SC_TAB, SK_NONE, SC_GRAVE, SC_NONE, SC_NONE);
+  handlePress(0, SC_TAB, SK_NONE, SC_GRAVE, SC_NONE, SC_NONE);
 
   if (isSettingsLayer()) {
     updateDisplay0();
@@ -1143,14 +1194,14 @@ func onPress0() {
 }
 func onRelease0() { handleRelease(SC_TAB, SK_NONE, SC_GRAVE, SC_NONE, SC_NONE); }
 
-func onPress1() { handlePress(SC_Q, SK_S1 | KEY_STENO, SC_1, SC_F9, SC_NONE); }
+func onPress1() { handlePress(1, SC_Q, SK_S1 | KEY_STENO, SC_1, SC_F9, SC_NONE); }
 func onRelease1() { handleRelease(SC_Q, SK_S1 | KEY_STENO, SC_1, SC_F9, SC_NONE); }
 
-func onPress2() { handlePress(SC_W, SK_TL | KEY_STENO, SC_2, SC_F10, SC_NONE); }
+func onPress2() { handlePress(2, SC_W, SK_TL | KEY_STENO, SC_2, SC_F10, SC_NONE); }
 func onRelease2() { handleRelease(SC_W, SK_TL | KEY_STENO, SC_2, SC_F10, SC_NONE); }
 
 func onPress3() {
-  handlePress(SC_E, SK_PL | KEY_STENO, SC_3, SC_F11, SC_NONE);
+  handlePress(3, SC_E, SK_PL | KEY_STENO, SC_3, SC_F11, SC_NONE);
 
   if (isSettingsLayer()) {
     console("set_steno_mode embedded");
@@ -1160,14 +1211,14 @@ func onPress3() {
 }
 func onRelease3() { handleRelease(SC_E, SK_PL | KEY_STENO, SC_3, SC_F11, SC_NONE); }
 
-func onPress4() { handlePress(SC_R, SK_HL | KEY_STENO, SC_4, SC_F12, SC_NONE); }
+func onPress4() { handlePress(4, SC_R, SK_HL | KEY_STENO, SC_4, SC_F12, SC_NONE); }
 func onRelease4() { handleRelease(SC_R, SK_HL | KEY_STENO, SC_4, SC_F12, SC_NONE); }
 
-func onPress5() { handlePress(SC_T, SK_STAR1 | KEY_STENO, SC_5, SC_NONE, SC_NONE); }
+func onPress5() { handlePress(5, SC_T, SK_STAR1 | KEY_STENO, SC_5, SC_NONE, SC_NONE); }
 func onRelease5() { handleRelease(SC_T, SK_STAR1 | KEY_STENO, SC_5, SC_NONE, SC_NONE); }
 
 func onPress6() {
-  handlePress(SC_Y, SK_STAR2 | KEY_STENO, SC_6, SC_NONE, SC_VOLUME_UP);
+  handlePress(6, SC_Y, SK_STAR2 | KEY_STENO, SC_6, SC_NONE, SC_VOLUME_UP);
 
   if (isSettingsLayer()) {
     if (speed < 8) {
@@ -1181,11 +1232,17 @@ func onPress6() {
 }
 func onRelease6() { handleRelease(SC_Y, SK_STAR2 | KEY_STENO, SC_6, SC_NONE, SC_VOLUME_UP); }
 
-func onPress7() { handlePress(SC_U, SK_FR | KEY_STENO, SC_7, SC_NONE, SC_BACKSPACE); }
+func onPress7() {
+  handlePress(7, SC_U, SK_FR | KEY_STENO, SC_7, SC_NONE, SC_BACKSPACE);
+
+  if (isSettingsLayer()) {
+    setColorMode(colorMode + 1);
+  }
+}
 func onRelease7() { handleRelease(SC_U, SK_FR | KEY_STENO, SC_7, SC_NONE, SC_BACKSPACE); }
 
 func onPress8() {
-  handlePress(SC_I, SK_PR | KEY_STENO, SC_8, SC_NONE, SC_UP);
+  handlePress(8, SC_I, SK_PR | KEY_STENO, SC_8, SC_NONE, SC_UP);
 
   if (isSettingsLayer()) {
     if (brightness < 8) {
@@ -1200,7 +1257,7 @@ func onPress8() {
 func onRelease8() { handleRelease(SC_I, SK_PR | KEY_STENO, SC_8, SC_NONE, SC_UP); }
 
 func onPress9() {
-  handlePress(SC_O, SK_LR | KEY_STENO, SC_9, SC_NONE, SC_DELETE);
+  handlePress(9, SC_O, SK_LR | KEY_STENO, SC_9, SC_NONE, SC_DELETE);
 
   if (isSettingsLayer()) {
     if (saturation < 8) {
@@ -1213,7 +1270,7 @@ func onPress9() {
 func onRelease9() { handleRelease(SC_O, SK_LR | KEY_STENO, SC_9, SC_NONE, SC_DELETE); }
 
 func onPress10() {
-  handlePress(SC_P, SK_TR | KEY_STENO, SC_0, SC_NONE, SC_PAGE_UP);
+  handlePress(10, SC_P, SK_TR | KEY_STENO, SC_0, SC_NONE, SC_PAGE_UP);
 
   if (isSettingsLayer()) {
     hueShift = hueShift - 0x800;
@@ -1222,7 +1279,7 @@ func onPress10() {
 func onRelease10() { handleRelease(SC_P, SK_TR | KEY_STENO, SC_0, SC_NONE, SC_PAGE_UP); }
 
 func onPress11() {
-  handlePress(SC_BACKSPACE, SK_DR | KEY_STENO, SC_EQUAL, SC_NONE, SC_HOME);
+  handlePress(11, SC_BACKSPACE, SK_DR | KEY_STENO, SC_EQUAL, SC_NONE, SC_HOME);
 
   if (isSettingsLayer()) {
     if (hueSpread < 8) {
@@ -1238,7 +1295,7 @@ func onRelease11() { handleRelease(SC_BACKSPACE, SK_DR | KEY_STENO, SC_EQUAL, SC
 var timer12;
 var pressCount12;
 func onPress12() {
-  handlePress(SC_L_CTRL, SK_NONE, SC_GRAVE | KEY_SHIFT, SC_NONE, SC_NONE);
+  handlePress(12, SC_L_CTRL, SK_NONE, SC_GRAVE | KEY_SHIFT, SC_NONE, SC_NONE);
   if (!isInPressAll()) {
     timer12 = getTime();
     pressCount12 = pressCount;
@@ -1251,14 +1308,14 @@ func onRelease12() {
   }
 }
 
-func onPress13() { handlePress(SC_A, SK_S2 | KEY_STENO, SC_1 | KEY_SHIFT, SC_F5, SC_L_META); }
+func onPress13() { handlePress(13, SC_A, SK_S2 | KEY_STENO, SC_1 | KEY_SHIFT, SC_F5, SC_L_META); }
 func onRelease13() { handleRelease(SC_A, SK_S2 | KEY_STENO, SC_1 | KEY_SHIFT, SC_F5, SC_L_META); }
 
-func onPress14() { handlePress(SC_S, SK_KL | KEY_STENO, SC_2 | KEY_SHIFT, SC_F6, SC_L_ALT); }
+func onPress14() { handlePress(14, SC_S, SK_KL | KEY_STENO, SC_2 | KEY_SHIFT, SC_F6, SC_L_ALT); }
 func onRelease14() { handleRelease(SC_S, SK_KL | KEY_STENO, SC_2 | KEY_SHIFT, SC_F6, SC_L_ALT); }
 
 func onPress15() {
-  handlePress(SC_D, SK_WL | KEY_STENO, SC_3 | KEY_SHIFT, SC_F7, SC_L_CTRL);
+  handlePress(15, SC_D, SK_WL | KEY_STENO, SC_3 | KEY_SHIFT, SC_F7, SC_L_CTRL);
 
   if (isSettingsLayer()) {
     console("set_steno_mode gemini");
@@ -1268,14 +1325,14 @@ func onPress15() {
 }
 func onRelease15() { handleRelease(SC_D, SK_WL | KEY_STENO, SC_3 | KEY_SHIFT, SC_F7, SC_L_CTRL); }
 
-func onPress16() { handlePress(SC_F, SK_RL | KEY_STENO, SC_4 | KEY_SHIFT, SC_F8, SC_L_SHIFT); }
+func onPress16() { handlePress(16, SC_F, SK_RL | KEY_STENO, SC_4 | KEY_SHIFT, SC_F8, SC_L_SHIFT); }
 func onRelease16() { handleRelease(SC_F, SK_RL | KEY_STENO, SC_4 | KEY_SHIFT, SC_F8, SC_L_SHIFT); }
 
-func onPress17() { handlePress(SC_G, SK_STAR3 | KEY_STENO, SC_5 | KEY_SHIFT, SC_NONE, SC_NONE); }
+func onPress17() { handlePress(17, SC_G, SK_STAR3 | KEY_STENO, SC_5 | KEY_SHIFT, SC_NONE, SC_NONE); }
 func onRelease17() { handleRelease(SC_G, SK_STAR3 | KEY_STENO, SC_5 | KEY_SHIFT, SC_NONE, SC_NONE); }
 
 func onPress18() {
-  handlePress(SC_H, SK_STAR4 | KEY_STENO, SC_6 | KEY_SHIFT, SC_NONE, SC_VOLUME_DOWN);
+  handlePress(18, SC_H, SK_STAR4 | KEY_STENO, SC_6 | KEY_SHIFT, SC_NONE, SC_VOLUME_DOWN);
 
   if (isSettingsLayer()) {
     if (speed > 0) {
@@ -1289,11 +1346,17 @@ func onPress18() {
 }
 func onRelease18() { handleRelease(SC_H, SK_STAR4 | KEY_STENO, SC_6 | KEY_SHIFT, SC_NONE, SC_VOLUME_DOWN); }
 
-func onPress19() { handlePress(SC_J, SK_RR | KEY_STENO, SC_7 | KEY_SHIFT, SC_L_SHIFT, SC_LEFT); }
+func onPress19() {
+  handlePress(19, SC_J, SK_RR | KEY_STENO, SC_7 | KEY_SHIFT, SC_L_SHIFT, SC_LEFT);
+
+  if (isSettingsLayer()) {
+    setColorMode(colorMode - 1);
+  }
+}
 func onRelease19() { handleRelease(SC_J, SK_RR | KEY_STENO, SC_7 | KEY_SHIFT, SC_L_SHIFT, SC_LEFT); }
 
 func onPress20() {
-  handlePress(SC_K, SK_BR | KEY_STENO, SC_8 | KEY_SHIFT, SC_L_CTRL, SC_DOWN);
+  handlePress(20, SC_K, SK_BR | KEY_STENO, SC_8 | KEY_SHIFT, SC_L_CTRL, SC_DOWN);
 
   if (isSettingsLayer()) {
     if (brightness > 0) {
@@ -1308,7 +1371,7 @@ func onPress20() {
 func onRelease20() { handleRelease(SC_K, SK_BR | KEY_STENO, SC_8 | KEY_SHIFT, SC_L_CTRL, SC_DOWN); }
 
 func onPress21() {
-  handlePress(SC_L, SK_GR | KEY_STENO, SC_9 | KEY_SHIFT, SC_L_ALT, SC_RIGHT);
+  handlePress(21, SC_L, SK_GR | KEY_STENO, SC_9 | KEY_SHIFT, SC_L_ALT, SC_RIGHT);
 
   if (isSettingsLayer()) {
     if (saturation > 0) {
@@ -1321,7 +1384,7 @@ func onPress21() {
 func onRelease21() { handleRelease(SC_L, SK_GR | KEY_STENO, SC_9 | KEY_SHIFT, SC_L_ALT, SC_RIGHT); }
 
 func onPress22() {
-  handlePress(SC_SEMICOLON, SK_SR | KEY_STENO, SC_0 | KEY_SHIFT, SC_L_META, SC_PAGE_DOWN);
+  handlePress(22, SC_SEMICOLON, SK_SR | KEY_STENO, SC_0 | KEY_SHIFT, SC_L_META, SC_PAGE_DOWN);
 
   if (isSettingsLayer()) {
     hueShift = hueShift + 0x800;
@@ -1330,7 +1393,7 @@ func onPress22() {
 func onRelease22() { handleRelease(SC_SEMICOLON, SK_SR | KEY_STENO, SC_0 | KEY_SHIFT, SC_L_META, SC_PAGE_DOWN); }
 
 func onPress23() {
-  handlePress(SC_APOSTROPHE, SK_ZR | KEY_STENO, SC_EQUAL | KEY_SHIFT, SC_NONE, SC_END);
+  handlePress(23, SC_APOSTROPHE, SK_ZR | KEY_STENO, SC_EQUAL | KEY_SHIFT, SC_NONE, SC_END);
 
   if (isSettingsLayer()) {
     if (hueSpread > 0) {
@@ -1346,7 +1409,9 @@ func onRelease23() { handleRelease(SC_APOSTROPHE, SK_ZR | KEY_STENO, SC_EQUAL | 
 var timer24;
 var wasSteno24;
 var pressCount24;
+var wasInLayer24;
 func onPress24() {
+  updateButtonColor(24);
   if (isInPressAll()) {
     if (layer == 0 && !wasSteno24) {
       press(SC_L_SHIFT);
@@ -1355,8 +1420,10 @@ func onPress24() {
   }
   lastActionTime = getTime();
   if (layer >> 1) {
+    wasInLayer24 = 1;
     return;
   }
+  wasInLayer24 = 0;
   wasSteno24 = layer & STENO_MASK;
   if (wasSteno24) {
     releaseAll();
@@ -1371,6 +1438,10 @@ func onPress24() {
 }
 func onRelease24() {
   lastActionTime = getTime();
+
+  if (wasInLayer24) {
+    return;
+  }
 
   if (wasSteno24) {
     // If the keypress was in steno mode, and other keys were pressed, drop
@@ -1394,14 +1465,14 @@ func onRelease24() {
   updateUnderglowRgb();
 }
 
-func onPress25() { handlePress(SC_Z, SC_NONE, SC_BACKSLASH, SC_F1, SC_NONE); }
+func onPress25() { handlePress(25, SC_Z, SC_NONE, SC_BACKSLASH, SC_F1, SC_NONE); }
 func onRelease25() { handleRelease(SC_Z, SC_NONE, SC_BACKSLASH, SC_F1, SC_NONE); }
 
-func onPress26() { handlePress(SC_X, SC_NONE, SC_BACKSLASH | KEY_SHIFT, SC_F2, SC_NONE); }
+func onPress26() { handlePress(26, SC_X, SC_NONE, SC_BACKSLASH | KEY_SHIFT, SC_F2, SC_NONE); }
 func onRelease26() { handleRelease(SC_X, SC_NONE, SC_BACKSLASH | KEY_SHIFT, SC_F2, SC_NONE); }
 
 func onPress27() {
-  handlePress(SC_C, SC_NONE, SC_MINUS, SC_F3, SC_NONE);
+  handlePress(27, SC_C, SC_NONE, SC_MINUS, SC_F3, SC_NONE);
 
   if (isSettingsLayer()) {
     console("set_steno_mode plover_hid");
@@ -1411,25 +1482,25 @@ func onPress27() {
 }
 func onRelease27() { handleRelease(SC_C, SC_NONE, SC_MINUS, SC_F3, SC_NONE); }
 
-func onPress28() { handlePress(SC_V, SC_NONE, SC_L_BRACKET, SC_F4, SC_NONE); }
+func onPress28() { handlePress(28, SC_V, SC_NONE, SC_L_BRACKET, SC_F4, SC_NONE); }
 func onRelease28() { handleRelease(SC_V, SC_NONE, SC_L_BRACKET, SC_F4, SC_NONE); }
 
-func onPress29() { handlePress(SC_B, SC_NONE, SC_L_BRACKET | KEY_SHIFT, SC_NONE, SC_NONE); }
+func onPress29() { handlePress(29, SC_B, SC_NONE, SC_L_BRACKET | KEY_SHIFT, SC_NONE, SC_NONE); }
 func onRelease29() { handleRelease(SC_B, SC_NONE, SC_L_BRACKET | KEY_SHIFT, SC_NONE, SC_NONE); }
 
-func onPress30() { handlePress(SC_N, SC_NONE, SC_R_BRACKET | KEY_SHIFT, SC_NONE, SC_MUTE); }
+func onPress30() { handlePress(30, SC_N, SC_NONE, SC_R_BRACKET | KEY_SHIFT, SC_NONE, SC_MUTE); }
 func onRelease30() { handleRelease(SC_N, SC_NONE, SC_R_BRACKET | KEY_SHIFT, SC_NONE, SC_MUTE); }
 
-func onPress31() { handlePress(SC_M, SC_NONE, SC_R_BRACKET, SC_NONE, SC_NONE); }
+func onPress31() { handlePress(31, SC_M, SC_NONE, SC_R_BRACKET, SC_NONE, SC_NONE); }
 func onRelease31() { handleRelease(SC_M, SC_NONE, SC_R_BRACKET, SC_NONE, SC_NONE); }
 
-func onPress32() { handlePress(SC_COMMA, SC_NONE, SC_MINUS | KEY_SHIFT, SC_NONE, SC_NONE); }
+func onPress32() { handlePress(32, SC_COMMA, SC_NONE, SC_MINUS | KEY_SHIFT, SC_NONE, SC_NONE); }
 func onRelease32() { handleRelease(SC_COMMA, SC_NONE, SC_MINUS | KEY_SHIFT, SC_NONE, SC_NONE); }
 
-func onPress33() { handlePress(SC_DOT, SC_NONE, SC_DOT, SC_NONE, SC_NONE); }
+func onPress33() { handlePress(33, SC_DOT, SC_NONE, SC_DOT, SC_NONE, SC_NONE); }
 func onRelease33() { handleRelease(SC_DOT, SC_NONE, SC_DOT, SC_NONE, SC_NONE); }
 
-func onPress34() { handlePress(SC_SLASH, SC_NONE, SC_SLASH, SC_NONE, SC_NONE); }
+func onPress34() { handlePress(34, SC_SLASH, SC_NONE, SC_SLASH, SC_NONE, SC_NONE); }
 func onRelease34() { handleRelease(SC_SLASH, SC_NONE, SC_SLASH, SC_NONE, SC_NONE); }
 
 var timer35;
@@ -1438,7 +1509,7 @@ var tapCount35;
 var pressCount35;
 var capsPressed;
 func onPress35() {
-  handlePress(SC_R_SHIFT, SC_NONE, SC_NONE, SC_NONE, SC_NONE);
+  handlePress(35, SC_R_SHIFT, SC_NONE, SC_NONE, SC_NONE, SC_NONE);
 
   capsPressed = 0;
   if (layer == 0) {
@@ -1475,13 +1546,13 @@ func onRelease35() {
 
 // 4th row
 
-func onPress36() { handlePress(SC_L_META, SK_NUM1 | KEY_STENO, SC_L_META, SC_NONE, SC_NONE); }
+func onPress36() { handlePress(36, SC_L_META, SK_NUM1 | KEY_STENO, SC_L_META, SC_NONE, SC_NONE); }
 func onRelease36() { handleRelease(SC_L_META, SK_NUM1 | KEY_STENO, SC_L_META, SC_NONE, SC_NONE); }
 
 var timer37;
 var pressCount37;
 func onPress37() {
-  handlePress(SC_L_ALT, SK_A | KEY_STENO, SC_L_ALT, SC_NONE, SC_NONE);
+  handlePress(37, SC_L_ALT, SK_A | KEY_STENO, SC_L_ALT, SC_NONE, SC_NONE);
   if (!isInPressAll()) {
     timer37 = getTime();
     pressCount37 = pressCount37;
@@ -1497,8 +1568,9 @@ func onRelease37() {
 var pressCount38;
 func onPress38() {
   if (layer != 0) {
-    handlePress(SC_NONE, SK_O | KEY_STENO, SC_L_CTRL, SC_NONE, SC_NONE);
+    handlePress(38, SC_NONE, SK_O | KEY_STENO, SC_L_CTRL, SC_NONE, SC_NONE);
   } else {
+    updateButtonColor(38);
     pressCount = pressCount + 1;
     releaseAll();
     setLayer(layer | NAV_MASK);
@@ -1526,12 +1598,12 @@ func onRelease38() {
   }
 }
 
-func onPress39() { handlePress(SC_SPACE, SK_E | KEY_STENO, SC_NONE, SC_NONE, SC_SPACE); }
+func onPress39() { handlePress(39, SC_SPACE, SK_E | KEY_STENO, SC_NONE, SC_NONE, SC_SPACE); }
 func onRelease39() { handleRelease(SC_SPACE, SK_E | KEY_STENO, SC_NONE, SC_NONE, SC_SPACE); }
 
 var pressCount40;
 func onPress40() {
-  handlePress(SC_NONE, SK_U | KEY_STENO, SC_NONE, SC_NONE, SC_ENTER);
+  handlePress(40, SC_NONE, SK_U | KEY_STENO, SC_NONE, SC_NONE, SC_ENTER);
   if ((layer | SYMBOL_MASK) == SYMBOL_MASK) {
     pressCount = pressCount + 1;
     releaseAll();
@@ -1564,8 +1636,9 @@ func onRelease40() {
 
 func onPress41() {
   if ((layer | FUNCTION_MASK) != FUNCTION_MASK) {
-    handlePress(SC_NONE, SK_NUM2 | KEY_STENO, SC_NONE, SC_NONE, SC_NONE);
+    handlePress(41, SC_NONE, SK_NUM2 | KEY_STENO, SC_NONE, SC_NONE, SC_NONE);
   } else {
+    updateButtonColor(41);
     pressCount = pressCount + 1;
     releaseAll();
     setLayer(layer | SYMBOL_MASK);
@@ -1582,3 +1655,4 @@ func onRelease41() {
     handleRelease(SC_NONE, SK_NUM2 | KEY_STENO, SC_L_CTRL, SC_NONE, SC_NONE);
   }
 }
+

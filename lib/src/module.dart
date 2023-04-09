@@ -121,11 +121,13 @@ class ScriptGlobal {
   ScriptGlobal({
     required this.name,
     required this.index,
+    required this.arraySize,
     required this.initializer,
   });
 
   final String name;
   final int index;
+  final int? arraySize;
   final AstNode? initializer;
 }
 

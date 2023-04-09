@@ -176,6 +176,24 @@ class LoadGlobalValueInstruction extends ScriptInstruction {
   String toString() => '  load g$index';
 }
 
+class LoadIndexedGlobalValueInstruction extends ScriptInstruction {
+  LoadIndexedGlobalValueInstruction(this.index);
+
+  final int index;
+
+  @override
+  int get byteCodeLength => 2;
+
+  @override
+  void addByteCode(ScriptByteCodeBuilder builder) {
+    builder.bytesBuilder.addByte(0xcd);
+    builder.bytesBuilder.addByte(index);
+  }
+
+  @override
+  String toString() => '  load g$index[]';
+}
+
 class StoreGlobalValueInstruction extends ScriptInstruction {
   StoreGlobalValueInstruction(this.index);
 
@@ -196,6 +214,24 @@ class StoreGlobalValueInstruction extends ScriptInstruction {
 
   @override
   String toString() => '  store g$index';
+}
+
+class StoreIndexedGlobalValueInstruction extends ScriptInstruction {
+  StoreIndexedGlobalValueInstruction(this.index);
+
+  final int index;
+
+  @override
+  int get byteCodeLength => 2;
+
+  @override
+  void addByteCode(ScriptByteCodeBuilder builder) {
+    builder.bytesBuilder.addByte(0xce);
+    builder.bytesBuilder.addByte(index);
+  }
+
+  @override
+  String toString() => '  store g$index[]';
 }
 
 class CallInBuiltFunctionInstruction extends ScriptInstruction {
@@ -453,7 +489,7 @@ class PushIntValueScriptInstruction extends ScriptInstruction {
       builder.bytesBuilder.addByte(value >> 8);
       builder.bytesBuilder.addByte(value >> 16);
     } else {
-      builder.bytesBuilder.addByte(0xc2);
+      builder.bytesBuilder.addByte(0xc3);
       builder.bytesBuilder.addByte(value);
       builder.bytesBuilder.addByte(value >> 8);
       builder.bytesBuilder.addByte(value >> 16);

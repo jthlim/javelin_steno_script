@@ -616,6 +616,44 @@ class LoadParamAstNode extends AstNode {
   final int index;
 }
 
+class LoadGlobalValueArrayAstNode extends AstNode {
+  LoadGlobalValueArrayAstNode({required this.name, required this.index});
+
+  @override
+  bool isConstant() => false;
+
+  @override
+  int constantValue() => 0;
+
+  @override
+  void addInstructions(ScriptByteCodeBuilder builder) {
+    throw Exception("Global value array $name must be indexed");
+  }
+
+  final String name;
+  final int index;
+}
+
+class LoadIndexedGlobalValueAstNode extends AstNode {
+  LoadIndexedGlobalValueAstNode(this.globalValue, this.indexExpression);
+
+  @override
+  bool isConstant() => false;
+
+  @override
+  int constantValue() => 0;
+
+  @override
+  void addInstructions(ScriptByteCodeBuilder builder) {
+    indexExpression.addInstructions(builder);
+    builder
+        .addInstruction(LoadIndexedGlobalValueInstruction(globalValue.index));
+  }
+
+  final LoadGlobalValueArrayAstNode globalValue;
+  final AstNode indexExpression;
+}
+
 class LoadValueAstNode extends AstNode {
   LoadValueAstNode({
     required this.isGlobal,
@@ -713,6 +751,32 @@ class StoreValueAstNode extends AstNode {
 
   final bool isGlobal;
   final int index;
+  final AstNode expression;
+}
+
+class StoreIndexedGlobalValueAstNode extends AstNode {
+  StoreIndexedGlobalValueAstNode({
+    required this.globalValueIndex,
+    required this.indexExpression,
+    required this.expression,
+  });
+
+  @override
+  bool isConstant() => false;
+
+  @override
+  int constantValue() => 0;
+
+  @override
+  void addInstructions(ScriptByteCodeBuilder builder) {
+    indexExpression.addInstructions(builder);
+    expression.addInstructions(builder);
+    builder
+        .addInstruction(StoreIndexedGlobalValueInstruction(globalValueIndex));
+  }
+
+  final int globalValueIndex;
+  final AstNode indexExpression;
   final AstNode expression;
 }
 
