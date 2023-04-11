@@ -475,7 +475,6 @@ var lastCapsLockStatus = 0;
 
 const COLOR_MODE_HUE_CYCLE = 0;
 const COLOR_MODE_RANDOM = 1;
-const COLOR_MODE_RANDOM_CHANGE_ON_PRESS = 2;
 const COLOR_MODE_COUNT = 2;
 
 var colorMode = COLOR_MODE_HUE_CYCLE;
@@ -840,23 +839,22 @@ func updateKeyConstantColor(r, g, b) {
 
 func updateKeyRandomColor() {
   var b = BRIGHTNESS_VALUES[brightness];
+  var s = SATURATION_VALUES[saturation] * 2;
   for (var i = 0; i < 42; i = i + 1) {
     var v = keyColorData[i];
     if ((v >>> 24) < 32) {
       v = v + 0x1000000;
       keyColorData[i] = v;
     }
-    setHsv(i, v, (v >> 16) & 0xff, b * (v >>> 24) >> 5);
+    if (speed == 0) {
+      setHsv(i, v, s, b * (v >>> 24) >> 5);
+    } else {
+      setHsv(i, v, s, b);
+    }
   }
-}
-
-func updateKeyRandomColorContinuousUpdate() {
-  var b = BRIGHTNESS_VALUES[brightness];
-  for (var i = 0; i < 42; i = i + 1) {
-    var v = keyColorData[i];
-    setHsv(i, v, (v >> 16) & 0xff, b);
+  for (var i = 0; i < speed; i = i + 1) {
+    updateButtonColor((rand() >>> 1) % 42);
   }
-  updateButtonColor((rand() >>> 1) % 42);
 }
 
 // 256 step sine table.
@@ -879,8 +877,6 @@ func updateKeyRgb() {
       BRIGHTNESS_VALUES[brightness]
     );
   } else if (colorMode == COLOR_MODE_RANDOM) {
-    updateKeyRandomColorContinuousUpdate();
-  } else if (colorMode == COLOR_MODE_RANDOM_CHANGE_ON_PRESS) {
     updateKeyRandomColor();
   }
 
@@ -1093,8 +1089,8 @@ func isSettingsLayer() var {
 }
 
 func updateButtonColor(buttonIndex) {
-  if (colorMode == COLOR_MODE_RANDOM || colorMode == COLOR_MODE_RANDOM_CHANGE_ON_PRESS) {
-    keyColorData[buttonIndex] = (rand() & 0xffff) | (((rand() & 0x1f) + 0xe0) << 16);
+  if (colorMode == COLOR_MODE_RANDOM) {
+    keyColorData[buttonIndex] = rand() & 0xffff;
   }
 }
 
@@ -1655,4 +1651,3 @@ func onRelease41() {
     handleRelease(SC_NONE, SK_NUM2 | KEY_STENO, SC_L_CTRL, SC_NONE, SC_NONE);
   }
 }
-

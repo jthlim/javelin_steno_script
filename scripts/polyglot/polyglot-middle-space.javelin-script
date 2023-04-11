@@ -908,7 +908,6 @@ func onPress24() {
     }
     return;
   }
-  lastActionTime = getTime();
   if (layer >> 1) {
     wasInLayer24 = 1;
     return;
@@ -917,7 +916,7 @@ func onPress24() {
   wasSteno24 = layer & STENO_MASK;
   if (wasSteno24) {
     releaseAll();
-    setLayer(layer ^ STENO_MASK);
+    layer = layer ^ STENO_MASK;
     pressCount24 = pressCount;
     pressAll();
   } else {
