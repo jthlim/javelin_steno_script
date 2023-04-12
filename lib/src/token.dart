@@ -34,6 +34,7 @@ enum TokenType {
   bitwiseOr,
   bitwiseAnd,
   bitwiseXor,
+  bitwiseNot,
   not,
   and,
   or,

@@ -257,6 +257,14 @@ class Tokenizer {
           yield Token(type: TokenType.closeBrace, line: _line, column: _column);
           continue;
 
+        case 0x7e: // '~'
+          yield Token(
+            type: TokenType.bitwiseNot,
+            line: _line,
+            column: _column,
+          );
+          continue;
+
         case 0x5b: // '['
           if (_offset < _length && _input.codeUnitAt(_offset) == 0x5b) {
             ++_column;

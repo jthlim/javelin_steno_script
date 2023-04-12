@@ -216,6 +216,19 @@ class StoreGlobalValueInstruction extends ScriptInstruction {
   String toString() => '  store g$index';
 }
 
+class PopValueInstruction extends ScriptInstruction {
+  @override
+  int get byteCodeLength => 1;
+
+  @override
+  void addByteCode(ScriptByteCodeBuilder builder) {
+    builder.bytesBuilder.addByte(0xc9);
+  }
+
+  @override
+  String toString() => '  pop';
+}
+
 class StoreIndexedGlobalValueInstruction extends ScriptInstruction {
   StoreIndexedGlobalValueInstruction(this.index);
 

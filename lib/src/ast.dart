@@ -121,6 +121,29 @@ class NegateAstNode extends UnaryOperatorAstNode {
   ScriptOpCode get opcode => ScriptOpCode.negative;
 }
 
+class BitwiseNotAstNode extends AstNode {
+  BitwiseNotAstNode(this.expression);
+
+  @override
+  bool isConstant() => expression.isConstant();
+
+  @override
+  int constantValue() => ~expression.constantValue();
+
+  @override
+  void addInstructions(ScriptByteCodeBuilder builder) {
+    if (isConstant()) {
+      builder.addInstruction(PushIntValueScriptInstruction(constantValue()));
+      return;
+    }
+    expression.addInstructions(builder);
+    builder.addInstruction(OpcodeScriptInstruction(ScriptOpCode.negative));
+    builder.addInstruction(OpcodeScriptInstruction(ScriptOpCode.decrement));
+  }
+
+  final AstNode expression;
+}
+
 abstract class BinaryOperatorAstNode extends AstNode {
   BinaryOperatorAstNode(this.statementA, this.statementB);
 
@@ -718,6 +741,10 @@ class CallFunctionAstNode extends AstNode {
       );
     } else {
       builder.addInstruction(CallFunctionInstruction(name));
+    }
+
+    if (!usesValue && definition.hasReturnValue) {
+      builder.addInstruction(PopValueInstruction());
     }
   }
 

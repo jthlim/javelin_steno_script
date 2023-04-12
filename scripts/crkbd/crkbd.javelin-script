@@ -74,8 +74,22 @@
 // |--------+------+------+------+------+------+        +------+------+------+------+------+--------|
 // |        |      |      |      |      |      |        | Mute |      |      |      |      |        |
 // `----------------------+--+---+--+---+--+---+--.  ,--+---+--+---+--+---+-------------------------'
-//                           |      |      |      |  | Space| Enter|      |
+//                           |      |Numpad|      |  | Space| Enter|      |
 //                           `--------------------'  `--------------------'
+//
+
+//
+// Numpad -- Pressing Alt + Nav at the same time
+//
+// ,-------------------------------------------.        ,-------------------------------------------.
+// |        |      |      |      |      |      |        |      |   7  |   8  |   9  |      |        |
+// |--------+------+------+------+------+------|        |------+------+------+------+------+--------|
+// |        |  GUI |  Alt | Ctrl | Shift|      |        |      |   4  |   5  |   6  |      |        |
+// |--------+------+------+------+------+------+        +------+------+------+------+------+--------|
+// |        |      |      |      |      |      |        |      |   1  |   2  |   3  |      |        |
+// `----------------------+--+---+--+---+--+---+--.  ,--+---+--+---+--+---+-------------------------'
+//                           |      |      |      |  |         |   0  |      |
+//                           `--------------------'  `-----------------------'
 //
 
 //
@@ -462,6 +476,7 @@ const STENO_MASK = 1;
 const SYMBOL_MASK = 2;
 const FUNCTION_MASK = 4;
 const NAV_MASK = 8;
+const NUMPAD_MASK = 16;
 
 var layer = STENO_MASK;
 var pressCount = 0;
@@ -628,6 +643,18 @@ const SETTINGS_IMAGE = [[
   f8 07 c0 7f fe 03 c0 ff ff 03 e0 ff ff 07 e0 ff
   ff 07 f0 ff ff 0f f0 ff ff 0f e0 f3 cf 07 c0 e0
   07 03 00 e0 07 00 00 e0 07 00 00 c0 03 00 00 00
+  00 00
+]];
+
+const NUMPAD_IMAGE = [[
+  20 20 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  00 00 00 00 00 00 fc ff ff 3f 0e 87 c3 7f 07 02
+  81 ff 07 02 81 ff 07 02 81 ff 07 02 81 ff 0f 87
+  c3 ff ff ff ff ff 0f 87 c3 e1 07 02 81 c0 07 02
+  81 c0 07 02 81 c0 07 02 81 c0 0f 87 c3 e1 ff ff
+  ff ff 0f 87 c3 ff 07 02 81 ff 07 02 81 ff 07 02
+  81 ff 07 02 81 ff 0e 87 c3 7f fc ff ff 3f 00 00
+  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
   00 00
 ]];
 
@@ -952,6 +979,8 @@ func drawDisplay0NonSteno(layerImage) {
 func updateDisplay0() {
   if (isSettingsLayer()) {
     drawDisplay0NonSteno(SETTINGS_IMAGE);
+  } else if (layer & NUMPAD_MASK) {
+    drawDisplay0NonSteno(NUMPAD_IMAGE);
   } else if (layer & NAV_MASK) {
     drawDisplay0NonSteno(NAVIGATION_IMAGE);
   } else if (layer & FUNCTION_MASK) {
@@ -961,6 +990,12 @@ func updateDisplay0() {
   } else if (layer & STENO_MASK) {
     clearDisplay(0);
     drawImage(0, 0, 16, STENO_IMAGE);
+    var mode = getParameter("steno_mode");
+    if (mode == "gemini")  {
+      drawImage(0, 0, 80, GEMINI_IMAGE);
+    } else if(mode == "plover_hid") {
+      drawImage(0, 0, 80, PLOVER_HID_IMAGE);
+    }
   } else {
     drawDisplay0NonSteno(QWERTY_IMAGE);
   }
@@ -1003,6 +1038,13 @@ func isModifierKey(key) var {
   return SC_L_CTRL <= key && key <= SC_R_META;
 }
 
+func isWordCapsModifierKey(key) var {
+  var v = key | 4;
+  return v == SC_R_SHIFT || key == SC_R_ALT;
+
+  return SC_L_CTRL <= key && key <= SC_R_META;
+}
+
 func isWordKey(key) var {
   return SC_A <= key && key <= SC_Z;
 }
@@ -1030,7 +1072,7 @@ func press(key) {
       if (isWordKey(key) && (key & KEY_SHIFT) == 0) {
         pressScanCode(SC_L_SHIFT);
         display0NeedsUpdate = 1;
-      } else if (!isModifierKey(key)
+      } else if (!isWordCapsModifierKey(key)
           && key != (SC_MINUS | KEY_SHIFT)
           && key != SC_BACKSPACE
           && !isDigitKey(key)) {
@@ -1103,11 +1145,13 @@ func setColorMode(newColorMode) {
   }
 }
 
-func handlePress(buttonIndex, qwertyKey, stenoKey, symbolsKey, functionKey, navKey) {
+func handlePress(buttonIndex, qwertyKey, stenoKey, symbolsKey, functionKey, navKey, numPadKey) {
   updateButtonColor(buttonIndex);
   lastActionTime = getTime();
   if (isSettingsLayer()) {
     return;
+  } else if (layer & NUMPAD_MASK) {
+    press(numPadKey);
   } else if (layer & NAV_MASK) {
     if (deferredLayerKey) {
       press(deferredLayerKey);
@@ -1146,10 +1190,12 @@ func handlePress(buttonIndex, qwertyKey, stenoKey, symbolsKey, functionKey, navK
     press(qwertyKey);
   }
 }
-func handleRelease(qwertyKey, stenoKey, symbolsKey, functionKey, navKey) {
+func handleRelease(qwertyKey, stenoKey, symbolsKey, functionKey, navKey, numPadKey) {
   lastActionTime = getTime();
   if (isSettingsLayer()) {
     return;
+  } else if (layer & NUMPAD_MASK) {
+    release(numPadKey);
   } else if (layer & NAV_MASK) {
     if (deferredLayerKey) {
       if (isButtonPressed(NAV_BUTTON)) {
@@ -1180,7 +1226,7 @@ func handleRelease(qwertyKey, stenoKey, symbolsKey, functionKey, navKey) {
 }
 
 func onPress0() {
-  handlePress(0, SC_TAB, SK_NONE, SC_GRAVE, SC_NONE, SC_NONE);
+  handlePress(0, SC_TAB, SK_NONE, SC_GRAVE, SC_NONE, SC_NONE, SC_NONE);
 
   if (isSettingsLayer()) {
     updateDisplay0();
@@ -1188,33 +1234,33 @@ func onPress0() {
     drawText(0, 16, 116, FONT_ID_SMALL_DIGITS, TEXT_ALIGNMENT_MIDDLE, console("get_parameter stroke_count"));
   }
 }
-func onRelease0() { handleRelease(SC_TAB, SK_NONE, SC_GRAVE, SC_NONE, SC_NONE); }
+func onRelease0() { handleRelease(SC_TAB, SK_NONE, SC_GRAVE, SC_NONE, SC_NONE, SC_NONE); }
 
-func onPress1() { handlePress(1, SC_Q, SK_S1 | KEY_STENO, SC_1, SC_F9, SC_NONE); }
-func onRelease1() { handleRelease(SC_Q, SK_S1 | KEY_STENO, SC_1, SC_F9, SC_NONE); }
+func onPress1() { handlePress(1, SC_Q, SK_S1 | KEY_STENO, SC_1, SC_F9, SC_NONE, SC_NONE); }
+func onRelease1() { handleRelease(SC_Q, SK_S1 | KEY_STENO, SC_1, SC_F9, SC_NONE, SC_NONE); }
 
-func onPress2() { handlePress(2, SC_W, SK_TL | KEY_STENO, SC_2, SC_F10, SC_NONE); }
-func onRelease2() { handleRelease(SC_W, SK_TL | KEY_STENO, SC_2, SC_F10, SC_NONE); }
+func onPress2() { handlePress(2, SC_W, SK_TL | KEY_STENO, SC_2, SC_F10, SC_NONE, SC_NONE); }
+func onRelease2() { handleRelease(SC_W, SK_TL | KEY_STENO, SC_2, SC_F10, SC_NONE, SC_NONE); }
 
 func onPress3() {
-  handlePress(3, SC_E, SK_PL | KEY_STENO, SC_3, SC_F11, SC_NONE);
+  handlePress(3, SC_E, SK_PL | KEY_STENO, SC_3, SC_F11, SC_NONE, SC_NONE);
 
   if (isSettingsLayer()) {
     console("set_steno_mode embedded");
     updateDisplay0();
-    drawImage(0, 0, 112, EMBEDDED_IMAGE);
+    drawImage(0, 0, 80, EMBEDDED_IMAGE);
   }
 }
-func onRelease3() { handleRelease(SC_E, SK_PL | KEY_STENO, SC_3, SC_F11, SC_NONE); }
+func onRelease3() { handleRelease(SC_E, SK_PL | KEY_STENO, SC_3, SC_F11, SC_NONE, SC_NONE); }
 
-func onPress4() { handlePress(4, SC_R, SK_HL | KEY_STENO, SC_4, SC_F12, SC_NONE); }
-func onRelease4() { handleRelease(SC_R, SK_HL | KEY_STENO, SC_4, SC_F12, SC_NONE); }
+func onPress4() { handlePress(4, SC_R, SK_HL | KEY_STENO, SC_4, SC_F12, SC_NONE, SC_NONE); }
+func onRelease4() { handleRelease(SC_R, SK_HL | KEY_STENO, SC_4, SC_F12, SC_NONE, SC_NONE); }
 
-func onPress5() { handlePress(5, SC_T, SK_STAR1 | KEY_STENO, SC_5, SC_NONE, SC_NONE); }
-func onRelease5() { handleRelease(SC_T, SK_STAR1 | KEY_STENO, SC_5, SC_NONE, SC_NONE); }
+func onPress5() { handlePress(5, SC_T, SK_STAR1 | KEY_STENO, SC_5, SC_NONE, SC_NONE, SC_NONE); }
+func onRelease5() { handleRelease(SC_T, SK_STAR1 | KEY_STENO, SC_5, SC_NONE, SC_NONE, SC_NONE); }
 
 func onPress6() {
-  handlePress(6, SC_Y, SK_STAR2 | KEY_STENO, SC_6, SC_NONE, SC_VOLUME_UP);
+  handlePress(6, SC_Y, SK_STAR2 | KEY_STENO, SC_6, SC_NONE, SC_VOLUME_UP, SC_NONE);
 
   if (isSettingsLayer()) {
     if (speed < 8) {
@@ -1226,19 +1272,19 @@ func onPress6() {
     drawSpeed();
   }
 }
-func onRelease6() { handleRelease(SC_Y, SK_STAR2 | KEY_STENO, SC_6, SC_NONE, SC_VOLUME_UP); }
+func onRelease6() { handleRelease(SC_Y, SK_STAR2 | KEY_STENO, SC_6, SC_NONE, SC_VOLUME_UP, SC_NONE); }
 
 func onPress7() {
-  handlePress(7, SC_U, SK_FR | KEY_STENO, SC_7, SC_NONE, SC_BACKSPACE);
+  handlePress(7, SC_U, SK_FR | KEY_STENO, SC_7, SC_NONE, SC_BACKSPACE, SC_KP_7);
 
   if (isSettingsLayer()) {
     setColorMode(colorMode + 1);
   }
 }
-func onRelease7() { handleRelease(SC_U, SK_FR | KEY_STENO, SC_7, SC_NONE, SC_BACKSPACE); }
+func onRelease7() { handleRelease(SC_U, SK_FR | KEY_STENO, SC_7, SC_NONE, SC_BACKSPACE, SC_KP_7); }
 
 func onPress8() {
-  handlePress(8, SC_I, SK_PR | KEY_STENO, SC_8, SC_NONE, SC_UP);
+  handlePress(8, SC_I, SK_PR | KEY_STENO, SC_8, SC_NONE, SC_UP, SC_KP_8);
 
   if (isSettingsLayer()) {
     if (brightness < 8) {
@@ -1250,10 +1296,10 @@ func onPress8() {
     drawBrightness();
   }
 }
-func onRelease8() { handleRelease(SC_I, SK_PR | KEY_STENO, SC_8, SC_NONE, SC_UP); }
+func onRelease8() { handleRelease(SC_I, SK_PR | KEY_STENO, SC_8, SC_NONE, SC_UP, SC_KP_8); }
 
 func onPress9() {
-  handlePress(9, SC_O, SK_LR | KEY_STENO, SC_9, SC_NONE, SC_DELETE);
+  handlePress(9, SC_O, SK_LR | KEY_STENO, SC_9, SC_NONE, SC_DELETE, SC_KP_9);
 
   if (isSettingsLayer()) {
     if (saturation < 8) {
@@ -1263,19 +1309,19 @@ func onPress9() {
     drawSaturation();
   }
 }
-func onRelease9() { handleRelease(SC_O, SK_LR | KEY_STENO, SC_9, SC_NONE, SC_DELETE); }
+func onRelease9() { handleRelease(SC_O, SK_LR | KEY_STENO, SC_9, SC_NONE, SC_DELETE, SC_KP_9); }
 
 func onPress10() {
-  handlePress(10, SC_P, SK_TR | KEY_STENO, SC_0, SC_NONE, SC_PAGE_UP);
+  handlePress(10, SC_P, SK_TR | KEY_STENO, SC_0, SC_NONE, SC_PAGE_UP, SC_NONE);
 
   if (isSettingsLayer()) {
     hueShift = hueShift - 0x800;
   }
 }
-func onRelease10() { handleRelease(SC_P, SK_TR | KEY_STENO, SC_0, SC_NONE, SC_PAGE_UP); }
+func onRelease10() { handleRelease(SC_P, SK_TR | KEY_STENO, SC_0, SC_NONE, SC_PAGE_UP, SC_NONE); }
 
 func onPress11() {
-  handlePress(11, SC_BACKSPACE, SK_DR | KEY_STENO, SC_EQUAL, SC_NONE, SC_HOME);
+  handlePress(11, SC_BACKSPACE, SK_DR | KEY_STENO, SC_EQUAL, SC_NONE, SC_HOME, SC_NONE);
 
   if (isSettingsLayer()) {
     if (hueSpread < 8) {
@@ -1284,51 +1330,51 @@ func onPress11() {
     drawHueSpread();
   }
 }
-func onRelease11() { handleRelease(SC_BACKSPACE, SK_DR | KEY_STENO, SC_EQUAL, SC_NONE, SC_HOME); }
+func onRelease11() { handleRelease(SC_BACKSPACE, SK_DR | KEY_STENO, SC_EQUAL, SC_NONE, SC_HOME, SC_NONE); }
 
 // 2nd row
 
 var timer12;
 var pressCount12;
 func onPress12() {
-  handlePress(12, SC_L_CTRL, SK_NONE, SC_GRAVE | KEY_SHIFT, SC_NONE, SC_NONE);
+  handlePress(12, SC_L_CTRL, SK_NONE, SC_GRAVE | KEY_SHIFT, SC_NONE, SC_NONE, SC_NONE);
   if (!isInPressAll()) {
     timer12 = getTime();
     pressCount12 = pressCount;
   }
 }
 func onRelease12() {
-  handleRelease(SC_L_CTRL, SK_NONE, SC_GRAVE | KEY_SHIFT, SC_NONE, SC_NONE);
+  handleRelease(SC_L_CTRL, SK_NONE, SC_GRAVE | KEY_SHIFT, SC_NONE, SC_NONE, SC_NONE);
   if (layer == 0 && pressCount12 == pressCount && getTime() - timer12 < TAP_THRESHOLD) {
     tap(SC_ESC);
   }
 }
 
-func onPress13() { handlePress(13, SC_A, SK_S2 | KEY_STENO, SC_1 | KEY_SHIFT, SC_F5, SC_L_META); }
-func onRelease13() { handleRelease(SC_A, SK_S2 | KEY_STENO, SC_1 | KEY_SHIFT, SC_F5, SC_L_META); }
+func onPress13() { handlePress(13, SC_A, SK_S2 | KEY_STENO, SC_1 | KEY_SHIFT, SC_F5, SC_L_META, SC_L_META); }
+func onRelease13() { handleRelease(SC_A, SK_S2 | KEY_STENO, SC_1 | KEY_SHIFT, SC_F5, SC_L_META, SC_L_META); }
 
-func onPress14() { handlePress(14, SC_S, SK_KL | KEY_STENO, SC_2 | KEY_SHIFT, SC_F6, SC_L_ALT); }
-func onRelease14() { handleRelease(SC_S, SK_KL | KEY_STENO, SC_2 | KEY_SHIFT, SC_F6, SC_L_ALT); }
+func onPress14() { handlePress(14, SC_S, SK_KL | KEY_STENO, SC_2 | KEY_SHIFT, SC_F6, SC_L_ALT, SC_L_ALT); }
+func onRelease14() { handleRelease(SC_S, SK_KL | KEY_STENO, SC_2 | KEY_SHIFT, SC_F6, SC_L_ALT, SC_L_ALT); }
 
 func onPress15() {
-  handlePress(15, SC_D, SK_WL | KEY_STENO, SC_3 | KEY_SHIFT, SC_F7, SC_L_CTRL);
+  handlePress(15, SC_D, SK_WL | KEY_STENO, SC_3 | KEY_SHIFT, SC_F7, SC_L_CTRL, SC_L_CTRL);
 
   if (isSettingsLayer()) {
     console("set_steno_mode gemini");
     updateDisplay0();
-    drawImage(0, 0, 116, GEMINI_IMAGE);
+    drawImage(0, 0, 80, GEMINI_IMAGE);
   }
 }
-func onRelease15() { handleRelease(SC_D, SK_WL | KEY_STENO, SC_3 | KEY_SHIFT, SC_F7, SC_L_CTRL); }
+func onRelease15() { handleRelease(SC_D, SK_WL | KEY_STENO, SC_3 | KEY_SHIFT, SC_F7, SC_L_CTRL, SC_L_CTRL); }
 
-func onPress16() { handlePress(16, SC_F, SK_RL | KEY_STENO, SC_4 | KEY_SHIFT, SC_F8, SC_L_SHIFT); }
-func onRelease16() { handleRelease(SC_F, SK_RL | KEY_STENO, SC_4 | KEY_SHIFT, SC_F8, SC_L_SHIFT); }
+func onPress16() { handlePress(16, SC_F, SK_RL | KEY_STENO, SC_4 | KEY_SHIFT, SC_F8, SC_L_SHIFT, SC_L_SHIFT); }
+func onRelease16() { handleRelease(SC_F, SK_RL | KEY_STENO, SC_4 | KEY_SHIFT, SC_F8, SC_L_SHIFT, SC_L_SHIFT); }
 
-func onPress17() { handlePress(17, SC_G, SK_STAR3 | KEY_STENO, SC_5 | KEY_SHIFT, SC_NONE, SC_NONE); }
-func onRelease17() { handleRelease(SC_G, SK_STAR3 | KEY_STENO, SC_5 | KEY_SHIFT, SC_NONE, SC_NONE); }
+func onPress17() { handlePress(17, SC_G, SK_STAR3 | KEY_STENO, SC_5 | KEY_SHIFT, SC_NONE, SC_NONE, SC_NONE); }
+func onRelease17() { handleRelease(SC_G, SK_STAR3 | KEY_STENO, SC_5 | KEY_SHIFT, SC_NONE, SC_NONE, SC_NONE); }
 
 func onPress18() {
-  handlePress(18, SC_H, SK_STAR4 | KEY_STENO, SC_6 | KEY_SHIFT, SC_NONE, SC_VOLUME_DOWN);
+  handlePress(18, SC_H, SK_STAR4 | KEY_STENO, SC_6 | KEY_SHIFT, SC_NONE, SC_VOLUME_DOWN, SC_NONE);
 
   if (isSettingsLayer()) {
     if (speed > 0) {
@@ -1340,19 +1386,19 @@ func onPress18() {
     drawSpeed();
   }
 }
-func onRelease18() { handleRelease(SC_H, SK_STAR4 | KEY_STENO, SC_6 | KEY_SHIFT, SC_NONE, SC_VOLUME_DOWN); }
+func onRelease18() { handleRelease(SC_H, SK_STAR4 | KEY_STENO, SC_6 | KEY_SHIFT, SC_NONE, SC_VOLUME_DOWN, SC_NONE); }
 
 func onPress19() {
-  handlePress(19, SC_J, SK_RR | KEY_STENO, SC_7 | KEY_SHIFT, SC_L_SHIFT, SC_LEFT);
+  handlePress(19, SC_J, SK_RR | KEY_STENO, SC_7 | KEY_SHIFT, SC_L_SHIFT, SC_LEFT, SC_KP_4);
 
   if (isSettingsLayer()) {
     setColorMode(colorMode - 1);
   }
 }
-func onRelease19() { handleRelease(SC_J, SK_RR | KEY_STENO, SC_7 | KEY_SHIFT, SC_L_SHIFT, SC_LEFT); }
+func onRelease19() { handleRelease(SC_J, SK_RR | KEY_STENO, SC_7 | KEY_SHIFT, SC_L_SHIFT, SC_LEFT, SC_KP_4); }
 
 func onPress20() {
-  handlePress(20, SC_K, SK_BR | KEY_STENO, SC_8 | KEY_SHIFT, SC_L_CTRL, SC_DOWN);
+  handlePress(20, SC_K, SK_BR | KEY_STENO, SC_8 | KEY_SHIFT, SC_L_CTRL, SC_DOWN, SC_KP_5);
 
   if (isSettingsLayer()) {
     if (brightness > 0) {
@@ -1364,10 +1410,10 @@ func onPress20() {
     drawBrightness();
   }
 }
-func onRelease20() { handleRelease(SC_K, SK_BR | KEY_STENO, SC_8 | KEY_SHIFT, SC_L_CTRL, SC_DOWN); }
+func onRelease20() { handleRelease(SC_K, SK_BR | KEY_STENO, SC_8 | KEY_SHIFT, SC_L_CTRL, SC_DOWN, SC_KP_5); }
 
 func onPress21() {
-  handlePress(21, SC_L, SK_GR | KEY_STENO, SC_9 | KEY_SHIFT, SC_L_ALT, SC_RIGHT);
+  handlePress(21, SC_L, SK_GR | KEY_STENO, SC_9 | KEY_SHIFT, SC_L_ALT, SC_RIGHT, SC_KP_6);
 
   if (isSettingsLayer()) {
     if (saturation > 0) {
@@ -1377,19 +1423,19 @@ func onPress21() {
     drawSaturation();
   }
 }
-func onRelease21() { handleRelease(SC_L, SK_GR | KEY_STENO, SC_9 | KEY_SHIFT, SC_L_ALT, SC_RIGHT); }
+func onRelease21() { handleRelease(SC_L, SK_GR | KEY_STENO, SC_9 | KEY_SHIFT, SC_L_ALT, SC_RIGHT, SC_KP_6); }
 
 func onPress22() {
-  handlePress(22, SC_SEMICOLON, SK_SR | KEY_STENO, SC_0 | KEY_SHIFT, SC_L_META, SC_PAGE_DOWN);
+  handlePress(22, SC_SEMICOLON, SK_SR | KEY_STENO, SC_0 | KEY_SHIFT, SC_L_META, SC_PAGE_DOWN, SC_NONE);
 
   if (isSettingsLayer()) {
     hueShift = hueShift + 0x800;
   }
 }
-func onRelease22() { handleRelease(SC_SEMICOLON, SK_SR | KEY_STENO, SC_0 | KEY_SHIFT, SC_L_META, SC_PAGE_DOWN); }
+func onRelease22() { handleRelease(SC_SEMICOLON, SK_SR | KEY_STENO, SC_0 | KEY_SHIFT, SC_L_META, SC_PAGE_DOWN, SC_NONE); }
 
 func onPress23() {
-  handlePress(23, SC_APOSTROPHE, SK_ZR | KEY_STENO, SC_EQUAL | KEY_SHIFT, SC_NONE, SC_END);
+  handlePress(23, SC_APOSTROPHE, SK_ZR | KEY_STENO, SC_EQUAL | KEY_SHIFT, SC_NONE, SC_END, SC_NONE);
 
   if (isSettingsLayer()) {
     if (hueSpread > 0) {
@@ -1398,7 +1444,7 @@ func onPress23() {
     drawHueSpread();
   }
 }
-func onRelease23() { handleRelease(SC_APOSTROPHE, SK_ZR | KEY_STENO, SC_EQUAL | KEY_SHIFT, SC_NONE, SC_END); }
+func onRelease23() { handleRelease(SC_APOSTROPHE, SK_ZR | KEY_STENO, SC_EQUAL | KEY_SHIFT, SC_NONE, SC_END, SC_NONE); }
 
 // 3rd row
 
@@ -1461,43 +1507,43 @@ func onRelease24() {
   updateUnderglowRgb();
 }
 
-func onPress25() { handlePress(25, SC_Z, SC_NONE, SC_BACKSLASH, SC_F1, SC_NONE); }
-func onRelease25() { handleRelease(SC_Z, SC_NONE, SC_BACKSLASH, SC_F1, SC_NONE); }
+func onPress25() { handlePress(25, SC_Z, SC_NONE, SC_BACKSLASH, SC_F1, SC_NONE, SC_NONE); }
+func onRelease25() { handleRelease(SC_Z, SC_NONE, SC_BACKSLASH, SC_F1, SC_NONE, SC_NONE); }
 
-func onPress26() { handlePress(26, SC_X, SC_NONE, SC_BACKSLASH | KEY_SHIFT, SC_F2, SC_NONE); }
-func onRelease26() { handleRelease(SC_X, SC_NONE, SC_BACKSLASH | KEY_SHIFT, SC_F2, SC_NONE); }
+func onPress26() { handlePress(26, SC_X, SC_NONE, SC_BACKSLASH | KEY_SHIFT, SC_F2, SC_NONE, SC_NONE); }
+func onRelease26() { handleRelease(SC_X, SC_NONE, SC_BACKSLASH | KEY_SHIFT, SC_F2, SC_NONE, SC_NONE); }
 
 func onPress27() {
-  handlePress(27, SC_C, SC_NONE, SC_MINUS, SC_F3, SC_NONE);
+  handlePress(27, SC_C, SC_NONE, SC_MINUS, SC_F3, SC_NONE, SC_NONE);
 
   if (isSettingsLayer()) {
     console("set_steno_mode plover_hid");
     updateDisplay0();
-    drawImage(0, 0, 112, PLOVER_HID_IMAGE);
+    drawImage(0, 0, 80, PLOVER_HID_IMAGE);
   }
 }
-func onRelease27() { handleRelease(SC_C, SC_NONE, SC_MINUS, SC_F3, SC_NONE); }
+func onRelease27() { handleRelease(SC_C, SC_NONE, SC_MINUS, SC_F3, SC_NONE, SC_NONE); }
 
-func onPress28() { handlePress(28, SC_V, SC_NONE, SC_L_BRACKET, SC_F4, SC_NONE); }
-func onRelease28() { handleRelease(SC_V, SC_NONE, SC_L_BRACKET, SC_F4, SC_NONE); }
+func onPress28() { handlePress(28, SC_V, SC_NONE, SC_L_BRACKET, SC_F4, SC_NONE, SC_NONE); }
+func onRelease28() { handleRelease(SC_V, SC_NONE, SC_L_BRACKET, SC_F4, SC_NONE, SC_NONE); }
 
-func onPress29() { handlePress(29, SC_B, SC_NONE, SC_L_BRACKET | KEY_SHIFT, SC_NONE, SC_NONE); }
-func onRelease29() { handleRelease(SC_B, SC_NONE, SC_L_BRACKET | KEY_SHIFT, SC_NONE, SC_NONE); }
+func onPress29() { handlePress(29, SC_B, SC_NONE, SC_L_BRACKET | KEY_SHIFT, SC_NONE, SC_NONE, SC_NONE); }
+func onRelease29() { handleRelease(SC_B, SC_NONE, SC_L_BRACKET | KEY_SHIFT, SC_NONE, SC_NONE, SC_NONE); }
 
-func onPress30() { handlePress(30, SC_N, SC_NONE, SC_R_BRACKET | KEY_SHIFT, SC_NONE, SC_MUTE); }
-func onRelease30() { handleRelease(SC_N, SC_NONE, SC_R_BRACKET | KEY_SHIFT, SC_NONE, SC_MUTE); }
+func onPress30() { handlePress(30, SC_N, SC_NONE, SC_R_BRACKET | KEY_SHIFT, SC_NONE, SC_MUTE, SC_NONE); }
+func onRelease30() { handleRelease(SC_N, SC_NONE, SC_R_BRACKET | KEY_SHIFT, SC_NONE, SC_MUTE, SC_NONE); }
 
-func onPress31() { handlePress(31, SC_M, SC_NONE, SC_R_BRACKET, SC_NONE, SC_NONE); }
-func onRelease31() { handleRelease(SC_M, SC_NONE, SC_R_BRACKET, SC_NONE, SC_NONE); }
+func onPress31() { handlePress(31, SC_M, SC_NONE, SC_R_BRACKET, SC_NONE, SC_NONE, SC_KP_1); }
+func onRelease31() { handleRelease(SC_M, SC_NONE, SC_R_BRACKET, SC_NONE, SC_NONE, SC_KP_1); }
 
-func onPress32() { handlePress(32, SC_COMMA, SC_NONE, SC_MINUS | KEY_SHIFT, SC_NONE, SC_NONE); }
-func onRelease32() { handleRelease(SC_COMMA, SC_NONE, SC_MINUS | KEY_SHIFT, SC_NONE, SC_NONE); }
+func onPress32() { handlePress(32, SC_COMMA, SC_NONE, SC_MINUS | KEY_SHIFT, SC_NONE, SC_NONE, SC_KP_2); }
+func onRelease32() { handleRelease(SC_COMMA, SC_NONE, SC_MINUS | KEY_SHIFT, SC_NONE, SC_NONE, SC_KP_2); }
 
-func onPress33() { handlePress(33, SC_DOT, SC_NONE, SC_DOT, SC_NONE, SC_NONE); }
-func onRelease33() { handleRelease(SC_DOT, SC_NONE, SC_DOT, SC_NONE, SC_NONE); }
+func onPress33() { handlePress(33, SC_DOT, SC_NONE, SC_DOT, SC_NONE, SC_NONE, SC_KP_3); }
+func onRelease33() { handleRelease(SC_DOT, SC_NONE, SC_DOT, SC_NONE, SC_NONE, SC_KP_3); }
 
-func onPress34() { handlePress(34, SC_SLASH, SC_NONE, SC_SLASH, SC_NONE, SC_NONE); }
-func onRelease34() { handleRelease(SC_SLASH, SC_NONE, SC_SLASH, SC_NONE, SC_NONE); }
+func onPress34() { handlePress(34, SC_SLASH, SC_NONE, SC_SLASH, SC_NONE, SC_NONE, SC_NONE); }
+func onRelease34() { handleRelease(SC_SLASH, SC_NONE, SC_SLASH, SC_NONE, SC_NONE, SC_NONE); }
 
 var timer35;
 var releaseTimer35;
@@ -1505,7 +1551,7 @@ var tapCount35;
 var pressCount35;
 var capsPressed;
 func onPress35() {
-  handlePress(35, SC_R_SHIFT, SC_NONE, SC_NONE, SC_NONE, SC_NONE);
+  handlePress(35, SC_R_SHIFT, SC_NONE, SC_NONE, SC_NONE, SC_NONE, SC_NONE);
 
   capsPressed = 0;
   if (layer == 0) {
@@ -1528,7 +1574,7 @@ func onPress35() {
   }
 }
 func onRelease35() {
-  handleRelease(SC_R_SHIFT, SC_NONE, SC_NONE, SC_NONE, SC_NONE);
+  handleRelease(SC_R_SHIFT, SC_NONE, SC_NONE, SC_NONE, SC_NONE, SC_NONE);
 
   if (capsPressed) {
     capsPressed = 0;
@@ -1542,32 +1588,41 @@ func onRelease35() {
 
 // 4th row
 
-func onPress36() { handlePress(36, SC_L_META, SK_NUM1 | KEY_STENO, SC_L_META, SC_NONE, SC_NONE); }
-func onRelease36() { handleRelease(SC_L_META, SK_NUM1 | KEY_STENO, SC_L_META, SC_NONE, SC_NONE); }
+func onPress36() { handlePress(36, SC_L_META, SK_NUM1 | KEY_STENO, SC_L_META, SC_NONE, SC_NONE, SC_NONE); }
+func onRelease36() { handleRelease(SC_L_META, SK_NUM1 | KEY_STENO, SC_L_META, SC_NONE, SC_NONE, SC_NONE); }
 
 var timer37;
 var pressCount37;
 func onPress37() {
-  handlePress(37, SC_L_ALT, SK_A | KEY_STENO, SC_L_ALT, SC_NONE, SC_NONE);
+  handlePress(37, SC_L_ALT, SK_A | KEY_STENO, SC_L_ALT, SC_NONE, SC_NONE, SC_NONE);
   if (!isInPressAll()) {
     timer37 = getTime();
     pressCount37 = pressCount37;
+
+  }
+  if ((layer & (NAV_MASK | NUMPAD_MASK))  == NAV_MASK) {
+    releaseAll();
+    setLayer(layer | NUMPAD_MASK);
+    pressAll();
   }
 }
 func onRelease37() {
-  handleRelease(SC_L_ALT, SK_A | KEY_STENO, SC_L_ALT, SC_NONE, SC_NONE);
+  handleRelease(SC_L_ALT, SK_A | KEY_STENO, SC_L_ALT, SC_NONE, SC_NONE, SC_NONE);
   if (!isInPressAll() && layer == 0 && pressCount37 == pressCount && getTime() - timer37 < TAP_THRESHOLD) {
     tap(SC_ENTER);
+  }
+  if (layer & NUMPAD_MASK) {
+    releaseAll();
+    setLayer(layer ^ NUMPAD_MASK);
+    pressAll();
   }
 }
 
 var pressCount38;
 func onPress38() {
-  if (layer != 0) {
-    handlePress(38, SC_NONE, SK_O | KEY_STENO, SC_L_CTRL, SC_NONE, SC_NONE);
-  } else {
-    updateButtonColor(38);
-    pressCount = pressCount + 1;
+  handlePress(38, SC_NONE, SK_O | KEY_STENO, SC_L_CTRL, SC_NONE, SC_NONE, SC_NONE);
+
+  if (layer == 0) {
     releaseAll();
     setLayer(layer | NAV_MASK);
     pressAll();
@@ -1580,7 +1635,7 @@ func onRelease38() {
     var startPressCount = pressCount;
 
     releaseAll();
-    setLayer(layer ^ NAV_MASK);
+    setLayer(layer & ~(NAV_MASK | NUMPAD_MASK));
     pressAll();
 
     if (layer == 0 && pressCount38 == startPressCount && getTime() - navLayerPressTimestamp < TAP_THRESHOLD) {
@@ -1590,16 +1645,16 @@ func onRelease38() {
     deferredLayerKey = 0;
     deferredQwertyKey = 0;
   } else {
-    handleRelease(SC_NONE, SK_O | KEY_STENO, SC_L_CTRL, SC_NONE, SC_NONE);
+    handleRelease(SC_NONE, SK_O | KEY_STENO, SC_L_CTRL, SC_NONE, SC_NONE, SC_NONE);
   }
 }
 
-func onPress39() { handlePress(39, SC_SPACE, SK_E | KEY_STENO, SC_NONE, SC_NONE, SC_SPACE); }
-func onRelease39() { handleRelease(SC_SPACE, SK_E | KEY_STENO, SC_NONE, SC_NONE, SC_SPACE); }
+func onPress39() { handlePress(39, SC_SPACE, SK_E | KEY_STENO, SC_NONE, SC_NONE, SC_SPACE, SC_NONE); }
+func onRelease39() { handleRelease(SC_SPACE, SK_E | KEY_STENO, SC_NONE, SC_NONE, SC_SPACE, SC_NONE); }
 
 var pressCount40;
 func onPress40() {
-  handlePress(40, SC_NONE, SK_U | KEY_STENO, SC_NONE, SC_NONE, SC_ENTER);
+  handlePress(40, SC_NONE, SK_U | KEY_STENO, SC_NONE, SC_NONE, SC_ENTER, SC_KP_0);
   if ((layer | SYMBOL_MASK) == SYMBOL_MASK) {
     pressCount = pressCount + 1;
     releaseAll();
@@ -1610,7 +1665,7 @@ func onPress40() {
   }
 }
 func onRelease40() {
-  handleRelease(SC_NONE, SK_U | KEY_STENO, SC_NONE, SC_NONE, SC_ENTER);
+  handleRelease(SC_NONE, SK_U | KEY_STENO, SC_NONE, SC_NONE, SC_ENTER, SC_KP_0);
   if (layer & FUNCTION_MASK) {
     var startPressCount = pressCount;
 
@@ -1632,7 +1687,7 @@ func onRelease40() {
 
 func onPress41() {
   if ((layer | FUNCTION_MASK) != FUNCTION_MASK) {
-    handlePress(41, SC_NONE, SK_NUM2 | KEY_STENO, SC_NONE, SC_NONE, SC_NONE);
+    handlePress(41, SC_NONE, SK_NUM2 | KEY_STENO, SC_NONE, SC_NONE, SC_NONE, SC_NONE);
   } else {
     updateButtonColor(41);
     pressCount = pressCount + 1;
@@ -1648,6 +1703,7 @@ func onRelease41() {
     setLayer(layer ^ SYMBOL_MASK);
     pressAll();
   } else {
-    handleRelease(SC_NONE, SK_NUM2 | KEY_STENO, SC_L_CTRL, SC_NONE, SC_NONE);
+    handleRelease(SC_NONE, SK_NUM2 | KEY_STENO, SC_L_CTRL, SC_NONE, SC_NONE, SC_NONE);
   }
 }
+

@@ -383,6 +383,9 @@ class Parser {
         _nextToken();
         return NotAstNode(_parseSubscript());
 
+      case TokenType.bitwiseNot:
+        _nextToken();
+        return BitwiseNotAstNode(_parseSubscript());
       case TokenType.plus:
         _nextToken();
         return _parseSubscript();
