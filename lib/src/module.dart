@@ -136,6 +136,8 @@ class ScriptModule {
   final constants = <String, AstNode>{};
   final globals = <String, ScriptGlobal>{};
 
+  var globalsUsedCount = 0;
+
   Uint8List createByteCode(int buttonCount) =>
       ScriptByteCodeBuilder(this).createByteCode(buttonCount);
 }

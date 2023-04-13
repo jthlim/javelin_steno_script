@@ -186,11 +186,17 @@ class Parser {
     AstNode? initializer;
     if (_currentToken.type == TokenType.openSquareBracket) {
       _assertToken(TokenType.openSquareBracket);
-      arraySize = _currentToken.intValue;
-      _assertToken(TokenType.intValue);
+      final arraySizeExpression = _parseExpression();
       _assertToken(TokenType.closeSquareBracket);
 
-      if (arraySize! <= 0) {
+      if (!arraySizeExpression.isConstant()) {
+        throw FormatException(
+          'Array size must be a constant near $_currentToken',
+        );
+      }
+
+      arraySize = arraySizeExpression.constantValue();
+      if (arraySize <= 0) {
         throw FormatException(
           'Array size must be greater than 0 near $_currentToken',
         );
@@ -205,9 +211,10 @@ class Parser {
 
     _assertUniqueName(name);
 
-    final index = _module.globals.length;
+    final index = _module.globalsUsedCount;
+    final globalsUsedCount = arraySize ?? 1;
 
-    if (index >= maximumGlobalVariableCount) {
+    if (index + globalsUsedCount > maximumGlobalVariableCount) {
       throw FormatException('Too many global variables near $_currentToken');
     }
 
@@ -217,26 +224,7 @@ class Parser {
       arraySize: arraySize,
       initializer: initializer,
     );
-
-    // Populate dummy names for current global accounting.
-    if (arraySize != null) {
-      for (var i = 1; i < arraySize; ++i) {
-        final index = _module.globals.length;
-
-        if (index >= maximumGlobalVariableCount) {
-          throw FormatException(
-              'Too many global variables near $_currentToken');
-        }
-
-        final dummyName = 'name\$$i';
-        _module.globals[dummyName] = ScriptGlobal(
-          name: dummyName,
-          index: index + i,
-          arraySize: null,
-          initializer: null,
-        );
-      }
-    }
+    _module.globalsUsedCount += globalsUsedCount;
   }
 
   void _parseFunc() {
