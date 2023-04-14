@@ -28,7 +28,7 @@
 // |--------+------+------+------+------+------|        |------+------+------+------+------+--------|
 // |Shf/Sten|   Z  |   X  |   C  |   V  |   B  |        |   N  |   M  | ,  < | .  > | /  ? | RShift |
 // `----------------------+--+---+--+---+--+---+--.  ,--+---+--+---+--+---+-------------------------'
-//                           | Meta |  Alt |Nav/Sp|  | Space|Fn/Ent| Sym  |
+//                           | Meta |  Alt |Nav/Sp|  | Space| Sym  |Fn/Ent|
 //                           `--------------------'  `--------------------'
 //
 // For keys marked with two options, holding or pressing with other keys will cause the first option
@@ -71,10 +71,10 @@
 // |        |      |      |      |      |      |        | Vol+ | BkSp |   ↑  | Del  | PgUp |  Home  |
 // |--------+------+------+------+------+------|        |------+------+------+------+------+--------|
 // |        |  GUI |  Alt | Ctrl | Shift|      |        | Vol- |  ←   |   ↓  |   →  | PgDn |   End  |
-// |--------+------+------+------+------+------+        +------+------+------+------+------+--------|
+// |--------+------+------+------+------+------|        |------+------+------+------+------+--------|
 // |        |      |      |      |      |      |        | Mute |      |      |      |      |        |
 // `----------------------+--+---+--+---+--+---+--.  ,--+---+--+---+--+---+-------------------------'
-//                           |      |Numpad|      |  | Space| Enter|      |
+//                           |      |Numpad|      |  | Space|      | Enter|
 //                           `--------------------'  `--------------------'
 //
 
@@ -82,13 +82,13 @@
 // Numpad -- Pressing Alt + Nav at the same time
 //
 // ,-------------------------------------------.        ,-------------------------------------------.
-// |        |      |      |      |      |      |        |      |   7  |   8  |   9  |      |        |
+// |        |      |      |      |      |      |        |      |   7  |   8  |   9  |      |  Bksp  |
 // |--------+------+------+------+------+------|        |------+------+------+------+------+--------|
 // |        |  GUI |  Alt | Ctrl | Shift|      |        |      |   4  |   5  |   6  |      |        |
-// |--------+------+------+------+------+------+        +------+------+------+------+------+--------|
+// |--------+------+------+------+------+------|        |------+------+------+------+------+--------|
 // |        |      |      |      |      |      |        |      |   1  |   2  |   3  |      |        |
 // `----------------------+--+---+--+---+--+---+--.  ,--+---+--+---+--+---+-------------------------'
-//                           |      |      |      |  |         |   0  |      |
+//                           |      |      |      |  |         |   0  |   .  |
 //                           `--------------------'  `-----------------------'
 //
 
@@ -99,7 +99,7 @@
 // |StrkCnt |      |      |Embedd|      |      |        |Speed+|      |Brght+| Sat+ | Hue+ |HueSprd+|
 // |--------+------+------+------+------+------|        |------+------+------+------+------+--------|
 // |        |      |      |Gemini|      |      |        |Speed-|      |Brght-| Sat- | Hue- |HueSprd-|
-// |--------+------+------+------+------+------+        +------+------+------+------+------+--------|
+// |--------+------+------+------+------+------|        |------+------+------+------+------+--------|
 // |        |      |      |PloHID|      |      |        |      |      |      |      |      |        |
 // `----------------------+--+---+--+---+--+---+--.  ,--+---+--+---+--+---+-------------------------'
 //                           |      |      |      |  |      |      |      |
@@ -1321,7 +1321,7 @@ func onPress10() {
 func onRelease10() { handleRelease(SC_P, SK_TR | KEY_STENO, SC_0, SC_NONE, SC_PAGE_UP, SC_NONE); }
 
 func onPress11() {
-  handlePress(11, SC_BACKSPACE, SK_DR | KEY_STENO, SC_EQUAL, SC_NONE, SC_HOME, SC_NONE);
+  handlePress(11, SC_BACKSPACE, SK_DR | KEY_STENO, SC_EQUAL, SC_NONE, SC_HOME, SC_BACKSPACE);
 
   if (isSettingsLayer()) {
     if (hueSpread < 8) {
@@ -1330,7 +1330,7 @@ func onPress11() {
     drawHueSpread();
   }
 }
-func onRelease11() { handleRelease(SC_BACKSPACE, SK_DR | KEY_STENO, SC_EQUAL, SC_NONE, SC_HOME, SC_NONE); }
+func onRelease11() { handleRelease(SC_BACKSPACE, SK_DR | KEY_STENO, SC_EQUAL, SC_NONE, SC_HOME, SC_BACKSPACE); }
 
 // 2nd row
 
@@ -1631,6 +1631,7 @@ func onPress38() {
   }
 }
 func onRelease38() {
+  handleRelease(SC_NONE, SK_O | KEY_STENO, SC_L_CTRL, SC_NONE, SC_NONE, SC_NONE);
   if (layer & NAV_MASK) {
     var startPressCount = pressCount;
 
@@ -1644,28 +1645,44 @@ func onRelease38() {
     tap(deferredQwertyKey);
     deferredLayerKey = 0;
     deferredQwertyKey = 0;
-  } else {
-    handleRelease(SC_NONE, SK_O | KEY_STENO, SC_L_CTRL, SC_NONE, SC_NONE, SC_NONE);
   }
 }
 
 func onPress39() { handlePress(39, SC_SPACE, SK_E | KEY_STENO, SC_NONE, SC_NONE, SC_SPACE, SC_NONE); }
 func onRelease39() { handleRelease(SC_SPACE, SK_E | KEY_STENO, SC_NONE, SC_NONE, SC_SPACE, SC_NONE); }
 
-var pressCount40;
 func onPress40() {
-  handlePress(40, SC_NONE, SK_U | KEY_STENO, SC_NONE, SC_NONE, SC_ENTER, SC_KP_0);
+  handlePress(40, SC_NONE, SK_U | KEY_STENO, SC_NONE, SC_NONE, SC_NONE, SC_KP_0);
+  if ((layer | FUNCTION_MASK) == FUNCTION_MASK) {
+    releaseAll();
+    setLayer(layer | SYMBOL_MASK);
+    pressAll();
+  }
+}
+
+func onRelease40() {
+  handleRelease(SC_NONE, SK_U | KEY_STENO, SC_L_CTRL, SC_NONE, SC_NONE, SC_KP_0);
+  if (layer & SYMBOL_MASK) {
+    releaseAll();
+    setLayer(layer ^ SYMBOL_MASK);
+    pressAll();
+  }
+}
+
+var pressCount41;
+func onPress41() {
+  handlePress(41, SC_NONE, SK_NUM2 | KEY_STENO, SC_NONE, SC_NONE, SC_ENTER, SC_KP_DOT);
   if ((layer | SYMBOL_MASK) == SYMBOL_MASK) {
     pressCount = pressCount + 1;
     releaseAll();
     setLayer(layer | FUNCTION_MASK);
     pressAll();
     functionLayerPressTimestamp = getTime();
-    pressCount40 = pressCount;
+    pressCount41 = pressCount;
   }
 }
-func onRelease40() {
-  handleRelease(SC_NONE, SK_U | KEY_STENO, SC_NONE, SC_NONE, SC_ENTER, SC_KP_0);
+func onRelease41() {
+  handleRelease(SC_NONE, SK_NUM2 | KEY_STENO, SC_NONE, SC_NONE, SC_ENTER, SC_KP_DOT);
   if (layer & FUNCTION_MASK) {
     var startPressCount = pressCount;
 
@@ -1674,7 +1691,7 @@ func onRelease40() {
     pressAll();
 
     if (layer == 0) {
-      if (pressCount40 == startPressCount && getTime() - functionLayerPressTimestamp < TAP_THRESHOLD) {
+      if (pressCount41 == startPressCount && getTime() - functionLayerPressTimestamp < TAP_THRESHOLD) {
         tap(SC_ENTER);
       }
 
@@ -1684,26 +1701,3 @@ func onRelease40() {
     deferredQwertyKey = 0;
   }
 }
-
-func onPress41() {
-  if ((layer | FUNCTION_MASK) != FUNCTION_MASK) {
-    handlePress(41, SC_NONE, SK_NUM2 | KEY_STENO, SC_NONE, SC_NONE, SC_NONE, SC_NONE);
-  } else {
-    updateButtonColor(41);
-    pressCount = pressCount + 1;
-    releaseAll();
-    setLayer(layer | SYMBOL_MASK);
-    pressAll();
-  }
-}
-
-func onRelease41() {
-  if (layer & SYMBOL_MASK) {
-    releaseAll();
-    setLayer(layer ^ SYMBOL_MASK);
-    pressAll();
-  } else {
-    handleRelease(SC_NONE, SK_NUM2 | KEY_STENO, SC_L_CTRL, SC_NONE, SC_NONE, SC_NONE);
-  }
-}
-
