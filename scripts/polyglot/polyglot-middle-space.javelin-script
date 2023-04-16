@@ -60,7 +60,7 @@
 //   - Following '(', it means '"'
 //   - Following a '{' or '[', it means enter (newline)
 //   - Following a digit, it means ','
-//   - Following a comma, it means space ' '
+//   - Following a comma or dot, it means space ' '
 //
 
 //
@@ -97,11 +97,12 @@
 // |--------+------+------+------+------+------|        |------+------+------+------+------+--------|
 // |        |  GUI |  Alt | Ctrl | Shift|      |        |      |   4  |   5  |   6  |      |        |
 // |--------+------+------+------+------+------|        |------+------+------+------+------+--------|
-// |        |      |      |      |      |      |        |      |   1  |   2  |   3  |      |        |
+// |        |      |      |      |      |      |        |      |   1  |   2  |   3  |      |  Magic |
 // `----------------------+------+------+------|        |-------------------------------------------'
 //                        |      |      |      |        |      |   0  |   .  |
 //                        `--------------------'        `--------------------'
 //
+// * Magic has the same meaning as the symbol layer.
 
 //
 // Settings - pressing both Sym and Fn together.
@@ -1033,27 +1034,27 @@ var releaseTimer35;
 var tapCount35;
 var pressCount35;
 var capsPressed;
-var symbolKey35;
+var magicKey35;
 func onPress35() {
   // Magic key handling.
-  symbolKey35 = SC_NONE;
-  if (layer & SYMBOL_MASK) {
-    if (lastPressLayer & SYMBOL_MASK) {
-      if (lastPressKey == SC_MINUS) {
-        symbolKey35 = SC_DOT | KEY_SHIFT;
-      } else if (lastPressKey == (SC_9 | KEY_SHIFT)) {
-        symbolKey35 = SC_APOSTROPHE | KEY_SHIFT;
-      } else if (SC_1 <= lastPressKey && lastPressKey <= SC_9) {
-        symbolKey35 = SC_COMMA;
-      } else if ((lastPressKey | KEY_SHIFT) == (SC_L_BRACKET | KEY_SHIFT)) {
-        symbolKey35 = SC_ENTER;
-      } else if (lastPressKey == SC_COMMA) {
-        symbolKey35 = SC_SPACE;
-      }
+  magicKey35 = SC_NONE;
+  if (layer & (SYMBOL_MASK | NUMPAD_MASK)) {
+    if (lastPressKey == SC_MINUS) {
+      magicKey35 = SC_DOT | KEY_SHIFT;
+    } else if (lastPressKey == (SC_9 | KEY_SHIFT)) {
+      magicKey35 = SC_APOSTROPHE | KEY_SHIFT;
+    } else if (SC_1 <= lastPressKey && lastPressKey <= SC_9) {
+      magicKey35 = SC_COMMA;
+    } else if (SC_KP_1 <= lastPressKey && lastPressKey <= SC_KP_9) {
+      magicKey35 = SC_COMMA;
+    } else if ((lastPressKey | KEY_SHIFT) == (SC_L_BRACKET | KEY_SHIFT)) {
+      magicKey35 = SC_ENTER;
+    } else if (lastPressKey == SC_COMMA || lastPressKey == SC_DOT || lastPressKey == SC_KP_DOT) {
+      magicKey35 = SC_SPACE;
     }
   }
 
-  handlePress(35, SC_R_SHIFT, SC_NONE, symbolKey35, SC_NONE, SC_NONE, SC_NONE);
+  handlePress(35, SC_R_SHIFT, SC_NONE, magicKey35, SC_NONE, SC_NONE, magicKey35);
 
   capsPressed = 0;
   if (layer == 0) {
@@ -1074,7 +1075,7 @@ func onPress35() {
   }
 }
 func onRelease35() {
-  handleRelease(SC_R_SHIFT, SC_NONE, symbolKey35, SC_NONE, SC_NONE, SC_NONE);
+  handleRelease(SC_R_SHIFT, SC_NONE, magicKey35, SC_NONE, SC_NONE, magicKey35);
 
   if (capsPressed) {
     capsPressed = 0;
