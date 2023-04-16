@@ -45,11 +45,17 @@
 // |--------+------+------+------+------+------|        |------+------+------+------+------+--------|
 // |    ~   |  !   |  @   |  #   |  $   |  %   |        |   ^  |  &   |  *   |  (   |  )   |   +    |
 // |--------+------+------+------+------+------|        |------+------+------+------+------+--------|
-// |        |  \   |  |   |  -   |  [   |  {   |        |   }  |  ]   |  _   |  .   |  /   |        |
+// |        |  \   |  |   |  -   |  [   |  {   |        |   }  |  ]   |  _   |  .   |  /   |  Magic |
 // `----------------------+--+---+--+---+--+---+--.  ,--+---+--+---+--+---+-------------------------'
 //                           | Meta |  Alt | Ctrl |  |      |      |      |
 //                           `--------------------'  `--------------------'
 //
+// * Magic has a few different meanings:
+//   - By itself, it does nothing.
+//   - Following '-', it means '>'
+//   - Following '(', it means '"'
+//   - Following a '{' or '[', it means enter (newline)
+//   - Following a digit, it means ','
 
 //
 // Function
@@ -543,6 +549,8 @@ const STENO_MODE_EMBEDDED = 0;
 const STENO_MODE_GEMINI = 1;
 
 var wordCaps = 0;
+var lastPressLayer;
+var lastPressKey;
 
 const SHIFT_IMAGE = [[
   10 10
@@ -1062,6 +1070,8 @@ func press(key) {
     return;
   }
 
+  lastPressLayer = layer;
+  lastPressKey = key;
   pressCount = pressCount + 1;
 
   if (key & KEY_STENO) {
@@ -1550,8 +1560,25 @@ var releaseTimer35;
 var tapCount35;
 var pressCount35;
 var capsPressed;
+var symbolKey35;
 func onPress35() {
-  handlePress(35, SC_R_SHIFT, SC_NONE, SC_NONE, SC_NONE, SC_NONE, SC_NONE);
+  // Magic key handling.
+  symbolKey35 = SC_NONE;
+  if (layer & SYMBOL_MASK) {
+    if (lastPressLayer & SYMBOL_MASK) {
+      if (lastPressKey == SC_MINUS) {
+        symbolKey35 = SC_DOT | KEY_SHIFT;
+      } else if (lastPressKey == (SC_9 | KEY_SHIFT)) {
+        symbolKey35 = SC_APOSTROPHE | KEY_SHIFT;
+      } else if (SC_1 <= lastPressKey && lastPressKey <= SC_9) {
+        symbolKey35 = SC_COMMA;
+      } else if ((lastPressKey | KEY_SHIFT) == (SC_L_BRACKET | KEY_SHIFT)) {
+        symbolKey35 = SC_ENTER;
+      }
+    }
+  }
+
+  handlePress(35, SC_R_SHIFT, SC_NONE, symbolKey35, SC_NONE, SC_NONE, SC_NONE);
 
   capsPressed = 0;
   if (layer == 0) {
@@ -1574,7 +1601,7 @@ func onPress35() {
   }
 }
 func onRelease35() {
-  handleRelease(SC_R_SHIFT, SC_NONE, SC_NONE, SC_NONE, SC_NONE, SC_NONE);
+  handleRelease(SC_R_SHIFT, SC_NONE, symbolKey35, SC_NONE, SC_NONE, SC_NONE);
 
   if (capsPressed) {
     capsPressed = 0;
