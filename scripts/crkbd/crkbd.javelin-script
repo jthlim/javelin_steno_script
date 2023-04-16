@@ -1572,9 +1572,9 @@ func onPress35() {
       magicKey35 = SC_DOT | KEY_SHIFT;
     } else if (lastPressKey == (SC_9 | KEY_SHIFT)) {
       magicKey35 = SC_APOSTROPHE | KEY_SHIFT;
-    } else if (SC_1 <= lastPressKey && lastPressKey <= SC_9) {
+    } else if (SC_1 <= lastPressKey && lastPressKey <= SC_0) {
       magicKey35 = SC_COMMA;
-    } else if (SC_KP_1 <= lastPressKey && lastPressKey <= SC_KP_9) {
+    } else if (SC_KP_1 <= lastPressKey && lastPressKey <= SC_KP_0) {
       magicKey35 = SC_COMMA;
     } else if ((lastPressKey | KEY_SHIFT) == (SC_L_BRACKET | KEY_SHIFT)) {
       magicKey35 = SC_ENTER;
