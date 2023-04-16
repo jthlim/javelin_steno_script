@@ -56,6 +56,7 @@
 //   - Following '(', it means '"'
 //   - Following a '{' or '[', it means enter (newline)
 //   - Following a digit, it means ','
+//   - Following a comma, it means space ' '
 
 //
 // Function
@@ -1574,6 +1575,8 @@ func onPress35() {
         symbolKey35 = SC_COMMA;
       } else if ((lastPressKey | KEY_SHIFT) == (SC_L_BRACKET | KEY_SHIFT)) {
         symbolKey35 = SC_ENTER;
+      } else if (lastPressKey == SC_COMMA) {
+        symbolKey35 = SC_SPACE;
       }
     }
   }
