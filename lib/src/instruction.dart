@@ -5,39 +5,53 @@ import 'module.dart';
 import 'string_data.dart';
 
 enum ScriptOpCode {
-  not(0x40),
-  negative(0x41),
-  multiply(0x42),
-  quotient(0x43),
-  remainder(0x44),
-  add(0x45),
-  subtract(0x46),
-  equals(0x47),
-  notEquals(0x48),
-  lessThan(0x49),
-  lessThanOrEqualTo(0x4a),
-  greaterThan(0x4b),
-  greaterThanOrEqualTo(0x4c),
-  bitwiseAnd(0x4d),
-  bitwiseOr(0x4e),
-  bitwiseXor(0x4f),
-  logicalAnd(0x50),
-  logicalOr(0x51),
-  shiftLeft(0x52),
-  arithmeticShiftRight(0x53),
-  logicalShiftRight(0x54),
-  byteLookup(0x55),
-  wordLookup(0x56),
-  increment(0x57),
-  decrement(0x58);
+  not(0x40, true),
+  negative(0x41, false),
+  multiply(0x42, false),
+  quotient(0x43, false),
+  remainder(0x44, false),
+  add(0x45, false),
+  subtract(0x46, false),
+  equals(0x47, true),
+  notEquals(0x48, true),
+  lessThan(0x49, true),
+  lessThanOrEqualTo(0x4a, true),
+  greaterThan(0x4b, true),
+  greaterThanOrEqualTo(0x4c, true),
+  bitwiseAnd(0x4d, false),
+  bitwiseOr(0x4e, false),
+  bitwiseXor(0x4f, false),
+  logicalAnd(0x50, true),
+  logicalOr(0x51, true),
+  shiftLeft(0x52, false),
+  arithmeticShiftRight(0x53, false),
+  logicalShiftRight(0x54, false),
+  byteLookup(0x55, false),
+  wordLookup(0x56, false),
+  increment(0x57, false),
+  decrement(0x58, false);
 
-  const ScriptOpCode(this.value);
+  const ScriptOpCode(this.value, this.isBooleanResult);
+
+  static const _opposites = {
+    equals: notEquals,
+    notEquals: equals,
+    lessThan: greaterThanOrEqualTo,
+    greaterThanOrEqualTo: lessThan,
+    greaterThan: lessThanOrEqualTo,
+    lessThanOrEqualTo: greaterThan,
+  };
 
   final int value;
+  final bool isBooleanResult;
+
+  ScriptOpCode? get opposite => _opposites[this];
 }
 
 abstract class ScriptInstruction extends LinkedListEntry<ScriptInstruction> {
   int get byteCodeLength;
+
+  bool get isBooleanResult => false;
 
   bool get implicitNext => true;
 
@@ -251,6 +265,9 @@ class CallInBuiltFunctionInstruction extends ScriptInstruction {
   CallInBuiltFunctionInstruction(this.function);
 
   @override
+  bool get isBooleanResult => function.isBooleanResult;
+
+  @override
   int get byteCodeLength => function.functionIndex >= 0x100 ? 2 : 1;
 
   @override
@@ -402,6 +419,20 @@ abstract class JumpScriptInstructionBase extends ScriptInstruction {
     }
   }
 
+  bool isJumpToNext() {
+    ScriptInstruction? n = next;
+    while (n != null) {
+      if (identical(n, target)) {
+        return true;
+      }
+      if (n is! NopScriptInstruction) {
+        return false;
+      }
+      n = n.next;
+    }
+    return false;
+  }
+
   int get shortOpcode;
   int get longOpcode;
 
@@ -536,6 +567,9 @@ class NopScriptInstruction extends ScriptInstruction {
 
 class OpcodeScriptInstruction extends ScriptInstruction {
   OpcodeScriptInstruction(this.opcode);
+
+  @override
+  bool get isBooleanResult => opcode.isBooleanResult;
 
   @override
   int get byteCodeLength => 1;

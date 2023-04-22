@@ -535,23 +535,57 @@ class Parser {
 
   AstNode _parseLogicalAnd() {
     var result = _parseBitwise();
-    while (_currentToken.type == TokenType.and) {
+    if (_currentToken.type == TokenType.and) {
       _nextToken();
-      result = LogicalAndAstNode(result, _parseBitwise()).simplify();
+      var rhs = _parseLogicalAnd();
+      if (result.isConstant() && rhs.isConstant()) {
+        result = LogicalAndAstNode(result, rhs).simplify();
+      } else {
+        result = IfStatementAstNode(
+          condition: result,
+          whenTrue: rhs.isBoolean() ? rhs : NotAstNode(NotAstNode(rhs)),
+          whenFalse: IntValueAstNode(0),
+        );
+      }
     }
     return result;
   }
 
   AstNode _parseLogicalOr() {
     var result = _parseLogicalAnd();
-    while (_currentToken.type == TokenType.or) {
+    if (_currentToken.type == TokenType.or) {
       _nextToken();
-      result = LogicalOrAstNode(result, _parseLogicalAnd()).simplify();
+      var rhs = _parseLogicalOr();
+      if (result.isConstant() && rhs.isConstant()) {
+        result = LogicalOrAstNode(result, rhs).simplify();
+      } else {
+        result = IfStatementAstNode(
+          condition: NotAstNode(result),
+          whenTrue: rhs.isBoolean() ? rhs : NotAstNode(NotAstNode(rhs)),
+          whenFalse: IntValueAstNode(1),
+        );
+      }
     }
     return result;
   }
 
-  AstNode _parseExpression() => _parseLogicalOr();
+  AstNode _parseTernary() {
+    var result = _parseLogicalOr();
+    if (_currentToken.type == TokenType.questionMark) {
+      _nextToken();
+      var trueExpression = _parseExpression();
+      _assertToken(TokenType.colon);
+      var falseExpression = _parseExpression();
+      result = IfStatementAstNode(
+        condition: result,
+        whenTrue: trueExpression,
+        whenFalse: falseExpression,
+      );
+    }
+    return result;
+  }
+
+  AstNode _parseExpression() => _parseTernary();
 
   AstNode _parseIfStatement() {
     _assertToken(TokenType.ifKeyword);

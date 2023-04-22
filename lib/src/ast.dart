@@ -3,6 +3,8 @@ import 'byte_code_builder.dart';
 import 'module.dart';
 
 abstract class AstNode {
+  bool isBoolean() => false;
+
   bool isConstant();
   int constantValue();
   void addInstructions(ScriptByteCodeBuilder builder);
@@ -103,6 +105,9 @@ abstract class UnaryOperatorAstNode extends AstNode {
 
 class NotAstNode extends UnaryOperatorAstNode {
   NotAstNode(super.statement);
+
+  @override
+  bool isBoolean() => true;
 
   @override
   int constantValue() => statement.constantValue() == 0 ? 1 : 0;
@@ -353,6 +358,9 @@ class LogicalAndAstNode extends BinaryOperatorAstNode {
   LogicalAndAstNode(super.statementA, super.statementB);
 
   @override
+  bool isBoolean() => true;
+
+  @override
   int constantValue() {
     if (statementA.constantValue() != 0 && statementB.constantValue() != 0) {
       return 1;
@@ -368,6 +376,9 @@ class LogicalOrAstNode extends BinaryOperatorAstNode {
   LogicalOrAstNode(super.statementA, super.statementB);
 
   @override
+  bool isBoolean() => true;
+
+  @override
   int constantValue() {
     if (statementA.constantValue() != 0 || statementB.constantValue() != 0) {
       return 1;
@@ -381,6 +392,9 @@ class LogicalOrAstNode extends BinaryOperatorAstNode {
 
 class EqualsAstNode extends BinaryOperatorAstNode {
   EqualsAstNode(super.statementA, super.statementB);
+
+  @override
+  bool isBoolean() => true;
 
   @override
   int constantValue() {
@@ -411,6 +425,9 @@ class NotEqualsAstNode extends BinaryOperatorAstNode {
   NotEqualsAstNode(super.statementA, super.statementB);
 
   @override
+  bool isBoolean() => true;
+
+  @override
   int constantValue() {
     if (statementA.constantValue() != statementB.constantValue()) {
       return 1;
@@ -424,6 +441,9 @@ class NotEqualsAstNode extends BinaryOperatorAstNode {
 
 class LessThanAstNode extends BinaryOperatorAstNode {
   LessThanAstNode(super.statementA, super.statementB);
+
+  @override
+  bool isBoolean() => true;
 
   @override
   int constantValue() {
@@ -441,6 +461,9 @@ class LessThanOrEqualToAstNode extends BinaryOperatorAstNode {
   LessThanOrEqualToAstNode(super.statementA, super.statementB);
 
   @override
+  bool isBoolean() => true;
+
+  @override
   int constantValue() {
     if (statementA.constantValue() <= statementB.constantValue()) {
       return 1;
@@ -456,6 +479,9 @@ class GreaterThanAstNode extends BinaryOperatorAstNode {
   GreaterThanAstNode(super.statementA, super.statementB);
 
   @override
+  bool isBoolean() => true;
+
+  @override
   int constantValue() {
     if (statementA.constantValue() > statementB.constantValue()) {
       return 1;
@@ -469,6 +495,9 @@ class GreaterThanAstNode extends BinaryOperatorAstNode {
 
 class GreaterThanOrEqualToAstNode extends BinaryOperatorAstNode {
   GreaterThanOrEqualToAstNode(super.statementA, super.statementB);
+
+  @override
+  bool isBoolean() => true;
 
   @override
   int constantValue() {

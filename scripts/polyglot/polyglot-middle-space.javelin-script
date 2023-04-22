@@ -99,7 +99,7 @@
 // |--------+------+------+------+------+------|        |------+------+------+------+------+--------|
 // |        |      |      |      |      |      |        |      |   1  |   2  |   3  |      |  Magic |
 // `----------------------+------+------+------|        |-------------------------------------------'
-//                        |      |      |      |        |      |   0  |   .  |
+//                        |      |      |      |        | Space|   0  |   .  |
 //                        `--------------------'        `--------------------'
 //
 // * Magic has the same meaning as the symbol layer.
@@ -1149,8 +1149,8 @@ func onRelease38() {
   }
 }
 
-func onPress39() { handlePress(39, SC_SPACE, SK_E | KEY_STENO, SC_NONE, SC_NONE, SC_SPACE, SC_NONE); }
-func onRelease39() { handleRelease(SC_SPACE, SK_E | KEY_STENO, SC_NONE, SC_NONE, SC_SPACE, SC_NONE); }
+func onPress39() { handlePress(39, SC_SPACE, SK_E | KEY_STENO, SC_NONE, SC_NONE, SC_SPACE, SC_SPACE); }
+func onRelease39() { handleRelease(SC_SPACE, SK_E | KEY_STENO, SC_NONE, SC_NONE, SC_SPACE, SC_SPACE); }
 
 func onPress40() {
   handlePress(40, SC_NONE, SK_U | KEY_STENO, SC_NONE, SC_NONE, SC_NONE, SC_KP_0);

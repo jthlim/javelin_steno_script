@@ -95,8 +95,8 @@
 // |--------+------+------+------+------+------|        |------+------+------+------+------+--------|
 // |        |      |      |      |      |      |        |      |   1  |   2  |   3  |      | Magic  |
 // `----------------------+--+---+--+---+--+---+--.  ,--+---+--+---+--+---+-------------------------'
-//                           |      |      |      |  |         |   0  |   .  |
-//                           `--------------------'  `-----------------------'
+//                           |      |      |      |  | Space|   0  |   .  |
+//                           `--------------------'  `--------------------'
 //
 // * Magic has the same meaning as the symbol layer.
 
@@ -810,9 +810,11 @@ func tick() {
   setScreenOn(0, screenOn);
   setScreenOn(1, screenOn);
 
-  if (time - lastRgbUpdateTime >= RGB_UPDATE_TIME) {
-    lastRgbUpdateTime = time;
-    updateKeyRgb();
+  if (brightness != 0) {
+    if (time - lastRgbUpdateTime >= RGB_UPDATE_TIME) {
+      lastRgbUpdateTime = time;
+      updateKeyRgb();
+    }
   }
 
   var capsLockStatus = getLedStatus(LED_STATUS_CAPS_LOCK);
@@ -1474,11 +1476,10 @@ func onPress24() {
     return;
   }
   lastActionTime = getTime();
-  if (layer >> 1) {
-    wasInLayer24 = 1;
+  wasInLayer24 = layer >> 1;
+  if (wasInLayer24) {
     return;
   }
-  wasInLayer24 = 0;
   wasSteno24 = layer & STENO_MASK;
   if (wasSteno24) {
     releaseAll();
@@ -1509,7 +1510,9 @@ func onRelease24() {
     release(SC_L_SHIFT);
 
     // A tap of the key turns on steno mode.
-    if (layer == 0 && pressCount24 == pressCount && getTime() - timer24 < TAP_THRESHOLD) {
+    if (layer == 0 && pressCount24 == pressCount
+        && getTime() - timer24 < TAP_THRESHOLD
+        && checkButtonState("000000000000000000000000000000000000000000")) {
       releaseAll();
       setLayer(layer | STENO_MASK);
 
@@ -1680,8 +1683,8 @@ func onRelease38() {
   }
 }
 
-func onPress39() { handlePress(39, SC_SPACE, SK_E | KEY_STENO, SC_NONE, SC_NONE, SC_SPACE, SC_NONE); }
-func onRelease39() { handleRelease(SC_SPACE, SK_E | KEY_STENO, SC_NONE, SC_NONE, SC_SPACE, SC_NONE); }
+func onPress39() { handlePress(39, SC_SPACE, SK_E | KEY_STENO, SC_NONE, SC_NONE, SC_SPACE, SC_SPACE); }
+func onRelease39() { handleRelease(SC_SPACE, SK_E | KEY_STENO, SC_NONE, SC_NONE, SC_SPACE, SC_SPACE); }
 
 func onPress40() {
   handlePress(40, SC_NONE, SK_U | KEY_STENO, SC_NONE, SC_NONE, SC_NONE, SC_KP_0);

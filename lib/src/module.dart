@@ -11,47 +11,48 @@ abstract class ScriptFunctionDefinition {
 
 enum InBuiltScriptFunction implements ScriptFunctionDefinition {
   // Direct functions, using one byte opcodes.
-  pressScanCode('pressScanCode', 1, false, 0),
-  releaseScanCode('releaseScanCode', 1, false, 1),
-  tapScanCode('tapScanCode', 1, false, 2),
-  isScanCodePressed('isScanCodePressed', 1, true, 3),
-  pressStenoKey('pressStenoKey', 1, false, 4),
-  releaseStenoKey('releaseStenoKey', 1, false, 5),
-  isStenoKeyPressed('isStenoKeyPressed', 1, true, 6),
-  releaseAll('releaseAll', 0, false, 7),
-  isButtonPressed('isButtonPressed', 1, true, 8),
-  pressAll('pressAll', 0, false, 9),
-  sendText('sendText', 1, false, 10),
-  console('console', 1, true, 11),
-  checkButtonState('checkButtonState', 1, true, 12),
-  isInPressAll('isInPressAll', 0, true, 13),
-  setRgb('setRgb', 4, false, 14),
-  getTime('getTime', 0, true, 15),
+  pressScanCode('pressScanCode', 1, false, 0, false),
+  releaseScanCode('releaseScanCode', 1, false, 1, false),
+  tapScanCode('tapScanCode', 1, false, 2, false),
+  isScanCodePressed('isScanCodePressed', 1, true, 3, true),
+  pressStenoKey('pressStenoKey', 1, false, 4, false),
+  releaseStenoKey('releaseStenoKey', 1, false, 5, false),
+  isStenoKeyPressed('isStenoKeyPressed', 1, true, 6, true),
+  releaseAll('releaseAll', 0, false, 7, false),
+  isButtonPressed('isButtonPressed', 1, true, 8, true),
+  pressAll('pressAll', 0, false, 9, false),
+  sendText('sendText', 1, false, 10, false),
+  console('console', 1, true, 11, false),
+  checkButtonState('checkButtonState', 1, true, 12, true),
+  isInPressAll('isInPressAll', 0, true, 13, true),
+  setRgb('setRgb', 4, false, 14, false),
+  getTime('getTime', 0, true, 15, false),
 
   // Extended functions, using two byte 0xcc opcode.
-  getLedStatus('getLedStatus', 1, true, 0x100),
-  setGpioPin('setGpioPin', 2, false, 0x101),
-  clearDisplay('clearDisplay', 1, false, 0x102),
-  setAutoDraw('setAutoDraw', 2, false, 0x103),
-  setScreenOn('setScreenOn', 2, false, 0x104),
-  setScreenContrast('setScreenContrast', 2, false, 0x105),
-  drawPixel('drawPixel', 3, false, 0x106),
-  drawLine('drawLine', 5, false, 0x107),
-  drawImage('drawImage', 4, false, 0x108),
-  drawText('drawText', 6, false, 0x109),
-  setDrawColor('setDrawColor', 2, false, 0x10a),
-  drawRect('drawRect', 5, false, 0x10b),
-  setHsv('setHsv', 4, false, 0x10c),
-  rand('rand', 0, true, 0x10d),
-  isUsbConnected('isUsbConnected', 0, true, 0x10e),
-  isUsbSuspended('isUsbSuspended', 0, true, 0x10f),
-  getParameter('getParameter', 1, true, 0x110);
+  getLedStatus('getLedStatus', 1, true, 0x100, true),
+  setGpioPin('setGpioPin', 2, false, 0x101, false),
+  clearDisplay('clearDisplay', 1, false, 0x102, false),
+  setAutoDraw('setAutoDraw', 2, false, 0x103, false),
+  setScreenOn('setScreenOn', 2, false, 0x104, false),
+  setScreenContrast('setScreenContrast', 2, false, 0x105, false),
+  drawPixel('drawPixel', 3, false, 0x106, false),
+  drawLine('drawLine', 5, false, 0x107, false),
+  drawImage('drawImage', 4, false, 0x108, false),
+  drawText('drawText', 6, false, 0x109, false),
+  setDrawColor('setDrawColor', 2, false, 0x10a, false),
+  drawRect('drawRect', 5, false, 0x10b, false),
+  setHsv('setHsv', 4, false, 0x10c, false),
+  rand('rand', 0, true, 0x10d, false),
+  isUsbConnected('isUsbConnected', 0, true, 0x10e, true),
+  isUsbSuspended('isUsbSuspended', 0, true, 0x10f, true),
+  getParameter('getParameter', 1, true, 0x110, false);
 
   const InBuiltScriptFunction(
     this.functionName,
     this.numberOfParameters,
     this.hasReturnValue,
     this.functionIndex,
+    this.isBooleanResult,
   );
 
   final String functionName;
@@ -66,6 +67,8 @@ enum InBuiltScriptFunction implements ScriptFunctionDefinition {
   final bool hasReturnValue;
 
   final int functionIndex;
+
+  final bool isBooleanResult;
 }
 
 class ScriptFunction implements ScriptFunctionDefinition {

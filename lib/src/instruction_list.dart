@@ -17,10 +17,14 @@ class InstructionList extends Iterable<ScriptInstruction> {
   Iterator<ScriptInstruction> get iterator => instructions.iterator;
 
   void optimize() {
+    optimizeNot();
+    optimizeTrueFalseJumps();
     optimizeJumpTarget();
     optimizeRightFactor();
     optimizeCallReturn();
     optimizeDeadCode();
+    optimizeJumpToNext();
+    optimizeNot();
   }
 
   void optimizeRightFactor() {
@@ -48,6 +52,71 @@ class InstructionList extends Iterable<ScriptInstruction> {
         }
       }
       instruction = instruction.next;
+    }
+  }
+
+  void optimizeTrueFalseJumps() {
+    if (instructions.isEmpty) {
+      return;
+    }
+
+    ScriptInstruction? instruction = instructions.first;
+    while (instruction != null) {
+      if (instruction is PushIntValueScriptInstruction) {
+        final value = instruction.value;
+        if (value == 0 || value == 1) {
+          ScriptInstruction? jumpInstruction =
+              findFixedJumpTarget(instruction.next, value != 0);
+          if (jumpInstruction != null) {
+            instruction.replaceWith(jumpInstruction);
+            instruction = jumpInstruction;
+          }
+        }
+      }
+
+      instruction = instruction.next;
+    }
+  }
+
+  // Resolves true/false followed by conditional jump.
+  static ScriptInstruction? findFixedJumpTarget(
+    ScriptInstruction? instruction,
+    bool isNonZero,
+  ) {
+    for (;;) {
+      if (instruction is JumpScriptInstruction) {
+        instruction = instruction.target;
+        continue;
+      }
+      if (instruction is NopScriptInstruction) {
+        instruction = instruction.next;
+        continue;
+      }
+      if (instruction is OpcodeScriptInstruction &&
+          instruction.opcode == ScriptOpCode.not) {
+        isNonZero = !isNonZero;
+        instruction = instruction.next;
+        continue;
+      }
+      if (instruction is JumpIfZeroScriptInstruction) {
+        final jumpInstruction = JumpScriptInstruction();
+        if (isNonZero) {
+          instruction.insertAfter(jumpInstruction.target);
+        } else {
+          instruction.target.insertBefore(jumpInstruction.target);
+        }
+        return jumpInstruction;
+      }
+      if (instruction is JumpIfNotZeroScriptInstruction) {
+        final jumpInstruction = JumpScriptInstruction();
+        if (isNonZero) {
+          instruction.target.insertBefore(jumpInstruction.target);
+        } else {
+          instruction.insertAfter(jumpInstruction.target);
+        }
+        return jumpInstruction;
+      }
+      return null;
     }
   }
 
@@ -119,9 +188,91 @@ class InstructionList extends Iterable<ScriptInstruction> {
 
     ScriptInstruction? instruction = instructions.first;
     while (instruction != null) {
-      final next = instruction.next;
+      var next = instruction.next;
       if (!instruction.hasReference) {
+        if (instruction is JumpScriptInstructionBase &&
+            identical(instruction.next, instruction.target)) {
+          next = instruction.target.next;
+        }
         instruction.unlink();
+      }
+      instruction = next;
+    }
+  }
+
+  void optimizeJumpToNext() {
+    if (instructions.isEmpty) {
+      return;
+    }
+
+    ScriptInstruction? instruction = instructions.first;
+    while (instruction != null) {
+      if (instruction is! JumpScriptInstructionBase ||
+          !instruction.isJumpToNext()) {
+        instruction = instruction.next;
+        continue;
+      }
+
+      final next = instruction.target.next;
+      if (instruction is JumpScriptInstruction) {
+        instruction.unlink();
+      }
+      instruction = next;
+    }
+  }
+
+  void optimizeNot() {
+    if (instructions.isEmpty) {
+      return;
+    }
+
+    ScriptInstruction? instruction = instructions.first;
+    while (instruction != null) {
+      if (instruction is! OpcodeScriptInstruction ||
+          instruction.opcode != ScriptOpCode.not) {
+        instruction = instruction.next;
+        continue;
+      }
+
+      final next = instruction.next;
+      final previous = instruction.previous!;
+      if (previous.isBooleanResult &&
+          next is OpcodeScriptInstruction &&
+          next.opcode == ScriptOpCode.not) {
+        final nextNext = next.next;
+        instruction.unlink();
+        next.unlink();
+        instruction = nextNext;
+        continue;
+      } else if (previous is OpcodeScriptInstruction &&
+          previous.opcode.opposite != null) {
+        final opposite = previous.opcode.opposite!;
+        previous.replaceWith(OpcodeScriptInstruction(opposite));
+        instruction.unlink();
+      } else if (next is OpcodeScriptInstruction &&
+          next.opcode == ScriptOpCode.not) {
+        final nextNext = next.next;
+        if (nextNext is OpcodeScriptInstruction &&
+            nextNext.opcode == ScriptOpCode.not) {
+          next.unlink();
+          nextNext.unlink();
+          continue;
+        }
+      } else if (next is JumpIfZeroScriptInstruction) {
+        final replacement = JumpIfNotZeroScriptInstruction();
+        next.target.insertAfter(replacement.target);
+        next.replaceWith(replacement);
+        instruction.unlink();
+        instruction = previous;
+        continue;
+      } else if (next is JumpIfNotZeroScriptInstruction) {
+        final replacement = JumpIfZeroScriptInstruction();
+        final previous = instruction.previous!;
+        next.target.insertAfter(replacement.target);
+        next.replaceWith(replacement);
+        instruction.unlink();
+        instruction = previous;
+        continue;
       }
       instruction = next;
     }
@@ -154,28 +305,24 @@ class InstructionList extends Iterable<ScriptInstruction> {
         throw Exception('Internal error: Unexpected jump type $second');
       }
     } else if (first is JumpIfZeroScriptInstruction) {
-      if (second is JumpScriptInstruction ||
-          second is JumpIfZeroScriptInstruction) {
+      if (second is JumpScriptInstruction) {
         final result = JumpIfZeroScriptInstruction();
         second.target.insertAfter(result.target);
         return result;
-      } else if (second is JumpIfNotZeroScriptInstruction) {
-        final result = JumpIfZeroScriptInstruction();
-        second.target.nextNonNopInstruction.insertAfter(result.target);
-        return result;
+      } else if (second is JumpIfZeroScriptInstruction ||
+          second is JumpIfNotZeroScriptInstruction) {
+        return null;
       } else {
         throw Exception('Internal error: Unexpected jump type $second');
       }
     } else if (first is JumpIfNotZeroScriptInstruction) {
-      if (second is JumpScriptInstruction ||
-          second is JumpIfNotZeroScriptInstruction) {
+      if (second is JumpScriptInstruction) {
         final result = JumpIfNotZeroScriptInstruction();
         second.target.insertAfter(result.target);
         return result;
-      } else if (second is JumpIfZeroScriptInstruction) {
-        final result = JumpIfNotZeroScriptInstruction();
-        second.target.nextNonNopInstruction.insertAfter(result.target);
-        return result;
+      } else if (second is JumpIfZeroScriptInstruction ||
+          second is JumpIfNotZeroScriptInstruction) {
+        return null;
       } else {
         throw Exception('Internal error: Unexpected jump type $second');
       }
