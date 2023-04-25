@@ -42,6 +42,7 @@ class InstructionList extends Iterable<ScriptInstruction> {
           final previousReferenceInstruction = reference.previous;
 
           if (previousInstruction != null &&
+              previousInstruction.implicitNext &&
               previousReferenceInstruction != null &&
               previousInstruction == previousReferenceInstruction) {
             reference.unlink();
