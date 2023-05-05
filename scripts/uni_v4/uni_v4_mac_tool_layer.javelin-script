@@ -4,12 +4,15 @@
 // The layer is accessed by holding down the Tool key:
 //
 // Tool Layer:
-//     Tab   Alt  Ctrl _____ _____   VolUp <-Del    Up Del->  Home  PgUp
+//     Tab   Alt  Ctrl [kpd] [kpc]   VolUp <-Del    Up Del->  Home  PgUp
 //   Shift  CmdZ  CmdX  CmdC  CmdV   VolDn  Left  Down Right   End  PgDn
 //
-//              [Tool]   Cmd [Swi]   _____ Space   Esc
+//              [Tool]   Cmd [Swi]   Enter Space   Esc
 //
 // [Swi] Switches between embedded steno and gemini protocol.
+//
+// [kpd] Sets keyboard protocol to default
+// [kpc] Sets keyboard protocol to compatibilityMode
 //
 //---------------------------------------------------------------------------
 
@@ -160,6 +163,13 @@ const SC_VOLUME_UP = 0x80;
 const SC_VOLUME_DOWN = 0x81;
 
 const SC_KP_COMMA = 0x85;
+
+const SC_SYSTEM_POWER = 0xa5;
+const SC_SYSTEM_SLEEP = 0xa6;
+const SC_SYSTEM_WAKE = 0xa7;
+const SC_AUDIO_MUTE = 0xa8;
+const SC_AUDIO_VOLUME_UP = 0xa9;
+const SC_AUDIO_VOLUME_DOWN = 0xaa;
 
 const SC_KP_LEFT_PAREN = 0xb6;
 const SC_KP_RIGHT_PAREN = 0xb7;
@@ -374,10 +384,20 @@ func onRelease1() { handleRelease(SK_TL, SC_L_ALT); }
 func onPress2() { handlePress(SK_PL, SC_L_CTRL); }
 func onRelease2() { handleRelease(SK_PL, SC_L_CTRL); }
 
-func onPress3() { handlePress(SK_HL, 0); }
+func onPress3() {
+  handlePress(SK_HL, 0);
+  if (layer == TOOL_LAYER) {
+    console("set_keyboard_protocol default");
+  }
+}
 func onRelease3() { handleRelease(SK_HL, 0); }
 
-func onPress4() { handlePress(SK_STAR1, 0); }
+func onPress4() {
+  handlePress(SK_STAR1, 0);
+  if (layer == TOOL_LAYER) {
+    console("set_keyboard_protocol compatibility");
+  }
+}
 func onRelease4() { handleRelease(SK_STAR1, 0); }
 
 func onPress5() { handlePress(SK_STAR2, SC_VOLUME_UP); }
@@ -455,8 +475,8 @@ func onPress24() {
 }
 func onRelease24() { handleRelease(SK_O, 0); }
 
-func onPress25() { handlePress(SK_E, 0); }
-func onRelease25() { handleRelease(SK_E, 0); }
+func onPress25() { handlePress(SK_E, SC_ENTER); }
+func onRelease25() { handleRelease(SK_E, SC_ENTER); }
 
 func onPress26() { handlePress(SK_U, SC_SPACE); }
 func onRelease26() { handleRelease(SK_U, SC_SPACE); }

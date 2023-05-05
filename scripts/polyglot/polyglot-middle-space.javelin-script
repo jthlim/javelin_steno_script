@@ -269,6 +269,13 @@ const SC_VOLUME_DOWN = 0x81;
 
 const SC_KP_COMMA = 0x85;
 
+const SC_SYSTEM_POWER = 0xa5;
+const SC_SYSTEM_SLEEP = 0xa6;
+const SC_SYSTEM_WAKE = 0xa7;
+const SC_AUDIO_MUTE = 0xa8;
+const SC_AUDIO_VOLUME_UP = 0xa9;
+const SC_AUDIO_VOLUME_DOWN = 0xaa;
+
 const SC_KP_LEFT_PAREN = 0xb6;
 const SC_KP_RIGHT_PAREN = 0xb7;
 

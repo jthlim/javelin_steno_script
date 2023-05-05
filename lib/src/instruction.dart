@@ -335,6 +335,7 @@ class JumpFunctionScriptInstruction extends JumpFunctionScriptInstructionBase {
 
   @override
   bool get implicitNext => false;
+
   @override
   int get opcode => 0xc6;
 

@@ -45,7 +45,18 @@ enum InBuiltScriptFunction implements ScriptFunctionDefinition {
   rand('rand', 0, true, 0x10d, false),
   isUsbConnected('isUsbConnected', 0, true, 0x10e, true),
   isUsbSuspended('isUsbSuspended', 0, true, 0x10f, true),
-  getParameter('getParameter', 1, true, 0x110, false);
+  getParameter('getParameter', 1, true, 0x110, false),
+  isConnected('isConnected', 1, true, 0x111, true),
+  getActiveConnection('getActiveConnection', 0, true, 0x112, false),
+  setPreferredConnection('setPreferredConnection', 3, false, 0x113, false),
+  isPairConnected('isPairConnected', 1, true, 0x114, true),
+  startBlePairing('startBlePairing', 0, false, 0x115, false),
+  getBleProfile('getBleProfile', 0, true, 0x116, false),
+  setBleProfile('setBleProfile', 1, false, 0x117, false),
+  isHostSleeping('isHostSleeping', 0, true, 0x118, true),
+  isPowered('isPowered', 0, true, 0x119, true),
+  isCharging('isCharging', 0, true, 0x11a, true),
+  getBatteryPercentage('getBatteryPercentage', 0, true, 0x11b, false);
 
   const InBuiltScriptFunction(
     this.functionName,
@@ -53,7 +64,7 @@ enum InBuiltScriptFunction implements ScriptFunctionDefinition {
     this.hasReturnValue,
     this.functionIndex,
     this.isBooleanResult,
-  );
+  ) : assert(!(hasReturnValue == false && isBooleanResult == true));
 
   final String functionName;
 
