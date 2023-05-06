@@ -266,18 +266,7 @@ const SC_FIND = 0x7e;
 const SC_MUTE = 0x7f;
 const SC_VOLUME_UP = 0x80;
 const SC_VOLUME_DOWN = 0x81;
-
 const SC_KP_COMMA = 0x85;
-
-const SC_SYSTEM_POWER = 0xa5;
-const SC_SYSTEM_SLEEP = 0xa6;
-const SC_SYSTEM_WAKE = 0xa7;
-const SC_AUDIO_MUTE = 0xa8;
-const SC_AUDIO_VOLUME_UP = 0xa9;
-const SC_AUDIO_VOLUME_DOWN = 0xaa;
-
-const SC_KP_LEFT_PAREN = 0xb6;
-const SC_KP_RIGHT_PAREN = 0xb7;
 
 const SC_L_CTRL = 0xe0;
 const SC_L_SHIFT = 0xe1;
@@ -288,26 +277,25 @@ const SC_R_SHIFT = 0xe5;
 const SC_R_ALT = 0xe6;
 const SC_R_META = 0xe7;
 
-const SC_MEDIA_PLAY_PAUSE = 0xe8;
-const SC_MEDIA_STOP_CD = 0xe9;
-const SC_MEDIA_PREVIOUS_SONG = 0xea;
-const SC_MEDIA_NEXT_SONG = 0xeb;
-const SC_MEDIA_EJECT_CD = 0xec;
-const SC_MEDIA_VOLUME_UP = 0xed;
-const SC_MEDIA_VOLUME_DOWN = 0xee;
-const SC_MEDIA_MUTE = 0xef;
-const SC_MEDIA_WWW = 0xf0;
-const SC_MEDIA_BACK = 0xf1;
-const SC_MEDIA_FORWARD = 0xf2;
-const SC_MEDIA_STOP = 0xf3;
-const SC_MEDIA_FIND = 0xf4;
-const SC_MEDIA_SCROLL_UP = 0xf5;
-const SC_MEDIA_SCROLL_DOWN = 0xf6;
-const SC_MEDIA_EDIT = 0xf7;
-const SC_MEDIA_SLEEP = 0xf8;
-const SC_MEDIA_COFFEE = 0xf9;
-const SC_MEDIA_REFRESH = 0xfa;
-const SC_MEDIA_CALC = 0xfb;
+// From Consumer Page (0x0c)
+const SC_CONSUMER_PLAY = 0xa0;                // UsageId 0xb0
+const SC_CONSUMER_PAUSE = 0xa1;               // UsageId 0xb1
+const SC_CONSUMER_RECORD = 0xa2;              // UsageId 0xb2
+const SC_CONSUMER_FAST_FORWARD = 0xa3;        // UsageId 0xb3
+const SC_CONSUMER_REWIND = 0xa4;              // UsageId 0xb4
+const SC_CONSUMER_SCAN_NEXT_TRACK = 0xa5;     // UsageId 0xb5
+const SC_CONSUMER_SCAN_PREVIOUS_TRACK = 0xa6; // UsageId 0xb6
+const SC_CONSUMER_STOP = 0xa7;                // UsageId 0xb7
+const SC_CONSUMER_EJECT = 0xa8;               // UsageId 0xb8
+
+const SC_CONSUMER_STOP_EJECT = 0xbc;          // UsageId 0xcc
+const SC_CONSUMER_PLAY_PAUSE = 0xbd;          // UsageId 0xcd
+const SC_CONSUMER_PLAY_SKIP = 0xbe;           // UsageId 0xce
+
+const SC_CONSUMER_MUTE = 0xd2;                // UsageId 0xe2
+const SC_CONSUMER_VOLUME_UP = 0xd9;           // UsageId 0xe9
+const SC_CONSUMER_VOLUME_DOWN = 0xda;         // UsageId 0xea
+
 
 //---------------------------------------------------------------------------
 // javelin-steno steno key values.
@@ -786,7 +774,7 @@ func onPress5() { handlePress(5, SC_T, SK_STAR1 | KEY_STENO, SC_5, SC_NONE, SC_N
 func onRelease5() { handleRelease(SC_T, SK_STAR1 | KEY_STENO, SC_5, SC_NONE, SC_NONE, SC_NONE); }
 
 func onPress6() {
-  handlePress(6, SC_Y, SK_STAR2 | KEY_STENO, SC_6, SC_NONE, SC_VOLUME_UP, SC_NONE);
+  handlePress(6, SC_Y, SK_STAR2 | KEY_STENO, SC_6, SC_NONE, SC_CONSUMER_VOLUME_UP, SC_NONE);
 
   if (isSettingsLayer()) {
     if (speed < 8) {
@@ -797,7 +785,7 @@ func onPress6() {
     }
   }
 }
-func onRelease6() { handleRelease(SC_Y, SK_STAR2 | KEY_STENO, SC_6, SC_NONE, SC_VOLUME_UP, SC_NONE); }
+func onRelease6() { handleRelease(SC_Y, SK_STAR2 | KEY_STENO, SC_6, SC_NONE, SC_CONSUMER_VOLUME_UP, SC_NONE); }
 
 func onPress7() { handlePress(7, SC_U, SK_FR | KEY_STENO, SC_7, SC_NONE, SC_BACKSPACE, SC_KP_7); }
 func onRelease7() { handleRelease(SC_U, SK_FR | KEY_STENO, SC_7, SC_NONE, SC_BACKSPACE, SC_KP_7); }
@@ -884,7 +872,7 @@ func onPress17() { handlePress(17, SC_G, SK_STAR3 | KEY_STENO, SC_5 | KEY_SHIFT,
 func onRelease17() { handleRelease(SC_G, SK_STAR3 | KEY_STENO, SC_5 | KEY_SHIFT, SC_NONE, SC_NONE, SC_NONE); }
 
 func onPress18() {
-  handlePress(18, SC_H, SK_STAR4 | KEY_STENO, SC_6 | KEY_SHIFT, SC_NONE, SC_VOLUME_DOWN, SC_NONE);
+  handlePress(18, SC_H, SK_STAR4 | KEY_STENO, SC_6 | KEY_SHIFT, SC_NONE, SC_CONSUMER_VOLUME_DOWN, SC_NONE);
 
   if (isSettingsLayer()) {
     if (speed > 0) {
@@ -895,7 +883,7 @@ func onPress18() {
     }
   }
 }
-func onRelease18() { handleRelease(SC_H, SK_STAR4 | KEY_STENO, SC_6 | KEY_SHIFT, SC_NONE, SC_VOLUME_DOWN, SC_NONE); }
+func onRelease18() { handleRelease(SC_H, SK_STAR4 | KEY_STENO, SC_6 | KEY_SHIFT, SC_NONE, SC_CONSUMER_VOLUME_DOWN, SC_NONE); }
 
 func onPress19() { handlePress(19, SC_J, SK_RR | KEY_STENO, SC_7 | KEY_SHIFT, SC_L_SHIFT, SC_LEFT, SC_KP_4); }
 func onRelease19() { handleRelease(SC_J, SK_RR | KEY_STENO, SC_7 | KEY_SHIFT, SC_L_SHIFT, SC_LEFT, SC_KP_4); }
@@ -1021,8 +1009,8 @@ func onRelease28() { handleRelease(SC_V, SC_NONE, SC_L_BRACKET, SC_F4, SC_NONE, 
 func onPress29() { handlePress(29, SC_B, SC_NONE, SC_L_BRACKET | KEY_SHIFT, SC_NONE, SC_NONE, SC_NONE); }
 func onRelease29() { handleRelease(SC_B, SC_NONE, SC_L_BRACKET | KEY_SHIFT, SC_NONE, SC_NONE, SC_NONE); }
 
-func onPress30() { handlePress(30, SC_N, SC_NONE, SC_R_BRACKET | KEY_SHIFT, SC_NONE, SC_MUTE, SC_NONE); }
-func onRelease30() { handleRelease(SC_N, SC_NONE, SC_R_BRACKET | KEY_SHIFT, SC_NONE, SC_MUTE, SC_NONE); }
+func onPress30() { handlePress(30, SC_N, SC_NONE, SC_R_BRACKET | KEY_SHIFT, SC_NONE, SC_CONSUMER_MUTE, SC_NONE); }
+func onRelease30() { handleRelease(SC_N, SC_NONE, SC_R_BRACKET | KEY_SHIFT, SC_NONE, SC_CONSUMER_MUTE, SC_NONE); }
 
 func onPress31() { handlePress(31, SC_M, SC_NONE, SC_R_BRACKET, SC_NONE, SC_NONE, SC_KP_1); }
 func onRelease31() { handleRelease(SC_M, SC_NONE, SC_R_BRACKET, SC_NONE, SC_NONE, SC_KP_1); }

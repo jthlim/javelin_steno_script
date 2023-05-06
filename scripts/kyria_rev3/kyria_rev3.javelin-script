@@ -233,18 +233,7 @@ const SC_FIND = 0x7e;
 const SC_MUTE = 0x7f;
 const SC_VOLUME_UP = 0x80;
 const SC_VOLUME_DOWN = 0x81;
-
 const SC_KP_COMMA = 0x85;
-
-const SC_SYSTEM_POWER = 0xa5;
-const SC_SYSTEM_SLEEP = 0xa6;
-const SC_SYSTEM_WAKE = 0xa7;
-const SC_AUDIO_MUTE = 0xa8;
-const SC_AUDIO_VOLUME_UP = 0xa9;
-const SC_AUDIO_VOLUME_DOWN = 0xaa;
-
-const SC_KP_LEFT_PAREN = 0xb6;
-const SC_KP_RIGHT_PAREN = 0xb7;
 
 const SC_L_CTRL = 0xe0;
 const SC_L_SHIFT = 0xe1;
@@ -255,26 +244,24 @@ const SC_R_SHIFT = 0xe5;
 const SC_R_ALT = 0xe6;
 const SC_R_META = 0xe7;
 
-const SC_MEDIA_PLAY_PAUSE = 0xe8;
-const SC_MEDIA_STOP_CD = 0xe9;
-const SC_MEDIA_PREVIOUS_SONG = 0xea;
-const SC_MEDIA_NEXT_SONG = 0xeb;
-const SC_MEDIA_EJECT_CD = 0xec;
-const SC_MEDIA_VOLUME_UP = 0xed;
-const SC_MEDIA_VOLUME_DOWN = 0xee;
-const SC_MEDIA_MUTE = 0xef;
-const SC_MEDIA_WWW = 0xf0;
-const SC_MEDIA_BACK = 0xf1;
-const SC_MEDIA_FORWARD = 0xf2;
-const SC_MEDIA_STOP = 0xf3;
-const SC_MEDIA_FIND = 0xf4;
-const SC_MEDIA_SCROLL_UP = 0xf5;
-const SC_MEDIA_SCROLL_DOWN = 0xf6;
-const SC_MEDIA_EDIT = 0xf7;
-const SC_MEDIA_SLEEP = 0xf8;
-const SC_MEDIA_COFFEE = 0xf9;
-const SC_MEDIA_REFRESH = 0xfa;
-const SC_MEDIA_CALC = 0xfb;
+// From Consumer Page (0x0c)
+const SC_CONSUMER_PLAY = 0xa0;                // UsageId 0xb0
+const SC_CONSUMER_PAUSE = 0xa1;               // UsageId 0xb1
+const SC_CONSUMER_RECORD = 0xa2;              // UsageId 0xb2
+const SC_CONSUMER_FAST_FORWARD = 0xa3;        // UsageId 0xb3
+const SC_CONSUMER_REWIND = 0xa4;              // UsageId 0xb4
+const SC_CONSUMER_SCAN_NEXT_TRACK = 0xa5;     // UsageId 0xb5
+const SC_CONSUMER_SCAN_PREVIOUS_TRACK = 0xa6; // UsageId 0xb6
+const SC_CONSUMER_STOP = 0xa7;                // UsageId 0xb7
+const SC_CONSUMER_EJECT = 0xa8;               // UsageId 0xb8
+
+const SC_CONSUMER_STOP_EJECT = 0xbc;          // UsageId 0xcc
+const SC_CONSUMER_PLAY_PAUSE = 0xbd;          // UsageId 0xcd
+const SC_CONSUMER_PLAY_SKIP = 0xbe;           // UsageId 0xce
+
+const SC_CONSUMER_MUTE = 0xd2;                // UsageId 0xe2
+const SC_CONSUMER_VOLUME_UP = 0xd9;           // UsageId 0xe9
+const SC_CONSUMER_VOLUME_DOWN = 0xda;         // UsageId 0xea
 
 //---------------------------------------------------------------------------
 // javelin-steno steno key values.
@@ -698,7 +685,7 @@ func init() {
   updateScreenContrast();
 
   // Disable liatris power light.
-  // setGpioPin(24, 1);
+  setGpioPin(24, 1);
 
   updateDisplay0();
   setAutoDraw(1, AUTO_DRAW_WPM);
@@ -983,7 +970,7 @@ func onPress5() { handlePress(SC_T, SK_STAR1, SC_5, SC_NONE, SC_NONE); }
 func onRelease5() { handleRelease(SC_T, SK_STAR1, SC_5, SC_NONE, SC_NONE); }
 
 func onPress6() {
-  handlePress(SC_Y, SK_STAR2, SC_6, SC_NONE, SC_VOLUME_UP);
+  handlePress(SC_Y, SK_STAR2, SC_6, SC_NONE, SC_CONSUMER_VOLUME_UP);
 
   if (layer & SETTINGS_MASK) {
     if (speed < 8) {
@@ -995,7 +982,7 @@ func onPress6() {
     drawSpeed();
   }
 }
-func onRelease6() { handleRelease(SC_Y, SK_STAR2, SC_6, SC_NONE, SC_VOLUME_UP); }
+func onRelease6() { handleRelease(SC_Y, SK_STAR2, SC_6, SC_NONE, SC_CONSUMER_VOLUME_UP); }
 
 func onPress7() { handlePress(SC_U, SK_FR, SC_7, SC_NONE, SC_BACKSPACE); }
 func onRelease7() { handleRelease(SC_U, SK_FR, SC_7, SC_NONE, SC_BACKSPACE); }
@@ -1086,7 +1073,7 @@ func onPress17() { handlePress(SC_G, SK_STAR3, SC_5 | SYM_SHIFT, SC_NONE, SC_NON
 func onRelease17() { handleRelease(SC_G, SK_STAR3, SC_5 | SYM_SHIFT, SC_NONE, SC_NONE); }
 
 func onPress18() {
-  handlePress(SC_H, SK_STAR4, SC_6 | SYM_SHIFT, SC_NONE, SC_VOLUME_DOWN);
+  handlePress(SC_H, SK_STAR4, SC_6 | SYM_SHIFT, SC_NONE, SC_CONSUMER_VOLUME_DOWN);
   if (layer & SETTINGS_MASK) {
     if (speed > 0) {
       // Adjust hue to avoid glitches.
@@ -1097,7 +1084,7 @@ func onPress18() {
     drawSpeed();
   }
 }
-func onRelease18() { handleRelease(SC_H, SK_STAR4, SC_6 | SYM_SHIFT, SC_NONE, SC_VOLUME_DOWN); }
+func onRelease18() { handleRelease(SC_H, SK_STAR4, SC_6 | SYM_SHIFT, SC_NONE, SC_CONSUMER_VOLUME_DOWN); }
 
 func onPress19() { handlePress(SC_J, SK_RR, SC_7 | SYM_SHIFT, SC_L_SHIFT, SC_LEFT); }
 func onRelease19() { handleRelease(SC_J, SK_RR, SC_7 | SYM_SHIFT, SC_L_SHIFT, SC_LEFT); }
@@ -1221,8 +1208,8 @@ func onRelease32() {
 func onPress33() { handlePress(SC_R_BRACKET, SK_NONE, SC_R_BRACKET | SYM_SHIFT, SC_NONE, SC_NONE); }
 func onRelease33() { handleRelease(SC_R_BRACKET, SK_NONE, SC_R_BRACKET | SYM_SHIFT, SC_NONE, SC_NONE); }
 
-func onPress34() { handlePress(SC_N, SK_NONE, SC_R_BRACKET, SC_NONE, SC_MUTE); }
-func onRelease34() { handleRelease(SC_N, SK_NONE, SC_R_BRACKET, SC_NONE, SC_MUTE); }
+func onPress34() { handlePress(SC_N, SK_NONE, SC_R_BRACKET, SC_NONE, SC_CONSUMER_MUTE); }
+func onRelease34() { handleRelease(SC_N, SK_NONE, SC_R_BRACKET, SC_NONE, SC_CONSUMER_MUTE); }
 
 func onPress35() { handlePress(SC_M, SK_NONE, SC_MINUS | SYM_SHIFT, SC_NONE, SC_NONE); }
 func onRelease35() { handleRelease(SC_M, SK_NONE, SC_MINUS | SYM_SHIFT, SC_NONE, SC_NONE); }
