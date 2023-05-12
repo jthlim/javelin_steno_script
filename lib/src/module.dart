@@ -54,9 +54,13 @@ enum InBuiltScriptFunction implements ScriptFunctionDefinition {
   getBleProfile('getBleProfile', 0, true, 0x116, false),
   setBleProfile('setBleProfile', 1, false, 0x117, false),
   isHostSleeping('isHostSleeping', 0, true, 0x118, true),
-  isPowered('isPowered', 0, true, 0x119, true),
+  isMainPowered('isMainPowered', 0, true, 0x119, true),
   isCharging('isCharging', 0, true, 0x11a, true),
-  getBatteryPercentage('getBatteryPercentage', 0, true, 0x11b, false);
+  getBatteryPercentage('getBatteryPercentage', 0, true, 0x11b, false),
+  getActivePairConnection('getActivePairConnection', 0, true, 0x11c, false),
+  setBoardPower('setBoardPower', 1, false, 0x11d, false),
+  sendEvent('sendEvent', 1, false, 0x11e, false),
+  isPairPowered('isPairPowered', 0, true, 0x11f, true);
 
   const InBuiltScriptFunction(
     this.functionName,

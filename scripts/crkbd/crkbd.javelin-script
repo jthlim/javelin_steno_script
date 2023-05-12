@@ -89,11 +89,11 @@
 // Numpad -- Pressing Alt + Nav at the same time
 //
 // ,-------------------------------------------.        ,-------------------------------------------.
-// |        |      |      |      |      |      |        |      |   7  |   8  |   9  |      |  Bksp  |
+// |        |      |      |      |      |      |        |      |   7  |   8  |   9  |   *  |  Bksp  |
 // |--------+------+------+------+------+------|        |------+------+------+------+------+--------|
-// |        |  GUI |  Alt | Ctrl | Shift|      |        |      |   4  |   5  |   6  |      |        |
+// |        |  GUI |  Alt | Ctrl | Shift|      |        |      |   4  |   5  |   6  |   -  |   +    |
 // |--------+------+------+------+------+------|        |------+------+------+------+------+--------|
-// |        |      |      |      |      |      |        |      |   1  |   2  |   3  |      | Magic  |
+// |        |      |      |      |      |      |        |      |   1  |   2  |   3  |   /  | Magic  |
 // `----------------------+--+---+--+---+--+---+--.  ,--+---+--+---+--+---+-------------------------'
 //                           |      |      |      |  | Space|   0  |   .  |
 //                           `--------------------'  `--------------------'
@@ -439,10 +439,14 @@ const FONT_ID_LARGE_DIGITS = 3;
 
 //---------------------------------------------------------------------------
 
-const CONNECTION_ID_ANY = 0;
-const CONNECTION_ID_BLE = 1;
-const CONNECTION_ID_USB = 2;
-const CONNECTION_ID_USB_PAIR = 3;
+const CONNECTION_NONE = 0;
+const CONNECTION_BLE = 1;
+const CONNECTION_USB = 2;
+const CONNECTION_USB2 = 3;
+
+const PAIR_CONNECTION_NONE = 0;
+const PAIR_CONNECTION_BLE = 1;
+const PAIR_CONNECTION_CABLE = 2;
 
 //---------------------------------------------------------------------------
 //
@@ -797,22 +801,26 @@ func init() {
   setAutoDraw(1, AUTO_DRAW_WPM);
 }
 
-const RGB_UPDATE_TIME = 20;
+const RGB_UPDATE_TIME = 10;
+const BLE_RGB_UPDATE_TIME = 50;
 var lastRgbUpdateTime = 0;
 
 func tick() {
   var time = getTime();
+
   var screenOn = time - lastActionTime <= SCREEN_OFF_TIMEOUT;
   setScreenOn(0, screenOn);
   setScreenOn(1, screenOn);
 
   if (brightness != 0) {
-    if (time - lastRgbUpdateTime >= RGB_UPDATE_TIME) {
+    if (time - lastRgbUpdateTime >= (getActivePairConnection() == PAIR_CONNECTION_BLE ? BLE_RGB_UPDATE_TIME : RGB_UPDATE_TIME)) {
       lastRgbUpdateTime = time;
-      updateKeyRgb();
 
-      // For nice!nano -- turns off all LEDs if it isn't plugged in.
-      // setGpioPin(13, isPowered());
+      updateKeyRgb();
+      var activeConnection = getActiveConnection();
+      setBoardPower(isMainPowered()
+        || activeConnection == CONNECTION_NONE
+        || (activeConnection == CONNECTION_USB2 && getActivePairConnection() == PAIR_CONNECTION_CABLE));
     }
   }
 
@@ -896,22 +904,51 @@ func updateKeyBreatheCycle() {
   updateKeyConstantColor((w + 0x53) >> 8, w >> 8, (w + 0xa6) >> 8);
 }
 
+const DISCONNECTED_KEY_ORDER = [[ 00 01 02 03 04 05 04 03 02 01 ]];
+func updateDisconnectedKeyRgbCycle() {
+  setBoardPower(1);
+
+  for (var i = 0; i < 42; i = i + 1) {
+    setRgb(i, 0, 0, 0);
+  }
+
+  var time = getTime();
+  var keyId = DISCONNECTED_KEY_ORDER[(time >> 6) % 10];
+  setHsv(keyId, time << 4, 0xf0, 16);
+}
+
+func animationTime() var {
+  if (getActivePairConnection() == PAIR_CONNECTION_BLE) {
+    if (isMainPowered() && isPairPowered()) {
+      return getTime();
+    }
+  } else if (isMainPowered() || isPairPowered()) {
+    return getTime();
+  }
+
+  return 0;
+}
+
 func updateKeyRgb() {
-  if (isHostSleeping()) {
+  if (getActiveConnection() == CONNECTION_NONE) {
+    updateDisconnectedKeyRgbCycle();
+  } else if (isHostSleeping()) {
     updateKeyBreatheCycle();
-  } else if (layer & STENO_MASK) {
-    updateKeyRgbHueCycle(
-      getTime() * SPEED_VALUES[speed] + hueShift,
-      SATURATION_VALUES[saturation] * 2,
-      HUE_SPREAD_VALUES[hueSpread] * 16,
-      BRIGHTNESS_VALUES[brightness]
-    );
   } else {
-    updateKeyRandomColor(
-      getTime() * SPEED_VALUES[speed] + hueShift,
-      BRIGHTNESS_VALUES[brightness],
-      SATURATION_VALUES[saturation] * 2,
-    );
+    if (layer & STENO_MASK) {
+      updateKeyRgbHueCycle(
+        animationTime() * SPEED_VALUES[speed] + hueShift,
+        SATURATION_VALUES[saturation] * 2,
+        HUE_SPREAD_VALUES[hueSpread] * 16,
+        BRIGHTNESS_VALUES[brightness]
+      );
+    } else {
+      updateKeyRandomColor(
+        animationTime() * SPEED_VALUES[speed] + hueShift,
+        BRIGHTNESS_VALUES[brightness],
+        SATURATION_VALUES[saturation] * 2,
+      );
+    }
   }
 
   // if (getLedStatus(LED_STATUS_CAPS_LOCK)) {
@@ -1263,7 +1300,7 @@ func onPress4() {
   handlePress(4, SC_R, SK_HL | KEY_STENO, SC_4, SC_F12, SC_NONE, SC_NONE);
 
   if (isSettingsLayer()) {
-    setPreferredConnection(CONNECTION_ID_USB, CONNECTION_ID_USB_PAIR, CONNECTION_ID_BLE);
+    setPreferredConnection(CONNECTION_USB, CONNECTION_USB2, CONNECTION_BLE);
   }
 }
 func onRelease4() { handleRelease(SC_R, SK_HL | KEY_STENO, SC_4, SC_F12, SC_NONE, SC_NONE); }
@@ -1272,7 +1309,7 @@ func onPress5() {
   handlePress(5, SC_T, SK_STAR1 | KEY_STENO, SC_5, SC_NONE, SC_NONE, SC_NONE);
 
   if (isSettingsLayer()) {
-    setPreferredConnection(CONNECTION_ID_USB_PAIR, CONNECTION_ID_USB, CONNECTION_ID_BLE);
+    setPreferredConnection(CONNECTION_USB2, CONNECTION_USB, CONNECTION_BLE);
   }
 }
 func onRelease5() { handleRelease(SC_T, SK_STAR1 | KEY_STENO, SC_5, SC_NONE, SC_NONE, SC_NONE); }
@@ -1283,7 +1320,7 @@ func onPress6() {
   if (isSettingsLayer()) {
     if (speed < 8) {
       // Adjust hue to avoid glitches.
-      hueShift = hueShift + getTime() * (SPEED_VALUES[speed] - SPEED_VALUES[speed + 1]);
+      hueShift = hueShift + animationTime() * (SPEED_VALUES[speed] - SPEED_VALUES[speed + 1]);
 
       speed = speed + 1;
     }
@@ -1324,13 +1361,13 @@ func onPress9() {
 func onRelease9() { handleRelease(SC_O, SK_LR | KEY_STENO, SC_9, SC_NONE, SC_DELETE, SC_KP_9); }
 
 func onPress10() {
-  handlePress(10, SC_P, SK_TR | KEY_STENO, SC_0, SC_NONE, SC_PAGE_UP, SC_NONE);
+  handlePress(10, SC_P, SK_TR | KEY_STENO, SC_0, SC_NONE, SC_PAGE_UP, SC_KP_ASTERISK);
 
   if (isSettingsLayer()) {
     hueShift = hueShift - 0x800;
   }
 }
-func onRelease10() { handleRelease(SC_P, SK_TR | KEY_STENO, SC_0, SC_NONE, SC_PAGE_UP, SC_NONE); }
+func onRelease10() { handleRelease(SC_P, SK_TR | KEY_STENO, SC_0, SC_NONE, SC_PAGE_UP, SC_KP_ASTERISK); }
 
 func onPress11() {
   handlePress(11, SC_BACKSPACE, SK_DR | KEY_STENO, SC_EQUAL, SC_NONE, SC_HOME, SC_BACKSPACE);
@@ -1386,7 +1423,7 @@ func onPress17() {
   handlePress(17, SC_G, SK_STAR3 | KEY_STENO, SC_5 | KEY_SHIFT, SC_NONE, SC_NONE, SC_NONE);
 
   if (isSettingsLayer()) {
-    setPreferredConnection(CONNECTION_ID_BLE, CONNECTION_ID_USB, CONNECTION_ID_USB_PAIR);
+    setPreferredConnection(CONNECTION_BLE, CONNECTION_USB, CONNECTION_USB2);
   }
 }
 func onRelease17() { handleRelease(SC_G, SK_STAR3 | KEY_STENO, SC_5 | KEY_SHIFT, SC_NONE, SC_NONE, SC_NONE); }
@@ -1397,7 +1434,7 @@ func onPress18() {
   if (isSettingsLayer()) {
     if (speed > 0) {
       // Adjust hue to avoid glitches.
-      hueShift = hueShift + getTime() * (SPEED_VALUES[speed] - SPEED_VALUES[speed - 1]);
+      hueShift = hueShift + animationTime() * (SPEED_VALUES[speed] - SPEED_VALUES[speed - 1]);
 
       speed = speed - 1;
     }
@@ -1438,16 +1475,16 @@ func onPress21() {
 func onRelease21() { handleRelease(SC_L, SK_GR | KEY_STENO, SC_9 | KEY_SHIFT, SC_L_ALT, SC_RIGHT, SC_KP_6); }
 
 func onPress22() {
-  handlePress(22, SC_SEMICOLON, SK_SR | KEY_STENO, SC_0 | KEY_SHIFT, SC_L_META, SC_PAGE_DOWN, SC_NONE);
+  handlePress(22, SC_SEMICOLON, SK_SR | KEY_STENO, SC_0 | KEY_SHIFT, SC_L_META, SC_PAGE_DOWN, SC_KP_MINUS);
 
   if (isSettingsLayer()) {
     hueShift = hueShift + 0x800;
   }
 }
-func onRelease22() { handleRelease(SC_SEMICOLON, SK_SR | KEY_STENO, SC_0 | KEY_SHIFT, SC_L_META, SC_PAGE_DOWN, SC_NONE); }
+func onRelease22() { handleRelease(SC_SEMICOLON, SK_SR | KEY_STENO, SC_0 | KEY_SHIFT, SC_L_META, SC_PAGE_DOWN, SC_KP_MINUS); }
 
 func onPress23() {
-  handlePress(23, SC_APOSTROPHE, SK_ZR | KEY_STENO, SC_EQUAL | KEY_SHIFT, SC_NONE, SC_END, SC_NONE);
+  handlePress(23, SC_APOSTROPHE, SK_ZR | KEY_STENO, SC_EQUAL | KEY_SHIFT, SC_NONE, SC_END, SC_KP_PLUS);
 
   if (isSettingsLayer()) {
     if (hueSpread > 0) {
@@ -1456,7 +1493,7 @@ func onPress23() {
     drawHueSpread();
   }
 }
-func onRelease23() { handleRelease(SC_APOSTROPHE, SK_ZR | KEY_STENO, SC_EQUAL | KEY_SHIFT, SC_NONE, SC_END, SC_NONE); }
+func onRelease23() { handleRelease(SC_APOSTROPHE, SK_ZR | KEY_STENO, SC_EQUAL | KEY_SHIFT, SC_NONE, SC_END, SC_KP_PLUS); }
 
 // 3rd row
 
@@ -1497,9 +1534,9 @@ func onRelease24() {
   }
 
   if (wasSteno24) {
-    // If the keypress was in steno mode, and other keys were pressed, drop
-    // immediately back to steno mode, and drop all masks.
-    if (pressCount24 != pressCount || layer) {
+    // If the keypress was in steno mode, and other keys were pressed, or it
+    // was a long press, drop immediately back to steno mode, and drop all masks.
+    if (pressCount24 != pressCount || layer || getTime() - timer24 >= TAP_THRESHOLD) {
       releaseAll();
       setLayer(STENO_MASK);
     }
@@ -1549,8 +1586,8 @@ func onPress29() {
 }
 func onRelease29() { handleRelease(SC_B, SC_NONE, SC_L_BRACKET | KEY_SHIFT, SC_NONE, SC_NONE, SC_NONE); }
 
-func onPress30() { handlePress(30, SC_N, SC_NONE, SC_R_BRACKET | KEY_SHIFT, SC_NONE, SC_CONSUMER_MUTE, SC_NONE); }
-func onRelease30() { handleRelease(SC_N, SC_NONE, SC_R_BRACKET | KEY_SHIFT, SC_NONE, SC_CONSUMER_MUTE, SC_NONE); }
+func onPress30() { handlePress(30, SC_N, SC_NONE, SC_R_BRACKET | KEY_SHIFT, SC_NONE, SC_MUTE, SC_NONE); }
+func onRelease30() { handleRelease(SC_N, SC_NONE, SC_R_BRACKET | KEY_SHIFT, SC_NONE, SC_MUTE, SC_NONE); }
 
 func onPress31() { handlePress(31, SC_M, SC_NONE, SC_R_BRACKET, SC_NONE, SC_NONE, SC_KP_1); }
 func onRelease31() { handleRelease(SC_M, SC_NONE, SC_R_BRACKET, SC_NONE, SC_NONE, SC_KP_1); }
@@ -1561,8 +1598,8 @@ func onRelease32() { handleRelease(SC_COMMA, SC_NONE, SC_MINUS | KEY_SHIFT, SC_N
 func onPress33() { handlePress(33, SC_DOT, SC_NONE, SC_DOT, SC_NONE, SC_NONE, SC_KP_3); }
 func onRelease33() { handleRelease(SC_DOT, SC_NONE, SC_DOT, SC_NONE, SC_NONE, SC_KP_3); }
 
-func onPress34() { handlePress(34, SC_SLASH, SC_NONE, SC_SLASH, SC_NONE, SC_NONE, SC_NONE); }
-func onRelease34() { handleRelease(SC_SLASH, SC_NONE, SC_SLASH, SC_NONE, SC_NONE, SC_NONE); }
+func onPress34() { handlePress(34, SC_SLASH, SC_NONE, SC_SLASH, SC_NONE, SC_NONE, SC_KP_SLASH); }
+func onRelease34() { handleRelease(SC_SLASH, SC_NONE, SC_SLASH, SC_NONE, SC_NONE, SC_KP_SLASH); }
 
 var timer35;
 var releaseTimer35;
