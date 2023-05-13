@@ -558,6 +558,33 @@ func handleRelease(qwertyKey, stenoKey, symbolsKey, functionKey, navKey) {
   }
 }
 
+func sendLayerEvent() {
+  if (layer & NAV_MASK) {
+    // sendEvent("layer: navigation");
+  } else if (layer & FUNCTION_MASK) {
+    // sendEvent("layer: function");
+  } else if (layer & SYMBOL_MASK) {
+    // sendEvent("layer: symbol");
+  } else if (layer & STENO_MASK) {
+    // var mode = getParameter("steno_mode");
+    // if (mode == "gemini")  {
+    //   sendEvent("layer: steno_gemini");
+    // } else if(mode == "plover_hid") {
+    //   sendEvent("layer: steno_plover_hid");
+    // } else {
+    //   sendEvent("layer: steno");
+    // }
+    sendEvent("layer: steno");
+  } else {
+    sendEvent("layer: qwerty");
+  }
+}
+
+func setLayer(value) {
+  layer = value;
+  sendLayerEvent();
+}
+
 func onPress0() {
   handlePress(SC_TAB, SK_NONE, SC_GRAVE, SC_NONE, SC_NONE);
   updateStenoMode();
@@ -672,7 +699,7 @@ func onPress24() {
   wasSteno24 = layer & STENO_MASK;
   if (wasSteno24) {
     releaseAll();
-    layer = layer ^ STENO_MASK;
+    setLayer(layer ^ STENO_MASK);
     otherPressCount = 0;
     pressAll();
   } else {
@@ -692,7 +719,8 @@ func onRelease24() {
     // immediately back to steno mode, and drop all masks.
     if (otherPressCount || layer) {
       releaseAll();
-      layer = STENO_MASK;
+      setLayer(STENO_MASK);
+      sendEvent("layer: steno");
     }
   } else {
     releaseScanCode(SC_L_SHIFT);
@@ -700,7 +728,8 @@ func onRelease24() {
     // A tap of the key turns on steno mode.
     if ((layer | otherPressCount) == 0 && getTime() - timer24 < TAP_THRESHOLD) {
       releaseAll();
-      layer = layer | STENO_MASK;
+      setLayer(layer | STENO_MASK);
+      sendEvent("layer: steno");
     }
   }
   underglowMode = layer & STENO_MASK;
@@ -766,7 +795,7 @@ func onPress38() {
   } else {
     otherPressCount = otherPressCount + 1;
     releaseAll();
-    layer = layer | NAV_MASK;
+    setLayer(layer | NAV_MASK);
     pressAll();
   }
 }
@@ -774,7 +803,7 @@ func onPress38() {
 func onRelease38() {
   if (layer & NAV_MASK) {
     releaseAll();
-    layer = layer ^ NAV_MASK;
+    setLayer(layer ^ NAV_MASK);
   } else {
     handleRelease(SC_NONE, SK_O | KEY_STENO, SC_L_CTRL, SC_NONE, SC_NONE);
   }
@@ -786,7 +815,7 @@ func onPress39() {
   } else {
     otherPressCount = otherPressCount + 1;
     releaseAll();
-    layer = layer | SYMBOL_MASK;
+    setLayer(layer | SYMBOL_MASK);
     pressAll();
   }
 }
@@ -794,7 +823,7 @@ func onPress39() {
 func onRelease39() {
   if (layer & SYMBOL_MASK) {
     releaseAll();
-    layer = layer ^ SYMBOL_MASK;
+    setLayer(layer ^ SYMBOL_MASK);
   } else {
     handleRelease(SC_NONE, SK_E | KEY_STENO, SC_L_CTRL, SC_NONE, SC_NONE);
   }
@@ -809,7 +838,7 @@ func onPress41() {
   if (layer == 0) {
     timer41 = getTime();
     releaseAll();
-    layer = layer | FUNCTION_MASK;
+    setLayer(layer | FUNCTION_MASK);
     otherPressCount = 0;
     pressAll();
   }
@@ -822,7 +851,7 @@ func onRelease41() {
       tapScanCode(SC_ENTER);
     }
     releaseAll();
-    layer = layer ^ FUNCTION_MASK;
+    setLayer(layer ^ FUNCTION_MASK);
   }
 }
 

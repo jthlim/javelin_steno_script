@@ -818,9 +818,13 @@ func tick() {
 
       updateKeyRgb();
       var activeConnection = getActiveConnection();
-      setBoardPower(isMainPowered()
-        || activeConnection == CONNECTION_NONE
-        || (activeConnection == CONNECTION_USB2 && getActivePairConnection() == PAIR_CONNECTION_CABLE));
+      if (activeConnection == CONNECTION_NONE) {
+        setBoardPower(1);
+      } else if (getActivePairConnection() == PAIR_CONNECTION_CABLE) {
+        setBoardPower(isPairPowered() || isMainPowered());
+      } else {
+        setBoardPower(isMainPowered());
+      }
     }
   }
 
@@ -918,11 +922,14 @@ func updateDisconnectedKeyRgbCycle() {
 }
 
 func animationTime() var {
-  if (getActivePairConnection() == PAIR_CONNECTION_BLE) {
-    if (isMainPowered() && isPairPowered()) {
-      return getTime();
-    }
-  } else if (isMainPowered() || isPairPowered()) {
+  if (getActivePairConnection() != PAIR_CONNECTION_CABLE) {
+    // Always return 0 for BLE to reduce traffic, which increases lag.
+    // To avoid flicker at startup / during reconnection, return 0 for
+    // no connection also.
+    return 0;
+  }
+
+  if (isCharging() || isPairPowered()) {
     return getTime();
   }
 
@@ -1045,6 +1052,32 @@ func updateDisplay0() {
   }
 }
 
+func sendLayerEvent() {
+  if (isSettingsLayer()) {
+    // sendEvent("layer: settings");
+  } else if (layer & NUMPAD_MASK) {
+    // sendEvent("layer: numpad");
+  } else if (layer & NAV_MASK) {
+    // sendEvent("layer: navigation");
+  } else if (layer & FUNCTION_MASK) {
+    // sendEvent("layer: function");
+  } else if (layer & SYMBOL_MASK) {
+    // sendEvent("layer: symbol");
+  } else if (layer & STENO_MASK) {
+    // var mode = getParameter("steno_mode");
+    // if (mode == "gemini")  {
+    //   sendEvent("layer: steno_gemini");
+    // } else if(mode == "plover_hid") {
+    //   sendEvent("layer: steno_plover_hid");
+    // } else {
+    //   sendEvent("layer: steno");
+    // }
+    sendEvent("layer: steno");
+  } else {
+    sendEvent("layer: qwerty");
+  }
+}
+
 func drawBar(barValue) {
   drawImage(0, 20, 64, BAR_IMAGES + barValue * 66);
 }
@@ -1075,6 +1108,7 @@ func drawSaturation() {
 
 func setLayer(value) {
   layer = value;
+  sendLayerEvent();
   updateDisplay0();
 }
 

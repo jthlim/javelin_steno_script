@@ -29,13 +29,14 @@ func tick() {
   if (activePairConnection == PAIR_CONNECTION_NONE) {
     updateDisconnectedKeyRgbCycle();
   } else if (activePairConnection == PAIR_CONNECTION_CABLE) {
-    setBoardPower(isPowered() || isCharging());
+    setBoardPower(isMainPowered() || isCharging());
   } else {
     setBoardPower(isCharging());
   }
 }
 
 const DISCONNECTED_KEY_ORDER = [[ 06 07 08 09 0a 0b 0a 09 08 07 ]];
+
 func updateDisconnectedKeyRgbCycle() {
   setBoardPower(1);
 
@@ -43,9 +44,9 @@ func updateDisconnectedKeyRgbCycle() {
     setRgb(i, 0, 0, 0);
   }
 
-  var time = getTime();
-  var keyId = DISCONNECTED_KEY_ORDER[(time >> 6) % 10];
-  setHsv(keyId, time << 4, 0xf0, 16);
+  var index = getTime() >> 6;
+  var keyId = DISCONNECTED_KEY_ORDER[index % 10];
+  setHsv(keyId, index << 10, 0xf0, 16);
 }
 
 //---------------------------------------------------------------------------
