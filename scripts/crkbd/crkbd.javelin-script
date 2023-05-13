@@ -1052,29 +1052,38 @@ func updateDisplay0() {
   }
 }
 
+var lastEvent;
+func sendEventUnique(event) {
+  if (event == lastEvent) {
+    return;
+  }
+  lastEvent = event;
+  sendEvent(event);
+}
+
 func sendLayerEvent() {
   if (isSettingsLayer()) {
-    // sendEvent("layer: settings");
+    // sendEventUnique("layer: settings");
   } else if (layer & NUMPAD_MASK) {
-    // sendEvent("layer: numpad");
+    // sendEventUnique("layer: numpad");
   } else if (layer & NAV_MASK) {
-    // sendEvent("layer: navigation");
+    // sendEventUnique("layer: navigation");
   } else if (layer & FUNCTION_MASK) {
-    // sendEvent("layer: function");
+    // sendEventUnique("layer: function");
   } else if (layer & SYMBOL_MASK) {
-    // sendEvent("layer: symbol");
+    // sendEventUnique("layer: symbol");
   } else if (layer & STENO_MASK) {
     // var mode = getParameter("steno_mode");
     // if (mode == "gemini")  {
-    //   sendEvent("layer: steno_gemini");
+    //   sendEventUnique("layer: steno_gemini");
     // } else if(mode == "plover_hid") {
-    //   sendEvent("layer: steno_plover_hid");
+    //   sendEventUnique("layer: steno_plover_hid");
     // } else {
-    //   sendEvent("layer: steno");
+    //   sendEventUnique("layer: steno");
     // }
-    sendEvent("layer: steno");
+    sendEventUnique("layer: steno");
   } else {
-    sendEvent("layer: qwerty");
+    sendEventUnique("layer: qwerty");
   }
 }
 
