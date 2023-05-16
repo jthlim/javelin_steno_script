@@ -470,7 +470,7 @@ var hueShift = 0;
 var brightness = 5;
 var saturation = 5;
 
-// Layer Tap Forgiveness.
+// Fuzzy layers
 //
 // To avoid unintended navigation/function layer presses, the following
 // sequence of events is interpreted as a press on the qwerty layer instead:

@@ -7,17 +7,18 @@
 // ,-------------------------------------------.        ,-------------------------------------------.
 // |        |  S1  |   T  |   P  |   H  |  *1  |        |  *2  |   F  |   P  |   L  |   T  |    D   |
 // |--------+------+------+------+------+------|        |------+------+------+------+------+--------|
-// |        |  S2  |   K  |   W  |   R  |  *3  |        |  *4  |   R  |   B  |   G  |   S  |    Z   |
+// |Ctrl/Esc|  S2  |   K  |   W  |   R  |  *3  |        |  *4  |   R  |   B  |   G  |   S  |    Z   |
 // |--------+------+------+------+------+------|        |------+------+------+------+------+--------|
 // | QWERTY |      |      |      |      |      |        |      |      |      |      |      |        |
 // `----------------------+--+---+--+---+--+---+--.  ,--+---+--+---+--+---+-------------------------'
-//                           |  #1  |   A  |   O  |  |   E  |   U  |  #2  |
+//                           | Cmd  |   A  |   O  |  |   E  |   U  |  #2  |
 //                           `--------------------'  `--------------------'
 //
 // * Tapping QWERTY key will switch to QWERTY mode
 // * Holding it down and pressing other buttons will cause the keyboard to return to steno mode when
 //   releasing it. This will also give access to the Symbols, Navigation and Function layers by
 //   pressing those keys on the QWERTY layer.
+// * Command and Control activate a temporary qwerty layer
 
 // QWERTY
 //
@@ -491,6 +492,7 @@ const SYMBOL_MASK = 2;
 const FUNCTION_MASK = 4;
 const NAV_MASK = 8;
 const NUMPAD_MASK = 16;
+const TEMPORARY_QWERTY_MASK = 32;
 
 var layer = STENO_MASK;
 var pressCount = 0;
@@ -504,7 +506,7 @@ var lastCapsLockStatus = 0;
 
 var keyColorData[42];
 
-// Layer Tap Forgiveness.
+// Fuzzy layers
 //
 // To avoid unintended navigation/function layer presses, the following
 // sequence of events is interpreted as a press on the qwerty layer instead:
@@ -802,45 +804,55 @@ func init() {
 }
 
 const RGB_UPDATE_TIME = 10;
-const BLE_RGB_UPDATE_TIME = 50;
-var lastRgbUpdateTime = 0;
+const BLE_UPDATE_TIME = 50;
+var lastDisplayUpdateTime = 0;
+
+func setAllScreenOn(screenOn) {
+  setScreenOn(0, screenOn);
+  setScreenOn(1, screenOn);
+}
 
 func tick() {
   var time = getTime();
 
-  var screenOn = time - lastActionTime <= SCREEN_OFF_TIMEOUT;
-  setScreenOn(0, screenOn);
-  setScreenOn(1, screenOn);
+  var activePairConnection = getActivePairConnection();
+  if (time - lastDisplayUpdateTime >= (activePairConnection == PAIR_CONNECTION_BLE ? BLE_UPDATE_TIME : RGB_UPDATE_TIME)) {
+    lastDisplayUpdateTime = time;
 
-  if (brightness != 0) {
-    if (time - lastRgbUpdateTime >= (getActivePairConnection() == PAIR_CONNECTION_BLE ? BLE_RGB_UPDATE_TIME : RGB_UPDATE_TIME)) {
-      lastRgbUpdateTime = time;
+    setAllScreenOn(time - lastActionTime <= SCREEN_OFF_TIMEOUT);
 
-      updateKeyRgb();
-      var activeConnection = getActiveConnection();
-      if (activeConnection == CONNECTION_NONE) {
-        setBoardPower(1);
-      } else if (getActivePairConnection() == PAIR_CONNECTION_CABLE) {
-        setBoardPower(isPairPowered() || isMainPowered());
-      } else {
-        setBoardPower(isMainPowered());
+    if (getActiveConnection() == CONNECTION_NONE) {
+      updateDisconnectedKeyRgbCycle();
+      setBoardPower(1);
+    } else if (activePairConnection == PAIR_CONNECTION_BLE) {
+      if (brightness != 0 && (isPairPowered() || isMainPowered())) {
+        updateKeyRgb();
       }
+      setBoardPower(isMainPowered());
+    } else if (activePairConnection == PAIR_CONNECTION_CABLE) {
+      if (brightness != 0) {
+        updateKeyRgb();
+      }
+      setBoardPower(isPairPowered() || isMainPowered());
+    } else {
+      if (brightness != 0) {
+        updateKeyRgb();
+      }
+      setBoardPower(isMainPowered());
+    }
+
+    var capsLockStatus = getLedStatus(LED_STATUS_CAPS_LOCK);
+    if (capsLockStatus != lastCapsLockStatus)  {
+      lastCapsLockStatus = capsLockStatus;
+      updateKeyRgb();
+      updateDisplay0();
     }
   }
 
-  var capsLockStatus = getLedStatus(LED_STATUS_CAPS_LOCK);
-  if (capsLockStatus != lastCapsLockStatus)  {
-    lastCapsLockStatus = capsLockStatus;
-    updateKeyRgb();
-    updateDisplay0();
-  }
-
-  if (deferredLayerKey) {
-    if (getTime() - qwertyPressTimestamp >= KEY_PRESS_TO_LAYER_RELEASE_THRESHOLD) {
-      press(deferredLayerKey);
-      deferredLayerKey = 0;
-      deferredQwertyKey = 0;
-    }
+  if (deferredLayerKey && time - qwertyPressTimestamp >= KEY_PRESS_TO_LAYER_RELEASE_THRESHOLD) {
+    press(deferredLayerKey);
+    deferredLayerKey = 0;
+    deferredQwertyKey = 0;
   }
 }
 
@@ -923,7 +935,7 @@ func updateDisconnectedKeyRgbCycle() {
 
 func animationTime() var {
   if (getActivePairConnection() != PAIR_CONNECTION_CABLE) {
-    // Always return 0 for BLE to reduce traffic, which increases lag.
+    // Always return 0 for BLE to reduce traffic, which reduces lag.
     // To avoid flicker at startup / during reconnection, return 0 for
     // no connection also.
     return 0;
@@ -937,9 +949,7 @@ func animationTime() var {
 }
 
 func updateKeyRgb() {
-  if (getActiveConnection() == CONNECTION_NONE) {
-    updateDisconnectedKeyRgbCycle();
-  } else if (isHostSleeping()) {
+  if (isHostSleeping()) {
     updateKeyBreatheCycle();
   } else {
     if (layer & STENO_MASK) {
@@ -1270,6 +1280,8 @@ func handlePress(buttonIndex, qwertyKey, stenoKey, symbolsKey, functionKey, navK
     }
   } else if (layer & SYMBOL_MASK) {
     press(symbolsKey);
+  } else if (layer & TEMPORARY_QWERTY_MASK) {
+    press(qwertyKey);
   } else if (layer & STENO_MASK) {
     press(stenoKey);
   } else {
@@ -1304,6 +1316,8 @@ func handleRelease(qwertyKey, stenoKey, symbolsKey, functionKey, navKey, numPadK
     release(functionKey);
   } else if (layer & SYMBOL_MASK) {
     release(symbolsKey);
+  } else if (layer & TEMPORARY_QWERTY_MASK) {
+    release(qwertyKey);
   } else if (layer & STENO_MASK) {
     release(stenoKey);
   } else {
@@ -1428,17 +1442,29 @@ func onRelease11() { handleRelease(SC_BACKSPACE, SK_DR | KEY_STENO, SC_EQUAL, SC
 
 var timer12;
 var pressCount12;
+var wasSteno12;
 func onPress12() {
-  handlePress(12, SC_L_CTRL, SK_NONE, SC_GRAVE | KEY_SHIFT, SC_NONE, SC_NONE, SC_NONE);
+  handlePress(12, SC_L_CTRL, SC_L_CTRL, SC_GRAVE | KEY_SHIFT, SC_NONE, SC_NONE, SC_NONE);
   if (!isInPressAll()) {
     timer12 = getTime();
     pressCount12 = pressCount;
   }
+  wasSteno12 = layer == STENO_MASK;
+  if (wasSteno12) {
+    releaseAll();
+    setLayer(layer | TEMPORARY_QWERTY_MASK);
+  }
 }
 func onRelease12() {
-  handleRelease(SC_L_CTRL, SK_NONE, SC_GRAVE | KEY_SHIFT, SC_NONE, SC_NONE, SC_NONE);
-  if (layer == 0 && pressCount12 == pressCount && getTime() - timer12 < TAP_THRESHOLD) {
+  handleRelease(SC_L_CTRL, SC_L_CTRL, SC_GRAVE | KEY_SHIFT, SC_NONE, SC_NONE, SC_NONE);
+  if ((layer == 0 || (layer & TEMPORARY_QWERTY_MASK))
+      && pressCount12 == pressCount
+      && getTime() - timer12 < TAP_THRESHOLD) {
     tap(SC_ESC);
+  }
+  if (wasSteno12) {
+    releaseAll();
+    setLayer(STENO_MASK);
   }
 }
 
@@ -1706,8 +1732,21 @@ func onRelease35() {
 
 // 4th row
 
-func onPress36() { handlePress(36, SC_L_META, SK_NUM1 | KEY_STENO, SC_L_META, SC_NONE, SC_NONE, SC_NONE); }
-func onRelease36() { handleRelease(SC_L_META, SK_NUM1 | KEY_STENO, SC_L_META, SC_NONE, SC_NONE, SC_NONE); }
+var wasSteno36;
+func onPress36() {
+  handlePress(36, SC_L_META, SC_L_META, SC_L_META, SC_NONE, SC_NONE, SC_NONE);
+  wasSteno36 = layer == STENO_MASK;
+  if (wasSteno36) {
+    setLayer(layer | TEMPORARY_QWERTY_MASK);
+  }
+}
+func onRelease36() {
+  handleRelease(SC_L_META, SC_L_META, SC_L_META, SC_NONE, SC_NONE, SC_NONE);
+  if (wasSteno36) {
+    releaseAll();
+    setLayer(STENO_MASK);
+  }
+}
 
 var timer37;
 var pressCount37;
@@ -1746,6 +1785,8 @@ func onPress38() {
     pressAll();
     navLayerPressTimestamp = getTime();
     pressCount38 = pressCount;
+  } else if (layer & TEMPORARY_QWERTY_MASK) {
+    press(SC_SPACE);
   }
 }
 func onRelease38() {
@@ -1763,6 +1804,8 @@ func onRelease38() {
     tap(deferredQwertyKey);
     deferredLayerKey = 0;
     deferredQwertyKey = 0;
+  } else if (layer & TEMPORARY_QWERTY_MASK) {
+    release(SC_SPACE);
   }
 }
 
@@ -1777,7 +1820,6 @@ func onPress40() {
     pressAll();
   }
 }
-
 func onRelease40() {
   handleRelease(SC_NONE, SK_U | KEY_STENO, SC_L_CTRL, SC_NONE, SC_NONE, SC_KP_0);
   if (layer & SYMBOL_MASK) {
@@ -1797,6 +1839,8 @@ func onPress41() {
     pressAll();
     functionLayerPressTimestamp = getTime();
     pressCount41 = pressCount;
+  } else if (layer & TEMPORARY_QWERTY_MASK) {
+    press(SC_ENTER);
   }
 }
 func onRelease41() {
@@ -1817,5 +1861,7 @@ func onRelease41() {
     }
     deferredLayerKey = 0;
     deferredQwertyKey = 0;
+  } else if (layer & TEMPORARY_QWERTY_MASK) {
+    release(SC_ENTER);
   }
 }
