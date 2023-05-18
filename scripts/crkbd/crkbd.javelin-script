@@ -830,10 +830,11 @@ func tick() {
       }
       setBoardPower(isMainPowered());
     } else if (activePairConnection == PAIR_CONNECTION_CABLE) {
-      if (brightness != 0) {
+      var hasPower = isPairPowered() || isMainPowered();
+      if (brightness != 0 && hasPower) {
         updateKeyRgb();
       }
-      setBoardPower(isPairPowered() || isMainPowered());
+      setBoardPower(hasPower);
     } else {
       if (brightness != 0) {
         updateKeyRgb();
@@ -1444,27 +1445,29 @@ var timer12;
 var pressCount12;
 var wasSteno12;
 func onPress12() {
-  handlePress(12, SC_L_CTRL, SC_L_CTRL, SC_GRAVE | KEY_SHIFT, SC_NONE, SC_NONE, SC_NONE);
+  handlePress(12, SC_L_CTRL, SC_NONE, SC_GRAVE | KEY_SHIFT, SC_NONE, SC_NONE, SC_NONE);
   if (!isInPressAll()) {
+    wasSteno12 = layer == STENO_MASK;
+    if (wasSteno12) {
+      releaseAll();
+      setLayer(layer | TEMPORARY_QWERTY_MASK);
+      press(SC_L_CTRL);
+    }
+
     timer12 = getTime();
     pressCount12 = pressCount;
   }
-  wasSteno12 = layer == STENO_MASK;
-  if (wasSteno12) {
-    releaseAll();
-    setLayer(layer | TEMPORARY_QWERTY_MASK);
-  }
 }
 func onRelease12() {
-  handleRelease(SC_L_CTRL, SC_L_CTRL, SC_GRAVE | KEY_SHIFT, SC_NONE, SC_NONE, SC_NONE);
-  if ((layer == 0 || (layer & TEMPORARY_QWERTY_MASK))
-      && pressCount12 == pressCount
-      && getTime() - timer12 < TAP_THRESHOLD) {
-    tap(SC_ESC);
-  }
+  handleRelease(SC_L_CTRL, SC_NONE, SC_GRAVE | KEY_SHIFT, SC_NONE, SC_NONE, SC_NONE);
   if (wasSteno12) {
     releaseAll();
     setLayer(STENO_MASK);
+  }
+  if ((layer == 0 || wasSteno12)
+      && pressCount12 == pressCount
+      && getTime() - timer12 < TAP_THRESHOLD) {
+    tap(SC_ESC);
   }
 }
 
