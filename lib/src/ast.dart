@@ -782,6 +782,27 @@ class CallFunctionAstNode extends AstNode {
   final List<AstNode> parameters;
 }
 
+class PushFunctionAddress extends AstNode {
+  PushFunctionAddress({required this.name});
+
+  @override
+  bool isConstant() => false;
+
+  @override
+  int constantValue() => 0;
+
+  @override
+  void addInstructions(ScriptByteCodeBuilder builder) {
+    final definition = builder.module.functions[name];
+    if (definition == null) {
+      throw FormatException('No such function $name');
+    }
+    builder.addInstruction(PushFunctionAddressInstruction(name));
+  }
+
+  final String name;
+}
+
 class StoreValueAstNode extends AstNode {
   StoreValueAstNode({
     required this.isGlobal,

@@ -6,18 +6,23 @@ import 'tokenizer.dart';
 class Parser {
   static const maximumGlobalVariableCount = 256;
 
-  factory Parser({required String input, required String filename}) {
-    return Parser.tokenizer(Tokenizer(input, filename));
+  factory Parser({
+    required String input,
+    required String filename,
+    required ScriptModule module,
+  }) {
+    return Parser.tokenizer(Tokenizer(input, filename), module);
   }
 
-  Parser.tokenizer(Tokenizer tokenizer)
-      : _tokens = tokenizer.tokenize().iterator {
+  Parser.tokenizer(Tokenizer tokenizer, ScriptModule? module)
+      : _tokens = tokenizer.tokenize().iterator,
+        _module = module ?? ScriptModule() {
     _nextToken();
   }
 
   final Iterator<Token> _tokens;
 
-  late ScriptModule _module;
+  final ScriptModule _module;
   late Token _currentToken;
 
   ScriptFunction? _function;
@@ -54,60 +59,7 @@ class Parser {
   }
 
   ScriptModule parse() {
-    _module = ScriptModule();
-    for (final builtInFunction in InBuiltScriptFunction.values) {
-      _module.functions[builtInFunction.name] = builtInFunction;
-    }
     parseModule();
-
-    // Patch or create init function with global variable inits.
-    var initFunction = _module.functions['init'] as ScriptFunction?;
-    if (initFunction == null) {
-      initFunction = ScriptFunction('init');
-      initFunction.statements = StatementListAstNode();
-      _module.functions['init'] = initFunction;
-    } else {
-      if (initFunction.hasReturnValue) {
-        throw const FormatException('init function should not return a value');
-      }
-      if (initFunction.numberOfParameters > 0) {
-        throw const FormatException(
-          'init function should not take any parameters',
-        );
-      }
-    }
-
-    final globalInitializers = <AstNode>[];
-    for (final global in _module.globals.values) {
-      final initializer = global.initializer;
-      if (initializer == null) continue;
-      globalInitializers.add(
-        StoreValueAstNode(
-          isGlobal: true,
-          index: global.index,
-          expression: initializer,
-        ),
-      );
-    }
-    initFunction.statements.statements.insertAll(0, globalInitializers);
-
-    // Create tick function if it doesn't exist.
-    var tickFunction = _module.functions['tick'] as ScriptFunction?;
-    if (tickFunction == null) {
-      tickFunction = ScriptFunction('tick');
-      tickFunction.statements = StatementListAstNode();
-      _module.functions['tick'] = tickFunction;
-    } else {
-      if (tickFunction.hasReturnValue) {
-        throw const FormatException('tick function should not return a value');
-      }
-      if (tickFunction.numberOfParameters > 0) {
-        throw const FormatException(
-          'tick function should not take any parameters',
-        );
-      }
-    }
-
     return _module;
   }
 
@@ -285,6 +237,12 @@ class Parser {
         _assertToken(TokenType.closeParen);
         return expression;
 
+      case TokenType.at:
+        _nextToken();
+        final value = _currentToken;
+        _assertToken(TokenType.identifier);
+        return PushFunctionAddress(name: value.stringValue!);
+
       case TokenType.identifier:
         // Global, local, constant or function call
         final name = _currentToken.stringValue!;
@@ -335,6 +293,13 @@ class Parser {
             return constantValue;
           }
 
+          // Unknown identifier!
+          // If the next token is a fallback, then use that instead.
+          if (_currentToken.type == TokenType.fallback) {
+            _nextToken();
+            return _parseExpression();
+          }
+
           throw FormatException('Unknown identifier $name near $_currentToken');
         }
 
@@ -345,8 +310,19 @@ class Parser {
     }
   }
 
-  AstNode _parseSubscript() {
+  AstNode _parseFallback() {
     final result = _parsePrimary();
+    if (_currentToken.type == TokenType.fallback) {
+      _nextToken();
+
+      // Discard the expression.
+      _parseExpression();
+    }
+    return result;
+  }
+
+  AstNode _parseSubscript() {
+    final result = _parseFallback();
     switch (_currentToken.type) {
       case TokenType.openSquareBracket:
         _nextToken();

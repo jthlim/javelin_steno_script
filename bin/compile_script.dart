@@ -5,24 +5,26 @@ import 'dart:io';
 import 'package:javelin_steno_script/javelin_steno_script.dart';
 
 void main(List<String> arguments) {
-  if (arguments.length != 2) {
-    print('Usage: compile_script <button_count> script_file_name');
+  if (arguments.length < 2) {
+    print('Usage: compile_script <button_count> script_file_name1 ...');
     return;
   }
 
   final buttonCount = int.tryParse(arguments[0]);
   if (buttonCount == null) {
-    print('Usage: compile_script <button_count> script_file_name');
+    print('Usage: compile_script <button_count> script_file_name1 ...');
     return;
   }
 
-  final filename = arguments[1];
+  final module = ScriptModule();
 
-  final source = File(filename).readAsStringSync();
+  for (var i = 1; i < arguments.length; ++i) {
+    final filename = arguments[i];
+    final source = File(filename).readAsStringSync();
+    Parser(input: source, filename: filename, module: module).parse();
+  }
 
-  final result = Parser(input: source, filename: filename).parse();
-
-  final builder = ScriptByteCodeBuilder(result);
+  final builder = ScriptByteCodeBuilder(module);
   final byteCode = builder.createByteCode(buttonCount);
 
   print('Opcodes');

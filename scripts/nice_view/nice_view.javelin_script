@@ -1,0 +1,2 @@
+const DISPLAY_WIDTH = 68;
+const DISPLAY_HEIGHT = 160;

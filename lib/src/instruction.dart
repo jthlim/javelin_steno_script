@@ -309,6 +309,28 @@ class CallFunctionInstruction extends ScriptInstruction {
   String toString() => '  call $functionName';
 }
 
+class PushFunctionAddressInstruction extends ScriptInstruction {
+  PushFunctionAddressInstruction(this.functionName);
+
+  @override
+  int get byteCodeLength => 3;
+
+  @override
+  void addByteCode(ScriptByteCodeBuilder builder) {
+    final function = builder.functions[functionName]!;
+    final offset = function.offset;
+
+    builder.bytesBuilder.addByte(0xc1);
+    builder.bytesBuilder.addByte(offset);
+    builder.bytesBuilder.addByte(offset >> 8);
+  }
+
+  final String functionName;
+
+  @override
+  String toString() => '  push @$functionName';
+}
+
 abstract class JumpFunctionScriptInstructionBase extends ScriptInstruction {
   JumpFunctionScriptInstructionBase(this.functionName);
 

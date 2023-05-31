@@ -224,8 +224,26 @@ class Tokenizer {
           continue;
 
         case 0x3f: // '?'
+          if (_offset < _length && _input.codeUnitAt(_offset) == 0x3f) {
+            ++_offset;
+            ++_column;
+            yield Token(
+              type: TokenType.fallback,
+              line: _line,
+              column: _column,
+            );
+          } else {
+            yield Token(
+              type: TokenType.questionMark,
+              line: _line,
+              column: _column,
+            );
+          }
+          continue;
+
+        case 0x40: // '@'
           yield Token(
-            type: TokenType.questionMark,
+            type: TokenType.at,
             line: _line,
             column: _column,
           );

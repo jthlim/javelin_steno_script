@@ -1,3 +1,4 @@
+import 'package:javelin_steno_script/javelin_steno_script.dart';
 import 'package:javelin_steno_script/src/byte_code_builder.dart';
 import 'package:javelin_steno_script/src/parser.dart';
 import 'package:test/test.dart';
@@ -8,12 +9,12 @@ void main() {
       final compiledCode = _compileScript('var a = -1;');
       expect(compiledCode, '''
 
-init (0x8):
+init (0xa):
   push -1
   store g0
   ret
 
-tick (0xc):
+tick (0xe):
   ret
 ''');
     });
@@ -21,11 +22,9 @@ tick (0xc):
 }
 
 String _compileScript(String script) {
-  final result = Parser(
-    input: script,
-    filename: '',
-  ).parse();
-  final builder = ScriptByteCodeBuilder(result);
+  final module = ScriptModule();
+  Parser(input: script, filename: '', module: module).parse();
+  final builder = ScriptByteCodeBuilder(module);
   builder.createByteCode(0);
 
   final buffer = StringBuffer();
