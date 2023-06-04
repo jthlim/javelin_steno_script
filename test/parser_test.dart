@@ -1,5 +1,4 @@
 import 'package:javelin_steno_script/javelin_steno_script.dart';
-import 'package:javelin_steno_script/src/parser.dart';
 import 'package:test/test.dart';
 
 void main() {

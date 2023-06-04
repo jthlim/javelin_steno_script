@@ -11,9 +11,9 @@ class ScriptByteCodeBuilder {
 
   final ScriptModule module;
 
-  final bytesBuilder = BytesBuilder();
+  final _bytesBuilder = BytesBuilder();
   final instructions = InstructionList();
-  final functions = <String, FunctionStartPlaceholderScriptInstruction>{};
+  final functions = <String, FunctionStartScriptInstruction>{};
   final strings = <String>{};
   late final List<String> sortedStrings;
   final stringTable = <String, int>{};
@@ -27,7 +27,7 @@ class ScriptByteCodeBuilder {
     _measureByteCode(buttonCount);
     _createByteCode(buttonCount);
 
-    return bytesBuilder.toBytes();
+    return _bytesBuilder.toBytes();
   }
 
   void _createInstructionList() {
@@ -39,15 +39,9 @@ class ScriptByteCodeBuilder {
         throw Exception('Internal error - inconsistent function name');
       }
       // Set up placeholder instruction.
-      final functionStart =
-          FunctionStartPlaceholderScriptInstruction(function.name);
+      final functionStart = FunctionStartScriptInstruction(function);
       functions[function.name] = functionStart;
       addInstruction(functionStart);
-
-      // Add instructions to store passed in parameters.
-      if (function.numberOfParameters > 0) {
-        addInstruction(StoreParamCountInstruction(function.numberOfParameters));
-      }
 
       // Add function instructions
       function.statements.addInstructions(this);
@@ -66,9 +60,12 @@ class ScriptByteCodeBuilder {
   }
 
   void _measureByteCode(int buttonCount) {
+    // init, tick, onPress/onRelease per button.
+    final fixedFunctionCount = 2 + buttonCount * 2;
+
     // Starting offset is:
-    // magic + 2 (string hash table) + 2 (init) + 2 (tick) + buttonCount * 2 (press/release) * 2 (bytes per offset)
-    final startingOffset = 4 + 2 + 2 + 2 + 4 * buttonCount;
+    // magic + 2 (string hash table) + function pointers
+    final startingOffset = 4 + 2 + 2 * fixedFunctionCount;
     var offset = startingOffset;
     for (final instruction in instructions) {
       offset += instruction.layoutFirstPass(offset);
@@ -98,7 +95,7 @@ class ScriptByteCodeBuilder {
   }
 
   void _createByteCode(int buttonCount) {
-    bytesBuilder.add('JSS0'.codeUnits);
+    _bytesBuilder.add('JSS3'.codeUnits);
 
     add16BitValue(stringHashTableOffset);
 
@@ -111,16 +108,16 @@ class ScriptByteCodeBuilder {
     }
 
     for (final instruction in instructions) {
-      if (instruction.offset != bytesBuilder.length) {
+      if (instruction.offset != _bytesBuilder.length) {
         throw Exception(
-          'Internal error: byte code offset (${instruction.offset} vs ${bytesBuilder.length}) mismatch at $instruction',
+          'Internal error: byte code offset (${instruction.offset} vs ${_bytesBuilder.length}) mismatch at $instruction',
         );
       }
       instruction.addByteCode(this);
     }
 
     for (final string in sortedStrings) {
-      if (stringTable[string] != bytesBuilder.length) {
+      if (stringTable[string] != _bytesBuilder.length) {
         throw Exception(
           'Internal error: byte code offset mismatch at string $string',
         );
@@ -129,19 +126,19 @@ class ScriptByteCodeBuilder {
       // Strings either start with 'S' (string) or 'D' (data).
       final marker = string.codeUnitAt(0);
       if (marker == 0x53 /* 'S' */) {
-        bytesBuilder.add(utf8.encode(string.substring(1)));
-        bytesBuilder.addByte(0);
+        _bytesBuilder.add(utf8.encode(string.substring(1)));
+        _bytesBuilder.addByte(0);
       } else if (marker == 0x44 /* 'D' */) {
         for (final byte in string.codeUnits.skip(1)) {
-          bytesBuilder.addByte(byte);
+          _bytesBuilder.addByte(byte);
         }
       } else {
         throw Exception('Internal error: Unhandled string marker');
       }
     }
 
-    if ((bytesBuilder.length & 1) != 0) {
-      bytesBuilder.addByte(0);
+    if ((_bytesBuilder.length & 1) != 0) {
+      _bytesBuilder.addByte(0);
     }
 
     writeStringHashTable();
@@ -160,8 +157,20 @@ class ScriptByteCodeBuilder {
       instructions.add(instruction);
 
   void add16BitValue(int value) {
-    bytesBuilder.addByte(value);
-    bytesBuilder.addByte(value >> 8);
+    _bytesBuilder.addByte(value);
+    _bytesBuilder.addByte(value >> 8);
+  }
+
+  void addByte(int byte) {
+    _bytesBuilder.addByte(byte);
+  }
+
+  void addOpcode(ScriptOpcode opcode) {
+    _bytesBuilder.addByte(opcode.value);
+  }
+
+  void addOperatorOpcode(ScriptOperatorOpcode operatorOpcode) {
+    _bytesBuilder.addByte(operatorOpcode.value);
   }
 
   void writeStringHashTable() {

@@ -6,11 +6,11 @@ import 'byte_code_builder.dart';
 abstract class ScriptFunctionDefinition {
   String get name;
   int get numberOfParameters;
+  int get numberOfLocals;
   bool get hasReturnValue;
 }
 
 enum InBuiltScriptFunction implements ScriptFunctionDefinition {
-  // Direct functions, using one byte opcodes.
   pressScanCode('pressScanCode', 1, false, 0, false),
   releaseScanCode('releaseScanCode', 1, false, 1, false),
   tapScanCode('tapScanCode', 1, false, 2, false),
@@ -21,47 +21,45 @@ enum InBuiltScriptFunction implements ScriptFunctionDefinition {
   releaseAll('releaseAll', 0, false, 7, false),
   isButtonPressed('isButtonPressed', 1, true, 8, true),
   pressAll('pressAll', 0, false, 9, false),
-  sendText('sendText', 1, false, 10, false),
-  console('console', 1, true, 11, false),
-  checkButtonState('checkButtonState', 1, true, 12, true),
-  isInPressAll('isInPressAll', 0, true, 13, true),
-  setRgb('setRgb', 4, false, 14, false),
-  getTime('getTime', 0, true, 15, false),
-
-  // Extended functions, using two byte 0xcc opcode.
-  getLedStatus('getLedStatus', 1, true, 0x100, true),
-  setGpioPin('setGpioPin', 2, false, 0x101, false),
-  clearDisplay('clearDisplay', 1, false, 0x102, false),
-  setAutoDraw('setAutoDraw', 2, false, 0x103, false),
-  setScreenOn('setScreenOn', 2, false, 0x104, false),
-  setScreenContrast('setScreenContrast', 2, false, 0x105, false),
-  drawPixel('drawPixel', 3, false, 0x106, false),
-  drawLine('drawLine', 5, false, 0x107, false),
-  drawImage('drawImage', 4, false, 0x108, false),
-  drawText('drawText', 6, false, 0x109, false),
-  setDrawColor('setDrawColor', 2, false, 0x10a, false),
-  drawRect('drawRect', 5, false, 0x10b, false),
-  setHsv('setHsv', 4, false, 0x10c, false),
-  rand('rand', 0, true, 0x10d, false),
-  isUsbConnected('isUsbConnected', 0, true, 0x10e, true),
-  isUsbSuspended('isUsbSuspended', 0, true, 0x10f, true),
-  getParameter('getParameter', 1, true, 0x110, false),
-  isConnected('isConnected', 1, true, 0x111, true),
-  getActiveConnection('getActiveConnection', 0, true, 0x112, false),
-  setPreferredConnection('setPreferredConnection', 3, false, 0x113, false),
-  isPairConnected('isPairConnected', 1, true, 0x114, true),
-  startBlePairing('startBlePairing', 0, false, 0x115, false),
-  getBleProfile('getBleProfile', 0, true, 0x116, false),
-  setBleProfile('setBleProfile', 1, false, 0x117, false),
-  isHostSleeping('isHostSleeping', 0, true, 0x118, true),
-  isMainPowered('isMainPowered', 0, true, 0x119, true),
-  isCharging('isCharging', 0, true, 0x11a, true),
-  getBatteryPercentage('getBatteryPercentage', 0, true, 0x11b, false),
-  getActivePairConnection('getActivePairConnection', 0, true, 0x11c, false),
-  setBoardPower('setBoardPower', 1, false, 0x11d, false),
-  sendEvent('sendEvent', 1, false, 0x11e, false),
-  isPairPowered('isPairPowered', 0, true, 0x11f, true),
-  setInputHint('setInputHint', 1, false, 0x120, false);
+  sendText('sendText', 1, false, 0xa, false),
+  console('console', 1, true, 0xb, false),
+  checkButtonState('checkButtonState', 1, true, 0xc, true),
+  isInPressAll('isInPressAll', 0, true, 0xd, true),
+  setRgb('setRgb', 4, false, 0xe, false),
+  getTime('getTime', 0, true, 0xf, false),
+  getLedStatus('getLedStatus', 1, true, 0x10, true),
+  setGpioPin('setGpioPin', 2, false, 0x11, false),
+  clearDisplay('clearDisplay', 1, false, 0x12, false),
+  setAutoDraw('setAutoDraw', 2, false, 0x13, false),
+  setScreenOn('setScreenOn', 2, false, 0x14, false),
+  setScreenContrast('setScreenContrast', 2, false, 0x15, false),
+  drawPixel('drawPixel', 3, false, 0x16, false),
+  drawLine('drawLine', 5, false, 0x17, false),
+  drawImage('drawImage', 4, false, 0x18, false),
+  drawText('drawText', 6, false, 0x19, false),
+  setDrawColor('setDrawColor', 2, false, 0x1a, false),
+  drawRect('drawRect', 5, false, 0x1b, false),
+  setHsv('setHsv', 4, false, 0x1c, false),
+  rand('rand', 0, true, 0x1d, false),
+  isUsbConnected('isUsbConnected', 0, true, 0x1e, true),
+  isUsbSuspended('isUsbSuspended', 0, true, 0x1f, true),
+  getParameter('getParameter', 1, true, 0x20, false),
+  isConnected('isConnected', 1, true, 0x21, true),
+  getActiveConnection('getActiveConnection', 0, true, 0x22, false),
+  setPreferredConnection('setPreferredConnection', 3, false, 0x23, false),
+  isPairConnected('isPairConnected', 1, true, 0x24, true),
+  startBlePairing('startBlePairing', 0, false, 0x25, false),
+  getBleProfile('getBleProfile', 0, true, 0x26, false),
+  setBleProfile('setBleProfile', 1, false, 0x27, false),
+  isHostSleeping('isHostSleeping', 0, true, 0x28, true),
+  isMainPowered('isMainPowered', 0, true, 0x29, true),
+  isCharging('isCharging', 0, true, 0x2a, true),
+  getBatteryPercentage('getBatteryPercentage', 0, true, 0x2b, false),
+  getActivePairConnection('getActivePairConnection', 0, true, 0x2c, false),
+  setBoardPower('setBoardPower', 1, false, 0x2d, false),
+  sendEvent('sendEvent', 1, false, 0x2e, false),
+  isPairPowered('isPairPowered', 0, true, 0x2f, true),
+  setInputHint('setInputHint', 1, false, 0x30, false);
 
   const InBuiltScriptFunction(
     this.functionName,
@@ -80,6 +78,9 @@ enum InBuiltScriptFunction implements ScriptFunctionDefinition {
   final int numberOfParameters;
 
   @override
+  int get numberOfLocals => 0;
+
+  @override
   final bool hasReturnValue;
 
   final int functionIndex;
@@ -96,7 +97,7 @@ class ScriptFunction implements ScriptFunctionDefinition {
   @override
   bool hasReturnValue = false;
 
-  final parameters = <String, int>{};
+  final parameters = <String>{};
   var locals = <String, int>{};
   late final StatementListAstNode statements;
 
@@ -105,18 +106,15 @@ class ScriptFunction implements ScriptFunctionDefinition {
   @override
   int get numberOfParameters => parameters.length;
 
+  @override
+  var numberOfLocals = 0;
+
   void addParameter(String parameterName) {
-    if (parameters.length >= 8) {
-      throw Exception('Too many parameters for $name');
-    }
-    parameters[parameterName] = parameters.length;
+    parameters.add(parameterName);
+    addLocalVar(parameterName);
   }
 
   int addLocalVar(String localName) {
-    if (locals.length >= 4) {
-      throw Exception('Too many local variables for $name');
-    }
-
     // Copy on write.
     if (localsStack.isNotEmpty && localsStack.last == locals) {
       locals = {...locals};
@@ -124,6 +122,9 @@ class ScriptFunction implements ScriptFunctionDefinition {
 
     final index = locals.length;
     locals[localName] = index;
+    if (index >= numberOfLocals) {
+      numberOfLocals = index + 1;
+    }
     return index;
   }
 

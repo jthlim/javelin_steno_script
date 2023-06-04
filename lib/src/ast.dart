@@ -53,7 +53,8 @@ class ByteIndexAstNode extends AstNode {
     byteValue.addInstructions(builder);
     index.addInstructions(builder);
 
-    builder.addInstruction(OpcodeScriptInstruction(ScriptOpCode.byteLookup));
+    builder.addInstruction(
+        OpcodeScriptInstruction(ScriptOperatorOpcode.byteLookup));
   }
 
   final AstNode byteValue;
@@ -98,7 +99,7 @@ abstract class UnaryOperatorAstNode extends AstNode {
     builder.addInstruction(OpcodeScriptInstruction(opcode));
   }
 
-  ScriptOpCode get opcode;
+  ScriptOperatorOpcode get opcode;
 
   final AstNode statement;
 }
@@ -113,7 +114,7 @@ class NotAstNode extends UnaryOperatorAstNode {
   int constantValue() => statement.constantValue() == 0 ? 1 : 0;
 
   @override
-  ScriptOpCode get opcode => ScriptOpCode.not;
+  ScriptOperatorOpcode get opcode => ScriptOperatorOpcode.not;
 }
 
 class NegateAstNode extends UnaryOperatorAstNode {
@@ -123,7 +124,7 @@ class NegateAstNode extends UnaryOperatorAstNode {
   int constantValue() => -statement.constantValue();
 
   @override
-  ScriptOpCode get opcode => ScriptOpCode.negative;
+  ScriptOperatorOpcode get opcode => ScriptOperatorOpcode.negative;
 }
 
 class BitwiseNotAstNode extends AstNode {
@@ -142,8 +143,10 @@ class BitwiseNotAstNode extends AstNode {
       return;
     }
     expression.addInstructions(builder);
-    builder.addInstruction(OpcodeScriptInstruction(ScriptOpCode.negative));
-    builder.addInstruction(OpcodeScriptInstruction(ScriptOpCode.decrement));
+    builder
+        .addInstruction(OpcodeScriptInstruction(ScriptOperatorOpcode.negative));
+    builder.addInstruction(
+        OpcodeScriptInstruction(ScriptOperatorOpcode.decrement));
   }
 
   final AstNode expression;
@@ -162,7 +165,7 @@ abstract class BinaryOperatorAstNode extends AstNode {
     builder.addInstruction(OpcodeScriptInstruction(opcode));
   }
 
-  ScriptOpCode get opcode;
+  ScriptOperatorOpcode get opcode;
 
   final AstNode statementA;
   final AstNode statementB;
@@ -210,7 +213,8 @@ class TermsAstNode extends AstNode {
           terms[1].mode == TermMode.add &&
           terms[0].statement.constantValue() == 1) {
         terms[1].statement.addInstructions(builder);
-        builder.addInstruction(OpcodeScriptInstruction(ScriptOpCode.increment));
+        builder.addInstruction(
+            OpcodeScriptInstruction(ScriptOperatorOpcode.increment));
         return;
       }
 
@@ -222,11 +226,11 @@ class TermsAstNode extends AstNode {
         switch (terms[1].mode) {
           case TermMode.add:
             builder.addInstruction(
-                OpcodeScriptInstruction(ScriptOpCode.increment));
+                OpcodeScriptInstruction(ScriptOperatorOpcode.increment));
             break;
           case TermMode.subtract:
             builder.addInstruction(
-                OpcodeScriptInstruction(ScriptOpCode.decrement));
+                OpcodeScriptInstruction(ScriptOperatorOpcode.decrement));
             break;
         }
         return;
@@ -241,11 +245,12 @@ class TermsAstNode extends AstNode {
       } else {
         switch (term.mode) {
           case TermMode.add:
-            builder.addInstruction(OpcodeScriptInstruction(ScriptOpCode.add));
+            builder.addInstruction(
+                OpcodeScriptInstruction(ScriptOperatorOpcode.add));
             break;
           case TermMode.subtract:
-            builder
-                .addInstruction(OpcodeScriptInstruction(ScriptOpCode.subtract));
+            builder.addInstruction(
+                OpcodeScriptInstruction(ScriptOperatorOpcode.subtract));
             break;
         }
       }
@@ -263,7 +268,7 @@ class MultiplyAstNode extends BinaryOperatorAstNode {
       statementA.constantValue() * statementB.constantValue();
 
   @override
-  ScriptOpCode get opcode => ScriptOpCode.multiply;
+  ScriptOperatorOpcode get opcode => ScriptOperatorOpcode.multiply;
 }
 
 class QuotientAstNode extends BinaryOperatorAstNode {
@@ -274,7 +279,7 @@ class QuotientAstNode extends BinaryOperatorAstNode {
       statementA.constantValue() ~/ statementB.constantValue();
 
   @override
-  ScriptOpCode get opcode => ScriptOpCode.quotient;
+  ScriptOperatorOpcode get opcode => ScriptOperatorOpcode.quotient;
 }
 
 class RemainderAstNode extends BinaryOperatorAstNode {
@@ -285,7 +290,7 @@ class RemainderAstNode extends BinaryOperatorAstNode {
       statementA.constantValue().remainder(statementB.constantValue());
 
   @override
-  ScriptOpCode get opcode => ScriptOpCode.remainder;
+  ScriptOperatorOpcode get opcode => ScriptOperatorOpcode.remainder;
 }
 
 class BitwiseAndAstNode extends BinaryOperatorAstNode {
@@ -296,7 +301,7 @@ class BitwiseAndAstNode extends BinaryOperatorAstNode {
       statementA.constantValue() & statementB.constantValue();
 
   @override
-  ScriptOpCode get opcode => ScriptOpCode.bitwiseAnd;
+  ScriptOperatorOpcode get opcode => ScriptOperatorOpcode.bitwiseAnd;
 }
 
 class BitwiseOrAstNode extends BinaryOperatorAstNode {
@@ -307,7 +312,7 @@ class BitwiseOrAstNode extends BinaryOperatorAstNode {
       statementA.constantValue() | statementB.constantValue();
 
   @override
-  ScriptOpCode get opcode => ScriptOpCode.bitwiseOr;
+  ScriptOperatorOpcode get opcode => ScriptOperatorOpcode.bitwiseOr;
 }
 
 class BitwiseXorAstNode extends BinaryOperatorAstNode {
@@ -318,7 +323,7 @@ class BitwiseXorAstNode extends BinaryOperatorAstNode {
       statementA.constantValue() ^ statementB.constantValue();
 
   @override
-  ScriptOpCode get opcode => ScriptOpCode.bitwiseXor;
+  ScriptOperatorOpcode get opcode => ScriptOperatorOpcode.bitwiseXor;
 }
 
 class BitShiftLeftAstNode extends BinaryOperatorAstNode {
@@ -329,7 +334,7 @@ class BitShiftLeftAstNode extends BinaryOperatorAstNode {
       statementA.constantValue() << statementB.constantValue();
 
   @override
-  ScriptOpCode get opcode => ScriptOpCode.shiftLeft;
+  ScriptOperatorOpcode get opcode => ScriptOperatorOpcode.shiftLeft;
 }
 
 class ArithmeticBitShiftRightAstNode extends BinaryOperatorAstNode {
@@ -340,7 +345,7 @@ class ArithmeticBitShiftRightAstNode extends BinaryOperatorAstNode {
       statementA.constantValue() >> statementB.constantValue();
 
   @override
-  ScriptOpCode get opcode => ScriptOpCode.arithmeticShiftRight;
+  ScriptOperatorOpcode get opcode => ScriptOperatorOpcode.arithmeticShiftRight;
 }
 
 class LogicalBitShiftRightAstNode extends BinaryOperatorAstNode {
@@ -351,7 +356,7 @@ class LogicalBitShiftRightAstNode extends BinaryOperatorAstNode {
       statementA.constantValue() >>> statementB.constantValue();
 
   @override
-  ScriptOpCode get opcode => ScriptOpCode.logicalShiftRight;
+  ScriptOperatorOpcode get opcode => ScriptOperatorOpcode.logicalShiftRight;
 }
 
 class LogicalAndAstNode extends BinaryOperatorAstNode {
@@ -369,7 +374,7 @@ class LogicalAndAstNode extends BinaryOperatorAstNode {
   }
 
   @override
-  ScriptOpCode get opcode => ScriptOpCode.logicalAnd;
+  ScriptOperatorOpcode get opcode => ScriptOperatorOpcode.logicalAnd;
 }
 
 class LogicalOrAstNode extends BinaryOperatorAstNode {
@@ -387,7 +392,7 @@ class LogicalOrAstNode extends BinaryOperatorAstNode {
   }
 
   @override
-  ScriptOpCode get opcode => ScriptOpCode.logicalOr;
+  ScriptOperatorOpcode get opcode => ScriptOperatorOpcode.logicalOr;
 }
 
 class EqualsAstNode extends BinaryOperatorAstNode {
@@ -408,17 +413,17 @@ class EqualsAstNode extends BinaryOperatorAstNode {
   void addInstructions(ScriptByteCodeBuilder builder) {
     if (statementA.isConstant() && statementA.constantValue() == 0) {
       statementB.addInstructions(builder);
-      builder.addInstruction(OpcodeScriptInstruction(ScriptOpCode.not));
+      builder.addInstruction(OpcodeScriptInstruction(ScriptOperatorOpcode.not));
     } else if (statementB.isConstant() && statementB.constantValue() == 0) {
       statementA.addInstructions(builder);
-      builder.addInstruction(OpcodeScriptInstruction(ScriptOpCode.not));
+      builder.addInstruction(OpcodeScriptInstruction(ScriptOperatorOpcode.not));
     } else {
       super.addInstructions(builder);
     }
   }
 
   @override
-  ScriptOpCode get opcode => ScriptOpCode.equals;
+  ScriptOperatorOpcode get opcode => ScriptOperatorOpcode.equals;
 }
 
 class NotEqualsAstNode extends BinaryOperatorAstNode {
@@ -436,7 +441,7 @@ class NotEqualsAstNode extends BinaryOperatorAstNode {
   }
 
   @override
-  ScriptOpCode get opcode => ScriptOpCode.notEquals;
+  ScriptOperatorOpcode get opcode => ScriptOperatorOpcode.notEquals;
 }
 
 class LessThanAstNode extends BinaryOperatorAstNode {
@@ -454,7 +459,7 @@ class LessThanAstNode extends BinaryOperatorAstNode {
   }
 
   @override
-  ScriptOpCode get opcode => ScriptOpCode.lessThan;
+  ScriptOperatorOpcode get opcode => ScriptOperatorOpcode.lessThan;
 }
 
 class LessThanOrEqualToAstNode extends BinaryOperatorAstNode {
@@ -472,7 +477,7 @@ class LessThanOrEqualToAstNode extends BinaryOperatorAstNode {
   }
 
   @override
-  ScriptOpCode get opcode => ScriptOpCode.lessThanOrEqualTo;
+  ScriptOperatorOpcode get opcode => ScriptOperatorOpcode.lessThanOrEqualTo;
 }
 
 class GreaterThanAstNode extends BinaryOperatorAstNode {
@@ -490,7 +495,7 @@ class GreaterThanAstNode extends BinaryOperatorAstNode {
   }
 
   @override
-  ScriptOpCode get opcode => ScriptOpCode.greaterThan;
+  ScriptOperatorOpcode get opcode => ScriptOperatorOpcode.greaterThan;
 }
 
 class GreaterThanOrEqualToAstNode extends BinaryOperatorAstNode {
@@ -508,7 +513,7 @@ class GreaterThanOrEqualToAstNode extends BinaryOperatorAstNode {
   }
 
   @override
-  ScriptOpCode get opcode => ScriptOpCode.greaterThanOrEqualTo;
+  ScriptOperatorOpcode get opcode => ScriptOperatorOpcode.greaterThanOrEqualTo;
 }
 
 class NopAstNode extends AstNode {
@@ -560,7 +565,7 @@ class ForStatementAstNode extends AstNode {
     final lastInstruction = builder.instructions.last;
     late final JumpScriptInstructionBase jumpToEndInstruction;
     if (lastInstruction is OpcodeScriptInstruction &&
-        lastInstruction.opcode == ScriptOpCode.not) {
+        lastInstruction.opcode == ScriptOperatorOpcode.not) {
       builder.instructions.removeLast();
       jumpToEndInstruction = JumpIfNotZeroScriptInstruction();
     } else {
@@ -601,7 +606,7 @@ class IfStatementAstNode extends AstNode {
       final lastInstruction = builder.instructions.last;
       late final JumpScriptInstructionBase jumpInstruction;
       if (lastInstruction is OpcodeScriptInstruction &&
-          lastInstruction.opcode == ScriptOpCode.not) {
+          lastInstruction.opcode == ScriptOperatorOpcode.not) {
         builder.instructions.removeLast();
         jumpInstruction = JumpIfNotZeroScriptInstruction();
       } else {
@@ -647,25 +652,6 @@ class StatementListAstNode extends AstNode {
   final statements = <AstNode>[];
 
   void add(AstNode statement) => statements.add(statement);
-}
-
-class LoadParamAstNode extends AstNode {
-  LoadParamAstNode({
-    required this.index,
-  });
-
-  @override
-  bool isConstant() => false;
-
-  @override
-  int constantValue() => 0;
-
-  @override
-  void addInstructions(ScriptByteCodeBuilder builder) {
-    builder.addInstruction(LoadParamInstruction(index));
-  }
-
-  final int index;
 }
 
 class LoadGlobalValueArrayAstNode extends AstNode {

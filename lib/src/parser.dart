@@ -100,11 +100,6 @@ class Parser {
         '$name already defined as a function near $_currentToken',
       );
     }
-    if (_function?.parameters.containsKey(name) ?? false) {
-      throw Exception(
-        '$name already defined as a parameter near $_currentToken',
-      );
-    }
     if (_function?.locals.containsKey(name) ?? false) {
       throw Exception('$name already defined as a local near $_currentToken');
     }
@@ -257,11 +252,6 @@ class Parser {
             parameters: parameters,
           );
         } else {
-          // Check parameters
-          if (_function?.parameters.containsKey(name) ?? false) {
-            return LoadParamAstNode(index: _function!.parameters[name]!);
-          }
-
           // Check locals
           if (_function?.locals.containsKey(name) ?? false) {
             return LoadValueAstNode(

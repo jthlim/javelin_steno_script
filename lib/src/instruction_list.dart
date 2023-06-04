@@ -94,7 +94,7 @@ class InstructionList extends Iterable<ScriptInstruction> {
         continue;
       }
       if (instruction is OpcodeScriptInstruction &&
-          instruction.opcode == ScriptOpCode.not) {
+          instruction.opcode == ScriptOperatorOpcode.not) {
         isNonZero = !isNonZero;
         instruction = instruction.next;
         continue;
@@ -230,7 +230,7 @@ class InstructionList extends Iterable<ScriptInstruction> {
     ScriptInstruction? instruction = instructions.first;
     while (instruction != null) {
       if (instruction is! OpcodeScriptInstruction ||
-          instruction.opcode != ScriptOpCode.not) {
+          instruction.opcode != ScriptOperatorOpcode.not) {
         instruction = instruction.next;
         continue;
       }
@@ -239,7 +239,7 @@ class InstructionList extends Iterable<ScriptInstruction> {
       final previous = instruction.previous!;
       if (previous.isBooleanResult &&
           next is OpcodeScriptInstruction &&
-          next.opcode == ScriptOpCode.not) {
+          next.opcode == ScriptOperatorOpcode.not) {
         final nextNext = next.next;
         instruction.unlink();
         next.unlink();
@@ -251,10 +251,10 @@ class InstructionList extends Iterable<ScriptInstruction> {
         previous.replaceWith(OpcodeScriptInstruction(opposite));
         instruction.unlink();
       } else if (next is OpcodeScriptInstruction &&
-          next.opcode == ScriptOpCode.not) {
+          next.opcode == ScriptOperatorOpcode.not) {
         final nextNext = next.next;
         if (nextNext is OpcodeScriptInstruction &&
-            nextNext.opcode == ScriptOpCode.not) {
+            nextNext.opcode == ScriptOperatorOpcode.not) {
           next.unlink();
           nextNext.unlink();
           continue;

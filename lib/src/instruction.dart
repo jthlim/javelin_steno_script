@@ -4,34 +4,80 @@ import 'byte_code_builder.dart';
 import 'module.dart';
 import 'string_data.dart';
 
-enum ScriptOpCode {
-  not(0x40, true),
-  negative(0x41, false),
-  multiply(0x42, false),
-  quotient(0x43, false),
-  remainder(0x44, false),
-  add(0x45, false),
-  subtract(0x46, false),
-  equals(0x47, true),
-  notEquals(0x48, true),
-  lessThan(0x49, true),
-  lessThanOrEqualTo(0x4a, true),
-  greaterThan(0x4b, true),
-  greaterThanOrEqualTo(0x4c, true),
-  bitwiseAnd(0x4d, false),
-  bitwiseOr(0x4e, false),
-  bitwiseXor(0x4f, false),
-  logicalAnd(0x50, true),
-  logicalOr(0x51, true),
-  shiftLeft(0x52, false),
-  arithmeticShiftRight(0x53, false),
-  logicalShiftRight(0x54, false),
-  byteLookup(0x55, false),
-  wordLookup(0x56, false),
-  increment(0x57, false),
-  decrement(0x58, false);
+enum ScriptOpcode {
+  pushConstantBegin(0),
+  pushConstantEnd(0x3b),
+  pushBytes1U(0x3c),
+  pushBytes2S(0x3d),
+  pushBytes3S(0x3e),
+  pushBytes4(0x3f),
+  loadGlobalBegin(0x40),
+  loadGlobalEnd(0x45),
+  loadGlobalValue(0x46),
+  loadGlobalIndex(0x47),
+  storeGlobalBegin(0x48),
+  storeGlobalEnd(0x4d),
+  storeGlobalValue(0x4e),
+  storeGlobalIndex(0x4f),
+  loadLocalBegin(0x50),
+  loadLocalEnd(0x5d),
+  loadLocalValue(0x5e),
+  loadLocalIndex(0x5f),
+  storeLocalBegin(0x60),
+  storeLocalEnd(0x6d),
+  storeLocalValue(0x6e),
+  storeLocalIndex(0x6f),
+  operatorBegin(0x70),
+  operatorEnd(0x8f),
+  callInternalFunction(0x90),
+  callFunction(0x91),
+  ret(0x92),
+  pop(0x93),
+  enterFunction(0x94),
+  jumpShortBegin(0xa0),
+  jumpShortEnd(0xbe),
+  jumpLong(0xbf),
+  jumpIfZeroShortBegin(0xc0),
+  jumpIfZeroShortEnd(0xde),
+  jumpIfZeroLong(0xdf),
+  jumpIfNotZeroShortBegin(0xe0),
+  jumpIfNotZeroShortEnd(0xfe),
+  jumpIfNotZeroLong(0xff);
 
-  const ScriptOpCode(this.value, this.isBooleanResult);
+  const ScriptOpcode(this.value);
+
+  final int value;
+}
+
+enum ScriptOperatorOpcode {
+  not(0x0, true),
+  negative(0x1, false),
+  multiply(0x2, false),
+  quotient(0x3, false),
+  remainder(0x4, false),
+  add(0x5, false),
+  subtract(0x6, false),
+  equals(0x7, true),
+  notEquals(0x8, true),
+  lessThan(0x9, true),
+  lessThanOrEqualTo(0xa, true),
+  greaterThan(0xb, true),
+  greaterThanOrEqualTo(0xc, true),
+  bitwiseAnd(0xd, false),
+  bitwiseOr(0xe, false),
+  bitwiseXor(0xf, false),
+  logicalAnd(0x10, true),
+  logicalOr(0x11, true),
+  shiftLeft(0x12, false),
+  arithmeticShiftRight(0x13, false),
+  logicalShiftRight(0x14, false),
+  byteLookup(0x15, false),
+  wordLookup(0x16, false),
+  increment(0x17, false),
+  decrement(0x18, false);
+
+  const ScriptOperatorOpcode(int value, this.isBooleanResult)
+      : value = value + 0x70; // ScriptOpcodeValue.operatorBegin.value
 
   static const _opposites = {
     equals: notEquals,
@@ -45,7 +91,7 @@ enum ScriptOpCode {
   final int value;
   final bool isBooleanResult;
 
-  ScriptOpCode? get opposite => _opposites[this];
+  ScriptOperatorOpcode? get opposite => _opposites[this];
 }
 
 abstract class ScriptInstruction extends LinkedListEntry<ScriptInstruction> {
@@ -100,49 +146,26 @@ abstract class ScriptInstruction extends LinkedListEntry<ScriptInstruction> {
   }
 }
 
-class LoadParamInstruction extends ScriptInstruction {
-  LoadParamInstruction(this.index);
-
-  @override
-  int get byteCodeLength => 1;
-
-  @override
-  void addByteCode(ScriptByteCodeBuilder builder) {
-    builder.bytesBuilder.addByte(0xd0 + index);
-  }
-
-  final int index;
-
-  @override
-  String toString() => '  load p$index';
-}
-
-class StoreParamCountInstruction extends ScriptInstruction {
-  StoreParamCountInstruction(this.count);
-
-  @override
-  int get byteCodeLength => 1;
-
-  @override
-  void addByteCode(ScriptByteCodeBuilder builder) {
-    builder.bytesBuilder.addByte(0xd7 + count);
-  }
-
-  final int count;
-
-  @override
-  String toString() => '  store-param-count $count';
-}
-
 class LoadLocalValueInstruction extends ScriptInstruction {
   LoadLocalValueInstruction(this.index);
 
   @override
-  int get byteCodeLength => 1;
+  int get byteCodeLength {
+    return index >
+            (ScriptOpcode.loadLocalEnd.value -
+                ScriptOpcode.loadLocalBegin.value)
+        ? 2
+        : 1;
+  }
 
   @override
   void addByteCode(ScriptByteCodeBuilder builder) {
-    builder.bytesBuilder.addByte(0xe0 + index);
+    if (byteCodeLength == 2) {
+      builder.addOpcode(ScriptOpcode.loadLocalValue);
+      builder.addByte(index);
+    } else {
+      builder.addByte(ScriptOpcode.loadLocalBegin.value + index);
+    }
   }
 
   final int index;
@@ -155,11 +178,22 @@ class StoreLocalValueInstruction extends ScriptInstruction {
   StoreLocalValueInstruction(this.index);
 
   @override
-  int get byteCodeLength => 1;
+  int get byteCodeLength {
+    return index >
+            (ScriptOpcode.storeLocalEnd.value -
+                ScriptOpcode.storeLocalBegin.value)
+        ? 2
+        : 1;
+  }
 
   @override
   void addByteCode(ScriptByteCodeBuilder builder) {
-    builder.bytesBuilder.addByte(0xe4 + index);
+    if (byteCodeLength == 2) {
+      builder.addOpcode(ScriptOpcode.storeLocalValue);
+      builder.addByte(index);
+    } else {
+      builder.addByte(ScriptOpcode.storeLocalBegin.value + index);
+    }
   }
 
   final int index;
@@ -172,15 +206,21 @@ class LoadGlobalValueInstruction extends ScriptInstruction {
   LoadGlobalValueInstruction(this.index);
 
   @override
-  int get byteCodeLength => index < 4 ? 1 : 2;
+  int get byteCodeLength {
+    return index >
+            (ScriptOpcode.loadGlobalEnd.value -
+                ScriptOpcode.loadGlobalBegin.value)
+        ? 2
+        : 1;
+  }
 
   @override
   void addByteCode(ScriptByteCodeBuilder builder) {
-    if (index < 4) {
-      builder.bytesBuilder.addByte(0xe8 + index);
+    if (byteCodeLength == 2) {
+      builder.addOpcode(ScriptOpcode.loadGlobalValue);
+      builder.addByte(index);
     } else {
-      builder.bytesBuilder.addByte(0xca);
-      builder.bytesBuilder.addByte(index);
+      builder.addByte(ScriptOpcode.loadGlobalBegin.value + index);
     }
   }
 
@@ -200,8 +240,8 @@ class LoadIndexedGlobalValueInstruction extends ScriptInstruction {
 
   @override
   void addByteCode(ScriptByteCodeBuilder builder) {
-    builder.bytesBuilder.addByte(0xcd);
-    builder.bytesBuilder.addByte(index);
+    builder.addOpcode(ScriptOpcode.loadGlobalIndex);
+    builder.addByte(index);
   }
 
   @override
@@ -212,15 +252,21 @@ class StoreGlobalValueInstruction extends ScriptInstruction {
   StoreGlobalValueInstruction(this.index);
 
   @override
-  int get byteCodeLength => index < 4 ? 1 : 2;
+  int get byteCodeLength {
+    return index >
+            (ScriptOpcode.storeGlobalEnd.value -
+                ScriptOpcode.storeGlobalBegin.value)
+        ? 2
+        : 1;
+  }
 
   @override
   void addByteCode(ScriptByteCodeBuilder builder) {
-    if (index < 4) {
-      builder.bytesBuilder.addByte(0xec + index);
+    if (byteCodeLength == 2) {
+      builder.addOpcode(ScriptOpcode.storeGlobalValue);
+      builder.addByte(index);
     } else {
-      builder.bytesBuilder.addByte(0xcb);
-      builder.bytesBuilder.addByte(index);
+      builder.addByte(ScriptOpcode.storeGlobalBegin.value + index);
     }
   }
 
@@ -228,19 +274,6 @@ class StoreGlobalValueInstruction extends ScriptInstruction {
 
   @override
   String toString() => '  store g$index';
-}
-
-class PopValueInstruction extends ScriptInstruction {
-  @override
-  int get byteCodeLength => 1;
-
-  @override
-  void addByteCode(ScriptByteCodeBuilder builder) {
-    builder.bytesBuilder.addByte(0xc9);
-  }
-
-  @override
-  String toString() => '  pop';
 }
 
 class StoreIndexedGlobalValueInstruction extends ScriptInstruction {
@@ -253,12 +286,25 @@ class StoreIndexedGlobalValueInstruction extends ScriptInstruction {
 
   @override
   void addByteCode(ScriptByteCodeBuilder builder) {
-    builder.bytesBuilder.addByte(0xce);
-    builder.bytesBuilder.addByte(index);
+    builder.addOpcode(ScriptOpcode.storeGlobalIndex);
+    builder.addByte(index);
   }
 
   @override
   String toString() => '  store g$index[]';
+}
+
+class PopValueInstruction extends ScriptInstruction {
+  @override
+  int get byteCodeLength => 1;
+
+  @override
+  void addByteCode(ScriptByteCodeBuilder builder) {
+    builder.addOpcode(ScriptOpcode.pop);
+  }
+
+  @override
+  String toString() => '  pop';
 }
 
 class CallInBuiltFunctionInstruction extends ScriptInstruction {
@@ -268,16 +314,12 @@ class CallInBuiltFunctionInstruction extends ScriptInstruction {
   bool get isBooleanResult => function.isBooleanResult;
 
   @override
-  int get byteCodeLength => function.functionIndex >= 0x100 ? 2 : 1;
+  int get byteCodeLength => 2;
 
   @override
   void addByteCode(ScriptByteCodeBuilder builder) {
-    if (function.functionIndex >= 0x100) {
-      builder.bytesBuilder.addByte(0xcc);
-      builder.bytesBuilder.addByte(function.functionIndex & 0xff);
-    } else {
-      builder.bytesBuilder.addByte(0xf0 + function.functionIndex);
-    }
+    builder.addOpcode(ScriptOpcode.callInternalFunction);
+    builder.addByte(function.functionIndex);
   }
 
   final InBuiltScriptFunction function;
@@ -298,9 +340,9 @@ class CallFunctionInstruction extends ScriptInstruction {
     final function = builder.functions[functionName]!;
     final offset = function.offset;
 
-    builder.bytesBuilder.addByte(0xc5);
-    builder.bytesBuilder.addByte(offset);
-    builder.bytesBuilder.addByte(offset >> 8);
+    builder.addOpcode(ScriptOpcode.callFunction);
+    builder.addByte(offset);
+    builder.addByte(offset >> 8);
   }
 
   final String functionName;
@@ -320,9 +362,9 @@ class PushFunctionAddressInstruction extends ScriptInstruction {
     final function = builder.functions[functionName]!;
     final offset = function.offset;
 
-    builder.bytesBuilder.addByte(0xc1);
-    builder.bytesBuilder.addByte(offset);
-    builder.bytesBuilder.addByte(offset >> 8);
+    builder.addOpcode(ScriptOpcode.pushBytes2S);
+    builder.addByte(offset);
+    builder.addByte(offset >> 8);
   }
 
   final String functionName;
@@ -342,12 +384,12 @@ abstract class JumpFunctionScriptInstructionBase extends ScriptInstruction {
     final function = builder.functions[functionName]!;
     final offset = function.offset;
 
-    builder.bytesBuilder.addByte(opcode);
-    builder.bytesBuilder.addByte(offset);
-    builder.bytesBuilder.addByte(offset >> 8);
+    builder.addOpcode(opcode);
+    builder.addByte(offset);
+    builder.addByte(offset >> 8);
   }
 
-  int get opcode;
+  ScriptOpcode get opcode;
 
   final String functionName;
 }
@@ -359,7 +401,7 @@ class JumpFunctionScriptInstruction extends JumpFunctionScriptInstructionBase {
   bool get implicitNext => false;
 
   @override
-  int get opcode => 0xc6;
+  ScriptOpcode get opcode => ScriptOpcode.jumpLong;
 
   @override
   String toString() => '  jmp $functionName';
@@ -370,7 +412,7 @@ class JumpIfZeroFunctionScriptInstruction
   JumpIfZeroFunctionScriptInstruction(super.functionName);
 
   @override
-  int get opcode => 0xc7;
+  ScriptOpcode get opcode => ScriptOpcode.jumpIfZeroLong;
 
   @override
   String toString() => '  jz $functionName';
@@ -381,10 +423,10 @@ class JumpIfNotZeroFunctionScriptInstruction
   JumpIfNotZeroFunctionScriptInstruction(super.functionName);
 
   @override
-  int get opcode => 0xc8;
+  ScriptOpcode get opcode => ScriptOpcode.jumpIfNotZeroLong;
 
   @override
-  String toString() => '  jz $functionName';
+  String toString() => '  jnz $functionName';
 }
 
 abstract class JumpScriptInstructionBase extends ScriptInstruction {
@@ -414,7 +456,7 @@ abstract class JumpScriptInstructionBase extends ScriptInstruction {
     if (layoutDelta == 3) {
       return 0;
     }
-    if (4 <= layoutDelta && layoutDelta <= 35) {
+    if (4 <= layoutDelta && layoutDelta < 35) {
       return 1;
     }
     return 3;
@@ -429,16 +471,16 @@ abstract class JumpScriptInstructionBase extends ScriptInstruction {
         throw Exception('Internal error on $this');
       }
       return;
-    } else if (4 <= layoutDelta && layoutDelta <= 35) {
-      if (delta < 2 || delta > 33) {
+    } else if (4 <= layoutDelta && layoutDelta < 35) {
+      if (delta < 2 || delta >= 33) {
         throw Exception('Internal error on $this');
       }
-      builder.bytesBuilder.addByte(shortOpcode + delta - 2);
+      builder.addByte(shortOpcode.value + delta - 2);
     } else {
       final targetOffset = target.offset;
-      builder.bytesBuilder.addByte(longOpcode);
-      builder.bytesBuilder.addByte(targetOffset);
-      builder.bytesBuilder.addByte(targetOffset >> 8);
+      builder.addOpcode(longOpcode);
+      builder.addByte(targetOffset);
+      builder.addByte(targetOffset >> 8);
     }
   }
 
@@ -456,8 +498,8 @@ abstract class JumpScriptInstructionBase extends ScriptInstruction {
     return false;
   }
 
-  int get shortOpcode;
-  int get longOpcode;
+  ScriptOpcode get shortOpcode;
+  ScriptOpcode get longOpcode;
 
   late final NopScriptInstruction target;
 }
@@ -467,10 +509,10 @@ class JumpScriptInstruction extends JumpScriptInstructionBase {
   bool get implicitNext => false;
 
   @override
-  int get shortOpcode => 0x60;
+  ScriptOpcode get shortOpcode => ScriptOpcode.jumpShortBegin;
 
   @override
-  int get longOpcode => 0xc6;
+  ScriptOpcode get longOpcode => ScriptOpcode.jumpLong;
 
   @override
   String toString() => '  jump 0x${target.offset.toRadixString(16)}';
@@ -478,10 +520,10 @@ class JumpScriptInstruction extends JumpScriptInstructionBase {
 
 class JumpIfZeroScriptInstruction extends JumpScriptInstructionBase {
   @override
-  int get shortOpcode => 0x80;
+  ScriptOpcode get shortOpcode => ScriptOpcode.jumpIfZeroShortBegin;
 
   @override
-  int get longOpcode => 0xc7;
+  ScriptOpcode get longOpcode => ScriptOpcode.jumpIfZeroLong;
 
   @override
   String toString() => '  jz 0x${target.offset.toRadixString(16)}';
@@ -489,10 +531,10 @@ class JumpIfZeroScriptInstruction extends JumpScriptInstructionBase {
 
 class JumpIfNotZeroScriptInstruction extends JumpScriptInstructionBase {
   @override
-  int get shortOpcode => 0xa0;
+  ScriptOpcode get shortOpcode => ScriptOpcode.jumpIfNotZeroShortBegin;
 
   @override
-  int get longOpcode => 0xc8;
+  ScriptOpcode get longOpcode => ScriptOpcode.jumpIfNotZeroLong;
 
   @override
   String toString() => '  jnz 0x${target.offset.toRadixString(16)}';
@@ -507,9 +549,9 @@ class PushStringValueScriptInstruction extends ScriptInstruction {
   @override
   void addByteCode(ScriptByteCodeBuilder builder) {
     int offset = builder.stringTable[value]!;
-    builder.bytesBuilder.addByte(0xc1);
-    builder.bytesBuilder.addByte(offset);
-    builder.bytesBuilder.addByte(offset >> 8);
+    builder.addOpcode(ScriptOpcode.pushBytes2S);
+    builder.addByte(offset);
+    builder.addByte(offset >> 8);
   }
 
   @override
@@ -523,10 +565,10 @@ class PushIntValueScriptInstruction extends ScriptInstruction {
 
   @override
   int get byteCodeLength {
-    if (0 <= value && value < 64) {
+    if (0 <= value && value < 60) {
       return 1;
     }
-    if (-64 <= value && value < 256) {
+    if (-60 <= value && value < 256) {
       return 2;
     }
     if (-32768 <= value && value < 32768) {
@@ -540,27 +582,33 @@ class PushIntValueScriptInstruction extends ScriptInstruction {
 
   @override
   void addByteCode(ScriptByteCodeBuilder builder) {
-    if (0 <= value && value < 64) {
-      builder.bytesBuilder.addByte(value);
-    } else if (-64 <= value && value < 256) {
-      builder.bytesBuilder.addByte(0xc0);
-      final byteValue = value < 0 ? value + 64 : value;
-      builder.bytesBuilder.addByte(byteValue);
-    } else if (-32768 <= value && value < 32768) {
-      builder.bytesBuilder.addByte(0xc1);
-      builder.bytesBuilder.addByte(value);
-      builder.bytesBuilder.addByte(value >> 8);
-    } else if (-8388608 <= value && value < 8388608) {
-      builder.bytesBuilder.addByte(0xc2);
-      builder.bytesBuilder.addByte(value);
-      builder.bytesBuilder.addByte(value >> 8);
-      builder.bytesBuilder.addByte(value >> 16);
-    } else {
-      builder.bytesBuilder.addByte(0xc3);
-      builder.bytesBuilder.addByte(value);
-      builder.bytesBuilder.addByte(value >> 8);
-      builder.bytesBuilder.addByte(value >> 16);
-      builder.bytesBuilder.addByte(value >> 24);
+    switch (byteCodeLength) {
+      case 1:
+        builder.addByte(ScriptOpcode.pushConstantBegin.value + value);
+        break;
+      case 2:
+        builder.addOpcode(ScriptOpcode.pushBytes1U);
+        final byteValue = value < 0 ? value + 60 : value;
+        builder.addByte(byteValue);
+        break;
+      case 3:
+        builder.addOpcode(ScriptOpcode.pushBytes2S);
+        builder.addByte(value);
+        builder.addByte(value >> 8);
+        break;
+      case 4:
+        builder.addOpcode(ScriptOpcode.pushBytes3S);
+        builder.addByte(value);
+        builder.addByte(value >> 8);
+        builder.addByte(value >> 16);
+        break;
+      case 5:
+        builder.addOpcode(ScriptOpcode.pushBytes4);
+        builder.addByte(value);
+        builder.addByte(value >> 8);
+        builder.addByte(value >> 16);
+        builder.addByte(value >> 24);
+        break;
     }
   }
 
@@ -599,10 +647,10 @@ class OpcodeScriptInstruction extends ScriptInstruction {
 
   @override
   void addByteCode(ScriptByteCodeBuilder builder) {
-    builder.bytesBuilder.addByte(opcode.value);
+    builder.addOperatorOpcode(opcode);
   }
 
-  final ScriptOpCode opcode;
+  final ScriptOperatorOpcode opcode;
 
   @override
   String toString() => '  ${opcode.name}';
@@ -617,27 +665,47 @@ class ReturnScriptInstruction extends ScriptInstruction {
 
   @override
   void addByteCode(ScriptByteCodeBuilder builder) {
-    builder.bytesBuilder.addByte(0xc4);
+    builder.addOpcode(ScriptOpcode.ret);
   }
 
   @override
   String toString() => '  ret';
 }
 
-class FunctionStartPlaceholderScriptInstruction extends ScriptInstruction {
-  FunctionStartPlaceholderScriptInstruction(this.functionName);
+class FunctionStartScriptInstruction extends ScriptInstruction {
+  FunctionStartScriptInstruction(this.function);
 
-  final String functionName;
+  final ScriptFunctionDefinition function;
 
   @override
   bool get hasReference => true;
 
   @override
-  int get byteCodeLength => 0;
+  int get byteCodeLength {
+    return function.numberOfParameters == 0 && function.numberOfLocals == 0
+        ? 0
+        : 3;
+  }
 
   @override
-  void addByteCode(ScriptByteCodeBuilder builder) {}
+  void addByteCode(ScriptByteCodeBuilder builder) {
+    if (function.numberOfParameters == 0 && function.numberOfLocals == 0) {
+      return;
+    }
+
+    builder.addOpcode(ScriptOpcode.enterFunction);
+    builder.addByte(function.numberOfParameters);
+    builder.addByte(function.numberOfLocals - function.numberOfParameters);
+  }
 
   @override
-  String toString() => '\n$functionName (0x${offset.toRadixString(16)}):';
+  String toString() {
+    if (function.numberOfParameters == 0 && function.numberOfLocals == 0) {
+      return '\n${function.name} (0x${offset.toRadixString(16)}):';
+    } else {
+      return '\n'
+          '${function.name} (0x${offset.toRadixString(16)}):'
+          '\n  enterFunction ${function.numberOfParameters} ${function.numberOfLocals - function.numberOfParameters}';
+    }
+  }
 }
