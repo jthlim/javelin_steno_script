@@ -265,10 +265,7 @@ class Parser {
             final global = _module.globals[name]!;
             final arraySize = global.arraySize;
             if (arraySize != null) {
-              return LoadGlobalValueArrayAstNode(
-                name: global.name,
-                index: global.index,
-              );
+              return LoadGlobalValueArrayAstNode(global);
             } else {
               return LoadValueAstNode(
                 isGlobal: true,

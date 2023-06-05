@@ -548,7 +548,11 @@ class PushStringValueScriptInstruction extends ScriptInstruction {
 
   @override
   void addByteCode(ScriptByteCodeBuilder builder) {
-    int offset = builder.stringTable[value]!;
+    final offset = builder.stringTable[value];
+    if (offset == null) {
+      throw Exception(
+          'Internal error: failed lookup on string value "${formatStringData(value)}"');
+    }
     builder.addOpcode(ScriptOpcode.pushBytes2S);
     builder.addByte(offset);
     builder.addByte(offset >> 8);

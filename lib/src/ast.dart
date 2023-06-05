@@ -2,12 +2,27 @@ import 'instruction.dart';
 import 'byte_code_builder.dart';
 import 'module.dart';
 
-abstract class AstNode {
-  bool isBoolean() => false;
+class ScriptReachability {
+  ScriptReachability(this.module);
 
+  final ScriptModule module;
+
+  final strings = <String>{};
+  final functions = <String>{};
+  final globals = <int>{};
+  final pendingGlobalStatements = <int, List<AstNode>>{};
+}
+
+abstract class AstNode {
+  bool isEmpty() => false;
+  bool isBoolean() => false;
+  bool isReturn() => false;
   bool isConstant();
+
   int constantValue();
   void addInstructions(ScriptByteCodeBuilder builder);
+
+  void mark(ScriptReachability context) {}
 
   AstNode simplify() {
     if (isConstant()) {
@@ -29,6 +44,11 @@ class StringValueAstNode extends AstNode {
   int constantValue() => 0;
 
   @override
+  void mark(ScriptReachability context) {
+    context.strings.add(value);
+  }
+
+  @override
   void addInstructions(ScriptByteCodeBuilder builder) {
     builder.strings.add(value);
     builder.addInstruction(PushStringValueScriptInstruction(value));
@@ -47,6 +67,12 @@ class ByteIndexAstNode extends AstNode {
 
   @override
   int constantValue() => 0;
+
+  @override
+  void mark(ScriptReachability context) {
+    byteValue.mark(context);
+    index.mark(context);
+  }
 
   @override
   void addInstructions(ScriptByteCodeBuilder builder) {
@@ -88,6 +114,11 @@ abstract class UnaryOperatorAstNode extends AstNode {
 
   @override
   bool isConstant() => statement.isConstant();
+
+  @override
+  void mark(ScriptReachability context) {
+    statement.mark(context);
+  }
 
   @override
   void addInstructions(ScriptByteCodeBuilder builder) {
@@ -159,6 +190,12 @@ abstract class BinaryOperatorAstNode extends AstNode {
   bool isConstant() => statementA.isConstant() && statementB.isConstant();
 
   @override
+  void mark(ScriptReachability context) {
+    statementA.mark(context);
+    statementB.mark(context);
+  }
+
+  @override
   void addInstructions(ScriptByteCodeBuilder builder) {
     statementA.addInstructions(builder);
     statementB.addInstructions(builder);
@@ -186,6 +223,13 @@ class Term {
 class TermsAstNode extends AstNode {
   @override
   bool isConstant() => terms.every((e) => e.statement.isConstant());
+
+  @override
+  void mark(ScriptReachability context) {
+    for (final term in terms) {
+      term.statement.mark(context);
+    }
+  }
 
   @override
   int constantValue() {
@@ -366,11 +410,22 @@ class LogicalAndAstNode extends BinaryOperatorAstNode {
   bool isBoolean() => true;
 
   @override
-  int constantValue() {
-    if (statementA.constantValue() != 0 && statementB.constantValue() != 0) {
-      return 1;
+  bool isConstant() {
+    if (statementA.isConstant()) {
+      if (statementA.constantValue() == 0) {
+        return true;
+      }
+      return statementB.isConstant();
     }
-    return 0;
+    return false;
+  }
+
+  @override
+  int constantValue() {
+    if (statementA.constantValue() == 0) {
+      return 0;
+    }
+    return statementB.constantValue() != 0 ? 1 : 0;
   }
 
   @override
@@ -384,11 +439,22 @@ class LogicalOrAstNode extends BinaryOperatorAstNode {
   bool isBoolean() => true;
 
   @override
+  bool isConstant() {
+    if (statementA.isConstant()) {
+      if (statementA.constantValue() == 1) {
+        return true;
+      }
+      return statementB.isConstant();
+    }
+    return false;
+  }
+
+  @override
   int constantValue() {
-    if (statementA.constantValue() != 0 || statementB.constantValue() != 0) {
+    if (statementA.constantValue() == 1) {
       return 1;
     }
-    return 0;
+    return statementB.constantValue() != 0 ? 1 : 0;
   }
 
   @override
@@ -403,10 +469,7 @@ class EqualsAstNode extends BinaryOperatorAstNode {
 
   @override
   int constantValue() {
-    if (statementA.constantValue() == statementB.constantValue()) {
-      return 1;
-    }
-    return 0;
+    return statementA.constantValue() == statementB.constantValue() ? 1 : 0;
   }
 
   @override
@@ -434,10 +497,7 @@ class NotEqualsAstNode extends BinaryOperatorAstNode {
 
   @override
   int constantValue() {
-    if (statementA.constantValue() != statementB.constantValue()) {
-      return 1;
-    }
-    return 0;
+    return statementA.constantValue() != statementB.constantValue() ? 1 : 0;
   }
 
   @override
@@ -452,10 +512,7 @@ class LessThanAstNode extends BinaryOperatorAstNode {
 
   @override
   int constantValue() {
-    if (statementA.constantValue() < statementB.constantValue()) {
-      return 1;
-    }
-    return 0;
+    return statementA.constantValue() < statementB.constantValue() ? 1 : 0;
   }
 
   @override
@@ -470,10 +527,7 @@ class LessThanOrEqualToAstNode extends BinaryOperatorAstNode {
 
   @override
   int constantValue() {
-    if (statementA.constantValue() <= statementB.constantValue()) {
-      return 1;
-    }
-    return 0;
+    return statementA.constantValue() <= statementB.constantValue() ? 1 : 0;
   }
 
   @override
@@ -488,10 +542,7 @@ class GreaterThanAstNode extends BinaryOperatorAstNode {
 
   @override
   int constantValue() {
-    if (statementA.constantValue() > statementB.constantValue()) {
-      return 1;
-    }
-    return 0;
+    return statementA.constantValue() > statementB.constantValue() ? 1 : 0;
   }
 
   @override
@@ -506,10 +557,7 @@ class GreaterThanOrEqualToAstNode extends BinaryOperatorAstNode {
 
   @override
   int constantValue() {
-    if (statementA.constantValue() >= statementB.constantValue()) {
-      return 1;
-    }
-    return 0;
+    return statementA.constantValue() >= statementB.constantValue() ? 1 : 0;
   }
 
   @override
@@ -547,6 +595,16 @@ class ForStatementAstNode extends AstNode {
   int constantValue() => 0;
 
   @override
+  void mark(ScriptReachability context) {
+    initialization?.mark(context);
+    condition.mark(context);
+    if (!condition.isConstant() || condition.constantValue() != 0) {
+      update?.mark(context);
+      body.mark(context);
+    }
+  }
+
+  @override
   void addInstructions(ScriptByteCodeBuilder builder) {
     // Layout is:
     //   initialization:
@@ -558,24 +616,26 @@ class ForStatementAstNode extends AstNode {
     //  end:
 
     initialization?.addInstructions(builder);
-    final jumpToConditionInstruction = JumpScriptInstruction();
-    builder.addInstruction(jumpToConditionInstruction.target);
-    condition.addInstructions(builder);
+    if (!condition.isConstant() || condition.constantValue() != 0) {
+      final jumpToConditionInstruction = JumpScriptInstruction();
+      builder.addInstruction(jumpToConditionInstruction.target);
+      condition.addInstructions(builder);
 
-    final lastInstruction = builder.instructions.last;
-    late final JumpScriptInstructionBase jumpToEndInstruction;
-    if (lastInstruction is OpcodeScriptInstruction &&
-        lastInstruction.opcode == ScriptOperatorOpcode.not) {
-      builder.instructions.removeLast();
-      jumpToEndInstruction = JumpIfNotZeroScriptInstruction();
-    } else {
-      jumpToEndInstruction = JumpIfZeroScriptInstruction();
+      final lastInstruction = builder.instructions.last;
+      late final JumpScriptInstructionBase jumpToEndInstruction;
+      if (lastInstruction is OpcodeScriptInstruction &&
+          lastInstruction.opcode == ScriptOperatorOpcode.not) {
+        builder.instructions.removeLast();
+        jumpToEndInstruction = JumpIfNotZeroScriptInstruction();
+      } else {
+        jumpToEndInstruction = JumpIfZeroScriptInstruction();
+      }
+      builder.addInstruction(jumpToEndInstruction);
+      body.addInstructions(builder);
+      update?.addInstructions(builder);
+      builder.addInstruction(jumpToConditionInstruction);
+      builder.addInstruction(jumpToEndInstruction.target);
     }
-    builder.addInstruction(jumpToEndInstruction);
-    body.addInstructions(builder);
-    update?.addInstructions(builder);
-    builder.addInstruction(jumpToConditionInstruction);
-    builder.addInstruction(jumpToEndInstruction.target);
   }
 }
 
@@ -587,10 +647,49 @@ class IfStatementAstNode extends AstNode {
   });
 
   @override
+  bool isEmpty() {
+    if (!condition.isConstant()) {
+      return false;
+    }
+    if (condition.constantValue() != 0) {
+      return whenTrue.isEmpty();
+    } else {
+      return whenFalse?.isEmpty() ?? true;
+    }
+  }
+
+  @override
+  bool isReturn() {
+    if (!condition.isConstant()) {
+      return false;
+    }
+    if (condition.constantValue() != 0) {
+      return whenTrue.isReturn();
+    } else {
+      return whenFalse?.isReturn() ?? false;
+    }
+  }
+
+  @override
   bool isConstant() => false;
 
   @override
   int constantValue() => 0;
+
+  @override
+  void mark(ScriptReachability context) {
+    if (condition.isConstant()) {
+      if (condition.constantValue() != 0) {
+        whenTrue.mark(context);
+      } else {
+        whenFalse?.mark(context);
+      }
+    } else {
+      condition.mark(context);
+      whenTrue.mark(context);
+      whenFalse?.mark(context);
+    }
+  }
 
   @override
   void addInstructions(ScriptByteCodeBuilder builder) {
@@ -637,15 +736,41 @@ class IfStatementAstNode extends AstNode {
 
 class StatementListAstNode extends AstNode {
   @override
+  bool isEmpty() {
+    for (final statement in statements) {
+      if (!statement.isEmpty()) return false;
+    }
+    return true;
+  }
+
+  @override
+  bool isReturn() {
+    for (final statement in statements) {
+      if (statement.isReturn()) return true;
+      if (!statement.isEmpty()) return false;
+    }
+    return false;
+  }
+
+  @override
   bool isConstant() => false;
 
   @override
   int constantValue() => 0;
 
   @override
+  void mark(ScriptReachability context) {
+    for (final statement in statements) {
+      statement.mark(context);
+      if (statement.isReturn()) break;
+    }
+  }
+
+  @override
   void addInstructions(ScriptByteCodeBuilder builder) {
     for (final statement in statements) {
       statement.addInstructions(builder);
+      if (statement.isReturn()) break;
     }
   }
 
@@ -655,7 +780,7 @@ class StatementListAstNode extends AstNode {
 }
 
 class LoadGlobalValueArrayAstNode extends AstNode {
-  LoadGlobalValueArrayAstNode({required this.name, required this.index});
+  LoadGlobalValueArrayAstNode(this.global);
 
   @override
   bool isConstant() => false;
@@ -665,11 +790,10 @@ class LoadGlobalValueArrayAstNode extends AstNode {
 
   @override
   void addInstructions(ScriptByteCodeBuilder builder) {
-    throw Exception("Global value array $name must be indexed");
+    throw Exception("Global value array ${global.name} must be indexed");
   }
 
-  final String name;
-  final int index;
+  final ScriptGlobal global;
 }
 
 class LoadIndexedGlobalValueAstNode extends AstNode {
@@ -682,10 +806,26 @@ class LoadIndexedGlobalValueAstNode extends AstNode {
   int constantValue() => 0;
 
   @override
+  void mark(ScriptReachability context) {
+    context.globals.add(globalValue.global.index);
+
+    final pendingStatements =
+        context.pendingGlobalStatements[globalValue.global.index];
+    context.pendingGlobalStatements.remove(globalValue.global.index);
+    if (pendingStatements != null) {
+      for (final pendingStatement in pendingStatements) {
+        pendingStatement.mark(context);
+      }
+    }
+
+    indexExpression.mark(context);
+  }
+
+  @override
   void addInstructions(ScriptByteCodeBuilder builder) {
     indexExpression.addInstructions(builder);
-    builder
-        .addInstruction(LoadIndexedGlobalValueInstruction(globalValue.index));
+    builder.addInstruction(
+        LoadIndexedGlobalValueInstruction(globalValue.global.index));
   }
 
   final LoadGlobalValueArrayAstNode globalValue;
@@ -703,6 +843,21 @@ class LoadValueAstNode extends AstNode {
 
   @override
   int constantValue() => 0;
+
+  @override
+  void mark(ScriptReachability context) {
+    if (isGlobal) {
+      context.globals.add(index);
+
+      final pendingStatements = context.pendingGlobalStatements[index];
+      context.pendingGlobalStatements.remove(index);
+      if (pendingStatements != null) {
+        for (final pendingStatement in pendingStatements) {
+          pendingStatement.mark(context);
+        }
+      }
+    }
+  }
 
   @override
   void addInstructions(ScriptByteCodeBuilder builder) {
@@ -731,6 +886,22 @@ class CallFunctionAstNode extends AstNode {
   int constantValue() => 0;
 
   @override
+  void mark(ScriptReachability context) {
+    context.functions.add(name);
+    for (final parameter in parameters) {
+      parameter.mark(context);
+    }
+
+    final function = context.module.functions[name];
+    if (function is ScriptFunction) {
+      if (function.hasReturnValue ||
+          (!function.statements.isReturn() && !function.statements.isEmpty())) {
+        function.mark(context);
+      }
+    }
+  }
+
+  @override
   void addInstructions(ScriptByteCodeBuilder builder) {
     final definition = builder.module.functions[name];
     if (definition == null) {
@@ -754,8 +925,16 @@ class CallFunctionAstNode extends AstNode {
       builder.addInstruction(
         CallInBuiltFunctionInstruction(definition),
       );
-    } else {
-      builder.addInstruction(CallFunctionInstruction(name));
+    } else if (definition is ScriptFunction) {
+      if (!definition.hasReturnValue &&
+          (definition.statements.isReturn() ||
+              definition.statements.isEmpty())) {
+        for (final _ in parameters) {
+          builder.addInstruction(PopValueInstruction());
+        }
+      } else {
+        builder.addInstruction(CallFunctionInstruction(name));
+      }
     }
 
     if (!usesValue && definition.hasReturnValue) {
@@ -776,6 +955,14 @@ class PushFunctionAddress extends AstNode {
 
   @override
   int constantValue() => 0;
+
+  @override
+  void mark(ScriptReachability context) {
+    context.functions.add(name);
+
+    final function = context.module.functions[name] as ScriptFunction?;
+    function?.mark(context);
+  }
 
   @override
   void addInstructions(ScriptByteCodeBuilder builder) {
@@ -803,7 +990,26 @@ class StoreValueAstNode extends AstNode {
   int constantValue() => 0;
 
   @override
+  void mark(ScriptReachability context) {
+    if (isGlobal) {
+      if (context.globals.contains(index)) {
+        expression.mark(context);
+      } else {
+        context.pendingGlobalStatements
+            .putIfAbsent(index, () => [])
+            .add(expression);
+      }
+    } else {
+      expression.mark(context);
+    }
+  }
+
+  @override
   void addInstructions(ScriptByteCodeBuilder builder) {
+    if (isGlobal && !builder.reachability.globals.contains(index)) {
+      return;
+    }
+
     expression.addInstructions(builder);
     if (isGlobal) {
       builder.addInstruction(StoreGlobalValueInstruction(index));
@@ -831,11 +1037,27 @@ class StoreIndexedGlobalValueAstNode extends AstNode {
   int constantValue() => 0;
 
   @override
+  void mark(ScriptReachability context) {
+    if (context.globals.contains(globalValueIndex)) {
+      indexExpression.mark(context);
+      expression.mark(context);
+    } else {
+      // Storing does not mark the value as used.
+      // Capture the expressions as pending evaluation.
+      context.pendingGlobalStatements.putIfAbsent(globalValueIndex, () => [])
+        ..add(indexExpression)
+        ..add(expression);
+    }
+  }
+
+  @override
   void addInstructions(ScriptByteCodeBuilder builder) {
-    indexExpression.addInstructions(builder);
-    expression.addInstructions(builder);
-    builder
-        .addInstruction(StoreIndexedGlobalValueInstruction(globalValueIndex));
+    if (builder.reachability.globals.contains(globalValueIndex)) {
+      indexExpression.addInstructions(builder);
+      expression.addInstructions(builder);
+      builder
+          .addInstruction(StoreIndexedGlobalValueInstruction(globalValueIndex));
+    }
   }
 
   final int globalValueIndex;
@@ -847,10 +1069,18 @@ class ReturnAstNode extends AstNode {
   ReturnAstNode(this.expression);
 
   @override
+  bool isReturn() => true;
+
+  @override
   bool isConstant() => false;
 
   @override
   int constantValue() => 0;
+
+  @override
+  void mark(ScriptReachability context) {
+    expression?.mark(context);
+  }
 
   @override
   void addInstructions(ScriptByteCodeBuilder builder) {
