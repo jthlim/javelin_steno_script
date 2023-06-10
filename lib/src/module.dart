@@ -194,6 +194,7 @@ class ScriptModule {
       final initializer = global.initializer;
       if (initializer == null) continue;
       if (!reachability.globals.contains(global.index)) continue;
+      if (initializer is IntValueAstNode && initializer.value == 0) continue;
 
       globalInitializers.add(
         StoreValueAstNode(

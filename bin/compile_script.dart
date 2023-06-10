@@ -3,6 +3,7 @@
 import 'dart:io';
 
 import 'package:javelin_steno_script/javelin_steno_script.dart';
+import 'package:javelin_steno_script/src/instruction.dart';
 
 void main(List<String> arguments) {
   if (arguments.length < 2) {
@@ -29,8 +30,15 @@ void main(List<String> arguments) {
 
   print('Opcodes');
   print('-------');
+  var lastInstruction = '';
   for (final instruction in builder.instructions) {
-    print(instruction);
+    final thisInstruction = instruction.toString();
+    if (thisInstruction != lastInstruction ||
+        instruction is! NopScriptInstruction) {
+      print(thisInstruction);
+    }
+
+    lastInstruction = thisInstruction;
   }
 
   if (builder.stringTable.isNotEmpty) {
