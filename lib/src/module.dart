@@ -59,7 +59,8 @@ enum InBuiltScriptFunction implements ScriptFunctionDefinition {
   setBoardPower('setBoardPower', 1, false, 0x2d, false),
   sendEvent('sendEvent', 1, false, 0x2e, false),
   isPairPowered('isPairPowered', 0, true, 0x2f, true),
-  setInputHint('setInputHint', 1, false, 0x30, false);
+  setInputHint('setInputHint', 1, false, 0x30, false),
+  setScript('setScript', 2, false, 0x31, false);
 
   const InBuiltScriptFunction(
     this.functionName,

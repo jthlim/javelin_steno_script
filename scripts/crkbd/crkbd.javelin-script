@@ -5,7 +5,7 @@
 // Steno
 //
 // ,-------------------------------------------.        ,-------------------------------------------.
-// |        |  S1  |   T  |   P  |   H  |  *1  |        |  *2  |   F  |   P  |   L  |   T  |    D   |
+// |   Tab  |  S1  |   T  |   P  |   H  |  *1  |        |  *2  |   F  |   P  |   L  |   T  |    D   |
 // |--------+------+------+------+------+------|        |------+------+------+------+------+--------|
 // |Ctrl/Esc|  S2  |   K  |   W  |   R  |  *3  |        |  *4  |   R  |   B  |   G  |   S  |    Z   |
 // |--------+------+------+------+------+------|        |------+------+------+------+------+--------|
@@ -450,10 +450,13 @@ const PAIR_CONNECTION_NONE = 0;
 const PAIR_CONNECTION_BLE = 1;
 const PAIR_CONNECTION_CABLE = 2;
 
-//---------------------------------------------------------------------------
-
 const INPUT_HINT_KEYBOARD = 0;
 const INPUT_HINT_STENOGRAPHY = 1;
+
+const SCRIPT_ID_DISPLAY_OVERLAY = 0;
+const SCRIPT_ID_BATTERY_UPDATE = 1;
+const SCRIPT_ID_CONNECTION_UPDATE = 2;
+const SCRIPT_ID_PAIR_CONNECTION_UPDATE = 3;
 
 //---------------------------------------------------------------------------
 //
@@ -493,6 +496,11 @@ const INPUT_HINT_STENOGRAPHY = 1;
 const DISPLAY_WIDTH = JAVELIN_DISPLAY_WIDTH ?? 32;
 const DISPLAY_HEIGHT = JAVELIN_DISPLAY_HEIGHT ?? 128;
 const HAS_DISPLAY = JAVELIN_HAS_DISPLAY ?? 1;
+const HAS_BLE = JAVELIN_HAS_BLE ?? 0;
+
+// Inferred
+
+const USE_STATUS_BAR = HAS_DISPLAY && HAS_BLE;
 
 //---------------------------------------------------------------------------
 // The script needs to have onPress## and onRelease## functions for every
@@ -803,6 +811,73 @@ const STROKES_IMAGE = [[
   92 64
 ]];
 
+const PAIR_CONNECTED_STATUS_IMAGE = [[
+  0c 0c 00 00 98 00 98 01 98 03 98 07 98 01 98 01
+  9e 01 9c 01 98 01 90 01 00 00
+]];
+
+const USB_L_STATUS_IMAGE = [[
+  0c 0c 00 00 f0 00 fe 01 fe 0f fe 0f fe 01 f0 00
+  00 00 c0 0f 00 08 00 08 00 08
+]];
+
+const USB_R_STATUS_IMAGE = [[
+  0c 0c 00 00 f0 00 fe 01 fe 0f fe 0f fe 01 f0 00
+  00 00 c0 0f 40 02 40 02 80 0d
+]];
+
+const BLUETOOTH_STATUS_IMAGE = [[
+  08 0c 00 00 08 01 90 00 fe 07 62 04 94 02 08 01
+  00 00
+]];
+
+const BATTERY_LEVEL_STATUS_IMAGES = [[
+  // battery0
+  0c 0c f8 01 08 01 08 01 08 01 08 01 08 01 08 01
+  08 01 08 01 08 01 f8 01 f0 00
+
+  // battery1
+  0c 0c f8 01 f8 01 08 01 08 01 08 01 08 01 08 01
+  08 01 08 01 08 01 f8 01 f0 00
+
+  // battery2
+  0c 0c f8 01 f8 01 f8 01 08 01 08 01 08 01 08 01
+  08 01 08 01 08 01 f8 01 f0 00
+
+  // battery3
+  0c 0c f8 01 f8 01 f8 01 f8 01 08 01 08 01 08 01
+  08 01 08 01 08 01 f8 01 f0 00
+
+  // battery4
+  0c 0c f8 01 f8 01 f8 01 f8 01 f8 01 08 01 08 01
+  08 01 08 01 08 01 f8 01 f0 00
+
+  // battery5
+  0c 0c f8 01 f8 01 f8 01 f8 01 f8 01 f8 01 08 01
+  08 01 08 01 08 01 f8 01 f0 00
+
+  // battery6
+  0c 0c f8 01 f8 01 f8 01 f8 01 f8 01 f8 01 f8 01
+  08 01 08 01 08 01 f8 01 f0 00
+
+  // battery7
+  0c 0c f8 01 f8 01 f8 01 f8 01 f8 01 f8 01 f8 01
+  f8 01 08 01 08 01 f8 01 f0 00
+
+  // battery8
+  0c 0c f8 01 f8 01 f8 01 f8 01 f8 01 f8 01 f8 01
+  f8 01 f8 01 08 01 f8 01 f0 00
+
+  // battery9
+  0c 0c f8 01 f8 01 f8 01 f8 01 f8 01 f8 01 f8 01
+  f8 01 f8 01 f8 01 f8 01 f0 00
+]];
+
+const CHARGING_STATUS_IMAGE = [[
+  0c 0c f8 01 08 01 08 01 68 01 70 04 78 03 ec 01
+  e2 00 68 01 08 01 f8 01 f0 00
+]];
+
 func init() {
   updateAllButtonColors();
 
@@ -814,6 +889,13 @@ func init() {
   // setGpioPin(24, 1);
 
   setLayer(layer);
+
+  if (USE_STATUS_BAR) {
+    setScript(SCRIPT_ID_DISPLAY_OVERLAY, @drawDisplayOverlay);
+    setScript(SCRIPT_ID_BATTERY_UPDATE, @redrawDisplayOverlay);
+    setScript(SCRIPT_ID_CONNECTION_UPDATE, @redrawDisplayOverlay);
+    setScript(SCRIPT_ID_PAIR_CONNECTION_UPDATE, @redrawDisplayOverlay);
+  }
 }
 
 const RGB_UPDATE_TIME = 10;
@@ -826,6 +908,14 @@ func setAllScreenOn(screenOn) {
 }
 
 func tick() {
+  // Uncomment this when testing/modifying drawDisplayOverlay
+//  if (USE_STATUS_BAR) {
+//    setScript(SCRIPT_ID_DISPLAY_OVERLAY, @drawDisplayOverlay);
+//    setScript(SCRIPT_ID_BATTERY_UPDATE, @redrawDisplayOverlay);
+//    setScript(SCRIPT_ID_CONNECTION_UPDATE, @redrawDisplayOverlay);
+//    setScript(SCRIPT_ID_PAIR_CONNECTION_UPDATE, @redrawDisplayOverlay);
+//  }
+
   var time = getTime();
 
   if (deferredLayerKey && time - qwertyPressTimestamp >= KEY_PRESS_TO_LAYER_RELEASE_THRESHOLD) {
@@ -874,6 +964,75 @@ func tick() {
     updateKeyRgb();
     updateDisplay0();
   }
+}
+
+func drawDisplayOverlay() {
+  if (!HAS_DISPLAY) return;
+
+  // Clear the region.
+  setDrawColor(0, 0);
+  drawRect(0, 0, 0, DISPLAY_WIDTH, 16);
+  setDrawColor(0, 1);
+
+  if (getActivePairConnection() != PAIR_CONNECTION_NONE) {
+    drawImage(0, 2, 0, PAIR_CONNECTED_STATUS_IMAGE);
+  }
+
+  var x = 15;
+  var activeConnection = getActiveConnection();
+  var activeConnectionCount = 0;
+  var activeConnectionPosition;
+  var activeConnectionUnderlineLength;
+  if (isConnected(CONNECTION_USB)) {
+    drawImage(0, x, 0, USB_L_STATUS_IMAGE);
+    if (activeConnection == CONNECTION_USB) {
+      activeConnectionPosition = x;
+      activeConnectionUnderlineLength = 12;
+    }
+    activeConnectionCount = activeConnectionCount + 1;
+    x = x + 13;
+  }
+  if (isConnected(CONNECTION_USB2)) {
+    drawImage(0, x, 0, USB_R_STATUS_IMAGE);
+    if (activeConnection == CONNECTION_USB2) {
+      activeConnectionPosition = x;
+      activeConnectionUnderlineLength = 12;
+    }
+    activeConnectionCount = activeConnectionCount + 1;
+    x = x + 13;
+  }
+  if (isConnected(CONNECTION_BLE)) {
+    drawImage(0, x, 0, BLUETOOTH_STATUS_IMAGE);
+    if (activeConnection == CONNECTION_BLE) {
+      activeConnectionPosition = x;
+      activeConnectionUnderlineLength = 10;
+    }
+    activeConnectionCount = activeConnectionCount + 1;
+  }
+
+  if (activeConnectionCount > 1) {
+    drawRect(0,
+             activeConnectionPosition,
+             14,
+             activeConnectionPosition+activeConnectionUnderlineLength,
+             16);
+  }
+
+  if (isCharging()) {
+    drawImage(0, DISPLAY_WIDTH-14, 0, CHARGING_STATUS_IMAGE);
+  } else {
+    // Map 0-100 -> 0-9.
+    // (value * 9 + 50) / 100
+    var batteryIndex = (getBatteryPercentage() * 9 + 50) / 100;
+    drawImage(0, DISPLAY_WIDTH-14, 0, BATTERY_LEVEL_STATUS_IMAGES + batteryIndex * 26);
+  }
+}
+
+func redrawDisplayOverlay() {
+  if (!HAS_DISPLAY) return;
+
+  // Mark the screen dirty
+  drawRect(0, 0, 0, 0, 0);
 }
 
 const HUE_CYCLE_RGB_ORDER = [[
@@ -1075,7 +1234,7 @@ func updateDisplay0() {
 
   if (isSettingsLayer()) {
     drawDisplay0NonSteno(SETTINGS_IMAGE);
-  } else if (layer & NUMPAD_MASK) { 
+  } else if (layer & NUMPAD_MASK) {
     drawDisplay0NonSteno(NUMPAD_IMAGE);
   } else if (layer & NAV_MASK) {
     drawDisplay0NonSteno(NAVIGATION_IMAGE);
@@ -1378,7 +1537,7 @@ func handleRelease(qwertyKey, stenoKey, symbolsKey, functionKey, navKey, numPadK
 }
 
 func onPress0() {
-  handlePress(0, SC_TAB, SK_NONE, SC_GRAVE, SC_NONE, SC_NONE, SC_NONE);
+  handlePress(0, SC_TAB, SC_TAB, SC_GRAVE, SC_NONE, SC_NONE, SC_NONE);
 
   if (isSettingsLayer()) {
     setPreferredConnection(CONNECTION_USB, CONNECTION_USB2, CONNECTION_BLE);
@@ -1388,7 +1547,7 @@ func onPress0() {
     }
   }
 }
-func onRelease0() { handleRelease(SC_TAB, SK_NONE, SC_GRAVE, SC_NONE, SC_NONE, SC_NONE); }
+func onRelease0() { handleRelease(SC_TAB, SC_TAB, SC_GRAVE, SC_NONE, SC_NONE, SC_NONE); }
 
 func onPress1() {
   handlePress(1, SC_Q, SK_S1 | KEY_STENO, SC_1, SC_F9, SC_NONE, SC_NONE);
