@@ -457,6 +457,7 @@ const SCRIPT_ID_DISPLAY_OVERLAY = 0;
 const SCRIPT_ID_BATTERY_UPDATE = 1;
 const SCRIPT_ID_CONNECTION_UPDATE = 2;
 const SCRIPT_ID_PAIR_CONNECTION_UPDATE = 3;
+const SCRIPT_ID_KEYBOARD_LED_STATUS_UPDATE = 4;
 
 //---------------------------------------------------------------------------
 //
@@ -523,7 +524,6 @@ var hueShift = 0;
 var brightness = 3;
 var saturation = 5;
 var lastActionTime = 0;
-var lastCapsLockStatus = 0;
 
 var keyColorData[42];
 
@@ -543,18 +543,17 @@ var keyColorData[42];
 // Mechanics:
 //  1. When a layer button is pressed, record a layerPressTimestamp.
 //  2. When a key is pressed within 100ms and there is no recorded
-//     keypress, then the layer and qwerty key are recorded with
-//     qwertyPressTimestamp. If there is already a recorded keypress, press the
-//     deferred layer key and immediately press the newer key. If a keypress
-//     occurs outside of 100ms, process normally.
+//     keypress, then the layer and qwerty key are recorded. If there is
+//     already a recorded keypress, press the deferred layer key and
+//     immediately press the newer key. If a keypress occurs outside of 100ms,
+//     process normally.
 //  2. When the layer button is released, if there is a deferredQwertyKey
-//     recorded timestamp within 50ms of qwertyPressTimestamp, then press space
-//     then the non-nav key. This is detected in release when NAV_MASK is on,
+//     recorded timestamp within 50ms, then press the deferredQwertyKey then
+//     the non-nav key. This is detected in release when NAV_MASK is on,
 //     but isButtonPressed(38) returns false, and the key is emitted in the
 //     release script for the layer key.
 //  3. When a key is released, if there is a deferred key, press it first.
-//  4. On tick update, if more than 50ms after qwertyPressTimestamp has elapsed,
-//     then issue the deferredQwertyKey.
+//  4. On timer expiration (after 50ms has elapsed), issue deferredQwertyKey.
 const LAYER_PRESS_TO_KEY_PRESS_THRESHOLD = 100;
 const KEY_PRESS_TO_LAYER_RELEASE_THRESHOLD = 50;
 const NAV_BUTTON = 38;
@@ -574,6 +573,10 @@ const SCREEN_OFF_TIMEOUT = 30000; // 30 seconds.
 const STENO_DISPLAY_WPM = 0;
 const STENO_DISPLAY_PAPER_TAPE = 1;
 const STENO_DISPLAY_STROKES_WPM = 2;
+
+const TIMER_ID_RGB_UPDATE = 0;
+const TIMER_ID_FUZZY_LAYER = 1;
+const TIMER_ID_SCREEN_ON_TIMER = 2;
 
 var stenoDisplay = STENO_DISPLAY_WPM;
 var wordCaps = 0;
@@ -878,92 +881,38 @@ const CHARGING_STATUS_IMAGE = [[
   e2 00 68 01 08 01 f8 01 f0 00
 ]];
 
+const RGB_UPDATE_TIME = 10;
+const BLE_UPDATE_TIME = 50;
+
 func init() {
   updateAllButtonColors();
 
-  updateKeyRgb();
-  updateUnderglowRgb();
+  setLayer(layer);
   updateScreenContrast();
 
   // Disable liatris power light.
   // setGpioPin(24, 1);
 
-  setLayer(layer);
-
   if (USE_STATUS_BAR) {
     setScript(SCRIPT_ID_DISPLAY_OVERLAY, @drawDisplayOverlay);
-    setScript(SCRIPT_ID_BATTERY_UPDATE, @redrawDisplayOverlay);
-    setScript(SCRIPT_ID_CONNECTION_UPDATE, @redrawDisplayOverlay);
-    setScript(SCRIPT_ID_PAIR_CONNECTION_UPDATE, @redrawDisplayOverlay);
   }
-}
-
-const RGB_UPDATE_TIME = 10;
-const BLE_UPDATE_TIME = 50;
-var lastDisplayUpdateTime = 0;
-
-func setAllScreenOn(screenOn) {
-  setScreenOn(0, screenOn);
-  setScreenOn(1, screenOn);
-}
-
-func tick() {
-  // Uncomment this when testing/modifying drawDisplayOverlay
-//  if (USE_STATUS_BAR) {
-//    setScript(SCRIPT_ID_DISPLAY_OVERLAY, @drawDisplayOverlay);
-//    setScript(SCRIPT_ID_BATTERY_UPDATE, @redrawDisplayOverlay);
-//    setScript(SCRIPT_ID_CONNECTION_UPDATE, @redrawDisplayOverlay);
-//    setScript(SCRIPT_ID_PAIR_CONNECTION_UPDATE, @redrawDisplayOverlay);
-//  }
-
-  var time = getTime();
-
-  if (deferredLayerKey && time - qwertyPressTimestamp >= KEY_PRESS_TO_LAYER_RELEASE_THRESHOLD) {
-    press(deferredLayerKey);
-    deferredLayerKey = 0;
-    deferredQwertyKey = 0;
-  }
-
-  if (time - lastDisplayUpdateTime < RGB_UPDATE_TIME) {
-    return;
-  }
-  var activePairConnection = getActivePairConnection();
-  if (activePairConnection == PAIR_CONNECTION_BLE && time - lastDisplayUpdateTime < BLE_UPDATE_TIME) {
-    return;
-  }
-  lastDisplayUpdateTime = time;
+  setScript(SCRIPT_ID_BATTERY_UPDATE, @onBatteryUpdate);
+  setScript(SCRIPT_ID_CONNECTION_UPDATE, @onConnectionUpdate);
+  setScript(SCRIPT_ID_PAIR_CONNECTION_UPDATE, @redrawDisplayOverlay);
+  setScript(SCRIPT_ID_KEYBOARD_LED_STATUS_UPDATE, @onKeyboardLedStatusUpdate);
 
   if (HAS_DISPLAY) {
-    setAllScreenOn(time - lastActionTime <= SCREEN_OFF_TIMEOUT);
+    startTimer(TIMER_ID_SCREEN_ON_TIMER, 1000, 1, @updateScreenOn);
   }
 
-  if (getActiveConnection() == CONNECTION_NONE) {
-    updateDisconnectedKeyRgbCycle();
-    setBoardPower(1);
-  } else if (activePairConnection == PAIR_CONNECTION_BLE) {
-    if (brightness != 0 && (isPairPowered() || isMainPowered())) {
-      updateKeyRgb();
-    }
-    setBoardPower(isMainPowered());
-  } else if (activePairConnection == PAIR_CONNECTION_CABLE) {
-    var hasPower = isPairPowered() || isMainPowered();
-    if (brightness != 0 && hasPower) {
-      updateKeyRgb();
-    }
-    setBoardPower(hasPower);
-  } else {
-    if (brightness != 0) {
-      updateKeyRgb();
-    }
-    setBoardPower(isMainPowered());
-  }
+  updateBoardPower();
+}
 
-  var capsLockStatus = getLedStatus(LED_STATUS_CAPS_LOCK);
-  if (capsLockStatus != lastCapsLockStatus)  {
-    lastCapsLockStatus = capsLockStatus;
-    updateKeyRgb();
-    updateDisplay0();
-  }
+func updateScreenOn() {
+  var time = getTime();
+  var screenOn = time - lastActionTime <= SCREEN_OFF_TIMEOUT;
+  setScreenOn(0, screenOn);
+  setScreenOn(1, screenOn);
 }
 
 func drawDisplayOverlay() {
@@ -1018,8 +967,10 @@ func drawDisplayOverlay() {
              16);
   }
 
-  if (isCharging()) {
-    drawImage(0, DISPLAY_WIDTH-14, 0, CHARGING_STATUS_IMAGE);
+  if (isMainPowered()) {
+    if (isCharging()) {
+      drawImage(0, DISPLAY_WIDTH-14, 0, CHARGING_STATUS_IMAGE);
+    }
   } else {
     // Map 0-100 -> 0-9.
     // (value * 9 + 50) / 100
@@ -1033,6 +984,48 @@ func redrawDisplayOverlay() {
 
   // Mark the screen dirty
   drawRect(0, 0, 0, 0, 0);
+}
+
+func updateBoardPower() {
+  if (getActiveConnection() == CONNECTION_NONE) {
+    updateDisconnectedKeyRgbCycle();
+    startTimer(TIMER_ID_RGB_UPDATE, 64, 1, @updateKeyRgb);
+    setBoardPower(1);
+  } else if (brightness == 0) {
+    stopTimer(TIMER_ID_RGB_UPDATE);
+    setBoardPower(0);
+  } else if (HAS_BLE && getActivePairConnection() == PAIR_CONNECTION_BLE) {
+    if (isPairPowered() && isMainPowered()) {
+      startTimer(TIMER_ID_RGB_UPDATE, BLE_UPDATE_TIME, 1, @updateKeyRgb);
+    } else {
+      stopTimer(TIMER_ID_RGB_UPDATE);
+    }
+    setBoardPower(isMainPowered());
+  } else {
+    if (isPairPowered() || isMainPowered()) {
+      startTimer(TIMER_ID_RGB_UPDATE, RGB_UPDATE_TIME, 1, @updateKeyRgb);
+    } else {
+      stopTimer(TIMER_ID_RGB_UPDATE);
+    }
+    setBoardPower(isMainPowered());
+  }
+}
+
+func onBatteryUpdate() {
+  redrawDisplayOverlay();
+  updateKeyRgb();
+  updateBoardPower();
+}
+
+func onConnectionUpdate() {
+  redrawDisplayOverlay();
+  updateKeyRgb();
+  updateBoardPower();
+}
+
+func onKeyboardLedStatusUpdate() {
+  updateKeyRgb();
+  updateDisplay0();
 }
 
 const HUE_CYCLE_RGB_ORDER = [[
@@ -1135,6 +1128,13 @@ func animationTime() var {
 }
 
 func updateKeyRgb() {
+  if (HAS_BLE) {
+    if (getActiveConnection() == CONNECTION_NONE) {
+      updateDisconnectedKeyRgbCycle();
+      return;
+    }
+  }
+
   if (isHostSleeping()) {
     updateKeyBreatheCycle();
   } else if (layer == STENO_MASK) {
@@ -1189,7 +1189,7 @@ const ICON_POSITIONS = [[
   00 00 10 00 00 12 10 12
 ]];
 
-func drawDisplay0NonSteno(layerImage) {
+func drawDisplay0(layerImage) {
   if (!HAS_DISPLAY) return;
 
   setAutoDraw(0, AUTO_DRAW_NONE);
@@ -1233,16 +1233,16 @@ func updateDisplay0() {
   if (!HAS_DISPLAY) return;
 
   if (isSettingsLayer()) {
-    drawDisplay0NonSteno(SETTINGS_IMAGE);
+    drawDisplay0(SETTINGS_IMAGE);
   } else if (layer & NUMPAD_MASK) {
-    drawDisplay0NonSteno(NUMPAD_IMAGE);
+    drawDisplay0(NUMPAD_IMAGE);
   } else if (layer & NAV_MASK) {
-    drawDisplay0NonSteno(NAVIGATION_IMAGE);
+    drawDisplay0(NAVIGATION_IMAGE);
   } else if (layer & FUNCTION_MASK) {
-    drawDisplay0NonSteno(FUNCTION_IMAGE);
+    drawDisplay0(FUNCTION_IMAGE);
   } else if (layer & SYMBOL_MASK) {
-    drawDisplay0NonSteno(SYMBOL_IMAGE);
-  } else if (layer & STENO_MASK) {
+    drawDisplay0(SYMBOL_IMAGE);
+  } else if (layer == STENO_MASK) {
     if (stenoDisplay == STENO_DISPLAY_STROKES_WPM) {
       setAutoDraw(0, AUTO_DRAW_STROKES);
       setAutoDraw(1, AUTO_DRAW_WPM);
@@ -1250,11 +1250,8 @@ func updateDisplay0() {
       setAutoDraw(0, AUTO_DRAW_PAPER_TAPE);
       setAutoDraw(1, AUTO_DRAW_PAPER_TAPE);
     } else {
-      setAutoDraw(0, AUTO_DRAW_NONE);
-      setAutoDraw(1, AUTO_DRAW_WPM);
+      drawDisplay0(STENO_IMAGE);
 
-      clearDisplay(0);
-      drawImage(0, DISPLAY_WIDTH/2 - 16, DISPLAY_HEIGHT/2 - 48, STENO_IMAGE);
       var mode = getParameter("steno_mode");
       if (mode == "gemini")  {
         drawImage(0, DISPLAY_WIDTH/2 - 16, DISPLAY_HEIGHT - 48, GEMINI_IMAGE);
@@ -1263,7 +1260,7 @@ func updateDisplay0() {
       }
     }
   } else {
-    drawDisplay0NonSteno(QWERTY_IMAGE);
+    drawDisplay0(QWERTY_IMAGE);
   }
 }
 
@@ -1343,6 +1340,8 @@ func drawSaturation() {
 func setLayer(value) {
   layer = value;
   sendLayerEvent();
+  updateKeyRgb();
+  updateUnderglowRgb();
   updateDisplay0();
 
   setInputHint(value == STENO_MASK ? INPUT_HINT_STENOGRAPHY : INPUT_HINT_KEYBOARD);
@@ -1443,6 +1442,11 @@ func isSettingsLayer() var {
 func updateButtonColor(buttonIndex) {
   if ((layer & STENO_MASK) == 0) {
     keyColorData[buttonIndex] = rand() & 0xffff;
+
+    // If there's no update of keys in the tick loop, update it now.
+    if (!isTimerActive(TIMER_ID_RGB_UPDATE)) {
+      updateKeyRgb();
+    }
   }
 }
 
@@ -1450,6 +1454,12 @@ func updateAllButtonColors() {
   for (var i = 0; i < 42; i = i + 1) {
     keyColorData[i] = (rand() & 0xffff) | 0x20000000;
   }
+}
+
+func fuzzyLayerTimeout() {
+  press(deferredLayerKey);
+  deferredLayerKey = 0;
+  deferredQwertyKey = 0;
 }
 
 func handlePress(buttonIndex, qwertyKey, stenoKey, symbolsKey, functionKey, navKey, numPadKey) {
@@ -1465,12 +1475,13 @@ func handlePress(buttonIndex, qwertyKey, stenoKey, symbolsKey, functionKey, navK
 
       deferredLayerKey = 0;
       deferredQwertyKey = 0;
+      stopTimer(TIMER_ID_FUZZY_LAYER);
 
       press(navKey);
     } else if (getTime() - navLayerPressTimestamp < LAYER_PRESS_TO_KEY_PRESS_THRESHOLD) {
       deferredLayerKey = navKey;
       deferredQwertyKey = qwertyKey;
-      qwertyPressTimestamp = getTime();
+      startTimer(TIMER_ID_FUZZY_LAYER, KEY_PRESS_TO_LAYER_RELEASE_THRESHOLD, 0, @fuzzyLayerTimeout);
     } else {
       press(navKey);
     }
@@ -1480,12 +1491,13 @@ func handlePress(buttonIndex, qwertyKey, stenoKey, symbolsKey, functionKey, navK
 
       deferredLayerKey = 0;
       deferredQwertyKey = 0;
+      stopTimer(TIMER_ID_FUZZY_LAYER);
 
       press(functionKey);
     } else if (getTime() - functionLayerPressTimestamp < LAYER_PRESS_TO_KEY_PRESS_THRESHOLD) {
       deferredLayerKey = functionKey;
       deferredQwertyKey = qwertyKey;
-      qwertyPressTimestamp = getTime();
+      startTimer(TIMER_ID_FUZZY_LAYER, KEY_PRESS_TO_LAYER_RELEASE_THRESHOLD, 0, @fuzzyLayerTimeout);
     } else {
       press(functionKey);
     }
@@ -1614,6 +1626,7 @@ func onPress8() {
   if (isSettingsLayer()) {
     if (brightness < 8) {
       brightness = brightness + 1;
+      updateBoardPower();
       updateKeyRgb();
       updateUnderglowRgb();
       updateScreenContrast();
@@ -1766,6 +1779,7 @@ func onPress20() {
   if (isSettingsLayer()) {
     if (brightness > 0) {
       brightness = brightness - 1;
+      updateBoardPower();
       updateKeyRgb();
       updateUnderglowRgb();
       updateScreenContrast();
@@ -1867,11 +1881,11 @@ func onRelease24() {
     if (layer == 0 && pressCount24 == pressCount
         && getTime() - timer24 < TAP_THRESHOLD
         && checkButtonState("000000000000000000000000000000000000000000")) {
-      releaseAll();
-      setLayer(layer | STENO_MASK);
-
       // Automatically turn off word caps when entering steno mode.
       wordCaps = 0;
+
+      releaseAll();
+      setLayer(layer | STENO_MASK);
     }
   }
   updateUnderglowRgb();
@@ -1895,7 +1909,7 @@ func onPress26() {
   if (HAS_DISPLAY && isSettingsLayer()) {
     stenoDisplay = STENO_DISPLAY_PAPER_TAPE;
     updateDisplay0();
-    drawText(0, DISPLAY_WIDTH/2, DISPLAY_HEIGHT * 3 / 4, FONT_ID_NORMAL, TEXT_ALIGNMENT_MIDDLE, "Paper Tape");
+    drawText(0, DISPLAY_WIDTH/2, DISPLAY_HEIGHT * 3 / 4, FONT_ID_NORMAL, TEXT_ALIGNMENT_MIDDLE, "Tape");
   }
 }
 func onRelease26() { handleRelease(SC_X, SC_NONE, SC_BACKSLASH | KEY_SHIFT, SC_F2, SC_NONE, SC_NONE); }
