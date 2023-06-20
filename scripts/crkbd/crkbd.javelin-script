@@ -502,6 +502,7 @@ const HAS_BLE = JAVELIN_HAS_BLE ?? 0;
 // Inferred
 
 const USE_STATUS_BAR = HAS_DISPLAY && HAS_BLE;
+const USE_SCREEN_SAVER = HAS_DISPLAY;
 
 //---------------------------------------------------------------------------
 // The script needs to have onPress## and onRelease## functions for every
@@ -814,9 +815,18 @@ const STROKES_IMAGE = [[
   92 64
 ]];
 
-const PAIR_CONNECTED_STATUS_IMAGE = [[
+const PAIR_CONNECTED_STATUS_IMAGE_OFFSETS = [[ 00 02 1c ]];
+const PAIR_CONNECTED_STATUS_IMAGES = [[
+  // None
+  00 00
+
+  // BLE
   0c 0c 00 00 98 00 98 01 98 03 98 07 98 01 98 01
   9e 01 9c 01 98 01 90 01 00 00
+
+  // Cable
+  0c 0c 00 00 60 00 f0 00 f8 01 fc 03 f0 00 f0 00
+  fc 03 f8 01 f0 00 60 00 00 00
 ]];
 
 const USB_L_STATUS_IMAGE = [[
@@ -898,15 +908,34 @@ func init() {
   }
   setScript(SCRIPT_ID_BATTERY_UPDATE, @onBatteryUpdate);
   setScript(SCRIPT_ID_CONNECTION_UPDATE, @onConnectionUpdate);
-  setScript(SCRIPT_ID_PAIR_CONNECTION_UPDATE, @redrawDisplayOverlay);
+  setScript(SCRIPT_ID_PAIR_CONNECTION_UPDATE, @onConnectionUpdate);
   setScript(SCRIPT_ID_KEYBOARD_LED_STATUS_UPDATE, @onKeyboardLedStatusUpdate);
 
-  if (HAS_DISPLAY) {
+  if (USE_SCREEN_SAVER) {
     startTimer(TIMER_ID_SCREEN_ON_TIMER, 1000, 1, @updateScreenOn);
   }
 
   updateBoardPower();
 }
+
+// Uncomment this function when developing to ensure callbacks and timers
+// work properly, otherwise they may call a wrong address in the script.
+//
+// func tick() {
+//   if (USE_STATUS_BAR) {
+//     setScript(SCRIPT_ID_DISPLAY_OVERLAY, @drawDisplayOverlay);
+//   }
+//   setScript(SCRIPT_ID_BATTERY_UPDATE, @onBatteryUpdate);
+//   setScript(SCRIPT_ID_CONNECTION_UPDATE, @onConnectionUpdate);
+//   setScript(SCRIPT_ID_PAIR_CONNECTION_UPDATE, @onConnectionUpdate);
+//   setScript(SCRIPT_ID_KEYBOARD_LED_STATUS_UPDATE, @onKeyboardLedStatusUpdate);
+//
+//   if (USE_SCREEN_SAVER) {
+//     startTimer(TIMER_ID_SCREEN_ON_TIMER, 1000, 1, @updateScreenOn);
+//   }
+//
+//   updateBoardPower();
+// }
 
 func updateScreenOn() {
   var time = getTime();
@@ -923,9 +952,12 @@ func drawDisplayOverlay() {
   drawRect(0, 0, 0, DISPLAY_WIDTH, 16);
   setDrawColor(0, 1);
 
-  if (getActivePairConnection() != PAIR_CONNECTION_NONE) {
-    drawImage(0, 2, 0, PAIR_CONNECTED_STATUS_IMAGE);
-  }
+  drawImage(
+    0,
+    2, 0,
+    PAIR_CONNECTED_STATUS_IMAGES
+      + PAIR_CONNECTED_STATUS_IMAGE_OFFSETS[getActivePairConnection()]
+  );
 
   var x = 15;
   var activeConnection = getActiveConnection();
@@ -1002,12 +1034,14 @@ func updateBoardPower() {
     }
     setBoardPower(isMainPowered());
   } else {
+    // No pair, or cable pair.
     if (isPairPowered() || isMainPowered()) {
       startTimer(TIMER_ID_RGB_UPDATE, RGB_UPDATE_TIME, 1, @updateKeyRgb);
+      setBoardPower(1);
     } else {
       stopTimer(TIMER_ID_RGB_UPDATE);
+      setBoardPower(0);
     }
-    setBoardPower(isMainPowered());
   }
 }
 

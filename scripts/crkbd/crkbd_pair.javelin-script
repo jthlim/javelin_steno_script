@@ -50,9 +50,18 @@ const USE_STATUS_BAR = HAS_DISPLAY && HAS_BLE;
 //
 //---------------------------------------------------------------------------
 
-const PAIR_CONNECTED_STATUS_IMAGE = [[
+const PAIR_CONNECTED_STATUS_IMAGE_OFFSETS = [[ 00 02 1c ]];
+const PAIR_CONNECTED_STATUS_IMAGES = [[
+  // None
+  00 00
+
+  // BLE
   0c 0c 00 00 98 00 98 01 98 03 98 07 98 01 98 01
   9e 01 9c 01 98 01 90 01 00 00
+
+  // Cable
+  0c 0c 00 00 60 00 f0 00 f8 01 fc 03 f0 00 f0 00
+  fc 03 f8 01 f0 00 60 00 00 00
 ]];
 
 const BATTERY_LEVEL_STATUS_IMAGES = [[
@@ -115,6 +124,20 @@ func init() {
   updateBoardPower();
 }
 
+// Uncomment this function when developing to ensure callbacks and timers
+// work properly, otherwise they may call a wrong address in the script.
+//
+// func tick() {
+//   if (USE_STATUS_BAR) {
+//     setScript(SCRIPT_ID_DISPLAY_OVERLAY, @drawDisplayOverlay);
+//   }
+//   setScript(SCRIPT_ID_BATTERY_UPDATE, @onBatteryUpdate);
+//   setScript(SCRIPT_ID_CONNECTION_UPDATE, @onConnectionUpdate);
+//   setScript(SCRIPT_ID_PAIR_CONNECTION_UPDATE, @onPairConnectionUpdate);
+//
+//   updateBoardPower();
+// }
+
 func onBatteryUpdate() {
   updateBoardPower();
   redrawDisplayOverlay();
@@ -164,9 +187,12 @@ func drawDisplayOverlay() {
   setDrawColor(1, 1);
 
   // Draw paired icon
-  if (getActivePairConnection() !=  PAIR_CONNECTION_NONE) {
-    drawImage(1, 2, 0, PAIR_CONNECTED_STATUS_IMAGE);
-  }
+  drawImage(
+    1,
+    2, 0,
+    PAIR_CONNECTED_STATUS_IMAGES
+      + PAIR_CONNECTED_STATUS_IMAGE_OFFSETS[getActivePairConnection()]
+  );
 
   // Draw battery
   if (isPairPowered()) {
