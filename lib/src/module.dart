@@ -65,6 +65,13 @@ enum InBuiltScriptFunction implements ScriptFunctionDefinition {
   startTimer('startTimer', 4, false, 0x33, false),
   stopTimer('stopTimer', 1, false, 0x34, false),
   isTimerActive('isTimerActive', 1, true, 0x35, true),
+  isBleProfileConnected('isBleProfileConnected', 1, true, 0x36, true),
+  disconnectBle('disconnectBle', 0, false, 0x37, false),
+  unpairBle('unpairBle', 0, false, 0x38, false),
+  isBleProfilePaired('isBleProfilePaired', 1, true, 0x39, true),
+  isBleProfileSleeping('isBleProfileSleeping', 1, true, 0x3a, true),
+  isBleAdvertising('isBleAdvertising', 0, true, 0x3b, true),
+  isBleScanning('isBleScanning', 0, true, 0x3c, true),
   ;
 
   const InBuiltScriptFunction(
@@ -94,6 +101,17 @@ enum InBuiltScriptFunction implements ScriptFunctionDefinition {
   final bool isBooleanResult;
 }
 
+class ScriptLocals {
+  ScriptLocals([Map<String, AstNode>? constants, Map<String, int>? variables])
+      : constants = constants ?? {},
+        variables = variables ?? {};
+
+  final Map<String, AstNode> constants;
+  final Map<String, int> variables;
+
+  ScriptLocals clone() => ScriptLocals({...constants}, {...variables});
+}
+
 class ScriptFunction implements ScriptFunctionDefinition {
   ScriptFunction(this.name);
 
@@ -104,10 +122,11 @@ class ScriptFunction implements ScriptFunctionDefinition {
   bool hasReturnValue = false;
 
   final parameters = <String>{};
-  var locals = <String, int>{};
+  var locals = ScriptLocals();
   late final StatementListAstNode statements;
+  var hasMarked = false;
 
-  final localsStack = <Map<String, int>>[];
+  final localsStack = <ScriptLocals>[];
 
   @override
   int get numberOfParameters => parameters.length;
@@ -116,6 +135,8 @@ class ScriptFunction implements ScriptFunctionDefinition {
   var numberOfLocals = 0;
 
   void mark(ScriptReachability context) {
+    if (hasMarked) return;
+    hasMarked = true;
     statements.mark(context);
   }
 
@@ -124,14 +145,23 @@ class ScriptFunction implements ScriptFunctionDefinition {
     addLocalVar(parameterName);
   }
 
+  void addLocalConstant(String constantName, AstNode value) {
+    // Copy on write.
+    if (localsStack.isNotEmpty && localsStack.last == locals) {
+      locals = locals.clone();
+    }
+
+    locals.constants[constantName] = value;
+  }
+
   int addLocalVar(String localName) {
     // Copy on write.
     if (localsStack.isNotEmpty && localsStack.last == locals) {
-      locals = {...locals};
+      locals = locals.clone();
     }
 
-    final index = locals.length;
-    locals[localName] = index;
+    final index = locals.variables.length;
+    locals.variables[localName] = index;
     if (index >= numberOfLocals) {
       numberOfLocals = index + 1;
     }

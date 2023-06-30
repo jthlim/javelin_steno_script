@@ -500,6 +500,7 @@ abstract class JumpScriptInstructionBase extends ScriptInstruction {
 
   ScriptOpcode get shortOpcode;
   ScriptOpcode get longOpcode;
+  bool isConditional() => false;
 
   late final NopScriptInstruction target;
 }
@@ -527,6 +528,9 @@ class JumpIfZeroScriptInstruction extends JumpScriptInstructionBase {
 
   @override
   String toString() => '  jz 0x${target.offset.toRadixString(16)}';
+
+  @override
+  bool isConditional() => true;
 }
 
 class JumpIfNotZeroScriptInstruction extends JumpScriptInstructionBase {
@@ -538,6 +542,9 @@ class JumpIfNotZeroScriptInstruction extends JumpScriptInstructionBase {
 
   @override
   String toString() => '  jnz 0x${target.offset.toRadixString(16)}';
+
+  @override
+  bool isConditional() => true;
 }
 
 class PushStringValueScriptInstruction extends ScriptInstruction {

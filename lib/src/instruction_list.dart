@@ -19,11 +19,13 @@ class InstructionList extends Iterable<ScriptInstruction> {
   void optimize() {
     optimizeNot();
     optimizeTrueFalseJumps();
+    optimizeRightFactor();
     optimizeJumpTarget();
     optimizeRightFactor();
     optimizeCallReturn();
     optimizeDeadCode();
     optimizeJumpToNext();
+    optimizeConditionalJumpOverJump();
     optimizeNot();
   }
 
@@ -219,6 +221,59 @@ class InstructionList extends Iterable<ScriptInstruction> {
         instruction.unlink();
       }
       instruction = next;
+    }
+  }
+
+  void optimizeConditionalJumpOverJump() {
+    // Optimizes the sequence:
+    //    jnz <label1>
+    //    jmp <label2>
+    //  label1:
+    //
+    // To:
+    //    jz <label2>
+    //
+    // And vice versa for jz.
+
+    if (instructions.isEmpty) {
+      return;
+    }
+
+    ScriptInstruction? instruction = instructions.first;
+    while (instruction != null) {
+      if (instruction is! JumpScriptInstructionBase ||
+          !instruction.isConditional()) {
+        instruction = instruction.next;
+        continue;
+      }
+
+      final next = instruction.next!;
+      if (next is! JumpScriptInstruction) {
+        instruction = instruction.next;
+        continue;
+      }
+
+      if (instruction.target != next.next) {
+        instruction = instruction.next;
+        continue;
+      }
+
+      final label2 = next.target;
+      late final JumpScriptInstructionBase replacementInstruction;
+      if (instruction is JumpIfZeroScriptInstruction) {
+        replacementInstruction = JumpIfNotZeroScriptInstruction();
+      } else if (instruction is JumpIfNotZeroScriptInstruction) {
+        replacementInstruction = JumpIfZeroScriptInstruction();
+      }
+      label2.insertAfter(replacementInstruction.target);
+      instruction.insertAfter(replacementInstruction);
+
+      final nextInstructionToProcess = instruction.target.next;
+
+      instruction.unlink();
+      next.unlink();
+
+      instruction = nextInstructionToProcess;
     }
   }
 

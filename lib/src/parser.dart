@@ -100,8 +100,12 @@ class Parser {
         '$name already defined as a function near $_currentToken',
       );
     }
-    if (_function?.locals.containsKey(name) ?? false) {
+    if (_function?.locals.variables.containsKey(name) ?? false) {
       throw Exception('$name already defined as a local near $_currentToken');
+    }
+    if (_function?.locals.constants.containsKey(name) ?? false) {
+      throw Exception(
+          '$name already defined as a local constant $_currentToken');
     }
   }
 
@@ -253,23 +257,29 @@ class Parser {
           );
         } else {
           // Check locals
-          if (_function?.locals.containsKey(name) ?? false) {
+          final localVariable = _function?.locals.variables[name];
+          if (localVariable != null) {
             return LoadValueAstNode(
               isGlobal: false,
-              index: _function!.locals[name]!,
+              index: localVariable,
             );
           }
 
+          final localConstant = _function?.locals.constants[name];
+          if (localConstant != null) {
+            return localConstant;
+          }
+
           // Check globals
-          if (_module.globals.containsKey(name)) {
-            final global = _module.globals[name]!;
-            final arraySize = global.arraySize;
+          final globalVariable = _module.globals[name];
+          if (globalVariable != null) {
+            final arraySize = globalVariable.arraySize;
             if (arraySize != null) {
-              return LoadGlobalValueArrayAstNode(global);
+              return LoadGlobalValueArrayAstNode(globalVariable);
             } else {
               return LoadValueAstNode(
                 isGlobal: true,
-                index: global.index,
+                index: globalVariable.index,
               );
             }
           }
@@ -601,6 +611,24 @@ class Parser {
     );
   }
 
+  void _parseLocalConst() {
+    _assertToken(TokenType.constKeyword);
+    final nameToken = _currentToken;
+    _assertToken(TokenType.identifier);
+    final name = nameToken.stringValue!;
+    _assertToken(TokenType.assign);
+    final expression = _parseExpression();
+    _assertToken(TokenType.semiColon);
+
+    _assertUniqueName(name);
+
+    if (!expression.isConstant() && expression is! StringValueAstNode) {
+      throw Exception('$name not a constant value near $_currentToken');
+    }
+
+    _function!.addLocalConstant(name, expression);
+  }
+
   AstNode _parseAssignment(String name, {bool requireSemicolon = true}) {
     AstNode? indexExpression;
     if (_currentToken.type == TokenType.openSquareBracket) {
@@ -639,8 +667,8 @@ class Parser {
           expression: value,
         );
       }
-    } else if (_function!.locals.containsKey(name)) {
-      final index = _function!.locals[name]!;
+    } else if (_function!.locals.variables.containsKey(name)) {
+      final index = _function!.locals.variables[name]!;
       return StoreValueAstNode(
         isGlobal: false,
         index: index,
@@ -762,6 +790,9 @@ class Parser {
 
   AstNode _parseStatement() {
     switch (_currentToken.type) {
+      case TokenType.constKeyword:
+        _parseLocalConst();
+        return NopAstNode();
       case TokenType.openBrace:
         return _parseBlock();
       case TokenType.ifKeyword:

@@ -394,6 +394,10 @@ class Tokenizer {
       // Support all string escapes from dart language specification 2.10 §17.7
       // https://dart.dev/guides/language/specifications/DartLangSpec-v2.10.pdf
       switch (v) {
+        case 0x30: // '0' -- null
+          buffer.writeCharCode(0);
+          continue;
+
         case 0x62: // 'b' -- Backspace
           buffer.writeCharCode(0x08);
           continue;
