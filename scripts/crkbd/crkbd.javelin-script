@@ -917,7 +917,10 @@ func init() {
   setScript(SCRIPT_ID_CONNECTION_UPDATE, @onConnectionUpdate);
   setScript(SCRIPT_ID_PAIR_CONNECTION_UPDATE, @onConnectionUpdate);
   setScript(SCRIPT_ID_KEYBOARD_LED_STATUS_UPDATE, @onKeyboardLedStatusUpdate);
-  setScript(SCRIPT_ID_BLE_ADVERTISING_UPDATE, @onConnectionUpdate);
+
+  if (HAS_BLE) {
+    setScript(SCRIPT_ID_BLE_ADVERTISING_UPDATE, @onConnectionUpdate);
+  }
 
   if (USE_SCREEN_SAVER) {
     startTimer(TIMER_ID_SCREEN_ON_TIMER, 1000, 1, @updateScreenOn);
@@ -937,7 +940,10 @@ func init() {
 //   setScript(SCRIPT_ID_CONNECTION_UPDATE, @onConnectionUpdate);
 //   setScript(SCRIPT_ID_PAIR_CONNECTION_UPDATE, @onConnectionUpdate);
 //   setScript(SCRIPT_ID_KEYBOARD_LED_STATUS_UPDATE, @onKeyboardLedStatusUpdate);
-//   setScript(SCRIPT_ID_BLE_ADVERTISING_UPDATE, @onConnectionUpdate);
+//
+//   if (HAS_BLE) {
+//     setScript(SCRIPT_ID_BLE_ADVERTISING_UPDATE, @onConnectionUpdate);
+//   }
 //
 //   if (USE_SCREEN_SAVER) {
 //     startTimer(TIMER_ID_SCREEN_ON_TIMER, 1000, 1, @updateScreenOn);
@@ -2014,8 +2020,8 @@ func onPress29() {
 }
 func onRelease29() { handleRelease(SC_B, SC_NONE, SC_L_BRACKET | KEY_SHIFT, SC_NONE, SC_NONE, SC_NONE); }
 
-func onPress30() { handlePress(30, SC_N, SC_NONE, SC_R_BRACKET | KEY_SHIFT, SC_NONE, SC_MUTE, SC_NONE); }
-func onRelease30() { handleRelease(SC_N, SC_NONE, SC_R_BRACKET | KEY_SHIFT, SC_NONE, SC_MUTE, SC_NONE); }
+func onPress30() { handlePress(30, SC_N, SC_NONE, SC_R_BRACKET | KEY_SHIFT, SC_NONE, SC_CONSUMER_MUTE, SC_NONE); }
+func onRelease30() { handleRelease(SC_N, SC_NONE, SC_R_BRACKET | KEY_SHIFT, SC_NONE, SC_CONSUMER_MUTE, SC_NONE); }
 
 func onPress31() { handlePress(31, SC_M, SC_NONE, SC_R_BRACKET, SC_NONE, SC_NONE, SC_KP_1); }
 func onRelease31() { handleRelease(SC_M, SC_NONE, SC_R_BRACKET, SC_NONE, SC_NONE, SC_KP_1); }

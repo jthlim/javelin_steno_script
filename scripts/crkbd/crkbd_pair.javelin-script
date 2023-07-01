@@ -159,11 +159,11 @@ func updateBoardPower() {
     startTimer(TIMER_ID_RGB_UPDATE, 64, 1, @updateDisconnectedKeyRgbCycle);
     setBoardPower(1);
   } else if (activePairConnection == PAIR_CONNECTION_CABLE) {
-    stopTimer(TIMER_ID_RGB_UPDATE);
     setBoardPower(isMainPowered() || isPairPowered());
-  } else {
     stopTimer(TIMER_ID_RGB_UPDATE);
+  } else {
     setBoardPower(isPairPowered());
+    stopTimer(TIMER_ID_RGB_UPDATE);
   }
 }
 

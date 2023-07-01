@@ -1049,8 +1049,8 @@ func onRelease28() { handleRelease(SC_V, SC_NONE, SC_L_BRACKET, SC_F4, SC_NONE, 
 func onPress29() { handlePress(29, SC_B, SC_NONE, SC_L_BRACKET | KEY_SHIFT, SC_NONE, SC_NONE, SC_NONE); }
 func onRelease29() { handleRelease(SC_B, SC_NONE, SC_L_BRACKET | KEY_SHIFT, SC_NONE, SC_NONE, SC_NONE); }
 
-func onPress30() { handlePress(30, SC_N, SC_NONE, SC_R_BRACKET | KEY_SHIFT, SC_NONE, SC_MUTE, SC_NONE); }
-func onRelease30() { handleRelease(SC_N, SC_NONE, SC_R_BRACKET | KEY_SHIFT, SC_NONE, SC_MUTE, SC_NONE); }
+func onPress30() { handlePress(30, SC_N, SC_NONE, SC_R_BRACKET | KEY_SHIFT, SC_NONE, SC_CONSUMER_MUTE, SC_NONE); }
+func onRelease30() { handleRelease(SC_N, SC_NONE, SC_R_BRACKET | KEY_SHIFT, SC_NONE, SC_CONSUMER_MUTE, SC_NONE); }
 
 func onPress31() { handlePress(31, SC_M, SC_NONE, SC_R_BRACKET, SC_NONE, SC_NONE, SC_KP_1); }
 func onRelease31() { handleRelease(SC_M, SC_NONE, SC_R_BRACKET, SC_NONE, SC_NONE, SC_KP_1); }
