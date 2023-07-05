@@ -41,7 +41,7 @@ class StringValueAstNode extends AstNode {
   bool isConstant() => false;
 
   @override
-  int constantValue() => 0;
+  int constantValue() => throw UnsupportedError('Should not be invoked');
 
   @override
   void mark(ScriptReachability context) {
@@ -66,7 +66,7 @@ class ByteIndexAstNode extends AstNode {
   bool isConstant() => false;
 
   @override
-  int constantValue() => 0;
+  int constantValue() => throw UnsupportedError('Should not be invoked');
 
   @override
   void mark(ScriptReachability context) {
@@ -235,6 +235,9 @@ class TermsAstNode extends AstNode {
   int constantValue() {
     var result = 0;
     for (final term in terms) {
+      if (!term.statement.isConstant()) {
+        continue;
+      }
       int value = term.statement.constantValue();
       switch (term.mode) {
         case TermMode.add:
@@ -250,54 +253,75 @@ class TermsAstNode extends AstNode {
 
   @override
   void addInstructions(ScriptByteCodeBuilder builder) {
-    if (terms.length == 2) {
-      // Detect 1 + x
-      if (terms[0].mode == TermMode.add &&
-          terms[0].statement.isConstant() &&
-          terms[1].mode == TermMode.add &&
-          terms[0].statement.constantValue() == 1) {
-        terms[1].statement.addInstructions(builder);
-        builder.addInstruction(
-            OpcodeScriptInstruction(ScriptOperatorOpcode.increment));
-        return;
-      }
-
-      // Detect x + 1 and x - 1
-      if (terms[0].mode == TermMode.add &&
-          terms[1].mode == TermMode.add &&
-          terms[1].statement.constantValue() == 1) {
-        terms[0].statement.addInstructions(builder);
-        switch (terms[1].mode) {
-          case TermMode.add:
-            builder.addInstruction(
-                OpcodeScriptInstruction(ScriptOperatorOpcode.increment));
-            break;
-          case TermMode.subtract:
-            builder.addInstruction(
-                OpcodeScriptInstruction(ScriptOperatorOpcode.decrement));
-            break;
-        }
-        return;
-      }
+    var constantsSum = constantValue();
+    if (isConstant()) {
+      builder.addInstruction(PushIntValueScriptInstruction(constantsSum));
+      return;
     }
 
-    bool isFirst = true;
+    var isFirst = true;
+
     for (final term in terms) {
-      term.statement.addInstructions(builder);
-      if (isFirst) {
-        isFirst = false;
-      } else {
-        switch (term.mode) {
-          case TermMode.add:
+      if (term.statement.isConstant()) {
+        // Already tallied into constantsSum
+        continue;
+      }
+      switch (term.mode) {
+        case TermMode.add:
+          term.statement.addInstructions(builder);
+          if (isFirst) {
+            isFirst = false;
+          } else {
             builder.addInstruction(
                 OpcodeScriptInstruction(ScriptOperatorOpcode.add));
-            break;
-          case TermMode.subtract:
+          }
+          break;
+        case TermMode.subtract:
+          if (isFirst) {
+            isFirst = false;
+            if (constantsSum == 0) {
+              term.statement.addInstructions(builder);
+              builder.addInstruction(
+                  OpcodeScriptInstruction(ScriptOperatorOpcode.negative));
+            } else {
+              builder
+                  .addInstruction(PushIntValueScriptInstruction(constantsSum));
+              constantsSum = 0;
+              term.statement.addInstructions(builder);
+              builder.addInstruction(
+                  OpcodeScriptInstruction(ScriptOperatorOpcode.subtract));
+            }
+          } else {
+            term.statement.addInstructions(builder);
             builder.addInstruction(
                 OpcodeScriptInstruction(ScriptOperatorOpcode.subtract));
-            break;
-        }
+          }
       }
+    }
+    switch (constantsSum) {
+      case 1:
+        builder.addInstruction(
+            OpcodeScriptInstruction(ScriptOperatorOpcode.increment));
+        break;
+      case -1:
+        builder.addInstruction(
+            OpcodeScriptInstruction(ScriptOperatorOpcode.decrement));
+        break;
+      case 0:
+        break;
+      default:
+        if (constantsSum < 0) {
+          // The bytecode format has a bias towards positive numbers,
+          // so using a subtract operation can be slightly smaller size.
+          builder.addInstruction(PushIntValueScriptInstruction(-constantsSum));
+          builder.addInstruction(
+              OpcodeScriptInstruction(ScriptOperatorOpcode.subtract));
+        } else {
+          builder.addInstruction(PushIntValueScriptInstruction(constantsSum));
+          builder.addInstruction(
+              OpcodeScriptInstruction(ScriptOperatorOpcode.add));
+        }
+        break;
     }
   }
 
@@ -569,7 +593,7 @@ class NopAstNode extends AstNode {
   bool isConstant() => false;
 
   @override
-  int constantValue() => 0;
+  int constantValue() => throw UnsupportedError('Should not be invoked');
 
   @override
   void addInstructions(ScriptByteCodeBuilder builder) {}
@@ -592,7 +616,7 @@ class ForStatementAstNode extends AstNode {
   bool isConstant() => false;
 
   @override
-  int constantValue() => 0;
+  int constantValue() => throw UnsupportedError('Should not be invoked');
 
   @override
   void mark(ScriptReachability context) {
@@ -674,7 +698,7 @@ class IfStatementAstNode extends AstNode {
   bool isConstant() => false;
 
   @override
-  int constantValue() => 0;
+  int constantValue() => throw UnsupportedError('Should not be invoked');
 
   @override
   void mark(ScriptReachability context) {
@@ -756,7 +780,7 @@ class StatementListAstNode extends AstNode {
   bool isConstant() => false;
 
   @override
-  int constantValue() => 0;
+  int constantValue() => throw UnsupportedError('Should not be invoked');
 
   @override
   void mark(ScriptReachability context) {
@@ -786,7 +810,7 @@ class LoadGlobalValueArrayAstNode extends AstNode {
   bool isConstant() => false;
 
   @override
-  int constantValue() => 0;
+  int constantValue() => throw UnsupportedError('Should not be invoked');
 
   @override
   void addInstructions(ScriptByteCodeBuilder builder) {
@@ -803,7 +827,7 @@ class LoadIndexedGlobalValueAstNode extends AstNode {
   bool isConstant() => false;
 
   @override
-  int constantValue() => 0;
+  int constantValue() => throw UnsupportedError('Should not be invoked');
 
   @override
   void mark(ScriptReachability context) {
@@ -842,7 +866,7 @@ class LoadValueAstNode extends AstNode {
   bool isConstant() => false;
 
   @override
-  int constantValue() => 0;
+  int constantValue() => throw UnsupportedError('Should not be invoked');
 
   @override
   void mark(ScriptReachability context) {
@@ -883,20 +907,23 @@ class CallFunctionAstNode extends AstNode {
   bool isConstant() => false;
 
   @override
-  int constantValue() => 0;
+  int constantValue() => throw UnsupportedError('Should not be invoked');
 
   @override
   void mark(ScriptReachability context) {
-    context.functions.add(name);
     for (final parameter in parameters) {
       parameter.mark(context);
     }
 
-    final function = context.module.functions[name];
-    if (function is ScriptFunction) {
-      if (function.hasReturnValue ||
-          (!function.statements.isReturn() && !function.statements.isEmpty())) {
-        function.mark(context);
+    final definition = context.module.functions[name];
+    if (definition is ScriptFunction) {
+      if (!definition.hasReturnValue &&
+          (definition.statements.isReturn() ||
+              definition.statements.isEmpty())) {
+        // Do nothing. Written this way to mimic the addInstructions logic.
+      } else {
+        context.functions.add(name);
+        definition.mark(context);
       }
     }
   }
@@ -954,7 +981,7 @@ class PushFunctionAddress extends AstNode {
   bool isConstant() => false;
 
   @override
-  int constantValue() => 0;
+  int constantValue() => throw UnsupportedError('Should not be invoked');
 
   @override
   void mark(ScriptReachability context) {
@@ -987,7 +1014,7 @@ class StoreValueAstNode extends AstNode {
   bool isConstant() => false;
 
   @override
-  int constantValue() => 0;
+  int constantValue() => throw UnsupportedError('Should not be invoked');
 
   @override
   void mark(ScriptReachability context) {
@@ -1034,7 +1061,7 @@ class StoreIndexedGlobalValueAstNode extends AstNode {
   bool isConstant() => false;
 
   @override
-  int constantValue() => 0;
+  int constantValue() => throw UnsupportedError('Should not be invoked');
 
   @override
   void mark(ScriptReachability context) {
@@ -1075,7 +1102,7 @@ class ReturnAstNode extends AstNode {
   bool isConstant() => false;
 
   @override
-  int constantValue() => 0;
+  int constantValue() => throw UnsupportedError('Should not be invoked');
 
   @override
   void mark(ScriptReachability context) {

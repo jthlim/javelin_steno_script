@@ -1067,7 +1067,7 @@ func onBatteryUpdate() {
 }
 
 func onConnectionUpdate() {
-  if (isShowingBleSummary()) {
+  if (HAS_BLE && isShowingBleSummary()) {
     drawBleSummary();
   }
   redrawDisplayOverlay();
@@ -1757,7 +1757,7 @@ func onRelease2() {
 func onPress3() {
   handlePress(3, SC_E, SK_PL | KEY_STENO, SC_3, SC_F11, SC_NONE, SC_NONE);
 
-  if (isSettingsLayer()) {
+  if (HAS_BLE && isSettingsLayer()) {
     setPreferredConnection(CONNECTION_BLE, CONNECTION_USB, CONNECTION_USB2);
     setBleProfile(2);
     if (HAS_DISPLAY) {
@@ -2130,7 +2130,7 @@ func onRelease28() { handleRelease(SC_V, SC_NONE, SC_L_BRACKET, SC_F4, SC_NONE, 
 func onPress29() {
   handlePress(29, SC_B, SC_NONE, SC_L_BRACKET | KEY_SHIFT, SC_NONE, SC_NONE, SC_NONE);
 
-  if (isSettingsLayer()) {
+  if (HAS_BLE && isSettingsLayer()) {
     if (isBleProfileConnected(getBleProfile())) {
       disconnectBle();
     } else if (isBleProfilePaired(getBleProfile())) {
