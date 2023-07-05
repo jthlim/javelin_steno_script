@@ -1238,5 +1238,5 @@ func onRelease41() {
   }
 }
 
-func onPress42() { console("launch_bootrom"); }
+func onPress42() { console("launch_bootloader"); }
 func onRelease42() {}

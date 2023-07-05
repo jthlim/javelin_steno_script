@@ -473,5 +473,5 @@ func onRelease26() { handleRelease(SK_U, SC_SPACE); }
 func onPress27() { handlePress(SK_NUM2, SC_ESC); }
 func onRelease27() { handleRelease(SK_NUM2, SC_ESC); }
 
-func onPress28() { console("launch_bootrom"); }
+func onPress28() { console("launch_bootloader"); }
 func onRelease28() {}
