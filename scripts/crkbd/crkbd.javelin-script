@@ -108,14 +108,17 @@
 // ,-------------------------------------------.        ,-------------------------------------------.
 // |  USB L | BLE1 | BLE2 | BLE3 | BLE4 | USB R|        |Speed+|      |Brght+| Sat+ | Hue+ |HueSprd+|
 // |--------+------+------+------+------+------|        |------+------+------+------+------+--------|
-// |        |      |Embedd|Gemini|PloHID| Pair |        |Speed-|      |Brght-| Sat- | Hue- |HueSprd-|
+// |        |      |Embedd|Gemini|PloHID|      |        |Speed-|      |Brght-| Sat- | Hue- |HueSprd-|
 // |--------+------+------+------+------+------|        |------+------+------+------+------+--------|
-// |        |      | WPM  | Tape |Strkes|Discon|        |      |      |      |      |      |        |
+// |        |      | WPM  | Tape |Strkes| D/UP |        |      |      |      |      |      |        |
 // `----------------------+--+---+--+---+--+---+--.  ,--+---+--+---+--+---+-------------------------'
 //                           |      |      |      |  |      |      |      |
 //                           `--------------------'  `--------------------'
 //
-
+// D/UP: Disconnects the active profile's bluetooth connection if connected.
+//       Unpairs the profile if not connected.
+//
+// To pair a device, hold BLE1-BLE4 for 3 seconds.
 
 //---------------------------------------------------------------------------
 // USB Scan code values.
@@ -498,13 +501,13 @@ const SCRIPT_ID_BLE_SCANNING_UPDATE = 6;
 // Constants passed in from the firmware.
 const DISPLAY_WIDTH = JAVELIN_DISPLAY_WIDTH ?? 32;
 const DISPLAY_HEIGHT = JAVELIN_DISPLAY_HEIGHT ?? 128;
-const HAS_DISPLAY = JAVELIN_HAS_DISPLAY ?? 1;
+const HAS_DISPLAY = JAVELIN_HAS_DISPLAY ?? 0;
 const HAS_BLE = JAVELIN_HAS_BLE ?? 0;
 
 // Inferred
 
 const USE_STATUS_BAR = HAS_DISPLAY && HAS_BLE;
-const USE_SCREEN_SAVER = HAS_DISPLAY;
+const USE_SCREEN_SAVER = HAS_DISPLAY && 0;
 
 //---------------------------------------------------------------------------
 // The script needs to have onPress## and onRelease## functions for every
@@ -580,6 +583,7 @@ const STENO_DISPLAY_STROKES_WPM = 2;
 const TIMER_ID_RGB_UPDATE = 0;
 const TIMER_ID_FUZZY_LAYER = 1;
 const TIMER_ID_SCREEN_ON_TIMER = 2;
+const TIMER_ID_PAIRING_HOLD = 3;
 
 var stenoDisplay = STENO_DISPLAY_WPM;
 var wordCaps = 0;
@@ -836,19 +840,13 @@ const PAIR_CONNECTED_STATUS_IMAGES = [[
   fc 03 f8 01 f0 00 60 00 00 00
 ]];
 
-const USB_L_STATUS_IMAGE = [[
-  0c 0c 00 00 f0 00 fe 01 fe 0f fe 0f fe 01 f0 00
-  00 00 c0 0f 00 08 00 08 00 08
-]];
-
-const USB_R_STATUS_IMAGE = [[
-  0c 0c 00 00 f0 00 fe 01 fe 0f fe 0f fe 01 f0 00
-  00 00 c0 0f 40 02 40 02 80 0d
+const USB_STATUS_IMAGE = [[
+  09 0c 30 00 78 00 b0 00 06 0d ff 0f 86 0c 58 00
+  3c 00 18 00
 ]];
 
 const BLUETOOTH_STATUS_IMAGE = [[
-  08 0c 00 00 08 01 90 00 fe 07 62 04 94 02 08 01
-  00 00
+  06 0c 08 01 90 00 ff 0f 62 04 94 02 08 01
 ]];
 
 const BATTERY_LEVEL_STATUS_IMAGES = [[
@@ -969,7 +967,7 @@ func drawDisplayOverlay() {
 
   drawImage(
     0,
-    2, 0,
+    2, 2,
     PAIR_CONNECTED_STATUS_IMAGES
       + PAIR_CONNECTED_STATUS_IMAGE_OFFSETS[getActivePairConnection()]
   );
@@ -980,30 +978,31 @@ func drawDisplayOverlay() {
   var activeConnectionPosition;
   var activeConnectionUnderlineLength;
   if (isConnected(CONNECTION_USB)) {
-    drawImage(0, x, 0, USB_L_STATUS_IMAGE);
+    drawImage(0, x, 1, USB_STATUS_IMAGE);
     if (activeConnection == CONNECTION_USB) {
       activeConnectionPosition = x;
-      activeConnectionUnderlineLength = 12;
+      activeConnectionUnderlineLength = 9;
     }
     activeConnectionCount = activeConnectionCount + 1;
-    x = x + 13;
-  }
-  if (isConnected(CONNECTION_USB2)) {
-    drawImage(0, x, 0, USB_R_STATUS_IMAGE);
-    if (activeConnection == CONNECTION_USB2) {
-      activeConnectionPosition = x;
-      activeConnectionUnderlineLength = 12;
-    }
-    activeConnectionCount = activeConnectionCount + 1;
-    x = x + 13;
+    x = x + 11;
   }
   if (isConnected(CONNECTION_BLE)) {
-    drawImage(0, x, 0, BLUETOOTH_STATUS_IMAGE);
+    drawImage(0, x+2, 1, BLUETOOTH_STATUS_IMAGE);
     if (activeConnection == CONNECTION_BLE) {
       activeConnectionPosition = x;
       activeConnectionUnderlineLength = 10;
     }
     activeConnectionCount = activeConnectionCount + 1;
+    x = x + 12;
+  }
+  if (isConnected(CONNECTION_USB2)) {
+    drawImage(0, x, 1, USB_STATUS_IMAGE);
+    if (activeConnection == CONNECTION_USB2) {
+      activeConnectionPosition = x;
+      activeConnectionUnderlineLength = 9;
+    }
+    activeConnectionCount = activeConnectionCount + 1;
+    // x = x + 11;
   }
 
   if (activeConnectionCount > 1) {
@@ -1069,7 +1068,6 @@ func onBatteryUpdate() {
 
 func onConnectionUpdate() {
   if (isShowingBleSummary()) {
-    updateDisplay0();
     drawBleSummary();
   }
   redrawDisplayOverlay();
@@ -1079,7 +1077,13 @@ func onConnectionUpdate() {
 
 func onKeyboardLedStatusUpdate() {
   updateKeyRgb();
-  updateDisplay0();
+  if (HAS_DISPLAY) {
+    if (HAS_BLE && isShowingBleSummary()) {
+      drawBleSummary();
+    } else {
+      updateDisplay0();
+    }
+  }
 }
 
 const HUE_CYCLE_RGB_ORDER = [[
@@ -1282,6 +1286,86 @@ func drawDisplay0(layerImage) {
   }
 }
 
+
+const BLE_ICONS = [[
+  // Laptop
+  10 10 fc 67 fe 6f 06 6c 06 6c 06 6c 06 6c 06 6c
+  06 6c 06 6c 06 6c 06 6c 06 6c 06 6c 06 6c fe 6f
+  fc 67
+
+  // Desktop
+  10 10 fc 0f fe 1f 06 1c 06 1c 06 9c 06 9c 06 fc
+  06 fc 06 fc 06 fc 06 9c 06 9c 06 1c 06 1c fe 1f
+  fc 0f
+
+  // Phone
+  10 10 00 00 00 00 fe 7f ff ff 03 c0 03 c0 07 c0
+  07 c0 07 c0 07 c0 03 c0 03 c0 ff ff fe 7f 00 00
+  00 00
+
+  // Tablet
+  10 10 00 00 00 00 fe 7f ff ff 07 f0 07 f0 07 f0
+  07 90 07 90 07 f0 07 f0 07 f0 ff ff fe 7f 00 00
+  00 00
+]];
+
+const SLEEPING_ICON = [[
+  20 10 00 00 00 00 10 04 10 06 10 05 90 04 50 04
+  30 04 10 04 00 00 10 04 10 06 10 05 90 04 50 04
+  30 04 10 04 00 00 10 04 10 06 10 05 90 04 50 04
+  30 04 10 04 00 00 00 04 00 00 00 04 00 00 00 04
+  00 00
+]];
+
+const CONNECTED_ICON = [[
+  10 10 30 00 38 00 9c 01 cc 01 ce 00 66 0c 66 0e
+  66 66 66 66 66 0e 66 0c ce 00 cc 01 9c 01 38 00
+  30 00
+]];
+
+const DISCONNECTED_ICON = [[
+  10 10 30 00 38 00 9c 01 cc 01 ce 70 66 7c 06 1f
+  c6 47 f0 61 7c 0c 1f 0c c7 00 c0 01 9c 01 38 00
+  30 00
+]];
+
+const UNPAIRED_ICON = [[
+  10 10 00 00 00 00 80 01 80 01 80 01 80 01 80 01
+  80 01 80 01 80 01 80 01 80 01 80 01 80 01 00 00
+  00 00
+]];
+
+func drawBleSummary() {
+  if (!HAS_DISPLAY) return;
+
+  updateDisplay0();
+  isBleSummaryActive = 1;
+
+  const yOffset = DISPLAY_HEIGHT/2 + (DISPLAY_HEIGHT/2 - 76) / 2;
+
+  for (var i = 0; i < 4; i = i + 1) {
+    var y = i * 19 + yOffset;
+    drawImage(0, DISPLAY_WIDTH/4 - 8, y, BLE_ICONS + i * 0x22);
+    // drawText(0, DISPLAY_WIDTH/4, y + 15, FONT_ID_MEDIUM_DIGITS, TEXT_ALIGNMENT_MIDDLE, "1\02\03\04\0" + i*2);
+
+    if (isBleProfileSleeping(i)) {
+      drawImage(0, DISPLAY_WIDTH*2/3 - 16, y+2, SLEEPING_ICON);
+    } else if (isBleProfileConnected(i)) {
+      drawImage(0, DISPLAY_WIDTH*2/3 - 8, y, CONNECTED_ICON);
+    } else if (isBleProfilePaired(i)) {
+      drawImage(0, DISPLAY_WIDTH*2/3 - 8, y, DISCONNECTED_ICON);
+    } else {
+      drawImage(0, DISPLAY_WIDTH*2/3 - 8, y, UNPAIRED_ICON);
+    }
+  }
+
+  var activeY = yOffset + getBleProfile() * 19;
+  drawLine(0, 2, activeY - 2, DISPLAY_WIDTH-2, activeY - 2);
+  drawLine(0, 2, activeY - 2, 2, activeY + 17);
+  drawLine(0, 2, activeY + 17, DISPLAY_WIDTH-2, activeY + 17);
+  drawLine(0, DISPLAY_WIDTH-2, activeY - 2, DISPLAY_WIDTH-2, activeY + 17);
+}
+
 func updateDisplay0() {
   if (!HAS_DISPLAY) return;
 
@@ -1393,6 +1477,7 @@ func drawSaturation() {
 
 func setLayer(value) {
   releaseAll();
+  if (HAS_BLE) stopTimer(TIMER_ID_PAIRING_HOLD);
   layer = value;
   sendLayerEvent();
   updateKeyRgb();
@@ -1603,7 +1688,14 @@ func handleRelease(qwertyKey, stenoKey, symbolsKey, functionKey, navKey, numPadK
   }
 }
 
+func onPairingHoldTimer() {
+  startBlePairing();
+}
+
 func onPress0() {
+  if (layer & STENO_MASK) {
+      setInputHint(INPUT_HINT_KEYBOARD);
+  }
   handlePress(0, SC_TAB, SC_TAB, SC_GRAVE, SC_NONE, SC_NONE, SC_NONE);
 
   if (isSettingsLayer()) {
@@ -1614,35 +1706,53 @@ func onPress0() {
     }
   }
 }
-func onRelease0() { handleRelease(SC_TAB, SC_TAB, SC_GRAVE, SC_NONE, SC_NONE, SC_NONE); }
+func onRelease0() {
+  handleRelease(SC_TAB, SC_TAB, SC_GRAVE, SC_NONE, SC_NONE, SC_NONE);
+
+  if (layer & STENO_MASK) {
+      setInputHint(INPUT_HINT_STENOGRAPHY);
+  }
+}
 
 func onPress1() {
   handlePress(1, SC_Q, SK_S1 | KEY_STENO, SC_1, SC_F9, SC_NONE, SC_NONE);
 
-  if (isSettingsLayer()) {
+  if (HAS_BLE && isSettingsLayer()) {
     setPreferredConnection(CONNECTION_BLE, CONNECTION_USB, CONNECTION_USB2);
     setBleProfile(0);
     if (HAS_DISPLAY) {
-      updateDisplay0();
       drawBleSummary();
     }
+    startTimer(TIMER_ID_PAIRING_HOLD, 3000, 0, @onPairingHoldTimer);
   }
 }
-func onRelease1() { handleRelease(SC_Q, SK_S1 | KEY_STENO, SC_1, SC_F9, SC_NONE, SC_NONE); }
+func onRelease1() {
+  handleRelease(SC_Q, SK_S1 | KEY_STENO, SC_1, SC_F9, SC_NONE, SC_NONE);
+
+  if (HAS_BLE && isSettingsLayer()) {
+    stopTimer(TIMER_ID_PAIRING_HOLD);
+  }
+}
 
 func onPress2() {
   handlePress(2, SC_W, SK_TL | KEY_STENO, SC_2, SC_F10, SC_NONE, SC_NONE);
 
-  if (isSettingsLayer()) {
+  if (HAS_BLE && isSettingsLayer()) {
     setPreferredConnection(CONNECTION_BLE, CONNECTION_USB, CONNECTION_USB2);
     setBleProfile(1);
     if (HAS_DISPLAY) {
-      updateDisplay0();
       drawBleSummary();
     }
+    startTimer(TIMER_ID_PAIRING_HOLD, 3000, 0, @onPairingHoldTimer);
   }
 }
-func onRelease2() { handleRelease(SC_W, SK_TL | KEY_STENO, SC_2, SC_F10, SC_NONE, SC_NONE); }
+func onRelease2() {
+  handleRelease(SC_W, SK_TL | KEY_STENO, SC_2, SC_F10, SC_NONE, SC_NONE);
+
+  if (HAS_BLE && isSettingsLayer()) {
+    stopTimer(TIMER_ID_PAIRING_HOLD);
+  }
+}
 
 func onPress3() {
   handlePress(3, SC_E, SK_PL | KEY_STENO, SC_3, SC_F11, SC_NONE, SC_NONE);
@@ -1651,26 +1761,38 @@ func onPress3() {
     setPreferredConnection(CONNECTION_BLE, CONNECTION_USB, CONNECTION_USB2);
     setBleProfile(2);
     if (HAS_DISPLAY) {
-      updateDisplay0();
       drawBleSummary();
     }
+    startTimer(TIMER_ID_PAIRING_HOLD, 3000, 0, @onPairingHoldTimer);
   }
 }
-func onRelease3() { handleRelease(SC_E, SK_PL | KEY_STENO, SC_3, SC_F11, SC_NONE, SC_NONE); }
+func onRelease3() {
+  handleRelease(SC_E, SK_PL | KEY_STENO, SC_3, SC_F11, SC_NONE, SC_NONE);
+
+  if (HAS_BLE && isSettingsLayer()) {
+    stopTimer(TIMER_ID_PAIRING_HOLD);
+  }
+}
 
 func onPress4() {
   handlePress(4, SC_R, SK_HL | KEY_STENO, SC_4, SC_F12, SC_NONE, SC_NONE);
 
-  if (isSettingsLayer()) {
+  if (HAS_BLE && isSettingsLayer()) {
     setPreferredConnection(CONNECTION_BLE, CONNECTION_USB, CONNECTION_USB2);
     setBleProfile(3);
     if (HAS_DISPLAY) {
-      updateDisplay0();
       drawBleSummary();
     }
+    startTimer(TIMER_ID_PAIRING_HOLD, 3000, 0, @onPairingHoldTimer);
   }
 }
-func onRelease4() { handleRelease(SC_R, SK_HL | KEY_STENO, SC_4, SC_F12, SC_NONE, SC_NONE); }
+func onRelease4() {
+  handleRelease(SC_R, SK_HL | KEY_STENO, SC_4, SC_F12, SC_NONE, SC_NONE);
+
+  if (HAS_BLE && isSettingsLayer()) {
+    stopTimer(TIMER_ID_PAIRING_HOLD);
+  }
+}
 
 func onPress5() {
   handlePress(5, SC_T, SK_STAR1 | KEY_STENO, SC_5, SC_NONE, SC_NONE, SC_NONE);
@@ -1833,13 +1955,7 @@ func onPress16() {
 }
 func onRelease16() { handleRelease(SC_F, SK_RL | KEY_STENO, SC_4 | KEY_SHIFT, SC_F8, SC_L_SHIFT, SC_L_SHIFT); }
 
-func onPress17() {
-  handlePress(17, SC_G, SK_STAR3 | KEY_STENO, SC_5 | KEY_SHIFT, SC_NONE, SC_NONE, SC_NONE);
-
-  if (isSettingsLayer()) {
-    startBlePairing();
-  }
-}
+func onPress17() { handlePress(17, SC_G, SK_STAR3 | KEY_STENO, SC_5 | KEY_SHIFT, SC_NONE, SC_NONE, SC_NONE); }
 func onRelease17() { handleRelease(SC_G, SK_STAR3 | KEY_STENO, SC_5 | KEY_SHIFT, SC_NONE, SC_NONE, SC_NONE); }
 
 func onPress18() {
@@ -2015,7 +2131,12 @@ func onPress29() {
   handlePress(29, SC_B, SC_NONE, SC_L_BRACKET | KEY_SHIFT, SC_NONE, SC_NONE, SC_NONE);
 
   if (isSettingsLayer()) {
-    disconnectBle();
+    if (isBleProfileConnected(getBleProfile())) {
+      disconnectBle();
+    } else if (isBleProfilePaired(getBleProfile())) {
+      unpairBle();
+      drawBleSummary();
+    }
   }
 }
 func onRelease29() { handleRelease(SC_B, SC_NONE, SC_L_BRACKET | KEY_SHIFT, SC_NONE, SC_NONE, SC_NONE); }
@@ -2173,83 +2294,6 @@ func onRelease38() {
 
 func onPress39() { handlePress(39, SC_SPACE, SK_E | KEY_STENO, SC_NONE, SC_NONE, SC_SPACE, SC_SPACE); }
 func onRelease39() { handleRelease(SC_SPACE, SK_E | KEY_STENO, SC_NONE, SC_NONE, SC_SPACE, SC_SPACE); }
-
-
-const BLE_ICONS = [[
-  // BLE1
-  10 10 00 00 00 00 00 00 10 04 20 02 40 01 ff 7f
-  82 20 44 11 28 0a 10 04 00 00 00 48 00 7c 00 40
-  00 00
-
-  // BLE2
-  10 10 00 00 00 00 00 00 10 04 20 02 40 01 ff 7f
-  82 20 44 11 28 0a 10 04 00 00 00 74 00 54 00 5c
-  00 00
-
-  // BLE3
-  10 10 00 00 00 00 00 00 10 04 20 02 40 01 ff 7f
-  82 20 44 11 28 0a 10 04 00 00 00 44 00 54 00 7c
-  00 00
-
-  // BLE4
-  10 10 00 00 00 00 00 00 10 04 20 02 40 01 ff 7f
-  82 20 44 11 28 0a 10 04 00 00 00 1c 00 10 00 7c
-  00 00
-]];
-
-const SLEEPING_ICON = [[
-  20 10 00 00 00 00 10 04 10 06 10 05 90 04 50 04
-  30 04 10 04 00 00 10 04 10 06 10 05 90 04 50 04
-  30 04 10 04 00 00 10 04 10 06 10 05 90 04 50 04
-  30 04 10 04 00 00 00 04 00 00 00 04 00 00 00 04
-  00 00
-]];
-
-const CONNECTED_ICON = [[
-  10 10 30 00 38 00 9c 01 cc 01 ce 00 66 0c 66 0e
-  66 66 66 66 66 0e 66 0c ce 00 cc 01 9c 01 38 00
-  30 00
-]];
-
-const DISCONNECTED_ICON = [[
-  10 10 30 00 38 00 9c 01 cc 01 ce 70 66 7c 06 1f
-  c6 47 f0 61 7c 0c 1f 0c c7 00 c0 01 9c 01 38 00
-  30 00
-]];
-
-const UNPAIRED_ICON = [[
-  10 10 00 00 00 00 80 01 80 01 80 01 80 01 80 01
-  80 01 80 01 80 01 80 01 80 01 80 01 80 01 00 00
-  00 00
-]];
-
-func drawBleSummary() {
-  isBleSummaryActive = 1;
-
-  const yOffset = DISPLAY_HEIGHT/2 + (DISPLAY_HEIGHT/2 - 76) / 2;
-
-  for (var i = 0; i < 4; i = i + 1) {
-    var y = i * 19 + yOffset;
-    drawImage(0, DISPLAY_WIDTH/4 - 8, y, BLE_ICONS + i * 0x22);
-    // drawText(0, DISPLAY_WIDTH/4, y + 15, FONT_ID_MEDIUM_DIGITS, TEXT_ALIGNMENT_MIDDLE, "1\02\03\04\0" + i*2);
-
-    if (isBleProfileSleeping(i)) {
-      drawImage(0, DISPLAY_WIDTH/2, y+2, SLEEPING_ICON);
-    } else if (isBleProfileConnected(i)) {
-      drawImage(0, DISPLAY_WIDTH/2, y, CONNECTED_ICON);
-    } else if (isBleProfilePaired(i)) {
-      drawImage(0, DISPLAY_WIDTH/2, y, DISCONNECTED_ICON);
-    } else {
-      drawImage(0, DISPLAY_WIDTH/2, y, UNPAIRED_ICON);
-    }
-  }
-
-  var activeY = yOffset + getBleProfile() * 19;
-  drawLine(0, 2, activeY - 2, DISPLAY_WIDTH-2, activeY - 2);
-  drawLine(0, 2, activeY - 2, 2, activeY + 17);
-  drawLine(0, 2, activeY + 17, DISPLAY_WIDTH-2, activeY + 17);
-  drawLine(0, DISPLAY_WIDTH-2, activeY - 2, DISPLAY_WIDTH-2, activeY + 17);
-}
 
 func onPress40() {
   handlePress(40, SC_NONE, SK_U | KEY_STENO, SC_NONE, SC_NONE, SC_NONE, SC_KP_0);
