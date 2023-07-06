@@ -27,6 +27,7 @@ class InstructionList extends Iterable<ScriptInstruction> {
     optimizeJumpToNext();
     optimizeConditionalJumpOverJump();
     optimizeNot();
+    optimizeConditionalJumpToNext();
   }
 
   void optimizeRightFactor() {
@@ -218,6 +219,28 @@ class InstructionList extends Iterable<ScriptInstruction> {
 
       final next = instruction.target.next;
       if (instruction is JumpScriptInstruction) {
+        instruction.unlink();
+      }
+      instruction = next;
+    }
+  }
+
+  void optimizeConditionalJumpToNext() {
+    if (instructions.isEmpty) {
+      return;
+    }
+
+    ScriptInstruction? instruction = instructions.first;
+    while (instruction != null) {
+      if (instruction is! JumpScriptInstructionBase ||
+          !instruction.isJumpToNext()) {
+        instruction = instruction.next;
+        continue;
+      }
+
+      final next = instruction.target.next;
+      if (instruction.isConditional()) {
+        instruction.insertAfter(PopValueInstruction());
         instruction.unlink();
       }
       instruction = next;

@@ -695,10 +695,16 @@ class IfStatementAstNode extends AstNode {
   }
 
   @override
-  bool isConstant() => false;
+  bool isConstant() => condition.isConstant()
+      ? condition.constantValue() != 0
+          ? whenTrue.isConstant()
+          : (whenFalse?.isConstant() ?? false)
+      : false;
 
   @override
-  int constantValue() => throw UnsupportedError('Should not be invoked');
+  int constantValue() => condition.constantValue() != 0
+      ? whenTrue.constantValue()
+      : whenFalse!.constantValue();
 
   @override
   void mark(ScriptReachability context) {
@@ -911,17 +917,19 @@ class CallFunctionAstNode extends AstNode {
 
   @override
   void mark(ScriptReachability context) {
-    for (final parameter in parameters) {
-      parameter.mark(context);
-    }
-
     final definition = context.module.functions[name];
-    if (definition is ScriptFunction) {
-      if (!definition.hasReturnValue &&
-          (definition.statements.isReturn() ||
-              definition.statements.isEmpty())) {
-        // Do nothing. Written this way to mimic the addInstructions logic.
-      } else {
+    if (definition is InBuiltScriptFunction) {
+      for (final parameter in parameters) {
+        parameter.mark(context);
+      }
+    } else if (definition is ScriptFunction) {
+      if (definition.hasReturnValue ||
+          (!definition.statements.isReturn() &&
+              !definition.statements.isEmpty())) {
+        for (final parameter in parameters) {
+          parameter.mark(context);
+        }
+
         context.functions.add(name);
         definition.mark(context);
       }
@@ -944,22 +952,22 @@ class CallFunctionAstNode extends AstNode {
       throw FormatException('$name does not return a value');
     }
 
-    for (final parameter in parameters) {
-      parameter.addInstructions(builder);
-    }
-
     if (definition is InBuiltScriptFunction) {
+      for (final parameter in parameters) {
+        parameter.addInstructions(builder);
+      }
+
       builder.addInstruction(
         CallInBuiltFunctionInstruction(definition),
       );
     } else if (definition is ScriptFunction) {
-      if (!definition.hasReturnValue &&
-          (definition.statements.isReturn() ||
-              definition.statements.isEmpty())) {
-        for (final _ in parameters) {
-          builder.addInstruction(PopValueInstruction());
+      if (definition.hasReturnValue ||
+          (!definition.statements.isReturn() &&
+              !definition.statements.isEmpty())) {
+        for (final parameter in parameters) {
+          parameter.addInstructions(builder);
         }
-      } else {
+
         builder.addInstruction(CallFunctionInstruction(name));
       }
     }

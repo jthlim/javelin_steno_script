@@ -2035,20 +2035,14 @@ var wasInLayer24;
 func onPress24() {
   updateButtonColor(24);
   if (isInPressAll()) {
-    if (layer == 0 && !wasSteno24) {
+    if (!wasSteno24) {
       press(SC_L_SHIFT);
     }
     return;
   }
   lastActionTime = getTime();
   wasInLayer24 = layer >> 1;
-  if (wasInLayer24) {
-    if (layer == (STENO_MASK | TEMPORARY_QWERTY_MASK)) {
-      press(SC_L_SHIFT);
-    }
-    return;
-  }
-  wasSteno24 = layer & STENO_MASK;
+  wasSteno24 = layer == STENO_MASK;
   if (wasSteno24) {
     setLayer(layer ^ STENO_MASK);
     pressCount24 = pressCount;
@@ -2061,13 +2055,6 @@ func onPress24() {
 }
 func onRelease24() {
   lastActionTime = getTime();
-
-  if (wasInLayer24) {
-    if (layer == (STENO_MASK | TEMPORARY_QWERTY_MASK)) {
-      release(SC_L_SHIFT);
-    }
-    return;
-  }
 
   if (wasSteno24) {
     // If the keypress was in steno mode, and other keys were pressed, or it

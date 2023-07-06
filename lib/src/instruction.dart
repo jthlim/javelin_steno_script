@@ -454,7 +454,7 @@ abstract class JumpScriptInstructionBase extends ScriptInstruction {
     offset = finalOffset;
     int layoutDelta = target._firstPassOffset - _firstPassOffset;
     if (layoutDelta == 3) {
-      return 0;
+      return isConditional() ? 1 : 0;
     }
     if (4 <= layoutDelta && layoutDelta < 35) {
       return 1;
@@ -467,6 +467,10 @@ abstract class JumpScriptInstructionBase extends ScriptInstruction {
     int delta = target.offset - offset;
     int layoutDelta = target._firstPassOffset - _firstPassOffset;
     if (layoutDelta == 3) {
+      if (isConditional()) {
+        builder.addByte(ScriptOpcode.pop.value);
+        --delta;
+      }
       if (delta != 0) {
         throw Exception('Internal error on $this');
       }
