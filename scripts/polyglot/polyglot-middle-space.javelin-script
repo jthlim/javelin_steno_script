@@ -8,20 +8,21 @@
 
 // Steno
 //
-// ,-------------------------------------------.        ,------------------------------------------.
-// |        |  S1  |   T  |   P  |   H  |  *1  |        | *2  |   F  |   P  |   L  |   T  |    D   |
-// |--------+------+------+------+------+------|        |-----+------+------+------+------+--------|
-// |        |  S2  |   K  |   W  |   R  |  *3  |        | *4  |   R  |   B  |   G  |   S  |    Z   |
-// |--------+------+------+------+------+------|        |-----+------+------+------+------+--------|
-// | QWERTY |      |      |      |      |      |        |     |      |      |      |      |        |
+// ,-------------------------------------------.        ,-------------------------------------------.
+// |   Tab  |  S1  |   T  |   P  |   H  |  *1  |        |  *2  |   F  |   P  |   L  |   T  |    D   |
+// |--------+------+------+------+------+------|        |------+------+------+------+------+--------|
+// |Ctrl/Esc|  S2  |   K  |   W  |   R  |  *3  |        |  *4  |   R  |   B  |   G  |   S  |    Z   |
+// |--------+------+------+------+------+------|        |------+------+------+------+------+--------|
+// | QWERTY |      |      |      |      |      |        |      |      |      |      |      |        |
 // `----------------------+------+------+------|        |------+------+------+----------------------'
-//                        |  #1  |   A  |   O  |        |  E  |   U  |  #2  |
+//                        |  #1  |   A  |   O  |        |   E  |   U  |  #2  |
 //                        `--------------------'        `-------------------'
 //
 // * Tapping QWERTY key will switch to QWERTY mode
 // * Holding it down and pressing other buttons will cause the keyboard to return to steno mode when
 //   releasing it. This will also give access to the Symbols, Navigation and Function layers by
 //   pressing those keys on the QWERTY layer.
+// * Command and Control activate a temporary qwerty layer
 
 // QWERTY
 //
@@ -61,7 +62,6 @@
 //   - Following a '{' or '[', it means enter (newline)
 //   - Following a digit, it means ','
 //   - Following a comma or dot, it means space ' '
-//
 
 //
 // Function
@@ -86,7 +86,7 @@
 // |--------+------+------+------+------+------|        |------+------+------+------+------+--------|
 // |        |      |      |      |      |      |        | Mute |      |      |      |      |        |
 // `----------------------+------+------+------|        |-------------------------------------------'
-//                        |      |      |      |        | Space|      | Enter|
+//                        |      |NumPad|      |        | Space|      | Enter|
 //                        `--------------------'        `--------------------'
 
 //
@@ -104,15 +104,16 @@
 //
 // * Magic has the same meaning as the symbol layer.
 
+
 //
 // Settings - pressing both Sym and Fn together.
 //
 // ,-------------------------------------------.        ,-------------------------------------------.
-// |StrkCnt |      |      |Embedd|      |      |        |Speed+|      |Brght+| Sat+ | Hue+ |HueSprd+|
+// |StrkCnt |      |      |      |      |      |        |Speed+|      |Brght+| Sat+ | Hue+ |HueSprd+|
 // |--------+------+------+------+------+------|        |------+------+------+------+------+--------|
-// |        |      |      |Gemini|      |      |        |Speed-|      |Brght-| Sat- | Hue- |HueSprd-|
+// |        |      |Embedd|Gemini|PloHID|      |        |Speed-|      |Brght-| Sat- | Hue- |HueSprd-|
 // |--------+------+------+------+------+------|        |------+------+------+------+------+--------|
-// |        |      |      |PloHID|      |      |        |      |      |      |      |      |        |
+// |        |      |      |      |      |      |        |      |      |      |      |      |        |
 // `----------------------+------+------+------|        |-------------------------------------------'
 //                        |      |      |      |        |      |      |      |
 //                        `--------------------'        `--------------------'
@@ -416,6 +417,13 @@ const LED_STATUS_COMPOSE = 3;
 const LED_STATUS_KANA = 4;
 
 //---------------------------------------------------------------------------
+
+const INPUT_HINT_KEYBOARD = 0;
+const INPUT_HINT_STENOGRAPHY = 1;
+
+const SCRIPT_ID_KEYBOARD_LED_STATUS_UPDATE = 4;
+
+//---------------------------------------------------------------------------
 //
 // Polyglot button layout:
 //
@@ -459,12 +467,13 @@ const SYMBOL_MASK = 2;
 const FUNCTION_MASK = 4;
 const NAV_MASK = 8;
 const NUMPAD_MASK = 16;
+const TEMPORARY_QWERTY_MASK = 32;
 
 var layer = STENO_MASK;
 var pressCount = 0;
-
-var underglowMode = layer;
 var speed = 3;
+var underglowMode = layer;
+
 var hueSpread = 4;
 var hueShift = 0;
 var brightness = 5;
@@ -486,18 +495,17 @@ var saturation = 5;
 // Mechanics:
 //  1. When a layer button is pressed, record a layerPressTimestamp.
 //  2. When a key is pressed within 100ms and there is no recorded
-//     keypress, then the layer and qwerty key are recorded with
-//     qwertyPressTimestamp. If there is already a recorded keypress, press the
-//     deferred layer key and immediately press the newer key. If a keypress
-//     occurs outside of 100ms, process normally.
+//     keypress, then the layer and qwerty key are recorded. If there is
+//     already a recorded keypress, press the deferred layer key and
+//     immediately press the newer key. If a keypress occurs outside of 100ms,
+//     process normally.
 //  2. When the layer button is released, if there is a deferredQwertyKey
-//     recorded timestamp within 50ms of qwertyPressTimestamp, then press space
-//     then the non-nav key. This is detected in release when NAV_MASK is on,
+//     recorded timestamp within 50ms, then press the deferredQwertyKey then
+//     the non-nav key. This is detected in release when NAV_MASK is on,
 //     but isButtonPressed(38) returns false, and the key is emitted in the
 //     release script for the layer key.
 //  3. When a key is released, if there is a deferred key, press it first.
-//  4. On tick update, if more than 50ms after qwertyPressTimestamp has elapsed,
-//     then issue the deferredQwertyKey.
+//  4. On timer expiration (after 50ms has elapsed), issue deferredQwertyKey.
 const LAYER_PRESS_TO_KEY_PRESS_THRESHOLD = 100;
 const KEY_PRESS_TO_LAYER_RELEASE_THRESHOLD = 50;
 const NAV_BUTTON = 38;
@@ -512,37 +520,29 @@ var qwertyPressTimestamp;
 const KEY_STENO = 0x200;
 const KEY_SHIFT = 0x100;
 const TAP_THRESHOLD = 200; // milliseconds for keys that have alternates
-const SCREEN_OFF_TIMEOUT = 30000; // 30 seconds.
 
-const STENO_MODE_EMBEDDED = 0;
-const STENO_MODE_GEMINI = 1;
+const TIMER_ID_RGB_UPDATE = 0;
+const TIMER_ID_FUZZY_LAYER = 1;
 
 var wordCaps = 0;
 var lastPressLayer;
 var lastPressKey;
 
-func init() {
-  updateUnderglowRgb();
-}
-
 const RGB_UPDATE_TIME = 20;
-var lastRgbUpdateTime = 0;
 
-func tick() {
-  var time = getTime();
-  if (time - lastRgbUpdateTime >= RGB_UPDATE_TIME) {
-    lastRgbUpdateTime = time;
-    updateUnderglowRgb();
-  }
+func init() {
+  setLayer(layer);
+  updateUnderglowRgb();
 
-  if (deferredLayerKey) {
-    if (getTime() - qwertyPressTimestamp >= KEY_PRESS_TO_LAYER_RELEASE_THRESHOLD) {
-      press(deferredLayerKey);
-      deferredLayerKey = 0;
-      deferredQwertyKey = 0;
-    }
-  }
+  startTimer(TIMER_ID_RGB_UPDATE, RGB_UPDATE_TIME, 1, @updateUnderglowRgb);
 }
+
+// Uncomment this function when developing to ensure callbacks and timers
+// work properly, otherwise they may call a wrong address in the script.
+//
+// func tick() {
+//   startTimer(TIMER_ID_RGB_UPDATE, RGB_UPDATE_TIME, 1, @updateUnderglowRgb);
+// }
 
 const SPEED_VALUES      = [[ 00 02 04 08 0c 10 18 20 30 ]];
 const HUE_SPREAD_VALUES = [[ 00 10 20 28 30 38 40 48 50 ]];
@@ -618,8 +618,11 @@ func sendLayerEvent() {
 }
 
 func setLayer(value) {
+  releaseAll();
   layer = value;
   sendLayerEvent();
+
+  setInputHint(value == STENO_MASK ? INPUT_HINT_STENOGRAPHY : INPUT_HINT_KEYBOARD);
 }
 
 func isModifierKey(key) var {
@@ -629,8 +632,6 @@ func isModifierKey(key) var {
 func isWordCapsModifierKey(key) var {
   var v = key | 4;
   return v == SC_R_SHIFT || key == SC_R_ALT;
-
-  return SC_L_CTRL <= key && key <= SC_R_META;
 }
 
 func isWordKey(key) var {
@@ -659,7 +660,7 @@ func press(key) {
   } else {
     if (wordCaps) {
       if (isWordKey(key) && (key & KEY_SHIFT) == 0) {
-        pressScanCode(SC_L_SHIFT);
+        key = key | KEY_SHIFT;
       } else if (!isWordCapsModifierKey(key)
           && key != (SC_MINUS | KEY_SHIFT)
           && key != SC_BACKSPACE
@@ -684,8 +685,8 @@ func release(key) {
     releaseStenoKey(key & 0xff);
   } else {
     if (wordCaps) {
-      if (isWordKey(key) && (key & KEY_SHIFT) == 0) {
-        releaseScanCode(SC_L_SHIFT);
+      if (isWordKey(key)) {
+        key = key | KEY_SHIFT;
       }
     }
     if (key & KEY_SHIFT) {
@@ -705,6 +706,12 @@ func isSettingsLayer() var {
   return (layer & (SYMBOL_MASK | FUNCTION_MASK)) == (SYMBOL_MASK | FUNCTION_MASK);
 }
 
+func fuzzyLayerTimeout() {
+  press(deferredLayerKey);
+  deferredLayerKey = 0;
+  deferredQwertyKey = 0;
+}
+
 func handlePress(buttonIndex, qwertyKey, stenoKey, symbolsKey, functionKey, navKey, numPadKey) {
   if (isSettingsLayer()) {
     return;
@@ -716,12 +723,13 @@ func handlePress(buttonIndex, qwertyKey, stenoKey, symbolsKey, functionKey, navK
 
       deferredLayerKey = 0;
       deferredQwertyKey = 0;
+      stopTimer(TIMER_ID_FUZZY_LAYER);
 
       press(navKey);
     } else if (getTime() - navLayerPressTimestamp < LAYER_PRESS_TO_KEY_PRESS_THRESHOLD) {
       deferredLayerKey = navKey;
       deferredQwertyKey = qwertyKey;
-      qwertyPressTimestamp = getTime();
+      startTimer(TIMER_ID_FUZZY_LAYER, KEY_PRESS_TO_LAYER_RELEASE_THRESHOLD, 0, @fuzzyLayerTimeout);
     } else {
       press(navKey);
     }
@@ -731,17 +739,20 @@ func handlePress(buttonIndex, qwertyKey, stenoKey, symbolsKey, functionKey, navK
 
       deferredLayerKey = 0;
       deferredQwertyKey = 0;
+      stopTimer(TIMER_ID_FUZZY_LAYER);
 
       press(functionKey);
     } else if (getTime() - functionLayerPressTimestamp < LAYER_PRESS_TO_KEY_PRESS_THRESHOLD) {
       deferredLayerKey = functionKey;
       deferredQwertyKey = qwertyKey;
-      qwertyPressTimestamp = getTime();
+      startTimer(TIMER_ID_FUZZY_LAYER, KEY_PRESS_TO_LAYER_RELEASE_THRESHOLD, 0, @fuzzyLayerTimeout);
     } else {
       press(functionKey);
     }
   } else if (layer & SYMBOL_MASK) {
     press(symbolsKey);
+  } else if (layer & TEMPORARY_QWERTY_MASK) {
+    press(qwertyKey);
   } else if (layer & STENO_MASK) {
     press(stenoKey);
   } else {
@@ -775,6 +786,8 @@ func handleRelease(qwertyKey, stenoKey, symbolsKey, functionKey, navKey, numPadK
     release(functionKey);
   } else if (layer & SYMBOL_MASK) {
     release(symbolsKey);
+  } else if (layer & TEMPORARY_QWERTY_MASK) {
+    release(qwertyKey);
   } else if (layer & STENO_MASK) {
     release(stenoKey);
   } else {
@@ -782,14 +795,23 @@ func handleRelease(qwertyKey, stenoKey, symbolsKey, functionKey, navKey, numPadK
   }
 }
 
-func onPress0() {
-  handlePress(0, SC_TAB, SK_NONE, SC_GRAVE, SC_NONE, SC_NONE, SC_NONE);
+func onPairingHoldTimer() {
+  startBlePairing();
+}
 
-  if (isSettingsLayer()) {
-    sendText(console("get_parameter stroke_count"));
+func onPress0() {
+  if (layer & STENO_MASK) {
+      setInputHint(INPUT_HINT_KEYBOARD);
+  }
+  handlePress(0, SC_TAB, SC_TAB, SC_GRAVE, SC_NONE, SC_NONE, SC_NONE);
+}
+func onRelease0() {
+  handleRelease(SC_TAB, SC_TAB, SC_GRAVE, SC_NONE, SC_NONE, SC_NONE);
+
+  if (layer & STENO_MASK) {
+      setInputHint(INPUT_HINT_STENOGRAPHY);
   }
 }
-func onRelease0() { handleRelease(SC_TAB, SK_NONE, SC_GRAVE, SC_NONE, SC_NONE, SC_NONE); }
 
 func onPress1() { handlePress(1, SC_Q, SK_S1 | KEY_STENO, SC_1, SC_F9, SC_NONE, SC_NONE); }
 func onRelease1() { handleRelease(SC_Q, SK_S1 | KEY_STENO, SC_1, SC_F9, SC_NONE, SC_NONE); }
@@ -797,13 +819,7 @@ func onRelease1() { handleRelease(SC_Q, SK_S1 | KEY_STENO, SC_1, SC_F9, SC_NONE,
 func onPress2() { handlePress(2, SC_W, SK_TL | KEY_STENO, SC_2, SC_F10, SC_NONE, SC_NONE); }
 func onRelease2() { handleRelease(SC_W, SK_TL | KEY_STENO, SC_2, SC_F10, SC_NONE, SC_NONE); }
 
-func onPress3() {
-  handlePress(3, SC_E, SK_PL | KEY_STENO, SC_3, SC_F11, SC_NONE, SC_NONE);
-
-  if (isSettingsLayer()) {
-    console("set_steno_mode embedded");
-  }
-}
+func onPress3() { handlePress(3, SC_E, SK_PL | KEY_STENO, SC_3, SC_F11, SC_NONE, SC_NONE); }
 func onRelease3() { handleRelease(SC_E, SK_PL | KEY_STENO, SC_3, SC_F11, SC_NONE, SC_NONE); }
 
 func onPress4() { handlePress(4, SC_R, SK_HL | KEY_STENO, SC_4, SC_F12, SC_NONE, SC_NONE); }
@@ -875,16 +891,33 @@ func onRelease11() { handleRelease(SC_BACKSPACE, SK_DR | KEY_STENO, SC_EQUAL, SC
 
 var timer12;
 var pressCount12;
+var wasSteno12;
 func onPress12() {
-  handlePress(12, SC_L_CTRL, SK_NONE, SC_GRAVE | KEY_SHIFT, SC_NONE, SC_NONE, SC_NONE);
+  if (!isInPressAll()) {
+    wasSteno12 = layer == STENO_MASK;
+    if (wasSteno12) {
+      setLayer(layer | TEMPORARY_QWERTY_MASK);
+    }
+  }
+  handlePress(12, SC_L_CTRL, SC_NONE, SC_GRAVE | KEY_SHIFT, SC_NONE, SC_NONE, SC_NONE);
+  update24();
+
   if (!isInPressAll()) {
     timer12 = getTime();
     pressCount12 = pressCount;
   }
 }
 func onRelease12() {
-  handleRelease(SC_L_CTRL, SK_NONE, SC_GRAVE | KEY_SHIFT, SC_NONE, SC_NONE, SC_NONE);
-  if (layer == 0 && pressCount12 == pressCount && getTime() - timer12 < TAP_THRESHOLD) {
+  if (wasSteno12) {
+    setLayer(STENO_MASK);
+  } else {
+    handleRelease(SC_L_CTRL, SC_NONE, SC_GRAVE | KEY_SHIFT, SC_NONE, SC_NONE, SC_NONE);
+    update24();
+  }
+
+  if ((layer == 0 || wasSteno12)
+      && pressCount12 == pressCount
+      && getTime() - timer12 < TAP_THRESHOLD) {
     tap(SC_ESC);
   }
 }
@@ -892,7 +925,13 @@ func onRelease12() {
 func onPress13() { handlePress(13, SC_A, SK_S2 | KEY_STENO, SC_1 | KEY_SHIFT, SC_F5, SC_L_META, SC_L_META); }
 func onRelease13() { handleRelease(SC_A, SK_S2 | KEY_STENO, SC_1 | KEY_SHIFT, SC_F5, SC_L_META, SC_L_META); }
 
-func onPress14() { handlePress(14, SC_S, SK_KL | KEY_STENO, SC_2 | KEY_SHIFT, SC_F6, SC_L_ALT, SC_L_ALT); }
+func onPress14() {
+  handlePress(14, SC_S, SK_KL | KEY_STENO, SC_2 | KEY_SHIFT, SC_F6, SC_L_ALT, SC_L_ALT);
+
+  if (isSettingsLayer()) {
+    console("set_steno_mode embedded");
+  }
+}
 func onRelease14() { handleRelease(SC_S, SK_KL | KEY_STENO, SC_2 | KEY_SHIFT, SC_F6, SC_L_ALT, SC_L_ALT); }
 
 func onPress15() {
@@ -904,7 +943,13 @@ func onPress15() {
 }
 func onRelease15() { handleRelease(SC_D, SK_WL | KEY_STENO, SC_3 | KEY_SHIFT, SC_F7, SC_L_CTRL, SC_L_CTRL); }
 
-func onPress16() { handlePress(16, SC_F, SK_RL | KEY_STENO, SC_4 | KEY_SHIFT, SC_F8, SC_L_SHIFT, SC_L_SHIFT); }
+func onPress16() {
+  handlePress(16, SC_F, SK_RL | KEY_STENO, SC_4 | KEY_SHIFT, SC_F8, SC_L_SHIFT, SC_L_SHIFT);
+
+  if (isSettingsLayer()) {
+    console("set_steno_mode plover_hid");
+  }
+}
 func onRelease16() { handleRelease(SC_F, SK_RL | KEY_STENO, SC_4 | KEY_SHIFT, SC_F8, SC_L_SHIFT, SC_L_SHIFT); }
 
 func onPress17() { handlePress(17, SC_G, SK_STAR3 | KEY_STENO, SC_5 | KEY_SHIFT, SC_NONE, SC_NONE, SC_NONE); }
@@ -974,55 +1019,56 @@ func onRelease23() { handleRelease(SC_APOSTROPHE, SK_ZR | KEY_STENO, SC_EQUAL | 
 var timer24;
 var wasSteno24;
 var pressCount24;
-var wasInLayer24;
+var wasShiftPressed24;
+func update24() {
+  if (isButtonPressed(24)
+        && (isButtonPressed(12 /*CTRL*/) || isButtonPressed(36 /*META*/))
+        && (layer == QWERTY_LAYER || (layer & TEMPORARY_QWERTY_MASK))) {
+    press(SC_L_SHIFT);
+    wasShiftPressed24 = 1;
+  } else if (wasShiftPressed24) {
+    release(SC_L_SHIFT);
+    wasShiftPressed24 = 0;
+  }
+}
 func onPress24() {
   if (isInPressAll()) {
-    if (layer == 0 && !wasSteno24) {
-      press(SC_L_SHIFT);
-    }
+    update24();
     return;
   }
-  wasInLayer24 = layer >> 1;
-  if (wasInLayer24) {
-    return;
-  }
-  wasSteno24 = layer & STENO_MASK;
+  wasSteno24 = layer == STENO_MASK;
+  wasShiftPressed24 = (layer == QWERTY_LAYER || (layer & TEMPORARY_QWERTY_MASK));
   if (wasSteno24) {
-    releaseAll();
     setLayer(layer ^ STENO_MASK);
     pressCount24 = pressCount;
     pressAll();
   } else {
-    press(SC_L_SHIFT);
+    if (wasShiftPressed24) {
+      press(SC_L_SHIFT);
+    }
     pressCount24 = pressCount;
   }
   timer24 = getTime();
 }
 func onRelease24() {
-  if (wasInLayer24) {
-    return;
+  if (wasShiftPressed24) {
+    release(SC_L_SHIFT);
   }
 
   if (wasSteno24) {
     // If the keypress was in steno mode, and other keys were pressed, or it
     // was a long press, drop immediately back to steno mode, and drop all masks.
     if (pressCount24 != pressCount || layer || getTime() - timer24 >= TAP_THRESHOLD) {
-      releaseAll();
       setLayer(STENO_MASK);
     }
-  } else {
-    release(SC_L_SHIFT);
-
+  } else if (layer == 0 && pressCount24 == pressCount
+      && getTime() - timer24 < TAP_THRESHOLD
+      && checkButtonState("000000000000000000000000000000000000000000")) {
     // A tap of the key turns on steno mode.
-    if (layer == 0 && pressCount24 == pressCount
-        && getTime() - timer24 < TAP_THRESHOLD
-        && checkButtonState("000000000000000000000000000000000000000000")) {
-      releaseAll();
-      setLayer(layer | STENO_MASK);
+    // Automatically turn off word caps when entering steno mode.
+    wordCaps = 0;
 
-      // Automatically turn off word caps when entering steno mode.
-      wordCaps = 0;
-    }
+    setLayer(layer | STENO_MASK);
   }
   underglowMode = layer & 1;
   updateUnderglowRgb();
@@ -1034,13 +1080,7 @@ func onRelease25() { handleRelease(SC_Z, SC_NONE, SC_BACKSLASH, SC_F1, SC_NONE, 
 func onPress26() { handlePress(26, SC_X, SC_NONE, SC_BACKSLASH | KEY_SHIFT, SC_F2, SC_NONE, SC_NONE); }
 func onRelease26() { handleRelease(SC_X, SC_NONE, SC_BACKSLASH | KEY_SHIFT, SC_F2, SC_NONE, SC_NONE); }
 
-func onPress27() {
-  handlePress(27, SC_C, SC_NONE, SC_MINUS, SC_F3, SC_NONE, SC_NONE);
-
-  if (isSettingsLayer()) {
-    console("set_steno_mode plover_hid");
-  }
-}
+func onPress27() { handlePress(27, SC_C, SC_NONE, SC_MINUS, SC_F3, SC_NONE, SC_NONE); }
 func onRelease27() { handleRelease(SC_C, SC_NONE, SC_MINUS, SC_F3, SC_NONE, SC_NONE); }
 
 func onPress28() { handlePress(28, SC_V, SC_NONE, SC_L_BRACKET, SC_F4, SC_NONE, SC_NONE); }
@@ -1124,8 +1164,24 @@ func onRelease35() {
 
 // 4th row
 
-func onPress36() { handlePress(36, SC_L_META, SK_NUM1 | KEY_STENO, SC_L_META, SC_NONE, SC_NONE, SC_NONE); }
-func onRelease36() { handleRelease(SC_L_META, SK_NUM1 | KEY_STENO, SC_L_META, SC_NONE, SC_NONE, SC_NONE); }
+var wasSteno36;
+func onPress36() {
+  if (!isInPressAll()) {
+    wasSteno36 = layer == STENO_MASK;
+    if (wasSteno36) {
+      setLayer(layer | TEMPORARY_QWERTY_MASK);
+    }
+  }
+  handlePress(36, SC_L_META, SC_NONE, SC_L_META, SC_NONE, SC_NONE, SC_NONE);
+  update24();
+}
+func onRelease36() {
+  handleRelease(SC_L_META, SC_NONE, SC_L_META, SC_NONE, SC_NONE, SC_NONE);
+  update24();
+  if (wasSteno36) {
+    setLayer(STENO_MASK);
+  }
+}
 
 var timer37;
 var pressCount37;
@@ -1137,7 +1193,6 @@ func onPress37() {
 
   }
   if ((layer & (NAV_MASK | NUMPAD_MASK))  == NAV_MASK) {
-    releaseAll();
     setLayer(layer | NUMPAD_MASK);
     pressAll();
   }
@@ -1148,7 +1203,6 @@ func onRelease37() {
     tap(SC_ENTER);
   }
   if (layer & NUMPAD_MASK) {
-    releaseAll();
     setLayer(layer ^ NUMPAD_MASK);
     pressAll();
   }
@@ -1159,11 +1213,12 @@ func onPress38() {
   handlePress(38, SC_NONE, SK_O | KEY_STENO, SC_L_CTRL, SC_NONE, SC_NONE, SC_NONE);
 
   if (layer == 0) {
-    releaseAll();
     setLayer(layer | NAV_MASK);
     pressAll();
     navLayerPressTimestamp = getTime();
     pressCount38 = pressCount;
+  } else if (layer & TEMPORARY_QWERTY_MASK) {
+    press(SC_SPACE);
   }
 }
 func onRelease38() {
@@ -1171,7 +1226,6 @@ func onRelease38() {
   if (layer & NAV_MASK) {
     var startPressCount = pressCount;
 
-    releaseAll();
     setLayer(layer & ~(NAV_MASK | NUMPAD_MASK));
     pressAll();
 
@@ -1181,6 +1235,8 @@ func onRelease38() {
     tap(deferredQwertyKey);
     deferredLayerKey = 0;
     deferredQwertyKey = 0;
+  } else if (layer & TEMPORARY_QWERTY_MASK) {
+    release(SC_SPACE);
   }
 }
 
@@ -1189,17 +1245,15 @@ func onRelease39() { handleRelease(SC_SPACE, SK_E | KEY_STENO, SC_NONE, SC_NONE,
 
 func onPress40() {
   handlePress(40, SC_NONE, SK_U | KEY_STENO, SC_NONE, SC_NONE, SC_NONE, SC_KP_0);
-  if ((layer | FUNCTION_MASK) == FUNCTION_MASK) {
-    releaseAll();
+  if ((layer | FUNCTION_MASK) == FUNCTION_MASK
+      || layer == (STENO_MASK | TEMPORARY_QWERTY_MASK)) {
     setLayer(layer | SYMBOL_MASK);
     pressAll();
   }
 }
-
 func onRelease40() {
   handleRelease(SC_NONE, SK_U | KEY_STENO, SC_L_CTRL, SC_NONE, SC_NONE, SC_KP_0);
   if (layer & SYMBOL_MASK) {
-    releaseAll();
     setLayer(layer ^ SYMBOL_MASK);
     pressAll();
   }
@@ -1210,11 +1264,12 @@ func onPress41() {
   handlePress(41, SC_NONE, SK_NUM2 | KEY_STENO, SC_NONE, SC_NONE, SC_ENTER, SC_KP_DOT);
   if ((layer | SYMBOL_MASK) == SYMBOL_MASK) {
     pressCount = pressCount + 1;
-    releaseAll();
     setLayer(layer | FUNCTION_MASK);
     pressAll();
     functionLayerPressTimestamp = getTime();
     pressCount41 = pressCount;
+  } else if (layer & TEMPORARY_QWERTY_MASK) {
+    press(SC_ENTER);
   }
 }
 func onRelease41() {
@@ -1222,7 +1277,6 @@ func onRelease41() {
   if (layer & FUNCTION_MASK) {
     var startPressCount = pressCount;
 
-    releaseAll();
     setLayer(layer ^ FUNCTION_MASK);
     pressAll();
 
@@ -1235,6 +1289,8 @@ func onRelease41() {
     }
     deferredLayerKey = 0;
     deferredQwertyKey = 0;
+  } else if (layer & TEMPORARY_QWERTY_MASK) {
+    release(SC_ENTER);
   }
 }
 
