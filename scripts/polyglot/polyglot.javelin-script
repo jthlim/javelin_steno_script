@@ -431,9 +431,6 @@ const KEY_STENO = 0x200;
 const KEY_SHIFT = 0x100;
 const TAP_THRESHOLD = 200; // milliseconds for keys that have alternates
 
-const STENO_MODE_EMBEDDED = 0;
-const STENO_MODE_GEMINI = 1;
-
 func init() {
   updateUnderglowRgb();
 }

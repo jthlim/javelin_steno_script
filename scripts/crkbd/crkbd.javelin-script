@@ -1456,14 +1456,9 @@ func drawBar(barValue) {
 var bleTransmitPower = 3;
 const POWER_TO_BAR_LENGTH = [[ 00 01 02 04 06 08]];
 func updateBleTransmitPower(power) {
-  if (!HAS_DISPLAY) return;
   if (!HAS_BLE) return;
 
   bleTransmitPower = power;
-
-  updateDisplay0();
-  drawImage(0, DISPLAY_WIDTH/2 - 16, DISPLAY_HEIGHT/2 + 24, CONNECTED_ICON);
-  drawBar(POWER_TO_BAR_LENGTH[power]);
 
   var text;
   if (power == 0) {
@@ -1485,19 +1480,20 @@ func updateBleTransmitPower(power) {
     console("set_ble_transmit_power 8");
     text = "8 dB";
   }
+
+  if (!HAS_DISPLAY) return;
+
+  updateDisplay0();
+  drawImage(0, DISPLAY_WIDTH/2 - 16, DISPLAY_HEIGHT/2 + 24, CONNECTED_ICON);
+  drawBar(POWER_TO_BAR_LENGTH[power]);
   drawText(0, DISPLAY_WIDTH/2, DISPLAY_HEIGHT - 4, FONT_ID_NORMAL, TEXT_ALIGNMENT_MIDDLE, text);
 }
 
 var bleSplitTransmitPower = 3;
 func updateBleSplitTransmitPower(power) {
-  if (!HAS_DISPLAY) return;
   if (!HAS_BLE) return;
 
   bleSplitTransmitPower = power;
-
-  updateDisplay0();
-  drawImage(0, DISPLAY_WIDTH/2 - 16, DISPLAY_HEIGHT/2 + 24, PAIR_CONNECTED_STATUS_IMAGES + PAIR_CONNECTED_STATUS_IMAGE_OFFSETS[PAIR_CONNECTION_BLE]);
-  drawBar(POWER_TO_BAR_LENGTH[power]);
 
   var text;
   if (power == 0) {
@@ -1525,6 +1521,12 @@ func updateBleSplitTransmitPower(power) {
     console("pair set_ble_split_transmit_power 8");
     text = "8 dB";
   }
+
+  if (!HAS_DISPLAY) return;
+
+  updateDisplay0();
+  drawImage(0, DISPLAY_WIDTH/2 - 16, DISPLAY_HEIGHT/2 + 24, PAIR_CONNECTED_STATUS_IMAGES + PAIR_CONNECTED_STATUS_IMAGE_OFFSETS[PAIR_CONNECTION_BLE]);
+  drawBar(POWER_TO_BAR_LENGTH[power]);
   drawText(0, DISPLAY_WIDTH/2, DISPLAY_HEIGHT - 4, FONT_ID_NORMAL, TEXT_ALIGNMENT_MIDDLE, text);
 }
 
@@ -1983,9 +1985,8 @@ func onPress12() {
     pressCount12 = pressCount;
   }
 
-  if (isSettingsLayer()) {
+  if (HAS_BLE && isSettingsLayer()) {
     updateBleTransmitPower(bleTransmitPower < 5 ? bleTransmitPower + 1 : 5);
-    return;
   }
 }
 func onRelease12() {
@@ -2006,9 +2007,8 @@ func onRelease12() {
 func onPress13() {
   handlePress(13, SC_A, SK_S2 | KEY_STENO, SC_1 | KEY_SHIFT, SC_F5, SC_L_META, SC_L_META);
 
-  if (isSettingsLayer()) {
+  if (HAS_BLE && isSettingsLayer()) {
     updateBleSplitTransmitPower(bleSplitTransmitPower < 5 ? bleSplitTransmitPower + 1 : 5);
-    return;
   }
 }
 
@@ -2152,7 +2152,7 @@ func onPress24() {
   wasSteno24 = layer == STENO_MASK;
   wasShiftPressed24 = (layer == QWERTY_LAYER || (layer & TEMPORARY_QWERTY_MASK));
 
-  if (isSettingsLayer()) {
+  if (HAS_BLE && isSettingsLayer()) {
     updateBleTransmitPower(bleTransmitPower > 0 ? bleTransmitPower - 1 : 0);
     return;
   }
@@ -2197,9 +2197,8 @@ func onRelease24() {
 func onPress25() {
   handlePress(25, SC_Z, SC_NONE, SC_BACKSLASH, SC_F1, SC_NONE, SC_NONE);
 
-  if (isSettingsLayer()) {
+  if (HAS_BLE && isSettingsLayer()) {
     updateBleSplitTransmitPower(bleSplitTransmitPower > 0 ? bleSplitTransmitPower - 1 : 0);
-    return;
   }
 }
 func onRelease25() { handleRelease(SC_Z, SC_NONE, SC_BACKSLASH, SC_F1, SC_NONE, SC_NONE); }

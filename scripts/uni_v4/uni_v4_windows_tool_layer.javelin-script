@@ -314,9 +314,6 @@ const SK_RES2 = 41;
 const STENO_LAYER = 0;
 const TOOL_LAYER = 1;
 
-const STENO_MODE_EMBEDDED = 0;
-const STENO_MODE_GEMINI = 1;
-
 var layer = STENO_LAYER;
 
 func updateStenoMode() {

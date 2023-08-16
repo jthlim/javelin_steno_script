@@ -1,8 +1,8 @@
 //---------------------------------------------------------------------------
-// Default Uni v4 script.
+// Default Starboard script.
 //
 // This maps all buttons to steno keys.
-// Presing all four corner keys will swap between embedded and gemini PR.
+// Pressing usr on the microcontroller swaps between embedded and gemini PR.
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
@@ -299,14 +299,14 @@ const LED_STATUS_KANA = 4;
 
 //---------------------------------------------------------------------------
 //
-// UniV4 button layout:
+// Starboard button layout:
 //
-//     0   1   2   3   4     5   6   7   8   9  10
-//    11  12  13  14  15    16  17  18  19  20  21
+//  0   1   2   3   4   5    |     6   7   8   9  10  11
+// 12  13  14  15  16   5    |     6  17  18  19  20  21
+//                 22  23    |    24  25
 //
-//            22  23  24    25  26  27
-//
-// Bootsel Button (B button on the back of the Uni) is button 28.
+// Usr button (on the microcontroller) is button 26.
+// Boot Button (on the microcontroller) is button 27.
 //
 //---------------------------------------------------------------------------
 // Example global variable:
@@ -333,67 +333,60 @@ const LED_STATUS_KANA = 4;
 // physical button.
 //---------------------------------------------------------------------------
 
-func updateStenoMode() {
-  if (checkButtonState("1000000000100000000000100001")) {
-    if (getParameter("steno_mode") != "embedded") {
-      console("set_steno_mode embedded");
-    } else {
-      console("set_steno_mode gemini");
-    }
-    releaseAll();
-  }
+func init() {
+  setRgb(0, 0, 4, 0);
 }
 
-func onPress0() { pressStenoKey(SK_S1); updateStenoMode(); }
-func onRelease0() { releaseStenoKey(SK_S1); }
+func onPress0() { }
+func onRelease0() { }
 
-func onPress1() { pressStenoKey(SK_TL); }
-func onRelease1() { releaseStenoKey(SK_TL); }
+func onPress1() { pressStenoKey(SK_NUM1); }
+func onRelease1() { releaseStenoKey(SK_NUM1); }
 
-func onPress2() { pressStenoKey(SK_PL); }
-func onRelease2() { releaseStenoKey(SK_PL); }
+func onPress2() { pressStenoKey(SK_TL); }
+func onRelease2() { releaseStenoKey(SK_TL); }
 
-func onPress3() { pressStenoKey(SK_HL); }
-func onRelease3() { releaseStenoKey(SK_HL); }
+func onPress3() { pressStenoKey(SK_PL); }
+func onRelease3() { releaseStenoKey(SK_PL); }
 
-func onPress4() { pressStenoKey(SK_STAR1); }
-func onRelease4() { releaseStenoKey(SK_STAR1); }
+func onPress4() { pressStenoKey(SK_HL); }
+func onRelease4() { releaseStenoKey(SK_HL); }
 
-func onPress5() { pressStenoKey(SK_STAR2); }
-func onRelease5() { releaseStenoKey(SK_STAR2); }
+func onPress5() { pressStenoKey(SK_STAR1); }
+func onRelease5() { releaseStenoKey(SK_STAR1); }
 
-func onPress6() { pressStenoKey(SK_FR); }
-func onRelease6() { releaseStenoKey(SK_FR); }
+func onPress6() { pressStenoKey(SK_STAR2); }
+func onRelease6() { releaseStenoKey(SK_STAR2); }
 
-func onPress7() { pressStenoKey(SK_PR); }
-func onRelease7() { releaseStenoKey(SK_PR); }
+func onPress7() { pressStenoKey(SK_FR); }
+func onRelease7() { releaseStenoKey(SK_FR); }
 
-func onPress8() { pressStenoKey(SK_LR); }
-func onRelease8() { releaseStenoKey(SK_LR); }
+func onPress8() { pressStenoKey(SK_PR); }
+func onRelease8() { releaseStenoKey(SK_PR); }
 
-func onPress9() { pressStenoKey(SK_TR); }
-func onRelease9() { releaseStenoKey(SK_TR); }
+func onPress9() { pressStenoKey(SK_LR); }
+func onRelease9() { releaseStenoKey(SK_LR); }
 
-func onPress10() { pressStenoKey(SK_DR); updateStenoMode(); }
-func onRelease10() { releaseStenoKey(SK_DR); }
+func onPress10() { pressStenoKey(SK_TR); }
+func onRelease10() { releaseStenoKey(SK_TR); }
 
-func onPress11() { pressStenoKey(SK_S2); }
-func onRelease11() { releaseStenoKey(SK_S2); }
+func onPress11() { pressStenoKey(SK_DR); }
+func onRelease11() { releaseStenoKey(SK_DR); }
 
-func onPress12() { pressStenoKey(SK_KL); }
-func onRelease12() { releaseStenoKey(SK_KL); }
+func onPress12() { }
+func onRelease12() { }
 
-func onPress13() { pressStenoKey(SK_WL); }
-func onRelease13() { releaseStenoKey(SK_WL); }
+func onPress13() { pressStenoKey(SK_S2); }
+func onRelease13() { releaseStenoKey(SK_S2); }
 
-func onPress14() { pressStenoKey(SK_RL); }
-func onRelease14() { releaseStenoKey(SK_RL); }
+func onPress14() { pressStenoKey(SK_KL); }
+func onRelease14() { releaseStenoKey(SK_KL); }
 
-func onPress15() { pressStenoKey(SK_STAR3); }
-func onRelease15() { releaseStenoKey(SK_STAR3); }
+func onPress15() { pressStenoKey(SK_WL); }
+func onRelease15() { releaseStenoKey(SK_WL); }
 
-func onPress16() { pressStenoKey(SK_STAR4); }
-func onRelease16() { releaseStenoKey(SK_STAR4); }
+func onPress16() { pressStenoKey(SK_RL); }
+func onRelease16() { releaseStenoKey(SK_RL); }
 
 func onPress17() { pressStenoKey(SK_RR); }
 func onRelease17() { releaseStenoKey(SK_RR); }
@@ -410,23 +403,29 @@ func onRelease20() { releaseStenoKey(SK_SR); }
 func onPress21() { pressStenoKey(SK_ZR); }
 func onRelease21() { releaseStenoKey(SK_ZR); }
 
-func onPress22() { pressStenoKey(SK_NUM1); updateStenoMode(); }
-func onRelease22() { releaseStenoKey(SK_NUM1); }
+func onPress22() { pressStenoKey(SK_A); }
+func onRelease22() { releaseStenoKey(SK_A); }
 
-func onPress23() { pressStenoKey(SK_A); }
-func onRelease23() { releaseStenoKey(SK_A); }
+func onPress23() { pressStenoKey(SK_O); }
+func onRelease23() { releaseStenoKey(SK_O); }
 
-func onPress24() { pressStenoKey(SK_O); }
-func onRelease24() { releaseStenoKey(SK_O); }
+func onPress24() { pressStenoKey(SK_E); }
+func onRelease24() { releaseStenoKey(SK_E); }
 
-func onPress25() { pressStenoKey(SK_E); }
-func onRelease25() { releaseStenoKey(SK_E); }
+func onPress25() { pressStenoKey(SK_U); }
+func onRelease25() { releaseStenoKey(SK_U); }
 
-func onPress26() { pressStenoKey(SK_U); }
-func onRelease26() { releaseStenoKey(SK_U); }
+func onPress26() {
+  if (getParameter("steno_mode") != "embedded") {
+    console("set_steno_mode embedded");
+    setRgb(0, 0, 4, 0);
+  } else {
+    console("set_steno_mode gemini");
+    setRgb(0, 4, 0, 0);
+  }
+  releaseAll();
+}
+func onRelease26() {}
 
-func onPress27() { pressStenoKey(SK_NUM2); updateStenoMode(); }
-func onRelease27() { releaseStenoKey(SK_NUM2); }
-
-func onPress28() { console("launch_bootloader"); }
-func onRelease28() {}
+func onPress27() {}
+func onRelease27() {}
