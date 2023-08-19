@@ -33,8 +33,7 @@ void main(List<String> arguments) {
   var lastInstruction = '';
   for (final instruction in builder.instructions) {
     final thisInstruction = instruction.toString();
-    if (thisInstruction != lastInstruction ||
-        instruction is! NopScriptInstruction) {
+    if (thisInstruction != lastInstruction || instruction is! NopInstruction) {
       print(thisInstruction);
     }
 

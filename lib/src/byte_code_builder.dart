@@ -16,7 +16,7 @@ class ScriptByteCodeBuilder {
 
   final _bytesBuilder = BytesBuilder();
   final instructions = InstructionList();
-  final functions = <String, FunctionStartScriptInstruction>{};
+  final functions = <String, FunctionStartInstruction>{};
   final strings = <String>{};
   late final List<String> sortedStrings;
   final stringTable = <String, int>{};
@@ -54,20 +54,19 @@ class ScriptByteCodeBuilder {
         throw Exception('Internal error - inconsistent function name');
       }
       // Set up placeholder instruction.
-      final functionStart = FunctionStartScriptInstruction(function);
+      final functionStart = FunctionStartInstruction(function);
       functions[function.name] = functionStart;
       addInstruction(functionStart);
 
       // Add function instructions
       function.statements.addInstructions(this);
 
-      if (instructions.isEmpty ||
-          instructions.last is! ReturnScriptInstruction) {
+      if (instructions.isEmpty || instructions.last is! ReturnInstruction) {
         // Add safety return.
         if (function.hasReturnValue) {
-          addInstruction(PushIntValueScriptInstruction(0));
+          addInstruction(PushIntValueInstruction(0));
         }
-        addInstruction(ReturnScriptInstruction());
+        addInstruction(ReturnInstruction());
       }
     }
 

@@ -305,8 +305,11 @@ const LED_STATUS_KANA = 4;
 // 12  13  14  15  16   5    |     6  17  18  19  20  21
 //                 22  23    |    24  25
 //
-// Usr button (on the microcontroller) is button 26.
-// Boot Button (on the microcontroller) is button 27.
+// USR button (on the microcontroller) is button 26.
+// BOOT Button (on the microcontroller) is button 27.
+//
+// The LED to the left side of the USB port is controlled by GPIO 25.
+// The LED to the right is hardwired and cannot be controlled by software.
 //
 //---------------------------------------------------------------------------
 // Example global variable:
@@ -340,8 +343,8 @@ func init() {
 func onPress0() { }
 func onRelease0() { }
 
-func onPress1() { pressStenoKey(SK_NUM1); }
-func onRelease1() { releaseStenoKey(SK_NUM1); }
+func onPress1() { pressStenoKey(SK_S1); }
+func onRelease1() { releaseStenoKey(SK_S1); }
 
 func onPress2() { pressStenoKey(SK_TL); }
 func onRelease2() { releaseStenoKey(SK_TL); }
@@ -352,11 +355,11 @@ func onRelease3() { releaseStenoKey(SK_PL); }
 func onPress4() { pressStenoKey(SK_HL); }
 func onRelease4() { releaseStenoKey(SK_HL); }
 
-func onPress5() { pressStenoKey(SK_STAR1); }
-func onRelease5() { releaseStenoKey(SK_STAR1); }
+func onPress5() { pressStenoKey(SK_NUM1); }
+func onRelease5() { releaseStenoKey(SK_NUM1); }
 
-func onPress6() { pressStenoKey(SK_STAR2); }
-func onRelease6() { releaseStenoKey(SK_STAR2); }
+func onPress6() { pressStenoKey(SK_STAR1); }
+func onRelease6() { releaseStenoKey(SK_STAR1); }
 
 func onPress7() { pressStenoKey(SK_FR); }
 func onRelease7() { releaseStenoKey(SK_FR); }

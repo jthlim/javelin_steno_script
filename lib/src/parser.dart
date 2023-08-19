@@ -17,21 +17,32 @@ class Parser {
   Parser.tokenizer(Tokenizer tokenizer, ScriptModule? module)
       : _tokens = tokenizer.tokenize().iterator,
         _module = module ?? ScriptModule() {
+    _hasNextToken = _tokens.moveNext();
     _nextToken();
   }
 
   final Iterator<Token> _tokens;
-
   final ScriptModule _module;
-  late Token _currentToken;
+
+  var _currentToken = const Token(type: TokenType.eof, line: 0, column: 0);
+  var _hasNextToken = false;
 
   ScriptFunction? _function;
 
   void _nextToken() {
-    if (_tokens.moveNext()) {
+    if (_hasNextToken) {
       _currentToken = _tokens.current;
+      _hasNextToken = _tokens.moveNext();
     } else {
       _currentToken = const Token(type: TokenType.eof, line: 0, column: 0);
+    }
+  }
+
+  Token? peekNextToken() {
+    if (_hasNextToken) {
+      return _tokens.current;
+    } else {
+      return const Token(type: TokenType.eof, line: 0, column: 0);
     }
   }
 
@@ -217,6 +228,46 @@ class Parser {
     _function = previousFunction;
   }
 
+  // Returns an AST node that loads the value, or nil if none available.
+  AstNode? _parseIdentifier(String name) {
+    // Check locals
+    final localVariable = _function?.locals.variables[name];
+    if (localVariable != null) {
+      return LoadValueAstNode(
+        isGlobal: false,
+        index: localVariable,
+      );
+    }
+
+    // Check local constants
+    final localConstant = _function?.locals.constants[name];
+    if (localConstant != null) {
+      return localConstant;
+    }
+
+    // Check globals
+    final globalVariable = _module.globals[name];
+    if (globalVariable != null) {
+      final arraySize = globalVariable.arraySize;
+      if (arraySize != null) {
+        return LoadGlobalValueArrayAstNode(globalVariable);
+      } else {
+        return LoadValueAstNode(
+          isGlobal: true,
+          index: globalVariable.index,
+        );
+      }
+    }
+
+    // Check constants
+    final constantValue = _module.constants[name];
+    if (constantValue != null) {
+      return constantValue;
+    }
+
+    return null;
+  }
+
   AstNode _parsePrimary() {
     // Brackets, constant or function call.
     switch (_currentToken.type) {
@@ -247,6 +298,11 @@ class Parser {
         final name = _currentToken.stringValue!;
         _nextToken();
 
+        final result = _parseIdentifier(name);
+        if (result != null) {
+          return result;
+        }
+
         if (_currentToken.type == TokenType.openParen) {
           // Function call.
           final parameters = _parseParameterList();
@@ -255,50 +311,16 @@ class Parser {
             name: name,
             parameters: parameters,
           );
-        } else {
-          // Check locals
-          final localVariable = _function?.locals.variables[name];
-          if (localVariable != null) {
-            return LoadValueAstNode(
-              isGlobal: false,
-              index: localVariable,
-            );
-          }
-
-          final localConstant = _function?.locals.constants[name];
-          if (localConstant != null) {
-            return localConstant;
-          }
-
-          // Check globals
-          final globalVariable = _module.globals[name];
-          if (globalVariable != null) {
-            final arraySize = globalVariable.arraySize;
-            if (arraySize != null) {
-              return LoadGlobalValueArrayAstNode(globalVariable);
-            } else {
-              return LoadValueAstNode(
-                isGlobal: true,
-                index: globalVariable.index,
-              );
-            }
-          }
-
-          // Check constants
-          final constantValue = _module.constants[name];
-          if (constantValue != null) {
-            return constantValue;
-          }
-
-          // Unknown identifier!
-          // If the next token is a fallback, then use that instead.
-          if (_currentToken.type == TokenType.fallback) {
-            _nextToken();
-            return _parseExpression();
-          }
-
-          throw FormatException('Unknown identifier $name near $_currentToken');
         }
+
+        // Unknown identifier!
+        // If the next token is a fallback, then use that instead.
+        if (_currentToken.type == TokenType.fallback) {
+          _nextToken();
+          return _parseExpression();
+        }
+
+        throw FormatException('Unknown identifier $name near $_currentToken');
 
       default:
         throw FormatException(
@@ -334,25 +356,31 @@ class Parser {
     }
   }
 
+  AstNode _parseCallValueFunction() {
+    var result = _parseSubscript();
+    while (_currentToken.type == TokenType.openParen) {
+      result =
+          CallValueAstNode(value: result, parameters: _parseParameterList());
+    }
+    return result;
+  }
+
   AstNode _parseUnary() {
     switch (_currentToken.type) {
       case TokenType.minus:
         _nextToken();
-        return NegateAstNode(_parseSubscript());
-
+        return NegateAstNode(_parseCallValueFunction());
       case TokenType.not:
         _nextToken();
-        return NotAstNode(_parseSubscript());
-
+        return NotAstNode(_parseCallValueFunction());
       case TokenType.bitwiseNot:
         _nextToken();
-        return BitwiseNotAstNode(_parseSubscript());
+        return BitwiseNotAstNode(_parseCallValueFunction());
       case TokenType.plus:
         _nextToken();
-        return _parseSubscript();
-
+        return _parseCallValueFunction();
       default:
-        return _parseSubscript();
+        return _parseCallValueFunction();
     }
   }
 
@@ -698,15 +726,24 @@ class Parser {
 
   AstNode _parseAssignOrFunctionCall({bool requireSemicolon = true}) {
     final nameToken = _currentToken;
-    _assertToken(TokenType.identifier);
     final name = nameToken.stringValue!;
 
-    switch (_currentToken.type) {
+    switch (peekNextToken()?.type) {
       case TokenType.assign:
       case TokenType.openSquareBracket:
+        _assertToken(TokenType.identifier);
         return _parseAssignment(name, requireSemicolon: requireSemicolon);
 
       case TokenType.openParen:
+        final isVariable = _parseIdentifier(name) != null;
+        if (isVariable) {
+          final value = _parseSubscript();
+          final parameters = _parseParameterList();
+          _assertToken(TokenType.semiColon);
+          return CallValueAstNode(value: value, parameters: parameters);
+        }
+
+        _assertToken(TokenType.identifier);
         final parameters = _parseParameterList();
         _assertToken(TokenType.semiColon);
         return CallFunctionAstNode(

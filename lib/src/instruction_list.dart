@@ -37,9 +37,9 @@ class InstructionList extends Iterable<ScriptInstruction> {
 
     ScriptInstruction? instruction = instructions.first;
     while (instruction != null) {
-      if (instruction is NopScriptInstruction) {
+      if (instruction is NopInstruction) {
         final reference = instruction.reference;
-        if (reference is JumpScriptInstruction) {
+        if (reference is JumpInstruction) {
           final previousInstruction =
               instruction.previous?.previousNonNopInstruction;
           final previousReferenceInstruction = reference.previous;
@@ -66,7 +66,7 @@ class InstructionList extends Iterable<ScriptInstruction> {
 
     ScriptInstruction? instruction = instructions.first;
     while (instruction != null) {
-      if (instruction is PushIntValueScriptInstruction) {
+      if (instruction is PushIntValueInstruction) {
         final value = instruction.value;
         if (value == 0 || value == 1) {
           ScriptInstruction? jumpInstruction =
@@ -88,22 +88,22 @@ class InstructionList extends Iterable<ScriptInstruction> {
     bool isNonZero,
   ) {
     for (;;) {
-      if (instruction is JumpScriptInstruction) {
+      if (instruction is JumpInstruction) {
         instruction = instruction.target;
         continue;
       }
-      if (instruction is NopScriptInstruction) {
+      if (instruction is NopInstruction) {
         instruction = instruction.next;
         continue;
       }
-      if (instruction is OpcodeScriptInstruction &&
+      if (instruction is OpcodeInstruction &&
           instruction.opcode == ScriptOperatorOpcode.not) {
         isNonZero = !isNonZero;
         instruction = instruction.next;
         continue;
       }
-      if (instruction is JumpIfZeroScriptInstruction) {
-        final jumpInstruction = JumpScriptInstruction();
+      if (instruction is JumpIfZeroInstruction) {
+        final jumpInstruction = JumpInstruction();
         if (isNonZero) {
           instruction.insertAfter(jumpInstruction.target);
         } else {
@@ -111,8 +111,8 @@ class InstructionList extends Iterable<ScriptInstruction> {
         }
         return jumpInstruction;
       }
-      if (instruction is JumpIfNotZeroScriptInstruction) {
-        final jumpInstruction = JumpScriptInstruction();
+      if (instruction is JumpIfNotZeroInstruction) {
+        final jumpInstruction = JumpInstruction();
         if (isNonZero) {
           instruction.target.insertBefore(jumpInstruction.target);
         } else {
@@ -131,16 +131,16 @@ class InstructionList extends Iterable<ScriptInstruction> {
 
     ScriptInstruction? instruction = instructions.first;
     while (instruction != null) {
-      if (instruction is JumpScriptInstructionBase) {
+      if (instruction is JumpInstructionBase) {
         final target = instruction.target.nextNonNopInstruction;
         ScriptInstruction? replacement;
-        if (target is ReturnScriptInstruction) {
-          if (instruction is JumpScriptInstruction) {
-            replacement = ReturnScriptInstruction();
+        if (target is ReturnInstruction) {
+          if (instruction is JumpInstruction) {
+            replacement = ReturnInstruction();
           }
-        } else if (target is JumpScriptInstructionBase) {
+        } else if (target is JumpInstructionBase) {
           replacement = replaceJumpPair(instruction, target);
-        } else if (target is JumpFunctionScriptInstruction) {
+        } else if (target is JumpFunctionInstruction) {
           replacement = replaceJumpToFunction(instruction, target);
         }
 
@@ -162,25 +162,44 @@ class InstructionList extends Iterable<ScriptInstruction> {
     while (instruction != null) {
       if (instruction is CallFunctionInstruction) {
         final nextInstruction = instruction.next;
-        if (nextInstruction is ReturnScriptInstruction) {
+        if (nextInstruction is ReturnInstruction) {
           final jumpInstruction =
-              JumpFunctionScriptInstruction(instruction.functionName);
+              JumpFunctionInstruction(instruction.functionName);
 
           instruction.replaceWith(jumpInstruction);
           nextInstruction.unlink();
 
           instruction = jumpInstruction;
-        } else if (nextInstruction is NopScriptInstruction) {
+        } else if (nextInstruction is NopInstruction) {
           final nextNonNop = nextInstruction.nextNonNopInstruction;
-          if (nextNonNop is ReturnScriptInstruction) {
+          if (nextNonNop is ReturnInstruction) {
             final jumpInstruction =
-                JumpFunctionScriptInstruction(instruction.functionName);
+                JumpFunctionInstruction(instruction.functionName);
+
+            instruction.replaceWith(jumpInstruction);
+            instruction = jumpInstruction;
+          }
+        }
+      } else if (instruction is CallValueInstruction) {
+        final nextInstruction = instruction.next;
+        if (nextInstruction is ReturnInstruction) {
+          final jumpInstruction = JumpValueInstruction();
+
+          instruction.replaceWith(jumpInstruction);
+          nextInstruction.unlink();
+
+          instruction = jumpInstruction;
+        } else if (nextInstruction is NopInstruction) {
+          final nextNonNop = nextInstruction.nextNonNopInstruction;
+          if (nextNonNop is ReturnInstruction) {
+            final jumpInstruction = JumpValueInstruction();
 
             instruction.replaceWith(jumpInstruction);
             instruction = jumpInstruction;
           }
         }
       }
+
       instruction = instruction.next;
     }
   }
@@ -194,7 +213,7 @@ class InstructionList extends Iterable<ScriptInstruction> {
     while (instruction != null) {
       var next = instruction.next;
       if (!instruction.hasReference) {
-        if (instruction is JumpScriptInstructionBase &&
+        if (instruction is JumpInstructionBase &&
             identical(instruction.next, instruction.target)) {
           next = instruction.target.next;
         }
@@ -211,14 +230,13 @@ class InstructionList extends Iterable<ScriptInstruction> {
 
     ScriptInstruction? instruction = instructions.first;
     while (instruction != null) {
-      if (instruction is! JumpScriptInstructionBase ||
-          !instruction.isJumpToNext()) {
+      if (instruction is! JumpInstructionBase || !instruction.isJumpToNext()) {
         instruction = instruction.next;
         continue;
       }
 
       final next = instruction.target.next;
-      if (instruction is JumpScriptInstruction) {
+      if (instruction is JumpInstruction) {
         instruction.unlink();
       }
       instruction = next;
@@ -232,8 +250,7 @@ class InstructionList extends Iterable<ScriptInstruction> {
 
     ScriptInstruction? instruction = instructions.first;
     while (instruction != null) {
-      if (instruction is! JumpScriptInstructionBase ||
-          !instruction.isJumpToNext()) {
+      if (instruction is! JumpInstructionBase || !instruction.isJumpToNext()) {
         instruction = instruction.next;
         continue;
       }
@@ -264,14 +281,13 @@ class InstructionList extends Iterable<ScriptInstruction> {
 
     ScriptInstruction? instruction = instructions.first;
     while (instruction != null) {
-      if (instruction is! JumpScriptInstructionBase ||
-          !instruction.isConditional()) {
+      if (instruction is! JumpInstructionBase || !instruction.isConditional()) {
         instruction = instruction.next;
         continue;
       }
 
       final next = instruction.next!;
-      if (next is! JumpScriptInstruction) {
+      if (next is! JumpInstruction) {
         instruction = instruction.next;
         continue;
       }
@@ -282,11 +298,11 @@ class InstructionList extends Iterable<ScriptInstruction> {
       }
 
       final label2 = next.target;
-      late final JumpScriptInstructionBase replacementInstruction;
-      if (instruction is JumpIfZeroScriptInstruction) {
-        replacementInstruction = JumpIfNotZeroScriptInstruction();
-      } else if (instruction is JumpIfNotZeroScriptInstruction) {
-        replacementInstruction = JumpIfZeroScriptInstruction();
+      late final JumpInstructionBase replacementInstruction;
+      if (instruction is JumpIfZeroInstruction) {
+        replacementInstruction = JumpIfNotZeroInstruction();
+      } else if (instruction is JumpIfNotZeroInstruction) {
+        replacementInstruction = JumpIfZeroInstruction();
       }
       label2.insertAfter(replacementInstruction.target);
       instruction.insertAfter(replacementInstruction);
@@ -307,7 +323,7 @@ class InstructionList extends Iterable<ScriptInstruction> {
 
     ScriptInstruction? instruction = instructions.first;
     while (instruction != null) {
-      if (instruction is! OpcodeScriptInstruction ||
+      if (instruction is! OpcodeInstruction ||
           instruction.opcode != ScriptOperatorOpcode.not) {
         instruction = instruction.next;
         continue;
@@ -316,36 +332,36 @@ class InstructionList extends Iterable<ScriptInstruction> {
       final next = instruction.next;
       final previous = instruction.previous!;
       if (previous.isBooleanResult &&
-          next is OpcodeScriptInstruction &&
+          next is OpcodeInstruction &&
           next.opcode == ScriptOperatorOpcode.not) {
         final nextNext = next.next;
         instruction.unlink();
         next.unlink();
         instruction = nextNext;
         continue;
-      } else if (previous is OpcodeScriptInstruction &&
+      } else if (previous is OpcodeInstruction &&
           previous.opcode.opposite != null) {
         final opposite = previous.opcode.opposite!;
-        previous.replaceWith(OpcodeScriptInstruction(opposite));
+        previous.replaceWith(OpcodeInstruction(opposite));
         instruction.unlink();
-      } else if (next is OpcodeScriptInstruction &&
+      } else if (next is OpcodeInstruction &&
           next.opcode == ScriptOperatorOpcode.not) {
         final nextNext = next.next;
-        if (nextNext is OpcodeScriptInstruction &&
+        if (nextNext is OpcodeInstruction &&
             nextNext.opcode == ScriptOperatorOpcode.not) {
           next.unlink();
           nextNext.unlink();
           continue;
         }
-      } else if (next is JumpIfZeroScriptInstruction) {
-        final replacement = JumpIfNotZeroScriptInstruction();
+      } else if (next is JumpIfZeroInstruction) {
+        final replacement = JumpIfNotZeroInstruction();
         next.target.insertAfter(replacement.target);
         next.replaceWith(replacement);
         instruction.unlink();
         instruction = previous;
         continue;
-      } else if (next is JumpIfNotZeroScriptInstruction) {
-        final replacement = JumpIfZeroScriptInstruction();
+      } else if (next is JumpIfNotZeroInstruction) {
+        final replacement = JumpIfZeroInstruction();
         final previous = instruction.previous!;
         next.target.insertAfter(replacement.target);
         next.replaceWith(replacement);
@@ -358,49 +374,49 @@ class InstructionList extends Iterable<ScriptInstruction> {
   }
 
   static ScriptInstruction? replaceJumpToFunction(
-      JumpScriptInstructionBase first, JumpFunctionScriptInstruction second) {
-    if (first is JumpScriptInstruction) {
-      return JumpFunctionScriptInstruction(second.functionName);
-    } else if (first is JumpIfZeroScriptInstruction) {
-      return JumpIfZeroFunctionScriptInstruction(second.functionName);
-    } else if (first is JumpIfNotZeroScriptInstruction) {
-      return JumpIfNotZeroFunctionScriptInstruction(second.functionName);
+      JumpInstructionBase first, JumpFunctionInstruction second) {
+    if (first is JumpInstruction) {
+      return JumpFunctionInstruction(second.functionName);
+    } else if (first is JumpIfZeroInstruction) {
+      return JumpIfZeroFunctionInstruction(second.functionName);
+    } else if (first is JumpIfNotZeroInstruction) {
+      return JumpIfNotZeroFunctionInstruction(second.functionName);
     } else {
       throw Exception('Internal error: Unexpected jump type $first');
     }
   }
 
-  static JumpScriptInstructionBase? replaceJumpPair(
-      JumpScriptInstructionBase first, JumpScriptInstructionBase second) {
-    if (first is JumpScriptInstruction) {
-      if (second is JumpScriptInstruction) {
-        final result = JumpScriptInstruction();
+  static JumpInstructionBase? replaceJumpPair(
+      JumpInstructionBase first, JumpInstructionBase second) {
+    if (first is JumpInstruction) {
+      if (second is JumpInstruction) {
+        final result = JumpInstruction();
         second.target.insertAfter(result.target);
         return result;
-      } else if (second is JumpIfZeroScriptInstruction ||
-          second is JumpIfNotZeroScriptInstruction) {
+      } else if (second is JumpIfZeroInstruction ||
+          second is JumpIfNotZeroInstruction) {
         return null;
       } else {
         throw Exception('Internal error: Unexpected jump type $second');
       }
-    } else if (first is JumpIfZeroScriptInstruction) {
-      if (second is JumpScriptInstruction) {
-        final result = JumpIfZeroScriptInstruction();
+    } else if (first is JumpIfZeroInstruction) {
+      if (second is JumpInstruction) {
+        final result = JumpIfZeroInstruction();
         second.target.insertAfter(result.target);
         return result;
-      } else if (second is JumpIfZeroScriptInstruction ||
-          second is JumpIfNotZeroScriptInstruction) {
+      } else if (second is JumpIfZeroInstruction ||
+          second is JumpIfNotZeroInstruction) {
         return null;
       } else {
         throw Exception('Internal error: Unexpected jump type $second');
       }
-    } else if (first is JumpIfNotZeroScriptInstruction) {
-      if (second is JumpScriptInstruction) {
-        final result = JumpIfNotZeroScriptInstruction();
+    } else if (first is JumpIfNotZeroInstruction) {
+      if (second is JumpInstruction) {
+        final result = JumpIfNotZeroInstruction();
         second.target.insertAfter(result.target);
         return result;
-      } else if (second is JumpIfZeroScriptInstruction ||
-          second is JumpIfNotZeroScriptInstruction) {
+      } else if (second is JumpIfZeroInstruction ||
+          second is JumpIfNotZeroInstruction) {
         return null;
       } else {
         throw Exception('Internal error: Unexpected jump type $second');

@@ -51,7 +51,7 @@ class StringValueAstNode extends AstNode {
   @override
   void addInstructions(ScriptByteCodeBuilder builder) {
     builder.strings.add(value);
-    builder.addInstruction(PushStringValueScriptInstruction(value));
+    builder.addInstruction(PushStringValueInstruction(value));
   }
 
   final String value;
@@ -79,8 +79,7 @@ class ByteIndexAstNode extends AstNode {
     byteValue.addInstructions(builder);
     index.addInstructions(builder);
 
-    builder.addInstruction(
-        OpcodeScriptInstruction(ScriptOperatorOpcode.byteLookup));
+    builder.addInstruction(OpcodeInstruction(ScriptOperatorOpcode.byteLookup));
   }
 
   final AstNode byteValue;
@@ -98,7 +97,7 @@ class IntValueAstNode extends AstNode {
 
   @override
   void addInstructions(ScriptByteCodeBuilder builder) {
-    builder.addInstruction(PushIntValueScriptInstruction(value));
+    builder.addInstruction(PushIntValueInstruction(value));
   }
 
   @override
@@ -123,11 +122,11 @@ abstract class UnaryOperatorAstNode extends AstNode {
   @override
   void addInstructions(ScriptByteCodeBuilder builder) {
     if (isConstant()) {
-      builder.addInstruction(PushIntValueScriptInstruction(constantValue()));
+      builder.addInstruction(PushIntValueInstruction(constantValue()));
       return;
     }
     statement.addInstructions(builder);
-    builder.addInstruction(OpcodeScriptInstruction(opcode));
+    builder.addInstruction(OpcodeInstruction(opcode));
   }
 
   ScriptOperatorOpcode get opcode;
@@ -170,14 +169,12 @@ class BitwiseNotAstNode extends AstNode {
   @override
   void addInstructions(ScriptByteCodeBuilder builder) {
     if (isConstant()) {
-      builder.addInstruction(PushIntValueScriptInstruction(constantValue()));
+      builder.addInstruction(PushIntValueInstruction(constantValue()));
       return;
     }
     expression.addInstructions(builder);
-    builder
-        .addInstruction(OpcodeScriptInstruction(ScriptOperatorOpcode.negative));
-    builder.addInstruction(
-        OpcodeScriptInstruction(ScriptOperatorOpcode.decrement));
+    builder.addInstruction(OpcodeInstruction(ScriptOperatorOpcode.negative));
+    builder.addInstruction(OpcodeInstruction(ScriptOperatorOpcode.decrement));
   }
 
   final AstNode expression;
@@ -199,7 +196,7 @@ abstract class BinaryOperatorAstNode extends AstNode {
   void addInstructions(ScriptByteCodeBuilder builder) {
     statementA.addInstructions(builder);
     statementB.addInstructions(builder);
-    builder.addInstruction(OpcodeScriptInstruction(opcode));
+    builder.addInstruction(OpcodeInstruction(opcode));
   }
 
   ScriptOperatorOpcode get opcode;
@@ -255,7 +252,7 @@ class TermsAstNode extends AstNode {
   void addInstructions(ScriptByteCodeBuilder builder) {
     var constantsSum = constantValue();
     if (isConstant()) {
-      builder.addInstruction(PushIntValueScriptInstruction(constantsSum));
+      builder.addInstruction(PushIntValueInstruction(constantsSum));
       return;
     }
 
@@ -272,8 +269,7 @@ class TermsAstNode extends AstNode {
           if (isFirst) {
             isFirst = false;
           } else {
-            builder.addInstruction(
-                OpcodeScriptInstruction(ScriptOperatorOpcode.add));
+            builder.addInstruction(OpcodeInstruction(ScriptOperatorOpcode.add));
           }
           break;
         case TermMode.subtract:
@@ -282,30 +278,29 @@ class TermsAstNode extends AstNode {
             if (constantsSum == 0) {
               term.statement.addInstructions(builder);
               builder.addInstruction(
-                  OpcodeScriptInstruction(ScriptOperatorOpcode.negative));
+                  OpcodeInstruction(ScriptOperatorOpcode.negative));
             } else {
-              builder
-                  .addInstruction(PushIntValueScriptInstruction(constantsSum));
+              builder.addInstruction(PushIntValueInstruction(constantsSum));
               constantsSum = 0;
               term.statement.addInstructions(builder);
               builder.addInstruction(
-                  OpcodeScriptInstruction(ScriptOperatorOpcode.subtract));
+                  OpcodeInstruction(ScriptOperatorOpcode.subtract));
             }
           } else {
             term.statement.addInstructions(builder);
             builder.addInstruction(
-                OpcodeScriptInstruction(ScriptOperatorOpcode.subtract));
+                OpcodeInstruction(ScriptOperatorOpcode.subtract));
           }
       }
     }
     switch (constantsSum) {
       case 1:
-        builder.addInstruction(
-            OpcodeScriptInstruction(ScriptOperatorOpcode.increment));
+        builder
+            .addInstruction(OpcodeInstruction(ScriptOperatorOpcode.increment));
         break;
       case -1:
-        builder.addInstruction(
-            OpcodeScriptInstruction(ScriptOperatorOpcode.decrement));
+        builder
+            .addInstruction(OpcodeInstruction(ScriptOperatorOpcode.decrement));
         break;
       case 0:
         break;
@@ -313,13 +308,12 @@ class TermsAstNode extends AstNode {
         if (constantsSum < 0) {
           // The bytecode format has a bias towards positive numbers,
           // so using a subtract operation can be slightly smaller size.
-          builder.addInstruction(PushIntValueScriptInstruction(-constantsSum));
-          builder.addInstruction(
-              OpcodeScriptInstruction(ScriptOperatorOpcode.subtract));
+          builder.addInstruction(PushIntValueInstruction(-constantsSum));
+          builder
+              .addInstruction(OpcodeInstruction(ScriptOperatorOpcode.subtract));
         } else {
-          builder.addInstruction(PushIntValueScriptInstruction(constantsSum));
-          builder.addInstruction(
-              OpcodeScriptInstruction(ScriptOperatorOpcode.add));
+          builder.addInstruction(PushIntValueInstruction(constantsSum));
+          builder.addInstruction(OpcodeInstruction(ScriptOperatorOpcode.add));
         }
         break;
     }
@@ -500,10 +494,10 @@ class EqualsAstNode extends BinaryOperatorAstNode {
   void addInstructions(ScriptByteCodeBuilder builder) {
     if (statementA.isConstant() && statementA.constantValue() == 0) {
       statementB.addInstructions(builder);
-      builder.addInstruction(OpcodeScriptInstruction(ScriptOperatorOpcode.not));
+      builder.addInstruction(OpcodeInstruction(ScriptOperatorOpcode.not));
     } else if (statementB.isConstant() && statementB.constantValue() == 0) {
       statementA.addInstructions(builder);
-      builder.addInstruction(OpcodeScriptInstruction(ScriptOperatorOpcode.not));
+      builder.addInstruction(OpcodeInstruction(ScriptOperatorOpcode.not));
     } else {
       super.addInstructions(builder);
     }
@@ -641,18 +635,18 @@ class ForStatementAstNode extends AstNode {
 
     initialization?.addInstructions(builder);
     if (!condition.isConstant() || condition.constantValue() != 0) {
-      final jumpToConditionInstruction = JumpScriptInstruction();
+      final jumpToConditionInstruction = JumpInstruction();
       builder.addInstruction(jumpToConditionInstruction.target);
       condition.addInstructions(builder);
 
       final lastInstruction = builder.instructions.last;
-      late final JumpScriptInstructionBase jumpToEndInstruction;
-      if (lastInstruction is OpcodeScriptInstruction &&
+      late final JumpInstructionBase jumpToEndInstruction;
+      if (lastInstruction is OpcodeInstruction &&
           lastInstruction.opcode == ScriptOperatorOpcode.not) {
         builder.instructions.removeLast();
-        jumpToEndInstruction = JumpIfNotZeroScriptInstruction();
+        jumpToEndInstruction = JumpIfNotZeroInstruction();
       } else {
-        jumpToEndInstruction = JumpIfZeroScriptInstruction();
+        jumpToEndInstruction = JumpIfZeroInstruction();
       }
       builder.addInstruction(jumpToEndInstruction);
       body.addInstructions(builder);
@@ -733,21 +727,21 @@ class IfStatementAstNode extends AstNode {
       condition.addInstructions(builder);
 
       final lastInstruction = builder.instructions.last;
-      late final JumpScriptInstructionBase jumpInstruction;
-      if (lastInstruction is OpcodeScriptInstruction &&
+      late final JumpInstructionBase jumpInstruction;
+      if (lastInstruction is OpcodeInstruction &&
           lastInstruction.opcode == ScriptOperatorOpcode.not) {
         builder.instructions.removeLast();
-        jumpInstruction = JumpIfNotZeroScriptInstruction();
+        jumpInstruction = JumpIfNotZeroInstruction();
       } else {
-        jumpInstruction = JumpIfZeroScriptInstruction();
+        jumpInstruction = JumpIfZeroInstruction();
       }
       final elseNop = jumpInstruction.target;
       builder.addInstruction(jumpInstruction);
 
       whenTrue.addInstructions(builder);
-      NopScriptInstruction? endNop;
+      NopInstruction? endNop;
       if (whenFalse != null) {
-        final jumpInstruction = JumpScriptInstruction();
+        final jumpInstruction = JumpInstruction();
         endNop = jumpInstruction.target;
         builder.addInstruction(jumpInstruction);
       }
@@ -1120,8 +1114,41 @@ class ReturnAstNode extends AstNode {
   @override
   void addInstructions(ScriptByteCodeBuilder builder) {
     expression?.addInstructions(builder);
-    builder.addInstruction(ReturnScriptInstruction());
+    builder.addInstruction(ReturnInstruction());
   }
 
   AstNode? expression;
+}
+
+class CallValueAstNode extends AstNode {
+  CallValueAstNode({required this.value, required this.parameters});
+
+  @override
+  bool isReturn() => false;
+
+  @override
+  bool isConstant() => false;
+
+  @override
+  int constantValue() => throw UnsupportedError('Should not be invoked');
+
+  @override
+  void mark(ScriptReachability context) {
+    value.mark(context);
+    for (final parameter in parameters) {
+      parameter.mark(context);
+    }
+  }
+
+  @override
+  void addInstructions(ScriptByteCodeBuilder builder) {
+    for (final parameter in parameters) {
+      parameter.addInstructions(builder);
+    }
+    value.addInstructions(builder);
+    builder.addInstruction(CallValueInstruction());
+  }
+
+  final AstNode value;
+  final List<AstNode> parameters;
 }

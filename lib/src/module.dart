@@ -226,6 +226,28 @@ class ScriptModule {
     }
 
     final globalInitializers = <AstNode>[];
+    final markedGlobalInitializers = <int>{};
+
+    // Loop until no more initializers are called.
+    var continueMarking = true;
+    while (continueMarking) {
+      continueMarking = false;
+
+      for (final global in globals.values) {
+        if (markedGlobalInitializers.contains(global.index)) continue;
+
+        final initializer = global.initializer;
+        if (initializer == null) continue;
+        if (!reachability.globals.contains(global.index)) continue;
+        if (initializer is IntValueAstNode && initializer.value == 0) continue;
+
+        markedGlobalInitializers.add(global.index);
+        initializer.mark(reachability);
+
+        continueMarking = true;
+      }
+    }
+
     for (final global in globals.values) {
       final initializer = global.initializer;
       if (initializer == null) continue;

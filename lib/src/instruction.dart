@@ -34,6 +34,8 @@ enum ScriptOpcode {
   ret(0x92),
   pop(0x93),
   enterFunction(0x94),
+  callValue(0x95),
+  jumpValue(0x96),
   jumpShortBegin(0xa0),
   jumpShortEnd(0xbe),
   jumpLong(0xbf),
@@ -131,7 +133,7 @@ abstract class ScriptInstruction extends LinkedListEntry<ScriptInstruction> {
 
   ScriptInstruction get nextNonNopInstruction {
     var instruction = this;
-    while (instruction is NopScriptInstruction) {
+    while (instruction is NopInstruction) {
       instruction = instruction.next!;
     }
     return instruction;
@@ -139,7 +141,7 @@ abstract class ScriptInstruction extends LinkedListEntry<ScriptInstruction> {
 
   ScriptInstruction? get previousNonNopInstruction {
     ScriptInstruction? instruction = this;
-    while (instruction is NopScriptInstruction) {
+    while (instruction is NopInstruction) {
       instruction = instruction.previous;
     }
     return instruction;
@@ -351,6 +353,32 @@ class CallFunctionInstruction extends ScriptInstruction {
   String toString() => '  call $functionName';
 }
 
+class CallValueInstruction extends ScriptInstruction {
+  @override
+  int get byteCodeLength => 1;
+
+  @override
+  void addByteCode(ScriptByteCodeBuilder builder) {
+    builder.addOpcode(ScriptOpcode.callValue);
+  }
+
+  @override
+  String toString() => '  call_value';
+}
+
+class JumpValueInstruction extends ScriptInstruction {
+  @override
+  int get byteCodeLength => 1;
+
+  @override
+  void addByteCode(ScriptByteCodeBuilder builder) {
+    builder.addOpcode(ScriptOpcode.jumpValue);
+  }
+
+  @override
+  String toString() => '  jump_value';
+}
+
 class PushFunctionAddressInstruction extends ScriptInstruction {
   PushFunctionAddressInstruction(this.functionName);
 
@@ -373,8 +401,8 @@ class PushFunctionAddressInstruction extends ScriptInstruction {
   String toString() => '  push @$functionName';
 }
 
-abstract class JumpFunctionScriptInstructionBase extends ScriptInstruction {
-  JumpFunctionScriptInstructionBase(this.functionName);
+abstract class JumpFunctionInstructionBase extends ScriptInstruction {
+  JumpFunctionInstructionBase(this.functionName);
 
   @override
   int get byteCodeLength => 3;
@@ -394,8 +422,8 @@ abstract class JumpFunctionScriptInstructionBase extends ScriptInstruction {
   final String functionName;
 }
 
-class JumpFunctionScriptInstruction extends JumpFunctionScriptInstructionBase {
-  JumpFunctionScriptInstruction(super.functionName);
+class JumpFunctionInstruction extends JumpFunctionInstructionBase {
+  JumpFunctionInstruction(super.functionName);
 
   @override
   bool get implicitNext => false;
@@ -407,9 +435,8 @@ class JumpFunctionScriptInstruction extends JumpFunctionScriptInstructionBase {
   String toString() => '  jmp $functionName';
 }
 
-class JumpIfZeroFunctionScriptInstruction
-    extends JumpFunctionScriptInstructionBase {
-  JumpIfZeroFunctionScriptInstruction(super.functionName);
+class JumpIfZeroFunctionInstruction extends JumpFunctionInstructionBase {
+  JumpIfZeroFunctionInstruction(super.functionName);
 
   @override
   ScriptOpcode get opcode => ScriptOpcode.jumpIfZeroLong;
@@ -418,9 +445,8 @@ class JumpIfZeroFunctionScriptInstruction
   String toString() => '  jz $functionName';
 }
 
-class JumpIfNotZeroFunctionScriptInstruction
-    extends JumpFunctionScriptInstructionBase {
-  JumpIfNotZeroFunctionScriptInstruction(super.functionName);
+class JumpIfNotZeroFunctionInstruction extends JumpFunctionInstructionBase {
+  JumpIfNotZeroFunctionInstruction(super.functionName);
 
   @override
   ScriptOpcode get opcode => ScriptOpcode.jumpIfNotZeroLong;
@@ -429,9 +455,9 @@ class JumpIfNotZeroFunctionScriptInstruction
   String toString() => '  jnz $functionName';
 }
 
-abstract class JumpScriptInstructionBase extends ScriptInstruction {
-  JumpScriptInstructionBase() {
-    target = NopScriptInstruction(this);
+abstract class JumpInstructionBase extends ScriptInstruction {
+  JumpInstructionBase() {
+    target = NopInstruction(this);
   }
 
   @override
@@ -494,7 +520,7 @@ abstract class JumpScriptInstructionBase extends ScriptInstruction {
       if (identical(n, target)) {
         return true;
       }
-      if (n is! NopScriptInstruction) {
+      if (n is! NopInstruction) {
         return false;
       }
       n = n.next;
@@ -506,10 +532,10 @@ abstract class JumpScriptInstructionBase extends ScriptInstruction {
   ScriptOpcode get longOpcode;
   bool isConditional() => false;
 
-  late final NopScriptInstruction target;
+  late final NopInstruction target;
 }
 
-class JumpScriptInstruction extends JumpScriptInstructionBase {
+class JumpInstruction extends JumpInstructionBase {
   @override
   bool get implicitNext => false;
 
@@ -523,7 +549,7 @@ class JumpScriptInstruction extends JumpScriptInstructionBase {
   String toString() => '  jump 0x${target.offset.toRadixString(16)}';
 }
 
-class JumpIfZeroScriptInstruction extends JumpScriptInstructionBase {
+class JumpIfZeroInstruction extends JumpInstructionBase {
   @override
   ScriptOpcode get shortOpcode => ScriptOpcode.jumpIfZeroShortBegin;
 
@@ -537,7 +563,7 @@ class JumpIfZeroScriptInstruction extends JumpScriptInstructionBase {
   bool isConditional() => true;
 }
 
-class JumpIfNotZeroScriptInstruction extends JumpScriptInstructionBase {
+class JumpIfNotZeroInstruction extends JumpInstructionBase {
   @override
   ScriptOpcode get shortOpcode => ScriptOpcode.jumpIfNotZeroShortBegin;
 
@@ -551,8 +577,8 @@ class JumpIfNotZeroScriptInstruction extends JumpScriptInstructionBase {
   bool isConditional() => true;
 }
 
-class PushStringValueScriptInstruction extends ScriptInstruction {
-  PushStringValueScriptInstruction(this.value);
+class PushStringValueInstruction extends ScriptInstruction {
+  PushStringValueInstruction(this.value);
 
   @override
   int get byteCodeLength => 3;
@@ -575,8 +601,8 @@ class PushStringValueScriptInstruction extends ScriptInstruction {
   final String value;
 }
 
-class PushIntValueScriptInstruction extends ScriptInstruction {
-  PushIntValueScriptInstruction(this.value);
+class PushIntValueInstruction extends ScriptInstruction {
+  PushIntValueInstruction(this.value);
 
   @override
   int get byteCodeLength {
@@ -633,8 +659,8 @@ class PushIntValueScriptInstruction extends ScriptInstruction {
   String toString() => '  push $value';
 }
 
-class NopScriptInstruction extends ScriptInstruction {
-  NopScriptInstruction(this.reference);
+class NopInstruction extends ScriptInstruction {
+  NopInstruction(this.reference);
 
   @override
   int get byteCodeLength => 0;
@@ -651,8 +677,8 @@ class NopScriptInstruction extends ScriptInstruction {
   String toString() => ' 0x${offset.toRadixString(16)}:';
 }
 
-class OpcodeScriptInstruction extends ScriptInstruction {
-  OpcodeScriptInstruction(this.opcode);
+class OpcodeInstruction extends ScriptInstruction {
+  OpcodeInstruction(this.opcode);
 
   @override
   bool get isBooleanResult => opcode.isBooleanResult;
@@ -671,7 +697,7 @@ class OpcodeScriptInstruction extends ScriptInstruction {
   String toString() => '  ${opcode.name}';
 }
 
-class ReturnScriptInstruction extends ScriptInstruction {
+class ReturnInstruction extends ScriptInstruction {
   @override
   int get byteCodeLength => 1;
 
@@ -687,8 +713,8 @@ class ReturnScriptInstruction extends ScriptInstruction {
   String toString() => '  ret';
 }
 
-class FunctionStartScriptInstruction extends ScriptInstruction {
-  FunctionStartScriptInstruction(this.function);
+class FunctionStartInstruction extends ScriptInstruction {
+  FunctionStartInstruction(this.function);
 
   final ScriptFunctionDefinition function;
 
