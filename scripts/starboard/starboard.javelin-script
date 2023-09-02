@@ -337,7 +337,7 @@ const LED_STATUS_KANA = 4;
 //---------------------------------------------------------------------------
 
 func init() {
-  setRgb(0, 0, 4, 0);
+  setRgb(0, 0, 1, 0);
 }
 
 func onPress0() { }
@@ -421,14 +421,14 @@ func onRelease25() { releaseStenoKey(SK_U); }
 func onPress26() {
   if (getParameter("steno_mode") != "embedded") {
     console("set_steno_mode embedded");
-    setRgb(0, 0, 4, 0);
+    setRgb(0, 0, 1, 0);
   } else {
     console("set_steno_mode gemini");
-    setRgb(0, 4, 0, 0);
+    setRgb(0, 1, 0, 0);
   }
   releaseAll();
 }
 func onRelease26() {}
 
-func onPress27() {}
+func onPress27() { console("launch_bootloader"); }
 func onRelease27() {}
