@@ -286,13 +286,13 @@ class InstructionList extends Iterable<ScriptInstruction> {
         continue;
       }
 
-      final next = instruction.next!;
+      final next = instruction.next;
       if (next is! JumpInstruction) {
         instruction = instruction.next;
         continue;
       }
 
-      if (instruction.target != next.next) {
+      if (!identical(instruction.target, next.next)) {
         instruction = instruction.next;
         continue;
       }
