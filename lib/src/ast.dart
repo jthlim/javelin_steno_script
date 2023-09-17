@@ -1,4 +1,5 @@
 import 'instruction.dart';
+import 'functions.dart';
 import 'byte_code_builder.dart';
 import 'module.dart';
 

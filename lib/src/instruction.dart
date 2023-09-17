@@ -1,7 +1,7 @@
 import 'dart:collection';
 
 import 'byte_code_builder.dart';
-import 'module.dart';
+import 'functions.dart';
 import 'string_data.dart';
 
 enum ScriptOpcode {
