@@ -15,6 +15,10 @@ const SCRIPT_ID_DISPLAY_OVERLAY = 0;
 const SCRIPT_ID_BATTERY_UPDATE = 1;
 const SCRIPT_ID_CONNECTION_UPDATE = 2;
 const SCRIPT_ID_PAIR_CONNECTION_UPDATE = 3;
+const SCRIPT_ID_KEYBOARD_LED_STATUS_UPDATE = 4;
+const SCRIPT_ID_BLE_ADVERTISING_UPDATE = 5;
+const SCRIPT_ID_BLE_SCANNING_UPDATE = 6;
+const SCRIPT_ID_U2F_STATUS_UPDATE = 7;
 
 const TEXT_ALIGNMENT_LEFT = 0;
 const TEXT_ALIGNMENT_MIDDLE = 1;
@@ -32,6 +36,7 @@ const DISPLAY_WIDTH = JAVELIN_DISPLAY_WIDTH ?? 32;
 const DISPLAY_HEIGHT = JAVELIN_DISPLAY_HEIGHT ?? 128;
 const HAS_DISPLAY = JAVELIN_HAS_DISPLAY ?? 1;
 const HAS_BLE = JAVELIN_HAS_BLE ?? 0;
+const HAS_U2F = JAVELIN_HAS_U2F ?? 0;
 
 // Inferred
 
@@ -121,6 +126,10 @@ func init() {
   setScript(SCRIPT_ID_CONNECTION_UPDATE, @onConnectionUpdate);
   setScript(SCRIPT_ID_PAIR_CONNECTION_UPDATE, @onPairConnectionUpdate);
 
+  if (HAS_U2F) {
+    setScript(SCRIPT_ID_U2F_STATUS_UPDATE, @onU2fStatusUpdate);
+  }
+
   updateBoardPower();
 }
 
@@ -152,7 +161,16 @@ func onPairConnectionUpdate() {
   redrawDisplayOverlay();
 }
 
+func onU2fStatusUpdate() {
+  updateBoardPower();
+}
+
 func updateBoardPower() {
+  if (HAS_U2F && isWaitingForUserPresence()) {
+    setBoardPower(1);
+    return;
+  }
+
   var activePairConnection = getActivePairConnection();
   if (activePairConnection == PAIR_CONNECTION_NONE) {
     updateDisconnectedKeyRgbCycle();

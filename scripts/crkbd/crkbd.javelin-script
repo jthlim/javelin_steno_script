@@ -1,5 +1,5 @@
 //---------------------------------------------------------------------------
-// Default Corne script.
+// Default Corne/Jarne script.
 //---------------------------------------------------------------------------
 
 // Steno
@@ -48,7 +48,7 @@
 // |--------+------+------+------+------+------|        |------+------+------+------+------+--------|
 // |        |  \   |  |   |  -   |  [   |  {   |        |   }  |  ]   |  _   |  .   |  /   |  Magic |
 // `----------------------+--+---+--+---+--+---+--.  ,--+---+--+---+--+---+-------------------------'
-//                           | Meta |  Alt | Ctrl |  |      |      |      |
+//                           | Meta |  Alt |Ctl/Sp|  |      |      |      |
 //                           `--------------------'  `--------------------'
 //
 // * Magic has a few different meanings:
@@ -510,6 +510,7 @@ const HAS_U2F = JAVELIN_HAS_U2F ?? 0;
 
 const USE_STATUS_BAR = HAS_DISPLAY && HAS_BLE;
 const USE_SCREEN_SAVER = HAS_DISPLAY && 0;
+const ENABLE_BLE_TRANSMIT_POWER_CONTROLS = HAS_BLE && 0;
 
 //---------------------------------------------------------------------------
 // The script needs to have onPress## and onRelease## functions for every
@@ -917,8 +918,14 @@ func init() {
   if (HAS_BLE) {
     setScript(SCRIPT_ID_BLE_ADVERTISING_UPDATE, @onConnectionUpdate);
 
-    updateBleTransmitPower(4);
-    updateBleSplitTransmitPower(4);
+    if (ENABLE_BLE_TRANSMIT_POWER_CONTROLS) {
+      updateBleTransmitPower(4);
+      updateBleSplitTransmitPower(4);
+    }
+  }
+
+  if (HAS_U2F) {
+    setScript(SCRIPT_ID_U2F_STATUS_UPDATE, @onU2fStatusUpdate);
   }
 
   if (USE_SCREEN_SAVER) {
@@ -1039,8 +1046,10 @@ func redrawDisplayOverlay() {
 }
 
 func updateBoardPower() {
-  if (HAS_BLE && isBleAdvertising()) {
-    updateKeyRgbConnectingCycle();
+  if (HAS_U2F && isWaitingForUserPresence()) {
+    startTimer(TIMER_ID_RGB_UPDATE, 32, 1, @updateKeyRgb);
+    setBoardPower(1);
+  } else if (HAS_BLE && isBleAdvertising()) {
     startTimer(TIMER_ID_RGB_UPDATE, 64, 1, @updateKeyRgb);
     setBoardPower(1);
   } else if (brightness == 0) {
@@ -1063,12 +1072,12 @@ func updateBoardPower() {
       setBoardPower(0);
     }
   }
+  updateKeyRgb();
   updateUnderglowRgb();
 }
 
 func onBatteryUpdate() {
   redrawDisplayOverlay();
-  updateKeyRgb();
   updateBoardPower();
 }
 
@@ -1077,7 +1086,10 @@ func onConnectionUpdate() {
     drawBleSummary();
   }
   redrawDisplayOverlay();
-  updateKeyRgb();
+  updateBoardPower();
+}
+
+func onU2fStatusUpdate() {
   updateBoardPower();
 }
 
@@ -1178,7 +1190,7 @@ func updateKeyRgbU2fAlertCycle() {
 
   var index = getTime() >> 6;
   var keyId = U2F_KEY_ORDER[index % 22];
-  setHsv(keyId, index << 10, 0xf0, 16);
+  setRgb(keyId, 16, 16, 16);
 
   setRgb(12, 32, 0, 0);
   setRgb(24, 0, 32, 0);
@@ -1246,6 +1258,9 @@ func setUnderglow(r, g, b) {
 }
 
 func updateUnderglowRgb() {
+  if (HAS_U2F && isWaitingForUserPresence()) {
+    return;
+  }
   if (HAS_BLE && isBleAdvertising()) {
     return;
   }
@@ -1479,6 +1494,7 @@ var bleTransmitPower = 3;
 const POWER_TO_BAR_LENGTH = [[ 00 01 02 04 06 08]];
 func updateBleTransmitPower(power) {
   if (!HAS_BLE) return;
+  if (!ENABLE_BLE_TRANSMIT_POWER_CONTROLS) return;
 
   bleTransmitPower = power;
 
@@ -1514,6 +1530,7 @@ func updateBleTransmitPower(power) {
 var bleSplitTransmitPower = 3;
 func updateBleSplitTransmitPower(power) {
   if (!HAS_BLE) return;
+  if (!ENABLE_BLE_TRANSMIT_POWER_CONTROLS) return;
 
   bleSplitTransmitPower = power;
 
@@ -1944,8 +1961,6 @@ func onPress8() {
     if (brightness < 8) {
       brightness = brightness + 1;
       updateBoardPower();
-      updateKeyRgb();
-      updateUnderglowRgb();
       updateScreenContrast();
     }
     drawBrightness();
@@ -2007,7 +2022,7 @@ func onPress12() {
     pressCount12 = pressCount;
   }
 
-  if (HAS_BLE && isSettingsLayer()) {
+  if (ENABLE_BLE_TRANSMIT_POWER_CONTROLS && isSettingsLayer()) {
     updateBleTransmitPower(bleTransmitPower < 5 ? bleTransmitPower + 1 : 5);
   }
 }
@@ -2032,7 +2047,7 @@ func onRelease12() {
 func onPress13() {
   handlePress(13, SC_A, SK_S2 | KEY_STENO, SC_1 | KEY_SHIFT, SC_F5, SC_L_META, SC_L_META);
 
-  if (HAS_BLE && isSettingsLayer()) {
+  if (ENABLE_BLE_TRANSMIT_POWER_CONTROLS && isSettingsLayer()) {
     updateBleSplitTransmitPower(bleSplitTransmitPower < 5 ? bleSplitTransmitPower + 1 : 5);
   }
 }
@@ -2106,8 +2121,6 @@ func onPress20() {
     if (brightness > 0) {
       brightness = brightness - 1;
       updateBoardPower();
-      updateKeyRgb();
-      updateUnderglowRgb();
       updateScreenContrast();
     }
     drawBrightness();
@@ -2177,7 +2190,7 @@ func onPress24() {
   wasSteno24 = layer == STENO_MASK;
   wasShiftPressed24 = (layer == QWERTY_LAYER || (layer & TEMPORARY_QWERTY_MASK));
 
-  if (HAS_BLE && isSettingsLayer()) {
+  if (ENABLE_BLE_TRANSMIT_POWER_CONTROLS && isSettingsLayer()) {
     updateBleTransmitPower(bleTransmitPower > 0 ? bleTransmitPower - 1 : 0);
     return;
   }
@@ -2222,7 +2235,7 @@ func onRelease24() {
 func onPress25() {
   handlePress(25, SC_Z, SC_NONE, SC_BACKSLASH, SC_F1, SC_NONE, SC_NONE);
 
-  if (HAS_BLE && isSettingsLayer()) {
+  if (ENABLE_BLE_TRANSMIT_POWER_CONTROLS && isSettingsLayer()) {
     updateBleSplitTransmitPower(bleSplitTransmitPower > 0 ? bleSplitTransmitPower - 1 : 0);
   }
 }
@@ -2381,7 +2394,7 @@ func onRelease36() {
   if (wasSteno36) {
     setLayer(STENO_MASK);
   }
-}
+  }
 
 var timer37;
 var pressCount37;
@@ -2408,6 +2421,7 @@ func onRelease37() {
   }
 }
 
+var timer38;
 var pressCount38;
 func onPress38() {
   handlePress(38, SC_NONE, SK_O | KEY_STENO, SC_L_CTRL, SC_NONE, SC_NONE, SC_NONE);
@@ -2416,6 +2430,9 @@ func onPress38() {
     setLayer(layer | NAV_MASK);
     pressAll();
     navLayerPressTimestamp = getTime();
+    pressCount38 = pressCount;
+  } else if (layer & SYMBOL_MASK) {
+    timer38 = getTime();
     pressCount38 = pressCount;
   } else if (layer & TEMPORARY_QWERTY_MASK) {
     press(SC_SPACE);
@@ -2435,6 +2452,10 @@ func onRelease38() {
     tap(deferredQwertyKey);
     deferredLayerKey = 0;
     deferredQwertyKey = 0;
+  } else if (layer & SYMBOL_MASK) {
+    if (pressCount38 == pressCount && getTime() - timer38 < TAP_THRESHOLD) {
+      tap(SC_SPACE);
+    }
   } else if (layer & TEMPORARY_QWERTY_MASK) {
     release(SC_SPACE);
   }
