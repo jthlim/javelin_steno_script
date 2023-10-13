@@ -268,6 +268,46 @@ class Parser {
     return null;
   }
 
+  String _parseLambda() {
+    final name =
+        '\$anonymous_function_${_currentToken.line}_${_currentToken.column}';
+
+    final function = ScriptFunction(name);
+    _module.functions[name] = function;
+
+    final previousFunction = _function;
+    _function = function;
+
+    if (_currentToken.type == TokenType.openParen) {
+      _assertToken(TokenType.openParen);
+
+      while (!_isScopeEnd(TokenType.closeParen)) {
+        final parameterName = _currentToken;
+        _assertToken(TokenType.identifier);
+        function.addParameter(parameterName.stringValue!);
+
+        if (_currentToken.type == TokenType.comma) {
+          _nextToken();
+        } else if (_currentToken.type != TokenType.closeParen) {
+          throw FormatException(
+            'Unexpected end of parameter list for $name near $_currentToken',
+          );
+        }
+      }
+    }
+
+    if (_currentToken.type == TokenType.varKeyword) {
+      _nextToken();
+      function.hasReturnValue = true;
+    }
+
+    function.statements = _parseBlock();
+
+    _function = previousFunction;
+
+    return name;
+  }
+
   AstNode _parsePrimary() {
     // Brackets, constant or function call.
     switch (_currentToken.type) {
@@ -289,9 +329,24 @@ class Parser {
 
       case TokenType.at:
         _nextToken();
-        final value = _currentToken;
-        _assertToken(TokenType.identifier);
-        return PushFunctionAddress(name: value.stringValue!);
+        switch (_currentToken.type) {
+          case TokenType.identifier:
+            final functionName = _currentToken.stringValue!;
+            _nextToken();
+            return PushFunctionAddress(name: functionName);
+
+          case TokenType.varKeyword:
+          case TokenType.openBrace:
+          case TokenType.openParen:
+            final lambdaName = _parseLambda();
+            return PushFunctionAddress(name: lambdaName);
+
+          default:
+            throw FormatException(
+              'Expected name of function or inline lamba '
+              'near $_currentToken',
+            );
+        }
 
       case TokenType.identifier:
         // Global, local, constant or function call

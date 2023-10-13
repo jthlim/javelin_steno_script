@@ -1661,10 +1661,17 @@ func press(key) {
     }
     if (key & KEY_SHIFT) {
       pressScanCode(SC_L_SHIFT);
-      display0NeedsUpdate = 1;
     }
     var scanCode = key & 0xff;
     pressScanCode(scanCode);
+
+    // When rapidly pressing a pair of keys, where the first includes shift,
+    // and the second one doesn't, the second can easily end up with the shift
+    // version unintentionally. This is especially evident with symbols, so
+    // release it immediately to avoid this.
+    if (key & KEY_SHIFT) {
+      releaseScanCode(SC_L_SHIFT);
+    }
 
     if (display0NeedsUpdate || isModifierKey(scanCode)) {
       updateDisplay0();
@@ -1680,18 +1687,19 @@ func release(key) {
   if (key & KEY_STENO) {
     releaseStenoKey(key & 0xff);
   } else {
-    if (wordCaps) {
-      if (isWordKey(key)) {
-        key = key | KEY_SHIFT;
-      }
-    }
-    if (key & KEY_SHIFT) {
-      releaseScanCode(SC_L_SHIFT);
-    }
+// See comment in press() -- this is intentionally not here now.
+//    if (wordCaps) {
+//      if (isWordKey(key)) {
+//        key = key | KEY_SHIFT;
+//      }
+//    }
+//    if (key & KEY_SHIFT) {
+//      releaseScanCode(SC_L_SHIFT);
+//    }
     var scanCode = key & 0xff;
     releaseScanCode(scanCode);
 
-    if ((key & KEY_SHIFT) || isModifierKey(scanCode)) {
+    if (isModifierKey(scanCode)) {
       updateDisplay0();
     }
   }
@@ -2308,17 +2316,6 @@ var releaseTimer35;
 var tapCount35;
 var pressCount35;
 var magicKey35;
-func pressCaps() {
-  // Tapping caps lock on macOS does not activate it.
-  // There needs to be a delay, so a timer is used to trigger the release.
-  pressScanCode(SC_CAPS);
-  startTimer(TIMER_ID_CAPS_HOLD, 100, 0, @releaseCaps);
-}
-func releaseCaps() {
-  releaseScanCode(SC_CAPS);
-  wordCaps = 0;
-  updateDisplay0();
-}
 func onPress35() {
   // Magic key handling.
   magicKey35 = SC_NONE;
@@ -2354,7 +2351,16 @@ func onPress35() {
         } else {
           wordCaps = wordCaps ^ 1;
           updateDisplay0();
-          startTimer(TIMER_ID_CAPS_HOLD, TAP_THRESHOLD, 0, @pressCaps);
+          startTimer(TIMER_ID_CAPS_HOLD, TAP_THRESHOLD, 0, @{
+            // Tapping caps lock on macOS does not activate it.
+            // There needs to be a delay, so a timer is used to trigger the release.
+            pressScanCode(SC_CAPS);
+            startTimer(TIMER_ID_CAPS_HOLD, 100, 0, @{
+              releaseScanCode(SC_CAPS);
+              wordCaps = 0;
+              updateDisplay0();
+            });
+          });
         }
       }
     } else {
@@ -2510,7 +2516,8 @@ func onRelease41() {
     pressAll();
 
     if (layer == 0) {
-      if (pressCount41 == startPressCount && getTime() - functionLayerPressTimestamp < TAP_THRESHOLD) {
+      // Give extra time for enter tapping.
+      if (pressCount41 == startPressCount && getTime() - functionLayerPressTimestamp < 2*TAP_THRESHOLD) {
         tap(SC_ENTER);
       }
 

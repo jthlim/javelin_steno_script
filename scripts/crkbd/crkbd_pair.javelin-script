@@ -167,6 +167,10 @@ func onU2fStatusUpdate() {
 
 func updateBoardPower() {
   if (HAS_U2F && isWaitingForUserPresence()) {
+    stopTimer(TIMER_ID_RGB_UPDATE);
+    for (var i = 0; i < 54; i = i + 1) {
+      setRgb(i, 0, 0, 0);
+    }
     setBoardPower(1);
     return;
   }
