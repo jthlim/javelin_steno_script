@@ -118,7 +118,7 @@
 // D/UP: Disconnects the active profile's bluetooth connection if connected.
 //       Unpairs the profile if not connected.
 //
-// To pair a device, hold BLE1-BLE4 for 2 seconds.
+// To pair a device to slot 1, hold BLE1 for 2 seconds. Same for BLE2-BLE4.
 
 //---------------------------------------------------------------------------
 // USB Scan code values.
@@ -2400,7 +2400,7 @@ func onRelease36() {
   if (wasSteno36) {
     setLayer(STENO_MASK);
   }
-  }
+}
 
 var timer37;
 var pressCount37;
