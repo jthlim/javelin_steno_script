@@ -108,7 +108,7 @@
 // ,-------------------------------------------.        ,-------------------------------------------.
 // |  USB L | BLE1 | BLE2 | BLE3 | BLE4 | USB R|        |Speed+|      |Brght+| Sat+ | Hue+ |HueSprd+|
 // |--------+------+------+------+------+------|        |------+------+------+------+------+--------|
-// | TxPwr+ |SplPw+|Embedd|Gemini|PloHID|      |        |Speed-|      |Brght-| Sat- | Hue- |HueSprd-|
+// | TxPwr+ |SplPw+|Embedd|Gemini|TxBolt|PloHID|        |Speed-|      |Brght-| Sat- | Hue- |HueSprd-|
 // |--------+------+------+------+------+------|        |------+------+------+------+------+--------|
 // | TxPwr- |SplPw-| WPM  | Tape |Strkes| D/UP |        |      |      |      |      |      |        |
 // `----------------------+--+---+--+---+--+---+--.  ,--+---+--+---+--+---+-------------------------'
@@ -1439,9 +1439,21 @@ func updateDisplay0() {
 
       var mode = getParameter("steno_mode");
       if (mode == "gemini")  {
-        drawImage(0, DISPLAY_WIDTH/2 - 16, DISPLAY_HEIGHT - 48, GEMINI_IMAGE);
+        if (DISPLAY_WIDTH < 64) {
+          drawImage(0, DISPLAY_WIDTH/2 - 16, DISPLAY_HEIGHT - 48, GEMINI_IMAGE);
+        } else {
+          drawText(0, DISPLAY_WIDTH/2, DISPLAY_HEIGHT - 48 + 10, FONT_ID_NORMAL, TEXT_ALIGNMENT_MIDDLE, "Gemini");
+        }
+      } else if(mode == "tx_bolt") {
+        drawText(0, DISPLAY_WIDTH/2, DISPLAY_HEIGHT - 48 + 10, FONT_ID_NORMAL, TEXT_ALIGNMENT_MIDDLE, "TX Bolt");
+      } else if(mode == "procat") {
+        drawText(0, DISPLAY_WIDTH/2, DISPLAY_HEIGHT - 48 + 10, FONT_ID_NORMAL, TEXT_ALIGNMENT_MIDDLE, "ProCAT");
       } else if(mode == "plover_hid") {
-        drawImage(0, DISPLAY_WIDTH/2 - 16, DISPLAY_HEIGHT - 48, PLOVER_HID_IMAGE);
+        if (DISPLAY_WIDTH < 64) {
+          drawImage(0, DISPLAY_WIDTH/2 - 16, DISPLAY_HEIGHT - 48, PLOVER_HID_IMAGE);
+        } else {
+          drawText(0, DISPLAY_WIDTH/2, DISPLAY_HEIGHT - 48 + 10, FONT_ID_NORMAL, TEXT_ALIGNMENT_MIDDLE, "Plover HID");
+        }
       }
     }
   } else {
@@ -2069,7 +2081,11 @@ func onPress14() {
     console("set_steno_mode embedded");
     if (HAS_DISPLAY) {
       updateDisplay0();
-      drawImage(0, DISPLAY_WIDTH/2 - 16, DISPLAY_HEIGHT - 48, EMBEDDED_IMAGE);
+      if (DISPLAY_WIDTH < 64) {
+        drawImage(0, DISPLAY_WIDTH/2 - 16, DISPLAY_HEIGHT - 48, EMBEDDED_IMAGE);
+      } else {
+        drawText(0, DISPLAY_WIDTH/2, DISPLAY_HEIGHT - 48 + 10, FONT_ID_NORMAL, TEXT_ALIGNMENT_MIDDLE, "Javelin");
+      }
     }
   }
 }
@@ -2082,7 +2098,11 @@ func onPress15() {
     console("set_steno_mode gemini");
     if (HAS_DISPLAY) {
       updateDisplay0();
-      drawImage(0, DISPLAY_WIDTH/2 - 16, DISPLAY_HEIGHT - 48, GEMINI_IMAGE);
+      if (DISPLAY_WIDTH < 64) {
+        drawImage(0, DISPLAY_WIDTH/2 - 16, DISPLAY_HEIGHT - 48, GEMINI_IMAGE);
+      } else {
+        drawText(0, DISPLAY_WIDTH/2, DISPLAY_HEIGHT - 48 + 10, FONT_ID_NORMAL, TEXT_ALIGNMENT_MIDDLE, "Gemini");
+      }
     }
   }
 }
@@ -2092,16 +2112,30 @@ func onPress16() {
   handlePress(16, SC_F, SK_RL | KEY_STENO, SC_4 | KEY_SHIFT, SC_F8, SC_L_SHIFT, SC_L_SHIFT);
 
   if (isSettingsLayer()) {
-    console("set_steno_mode plover_hid");
+    console("set_steno_mode tx_bolt");
     if (HAS_DISPLAY) {
       updateDisplay0();
-      drawImage(0, DISPLAY_WIDTH/2 - 16, DISPLAY_HEIGHT - 48, PLOVER_HID_IMAGE);
+      drawText(0, DISPLAY_WIDTH/2, DISPLAY_HEIGHT - 48 + 10, FONT_ID_NORMAL, TEXT_ALIGNMENT_MIDDLE, "TX Bolt");
     }
   }
 }
 func onRelease16() { handleRelease(SC_F, SK_RL | KEY_STENO, SC_4 | KEY_SHIFT, SC_F8, SC_L_SHIFT, SC_L_SHIFT); }
 
-func onPress17() { handlePress(17, SC_G, SK_STAR3 | KEY_STENO, SC_5 | KEY_SHIFT, SC_NONE, SC_NONE, SC_NONE); }
+func onPress17() {
+  handlePress(17, SC_G, SK_STAR3 | KEY_STENO, SC_5 | KEY_SHIFT, SC_NONE, SC_NONE, SC_NONE);
+
+  if (isSettingsLayer()) {
+    console("set_steno_mode plover_hid");
+    if (HAS_DISPLAY) {
+      updateDisplay0();
+      if (DISPLAY_WIDTH < 64) {
+        drawImage(0, DISPLAY_WIDTH/2 - 16, DISPLAY_HEIGHT - 48, PLOVER_HID_IMAGE);
+      } else {
+        drawText(0, DISPLAY_WIDTH/2, DISPLAY_HEIGHT - 48 + 10, FONT_ID_NORMAL, TEXT_ALIGNMENT_MIDDLE, "Plover HID");
+      }
+    }
+  }
+}
 func onRelease17() { handleRelease(SC_G, SK_STAR3 | KEY_STENO, SC_5 | KEY_SHIFT, SC_NONE, SC_NONE, SC_NONE); }
 
 func onPress18() {
