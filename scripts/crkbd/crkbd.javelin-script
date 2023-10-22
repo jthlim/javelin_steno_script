@@ -970,6 +970,12 @@ func updateScreenOn() {
   setScreenOn(1, screenOn);
 }
 
+const BLE_PROFILE_DOTS = [[
+  02 10 c0 00 c0 00
+  02 10 b0 01 b0 01
+  02 10 d8 06 d8 06
+  02 10 b6 0d b6 0d
+]];
 func drawDisplayOverlay() {
   if (!HAS_DISPLAY) return;
 
@@ -1003,10 +1009,13 @@ func drawDisplayOverlay() {
     drawImage(0, x+2, 1, BLUETOOTH_STATUS_IMAGE);
     if (activeConnection == CONNECTION_BLE) {
       activeConnectionPosition = x;
-      activeConnectionUnderlineLength = 10;
+      activeConnectionUnderlineLength = 13;
     }
+
+    drawImage(0, x+9, 0, BLE_PROFILE_DOTS + 6*getBleProfile());
+
     activeConnectionCount = activeConnectionCount + 1;
-    x = x + 12;
+    x = x + 15;
   }
   if (isConnected(CONNECTION_USB2)) {
     drawImage(0, x, 1, USB_STATUS_IMAGE);
