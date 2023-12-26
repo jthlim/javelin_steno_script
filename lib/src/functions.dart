@@ -71,6 +71,7 @@ enum InBuiltScriptFunction implements ScriptFunctionDefinition {
   replyUserPresence('replyUserPresence', 1, false, 0x3e, false),
   setGpioInputPin('setGpioInputPin', 2, false, 0x3f, false),
   readGpioPin('readGpioPin', 1, true, 0x40, true),
+  drawGrayscaleRange('drawGrayscaleRange', 6, false, 0x41, false),
   ;
 
   const InBuiltScriptFunction(

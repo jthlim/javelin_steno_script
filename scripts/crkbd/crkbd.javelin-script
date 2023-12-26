@@ -53,8 +53,8 @@
 //
 // * Magic has a few different meanings:
 //   - By itself, it does nothing.
-//   - Following '-', it means '>'
-//   - Following '(', it means '"'
+//   - Following '-' or '=', it means '>'
+//   - Following '(' or '\', it means '"'
 //   - Following a '{' or '[', it means enter (newline)
 //   - Following a digit, it means ','
 //   - Following a comma or dot, it means space ' '
@@ -577,6 +577,7 @@ var qwertyPressTimestamp;
 const KEY_STENO = 0x200;
 const KEY_SHIFT = 0x100;
 const TAP_THRESHOLD = 200; // milliseconds for keys that have alternates
+const RELEASE_TO_TAP_THRESHOLD = 200;
 const SCREEN_OFF_TIMEOUT = 30000; // 30 seconds.
 
 const STENO_DISPLAY_WPM = 0;
@@ -588,6 +589,7 @@ const TIMER_ID_FUZZY_LAYER = 1;
 const TIMER_ID_SCREEN_ON_TIMER = 2;
 const TIMER_ID_PAIRING_HOLD = 3;
 const TIMER_ID_CAPS_HOLD = 4;
+const TIMER_ID_CAPS_RELEASE = 5;
 
 var stenoDisplay = STENO_DISPLAY_WPM;
 var wordCaps = 0;
@@ -1059,7 +1061,7 @@ func updateBoardPower() {
     startTimer(TIMER_ID_RGB_UPDATE, 32, 1, @updateKeyRgb);
     setBoardPower(1);
   } else if (HAS_BLE && isBleAdvertising()) {
-    startTimer(TIMER_ID_RGB_UPDATE, 64, 1, @updateKeyRgb);
+    startTimer(TIMER_ID_RGB_UPDATE, 32, 1, @updateKeyRgb);
     setBoardPower(1);
   } else if (brightness == 0) {
     stopTimer(TIMER_ID_RGB_UPDATE);
@@ -1176,7 +1178,7 @@ const SINE_TABLE = [[ 80 83 86 89 8c 8f 92 95 98 9b 9e a2 a5 a7 aa ad b0 b3 b6 b
 func updateKeyBreatheCycle() {
   // Sine wave between 4-20 brightness, with staggerring of r, g, b values
   // to reduce harsh steps.
-  var w = (0xc00 + (SINE_TABLE[(getTime() >> 5) & 0xff] - 0x80) * (2 * 8));
+  var w = (0xc00 + (SINE_TABLE[(animationTime() >> 5) & 0xff] - 0x80) * (2 * 8));
   updateKeyConstantColor((w + 0x53) >> 8, w >> 8, (w + 0xa6) >> 8);
 }
 
@@ -1268,16 +1270,18 @@ func setUnderglow(r, g, b) {
 
 func updateUnderglowRgb() {
   if (HAS_U2F && isWaitingForUserPresence()) {
+    setUnderglow(0, 0, 0);
     return;
   }
   if (HAS_BLE && isBleAdvertising()) {
+    setUnderglow(0, 0, 0);
     return;
   }
 
   if (layer & STENO_MASK) {
-    setUnderglow(64, 64, 64);
+    setUnderglow(192, 192, 192);
   } else {
-    setUnderglow(53, 32, 64);
+    setUnderglow(159, 96, 192);
   }
 }
 
@@ -1661,9 +1665,17 @@ func press(key) {
     return;
   }
 
-  lastPressLayer = layer;
-  lastPressKey = key;
-  pressCount = pressCount + 1;
+  // When rapidly pressing a pair of keys, where the first includes shift,
+  // and the second one doesn't, the second can easily end up with the shift
+  // version unintentionally. This is especially evident with symbols, so
+  // release it here if the last key has shift, but the new key doesn't.
+  if (isScanCodePressed(lastPressKey & 0xff)) {
+    if ((lastPressKey & KEY_SHIFT) && (key & KEY_SHIFT) == 0) {
+      // Makes it possible to tap "+=" quickly.
+      releaseScanCode(lastPressKey & 0xff);
+      releaseScanCode(SC_L_SHIFT);
+    }
+  }
 
   if (key & KEY_STENO) {
     pressStenoKey(key & 0xff);
@@ -1686,18 +1698,14 @@ func press(key) {
     var scanCode = key & 0xff;
     pressScanCode(scanCode);
 
-    // When rapidly pressing a pair of keys, where the first includes shift,
-    // and the second one doesn't, the second can easily end up with the shift
-    // version unintentionally. This is especially evident with symbols, so
-    // release it immediately to avoid this.
-    if (key & KEY_SHIFT) {
-      releaseScanCode(SC_L_SHIFT);
-    }
-
     if (display0NeedsUpdate || isModifierKey(scanCode)) {
       updateDisplay0();
     }
   }
+
+  lastPressLayer = layer;
+  lastPressKey = key;
+  pressCount = pressCount + 1;
 }
 
 func release(key) {
@@ -1708,15 +1716,15 @@ func release(key) {
   if (key & KEY_STENO) {
     releaseStenoKey(key & 0xff);
   } else {
-// See comment in press() -- this is intentionally not here now.
-//    if (wordCaps) {
-//      if (isWordKey(key)) {
-//        key = key | KEY_SHIFT;
-//      }
-//    }
-//    if (key & KEY_SHIFT) {
-//      releaseScanCode(SC_L_SHIFT);
-//    }
+    if (wordCaps && key == (lastPressKey & 0xff)) {
+      if (isWordKey(key)) {
+        key = key | KEY_SHIFT;
+      }
+    }
+    if (key & KEY_SHIFT) {
+      releaseScanCode(SC_L_SHIFT);
+    }
+
     var scanCode = key & 0xff;
     releaseScanCode(scanCode);
 
@@ -2354,6 +2362,16 @@ func onRelease33() { handleRelease(SC_DOT, SC_NONE, SC_DOT, SC_NONE, SC_NONE, SC
 func onPress34() { handlePress(34, SC_SLASH, SC_NONE, SC_SLASH, SC_NONE, SC_NONE, SC_KP_SLASH); }
 func onRelease34() { handleRelease(SC_SLASH, SC_NONE, SC_SLASH, SC_NONE, SC_NONE, SC_KP_SLASH); }
 
+func tapCapsLock() {
+  // Tapping caps lock on macOS does not activate it.
+  // There needs to be a delay, so a timer is used to trigger the release.
+  pressScanCode(SC_CAPS);
+  startTimer(TIMER_ID_CAPS_RELEASE, 200, 0, @{
+    releaseScanCode(SC_CAPS);
+    wordCaps = 0;
+  });
+}
+
 var timer35;
 var releaseTimer35;
 var tapCount35;
@@ -2363,9 +2381,9 @@ func onPress35() {
   // Magic key handling.
   magicKey35 = SC_NONE;
   if (layer & (SYMBOL_MASK | NUMPAD_MASK)) {
-    if (lastPressKey == SC_MINUS) {
+    if (lastPressKey == SC_MINUS || lastPressKey == SC_EQUAL) {
       magicKey35 = SC_DOT | KEY_SHIFT;
-    } else if (lastPressKey == (SC_9 | KEY_SHIFT)) {
+    } else if (lastPressKey == (SC_9 | KEY_SHIFT) || lastPressKey == SC_BACKSLASH || lastPressKey == (SC_APOSTROPHE | KEY_SHIFT)) {
       magicKey35 = SC_APOSTROPHE | KEY_SHIFT;
     } else if (SC_1 <= lastPressKey && lastPressKey <= SC_0) {
       magicKey35 = SC_COMMA;
@@ -2380,30 +2398,21 @@ func onPress35() {
 
   handlePress(35, SC_R_SHIFT, SC_NONE, magicKey35, SC_NONE, SC_NONE, magicKey35);
 
-  if (layer == 0) {
+  if ((layer >> 1) == 0) {
     timer35 = getTime();
     pressCount35 = pressCount;
-    if (timer35 - releaseTimer35 < TAP_THRESHOLD) {
+    if (timer35 - releaseTimer35 < RELEASE_TO_TAP_THRESHOLD) {
       tapCount35 = tapCount35 + 1;
       if (tapCount35 == 1) {
         if (wordCaps) {
           wordCaps = 0;
           updateDisplay0();
         } else if (getLedStatus(LED_STATUS_CAPS_LOCK)) {
-          tapScanCode(SC_CAPS);
-        } else {
+          tapCapsLock();
+        } else if (layer == 0) {
           wordCaps = wordCaps ^ 1;
           updateDisplay0();
-          startTimer(TIMER_ID_CAPS_HOLD, TAP_THRESHOLD, 0, @{
-            // Tapping caps lock on macOS does not activate it.
-            // There needs to be a delay, so a timer is used to trigger the release.
-            pressScanCode(SC_CAPS);
-            startTimer(TIMER_ID_CAPS_HOLD, 100, 0, @{
-              releaseScanCode(SC_CAPS);
-              wordCaps = 0;
-              updateDisplay0();
-            });
-          });
+          startTimer(TIMER_ID_CAPS_HOLD, TAP_THRESHOLD, 0, @tapCapsLock);
         }
       }
     } else {
@@ -2419,7 +2428,7 @@ func onRelease35() {
   handleRelease(SC_R_SHIFT, SC_NONE, magicKey35, SC_NONE, SC_NONE, magicKey35);
   stopTimer(TIMER_ID_CAPS_HOLD);
 
-  if (layer == 0 && pressCount35 == pressCount && getTime() - timer35 < TAP_THRESHOLD) {
+  if ((layer >> 1) == 0 && pressCount35 == pressCount && getTime() - timer35 < TAP_THRESHOLD) {
     releaseTimer35 = getTime();
   }
 }
