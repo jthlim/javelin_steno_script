@@ -464,6 +464,7 @@ const SCRIPT_ID_KEYBOARD_LED_STATUS_UPDATE = 4;
 const SCRIPT_ID_BLE_ADVERTISING_UPDATE = 5;
 const SCRIPT_ID_BLE_SCANNING_UPDATE = 6;
 const SCRIPT_ID_U2F_STATUS_UPDATE = 7;
+const SCRIPT_ID_STENO_MODE_UPDATE = 9;
 
 //---------------------------------------------------------------------------
 //
@@ -916,6 +917,7 @@ func init() {
   setScript(SCRIPT_ID_CONNECTION_UPDATE, @onConnectionUpdate);
   setScript(SCRIPT_ID_PAIR_CONNECTION_UPDATE, @onConnectionUpdate);
   setScript(SCRIPT_ID_KEYBOARD_LED_STATUS_UPDATE, @onKeyboardLedStatusUpdate);
+  setScript(SCRIPT_ID_STENO_MODE_UPDATE, @onStenoModeUpdate);
 
   if (HAS_BLE) {
     setScript(SCRIPT_ID_BLE_ADVERTISING_UPDATE, @onConnectionUpdate);
@@ -1115,6 +1117,16 @@ func onKeyboardLedStatusUpdate() {
   }
 }
 
+func onStenoModeUpdate() {
+  if (HAS_DISPLAY) {
+    if (HAS_BLE && isShowingBleSummary()) {
+      drawBleSummary();
+    } else {
+      updateDisplay0();
+    }
+  }
+}
+
 const HUE_CYCLE_RGB_ORDER = [[
   00
   0c 01
@@ -1153,7 +1165,7 @@ func updateKeyRgbHueCycle(hShift, sat, spreadMultiplier, value) {
   }
 }
 
-func updateKeyConstantColor(r, g, b) {
+func updateKeyRgbConstantColor(r, g, b) {
   for (var i = 0; i < 42; i = i + 1) {
     setRgb(i, r, g, b);
   }
@@ -1175,11 +1187,11 @@ func updateKeyRgbRandomColors(hShift, b, s) {
 
 // 256 step sine table.
 const SINE_TABLE = [[ 80 83 86 89 8c 8f 92 95 98 9b 9e a2 a5 a7 aa ad b0 b3 b6 b9 bc be c1 c4 c6 c9 cb ce d0 d3 d5 d7 da dc de e0 e2 e4 e6 e8 ea eb ed ee f0 f1 f3 f4 f5 f6 f8 f9 fa fa fb fc fd fd fe fe fe ff ff ff ff ff ff ff fe fe fe fd fd fc fb fa fa f9 f8 f6 f5 f4 f3 f1 f0 ee ed eb ea e8 e6 e4 e2 e0 de dc da d7 d5 d3 d0 ce cb c9 c6 c4 c1 be bc b9 b6 b3 b0 ad aa a7 a5 a2 9e 9b 98 95 92 8f 8c 89 86 83 80 7c 79 76 73 70 6d 6a 67 64 61 5d 5a 58 55 52 4f 4c 49 46 43 41 3e 3b 39 36 34 31 2f 2c 2a 28 25 23 21 1f 1d 1b 19 17 15 14 12 11 0f 0e 0c 0b 0a 09 07 06 05 05 04 03 02 02 01 01 01 00 00 00 00 00 00 00 01 01 01 02 02 03 04 05 05 06 07 09 0a 0b 0c 0e 0f 11 12 14 15 17 19 1b 1d 1f 21 23 25 28 2a 2c 2f 31 34 36 39 3b 3e 41 43 46 49 4c 4f 52 55 58 5a 5d 61 64 67 6a 6d 70 73 76 79 7c ]];
-func updateKeyBreatheCycle() {
+func updateKeyRgbBreatheCycle() {
   // Sine wave between 4-20 brightness, with staggerring of r, g, b values
   // to reduce harsh steps.
   var w = (0xc00 + (SINE_TABLE[(animationTime() >> 5) & 0xff] - 0x80) * (2 * 8));
-  updateKeyConstantColor((w + 0x53) >> 8, w >> 8, (w + 0xa6) >> 8);
+  updateKeyRgbConstantColor((w + 0x53) >> 8, w >> 8, (w + 0xa6) >> 8);
 }
 
 const DISCONNECTED_KEY_ORDER = [[ 00 01 02 03 04 05 04 03 02 01 ]];
@@ -1238,14 +1250,14 @@ func updateKeyRgb() {
   } else if (HAS_BLE && isBleAdvertising()) {
     updateKeyRgbConnectingCycle();
   } else if (isHostSleeping()) {
-    updateKeyBreatheCycle();
+    updateKeyRgbBreatheCycle();
   } else if (layer == STENO_MASK) {
-      updateKeyRgbHueCycle(
-        animationTime() * SPEED_VALUES[speed] + hueShift,
-        SATURATION_VALUES[saturation] * 2,
-        HUE_SPREAD_VALUES[hueSpread] * 16,
-        BRIGHTNESS_VALUES[brightness]
-      );
+    updateKeyRgbHueCycle(
+      animationTime() * SPEED_VALUES[speed] + hueShift,
+      SATURATION_VALUES[saturation] * 2,
+      HUE_SPREAD_VALUES[hueSpread] * 16,
+      BRIGHTNESS_VALUES[brightness]
+    );
   } else {
     updateKeyRgbRandomColors(
       animationTime() * SPEED_VALUES[speed] + hueShift,
