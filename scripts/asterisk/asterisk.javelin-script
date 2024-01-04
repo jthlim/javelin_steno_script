@@ -333,11 +333,37 @@ const LED_STATUS_KANA = 4;
 // physical button.
 //---------------------------------------------------------------------------
 
+const TIMER_ID_LED_FLASH = 0;
+
+const LED_PIN = 26;
+
+var flashTimerStart;
+var flashTimerDuration;
+
+func init() {
+  flashTimerDuration = 1000;
+  flashTimerStart = getTime();
+  startTimer(TIMER_ID_LED_FLASH, 50, 1, @onLedFlashTimer);
+}
+
+func onLedFlashTimer() {
+  var now = getTime();
+  var elapsed = now - flashTimerStart;
+  if (elapsed >= flashTimerDuration) {
+    stopTimer(TIMER_ID_LED_FLASH);
+    updateLed();
+  } else {
+    setGpioPinDutyCycle(LED_PIN, 10 * !((elapsed/250) & 1));
+  }
+}
+
 func updateLed() {
+  if (isTimerActive(TIMER_ID_LED_FLASH)) return;
+
   if (checkButtonState("00000000000000000000000000")) {
-    setGpioPin(26, 0);
+    setGpioPin(LED_PIN, 0);
   } else{
-    setGpioPinDutyCycle(26, 5);
+    setGpioPinDutyCycle(LED_PIN, 5);
   }
 }
 
@@ -419,5 +445,17 @@ func onRelease24() { releaseStenoKey(SK_E); updateLed(); }
 func onPress25() { pressStenoKey(SK_U); updateLed(); }
 func onRelease25() { releaseStenoKey(SK_U); updateLed(); }
 
-func onPress26() { console("launch_bootloader"); }
+func onPress26() {
+    if (getParameter("steno_mode") != "embedded") {
+    console("set_steno_mode embedded");
+    flashTimerDuration = 500;
+  } else {
+    console("set_steno_mode gemini");
+    flashTimerDuration = 1000;
+  }
+  flashTimerStart = getTime();
+  startTimer(TIMER_ID_LED_FLASH, 50, 1, @onLedFlashTimer);
+  releaseAll();
+}
+
 func onRelease26() {}
