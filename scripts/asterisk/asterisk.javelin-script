@@ -333,83 +333,91 @@ const LED_STATUS_KANA = 4;
 // physical button.
 //---------------------------------------------------------------------------
 
-func onPress0() { pressStenoKey(SK_NUM1); }
-func onRelease0() { releaseStenoKey(SK_NUM1); }
+func updateLed() {
+  if (checkButtonState("00000000000000000000000000")) {
+    setGpioPin(26, 0);
+  } else{
+    setGpioPinDutyCycle(26, 5);
+  }
+}
 
-func onPress1() { pressStenoKey(SK_NUM2); }
-func onRelease1() { releaseStenoKey(SK_NUM2); }
+func onPress0() { pressStenoKey(SK_NUM1); updateLed(); }
+func onRelease0() { releaseStenoKey(SK_NUM1); updateLed(); }
 
-func onPress2() { pressStenoKey(SK_S1); }
-func onRelease2() { releaseStenoKey(SK_S1); }
+func onPress1() { pressStenoKey(SK_NUM2); updateLed(); }
+func onRelease1() { releaseStenoKey(SK_NUM2); updateLed(); }
 
-func onPress3() { pressStenoKey(SK_TL); }
-func onRelease3() { releaseStenoKey(SK_TL); }
+func onPress2() { pressStenoKey(SK_S1); updateLed(); }
+func onRelease2() { releaseStenoKey(SK_S1); updateLed(); }
 
-func onPress4() { pressStenoKey(SK_PL); }
-func onRelease4() { releaseStenoKey(SK_PL); }
+func onPress3() { pressStenoKey(SK_TL); updateLed(); }
+func onRelease3() { releaseStenoKey(SK_TL); updateLed(); }
 
-func onPress5() { pressStenoKey(SK_HL); }
-func onRelease5() { releaseStenoKey(SK_HL); }
+func onPress4() { pressStenoKey(SK_PL); updateLed(); }
+func onRelease4() { releaseStenoKey(SK_PL); updateLed(); }
 
-func onPress6() { pressStenoKey(SK_STAR1); }
-func onRelease6() { releaseStenoKey(SK_STAR1); }
+func onPress5() { pressStenoKey(SK_HL); updateLed(); }
+func onRelease5() { releaseStenoKey(SK_HL); updateLed(); }
 
-func onPress7() { pressStenoKey(SK_STAR2); }
-func onRelease7() { releaseStenoKey(SK_STAR2); }
+func onPress6() { pressStenoKey(SK_STAR1); updateLed(); }
+func onRelease6() { releaseStenoKey(SK_STAR1); updateLed(); }
 
-func onPress8() { pressStenoKey(SK_FR); }
-func onRelease8() { releaseStenoKey(SK_FR); }
+func onPress7() { pressStenoKey(SK_STAR2); updateLed(); }
+func onRelease7() { releaseStenoKey(SK_STAR2); updateLed(); }
 
-func onPress9() { pressStenoKey(SK_PR); }
-func onRelease9() { releaseStenoKey(SK_PR); }
+func onPress8() { pressStenoKey(SK_FR); updateLed(); }
+func onRelease8() { releaseStenoKey(SK_FR); updateLed(); }
 
-func onPress10() { pressStenoKey(SK_LR); }
-func onRelease10() { releaseStenoKey(SK_LR); }
+func onPress9() { pressStenoKey(SK_PR); updateLed(); }
+func onRelease9() { releaseStenoKey(SK_PR); updateLed(); }
 
-func onPress11() { pressStenoKey(SK_TR); }
-func onRelease11() { releaseStenoKey(SK_TR); }
+func onPress10() { pressStenoKey(SK_LR); updateLed(); }
+func onRelease10() { releaseStenoKey(SK_LR); updateLed(); }
 
-func onPress12() { pressStenoKey(SK_DR); }
-func onRelease12() { releaseStenoKey(SK_DR); }
+func onPress11() { pressStenoKey(SK_TR); updateLed(); }
+func onRelease11() { releaseStenoKey(SK_TR); updateLed(); }
 
-func onPress13() { pressStenoKey(SK_S2); }
-func onRelease13() { releaseStenoKey(SK_S2); }
+func onPress12() { pressStenoKey(SK_DR); updateLed(); }
+func onRelease12() { releaseStenoKey(SK_DR); updateLed(); }
 
-func onPress14() { pressStenoKey(SK_KL); }
-func onRelease14() { releaseStenoKey(SK_KL); }
+func onPress13() { pressStenoKey(SK_S2); updateLed(); }
+func onRelease13() { releaseStenoKey(SK_S2); updateLed(); }
 
-func onPress15() { pressStenoKey(SK_WL); }
-func onRelease15() { releaseStenoKey(SK_WL); }
+func onPress14() { pressStenoKey(SK_KL); updateLed(); }
+func onRelease14() { releaseStenoKey(SK_KL); updateLed(); }
 
-func onPress16() { pressStenoKey(SK_RL); }
-func onRelease16() { releaseStenoKey(SK_RL); }
+func onPress15() { pressStenoKey(SK_WL); updateLed(); }
+func onRelease15() { releaseStenoKey(SK_WL); updateLed(); }
 
-func onPress17() { pressStenoKey(SK_RR); }
-func onRelease17() { releaseStenoKey(SK_RR); }
+func onPress16() { pressStenoKey(SK_RL); updateLed(); }
+func onRelease16() { releaseStenoKey(SK_RL); updateLed(); }
 
-func onPress18() { pressStenoKey(SK_BR); }
-func onRelease18() { releaseStenoKey(SK_BR); }
+func onPress17() { pressStenoKey(SK_RR); updateLed(); }
+func onRelease17() { releaseStenoKey(SK_RR); updateLed(); }
 
-func onPress19() { pressStenoKey(SK_GR); }
-func onRelease19() { releaseStenoKey(SK_GR); }
+func onPress18() { pressStenoKey(SK_BR); updateLed(); }
+func onRelease18() { releaseStenoKey(SK_BR); updateLed(); }
 
-func onPress20() { pressStenoKey(SK_SR); }
-func onRelease20() { releaseStenoKey(SK_SR); }
+func onPress19() { pressStenoKey(SK_GR); updateLed(); }
+func onRelease19() { releaseStenoKey(SK_GR); updateLed(); }
 
-func onPress21() { pressStenoKey(SK_ZR); }
-func onRelease21() { releaseStenoKey(SK_ZR); }
+func onPress20() { pressStenoKey(SK_SR); updateLed(); }
+func onRelease20() { releaseStenoKey(SK_SR); updateLed(); }
 
-func onPress22() { pressStenoKey(SK_A); }
-func onRelease22() { releaseStenoKey(SK_A); }
+func onPress21() { pressStenoKey(SK_ZR); updateLed(); }
+func onRelease21() { releaseStenoKey(SK_ZR); updateLed(); }
 
-func onPress23() { pressStenoKey(SK_O); }
-func onRelease23() { releaseStenoKey(SK_O); }
+func onPress22() { pressStenoKey(SK_A); updateLed(); }
+func onRelease22() { releaseStenoKey(SK_A); updateLed(); }
 
-func onPress24() { pressStenoKey(SK_E); }
-func onRelease24() { releaseStenoKey(SK_E); }
+func onPress23() { pressStenoKey(SK_O); updateLed(); }
+func onRelease23() { releaseStenoKey(SK_O); updateLed(); }
 
-func onPress25() { pressStenoKey(SK_U); }
-func onRelease25() { releaseStenoKey(SK_U); }
+func onPress24() { pressStenoKey(SK_E); updateLed(); }
+func onRelease24() { releaseStenoKey(SK_E); updateLed(); }
+
+func onPress25() { pressStenoKey(SK_U); updateLed(); }
+func onRelease25() { releaseStenoKey(SK_U); updateLed(); }
 
 func onPress26() { console("launch_bootloader"); }
 func onRelease26() {}
