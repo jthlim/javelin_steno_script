@@ -448,10 +448,10 @@ func onRelease25() { releaseStenoKey(SK_U); updateLed(); }
 func onPress26() {
     if (getParameter("steno_mode") != "embedded") {
     console("set_steno_mode embedded");
-    flashTimerDuration = 500;
+    flashTimerDuration = 1000;
   } else {
     console("set_steno_mode gemini");
-    flashTimerDuration = 1000;
+    flashTimerDuration = 500;
   }
   flashTimerStart = getTime();
   startTimer(TIMER_ID_LED_FLASH, 50, 1, @onLedFlashTimer);
