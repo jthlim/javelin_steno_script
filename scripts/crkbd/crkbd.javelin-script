@@ -665,7 +665,7 @@ const buttonScanCodes = [[
   12 15 1c 13   // Button 9: O, R, Y, P
   13 0f 33 33   // Button 10: P, L, Semicolon, Semicolon
   2a 2a 2a 2a   // Button 11: Backspace
-  e0 30 30 30   // Button 12: Ctrl
+  e0 e0 e0 e0   // Button 12: Ctrl
   04 04 04 04   // Button 13: A
   16 12 15 16   // Button 14: S, O, R, S
   07 08 16 0b   // Button 15: D, E, S, H
