@@ -69,8 +69,8 @@
 //                           `--------------------'  `--------------------'
 //
 //
-// The layout is selected by pressing LAYOUT on the Settings layer. This can be pemanently changed
-// by changing the layout variable's initial value.
+// The layout is selected by pressing LAYOUT on the Settings layer to rotate through the options.
+//  This can be pemanently changed by changing the alphabeticLayout variable's initial value.
 //
 // For keys marked with two options, holding or pressing with other keys will cause the first option
 // to be used, tapping briefly will trigger the second.
@@ -643,14 +643,15 @@ func isShowingBleSummary() var {
   return isSettingsLayer() && isBleSummaryActive;
 }
 
-const ALPHABETIC_QWERTY = 0;
-const ALPHABETIC_DVORAK = 1;
-const ALPHABETIC_COLEMAK = 2;
-const ALPHABETIC_WORKMAN = 3;
+const ALPHABETIC_LAYOUT_QWERTY = 0;
+const ALPHABETIC_LAYOUT_DVORAK = 1;
+const ALPHABETIC_LAYOUT_COLEMAK = 2;
+const ALPHABETIC_LAYOUT_WORKMAN = 3;
 
-const ALPHABETIC_COUNT = 4;
+const ALPHABETIC_LAYOUT_COUNT = 4;
 
-var layout = ALPHABETIC_QWERTY;
+// Change this line to set the default layout on startup.
+var alphabeticLayout = ALPHABETIC_LAYOUT_QWERTY;
 
 const buttonScanCodes = [[
   2b 2b 2b 2b   // Button 0: Tab
@@ -1579,13 +1580,13 @@ func updateDisplay0() {
   } else {
     drawDisplay0(QWERTY_IMAGE);
 
-    if (layout == ALPHABETIC_QWERTY) {
+    if (alphabeticLayout == ALPHABETIC_LAYOUT_QWERTY) {
       // drawText(0, DISPLAY_WIDTH/2, DISPLAY_HEIGHT/2 - 12, FONT_ID_NORMAL, TEXT_ALIGNMENT_MIDDLE, "QWERTY");
-    } else if (layout == ALPHABETIC_DVORAK) {
+    } else if (alphabeticLayout == ALPHABETIC_LAYOUT_DVORAK) {
       drawText(0, DISPLAY_WIDTH/2, DISPLAY_HEIGHT/2 - 12, FONT_ID_NORMAL, TEXT_ALIGNMENT_MIDDLE, "Dvorak");
-    } else if (layout == ALPHABETIC_COLEMAK) {
+    } else if (alphabeticLayout == ALPHABETIC_LAYOUT_COLEMAK) {
       drawText(0, DISPLAY_WIDTH/2, DISPLAY_HEIGHT/2 - 12, FONT_ID_NORMAL, TEXT_ALIGNMENT_MIDDLE, "Colemak");
-    } else if (layout == ALPHABETIC_WORKMAN) {
+    } else if (alphabeticLayout == ALPHABETIC_LAYOUT_WORKMAN) {
       drawText(0, DISPLAY_WIDTH/2, DISPLAY_HEIGHT/2 - 12, FONT_ID_NORMAL, TEXT_ALIGNMENT_MIDDLE, "Workman");
     }
   }
@@ -1888,7 +1889,7 @@ func handlePress(buttonIndex, stenoKey, symbolsKey, functionKey, navKey, numPadK
     updateButtonColor(buttonIndex);
   }
   lastActionTime = getTime();
-  var alphabeticKey = buttonScanCodes[4 * buttonIndex + layout];
+  var alphabeticKey = buttonScanCodes[ALPHABETIC_LAYOUT_COUNT * buttonIndex + alphabeticLayout];
   if (isSettingsLayer()) {
     return;
   } else if (layer & NUMPAD_MASK) {
@@ -1964,11 +1965,11 @@ func handleRelease(buttonIndex, stenoKey, symbolsKey, functionKey, navKey, numPa
   } else if (layer & SYMBOL_MASK) {
     release(symbolsKey);
   } else if (layer & TEMPORARY_QWERTY_MASK) {
-    release(buttonScanCodes[4 * buttonIndex + layout]);
+    release(buttonScanCodes[ALPHABETIC_LAYOUT_COUNT * buttonIndex + alphabeticLayout]);
   } else if (layer & STENO_MASK) {
     release(stenoKey);
   } else {
-    release(buttonScanCodes[4 * buttonIndex + layout]);
+    release(buttonScanCodes[ALPHABETIC_LAYOUT_COUNT * buttonIndex + alphabeticLayout]);
   }
 }
 
@@ -2539,15 +2540,15 @@ func onPress35() {
   }
 
   if (isSettingsLayer()) {
-    layout = (layout + 1) % ALPHABETIC_COUNT;
+    alphabeticLayout = (alphabeticLayout + 1) % ALPHABETIC_LAYOUT_COUNT;
     updateDisplay0();
-    if (layout == ALPHABETIC_QWERTY) {
+    if (alphabeticLayout == ALPHABETIC_LAYOUT_QWERTY) {
       drawText(0, DISPLAY_WIDTH/2, DISPLAY_HEIGHT * 3 / 4, FONT_ID_NORMAL, TEXT_ALIGNMENT_MIDDLE, "QWERTY");
-    } else if (layout == ALPHABETIC_DVORAK) {
+    } else if (alphabeticLayout == ALPHABETIC_LAYOUT_DVORAK) {
       drawText(0, DISPLAY_WIDTH/2, DISPLAY_HEIGHT * 3 / 4, FONT_ID_NORMAL, TEXT_ALIGNMENT_MIDDLE, "Dvorak");
-    } else if (layout == ALPHABETIC_COLEMAK) {
+    } else if (alphabeticLayout == ALPHABETIC_LAYOUT_COLEMAK) {
       drawText(0, DISPLAY_WIDTH/2, DISPLAY_HEIGHT * 3 / 4, FONT_ID_NORMAL, TEXT_ALIGNMENT_MIDDLE, "Colemak");
-    } else if (layout == ALPHABETIC_WORKMAN) {
+    } else if (alphabeticLayout == ALPHABETIC_LAYOUT_WORKMAN) {
       drawText(0, DISPLAY_WIDTH/2, DISPLAY_HEIGHT * 3 / 4, FONT_ID_NORMAL, TEXT_ALIGNMENT_MIDDLE, "Workman");
     }
   }
