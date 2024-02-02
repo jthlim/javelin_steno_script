@@ -117,9 +117,9 @@
 // Navigation/Media
 //
 // ,-------------------------------------------.        ,-------------------------------------------.
-// |        |      |      |      |      |      |        | Vol+ | BkSp |   ↑  | Del  | PgUp |  Home  |
+// |        |      |      |      |      | Bri+ |        | Vol+ | BkSp |   ↑  | Del  | PgUp |  Home  |
 // |--------+------+------+------+------+------|        |------+------+------+------+------+--------|
-// |        |  GUI |  Alt | Ctrl | Shift|      |        | Vol- |  ←   |   ↓  |   →  | PgDn |   End  |
+// |        |  GUI |  Alt | Ctrl | Shift| Bri- |        | Vol- |  ←   |   ↓  |   →  | PgDn |   End  |
 // |--------+------+------+------+------+------|        |------+------+------+------+------+--------|
 // |        |      |      |      |      |      |        | Mute |      |      |      |      |        |
 // `----------------------+--+---+--+---+--+---+--.  ,--+---+--+---+--+---+-------------------------'
@@ -337,6 +337,9 @@ const SC_CONSUMER_PLAY_SKIP = 0xbe;           // UsageId 0xce
 const SC_CONSUMER_MUTE = 0xd2;                // UsageId 0xe2
 const SC_CONSUMER_VOLUME_UP = 0xd9;           // UsageId 0xe9
 const SC_CONSUMER_VOLUME_DOWN = 0xda;         // UsageId 0xea
+
+const SC_CONSUMER_BRIGHTNESS_UP = 0xde;       // UsageId 0x6f
+const SC_CONSUMER_BRIGHTNESS_DOWN = 0xdf;     // UsageId 0x70
 
 //---------------------------------------------------------------------------
 // javelin-steno steno key values.
@@ -647,55 +650,56 @@ const ALPHABETIC_LAYOUT_QWERTY = 0;
 const ALPHABETIC_LAYOUT_DVORAK = 1;
 const ALPHABETIC_LAYOUT_COLEMAK = 2;
 const ALPHABETIC_LAYOUT_WORKMAN = 3;
+const ALPHABETIC_LAYOUT_COLEMAK_DH = 4;
 
-const ALPHABETIC_LAYOUT_COUNT = 4;
+const ALPHABETIC_LAYOUT_COUNT = 5;
 
 // Change this line to set the default layout on startup.
 var alphabeticLayout = ALPHABETIC_LAYOUT_QWERTY;
 
 const buttonScanCodes = [[
-  2b 2b 2b 2b   // Button 0: Tab
-  14 34 14 14   // Button 1: Q, Apos, Q, Q
-  1a 36 1a 07   // Button 2: W, Comma, W, D
-  08 37 09 15   // Button 3: E, Period, F, R
-  15 13 13 1a   // Button 4: R, P, P, W
-  17 1c 0a 05   // Button 5: T, Y, G, B
-  1c 09 0d 0d   // Button 6: Y, F, J, J
-  18 0a 0f 09   // Button 7: U, G, L, F
-  0c 06 18 18   // Button 8: I, C, U, U
-  12 15 1c 13   // Button 9: O, R, Y, P
-  13 0f 33 33   // Button 10: P, L, Semicolon, Semicolon
-  2a 2a 2a 2a   // Button 11: Backspace
-  e0 e0 e0 e0   // Button 12: Ctrl
-  04 04 04 04   // Button 13: A
-  16 12 15 16   // Button 14: S, O, R, S
-  07 08 16 0b   // Button 15: D, E, S, H
-  09 18 17 17   // Button 16: F, U, T, T
-  0a 0c 07 0a   // Button 17: G, I, D, G
-  0b 07 0b 1c   // Button 18: H, D, H, Y
-  0d 0b 11 11   // Button 19: J, H, N, N
-  0e 17 08 08   // Button 20: K, T, E, E
-  0f 11 0c 12   // Button 21: L, N, I, O
-  33 16 12 0c   // Button 22: Semicolon, S, O, I
-  34 2d 34 34   // Button 23: Apos, Minus, Apos, Apos
-  00 00 00 00   // Button 24: <Special cased shift/steno>
-  1d 33 1d 1d   // Button 25: Z, Semicolon, Z, Z
-  1b 14 1b 1b   // Button 26: X, Q, X, X
-  06 0d 06 10   // Button 27: C, J, C, M
-  19 0e 19 06   // Button 28: V, K, V, C
-  05 1b 05 19   // Button 29: B, X, B, V
-  11 05 0e 0e   // Button 30: N, B, K, K
-  10 10 10 0f   // Button 31: M, M, M, L
-  36 1a 36 36   // Button 32: Comma, W, Comma, Comma
-  37 19 37 37   // Button 33: Period, V, Period, Period
-  38 1d 38 38   // Button 34: Slash, Z, Slash, Slash
-  e5 e5 e5 e5   // Button 35: Right Shift
-  e3 e3 e3 e3   // Button 36: Meta (Command, Windows)
-  e2 e2 e2 e2   // Button 37: Alt
-  00 00 00 00   // Button 38: <Special case navigation/space>
-  2c 2c 2c 2c   // Button 39: Space
-  00 00 00 00   // Button 40: <Special case Symbol>
-  00 00 00 00   // Button 41: <Special case Function/Enter>
+  2b 2b 2b 2b 2b  // Button 0: Tab
+  14 34 14 14 14  // Button 1: Q, Apos, Q, Q, Q
+  1a 36 1a 07 1a  // Button 2: W, Comma, W, D, W
+  08 37 09 15 09  // Button 3: E, Period, F, R, F
+  15 13 13 1a 13  // Button 4: R, P, P, W, P
+  17 1c 0a 05 05  // Button 5: T, Y, G, B, B
+  1c 09 0d 0d 0d  // Button 6: Y, F, J, J, J
+  18 0a 0f 09 0f  // Button 7: U, G, L, F, L
+  0c 06 18 18 18  // Button 8: I, C, U, U, U
+  12 15 1c 13 1c  // Button 9: O, R, Y, P, Y
+  13 0f 33 33 33  // Button 10: P, L, Semicolon, Semicolon, Semicolon
+  2a 2a 2a 2a 2a  // Button 11: Backspace
+  e0 e0 e0 e0 e0  // Button 12: Ctrl
+  04 04 04 04 04  // Button 13: A
+  16 12 15 16 15  // Button 14: S, O, R, S, R
+  07 08 16 0b 16  // Button 15: D, E, S, H, S
+  09 18 17 17 17  // Button 16: F, U, T, T, T
+  0a 0c 07 0a 0a  // Button 17: G, I, D, G, G
+  0b 07 0b 1c 10  // Button 18: H, D, H, Y, M
+  0d 0b 11 11 11  // Button 19: J, H, N, N, N
+  0e 17 08 08 08  // Button 20: K, T, E, E, E
+  0f 11 0c 12 0c  // Button 21: L, N, I, O, I
+  33 16 12 0c 12  // Button 22: Semicolon, S, O, I, O
+  34 2d 34 34 34  // Button 23: Apos, Minus, Apos, Apos, Apos
+  00 00 00 00 00  // Button 24: <Special cased shift/steno>
+  1d 33 1d 1d 1d  // Button 25: Z, Semicolon, Z, Z, Z
+  1b 14 1b 1b 1b  // Button 26: X, Q, X, X, X
+  06 0d 06 10 06  // Button 27: C, J, C, M, C
+  19 0e 19 06 07  // Button 28: V, K, V, C, D
+  05 1b 05 19 19  // Button 29: B, X, B, V, V
+  11 05 0e 0e 0e  // Button 30: N, B, K, K, K
+  10 10 10 0f 0b  // Button 31: M, M, M, L, H
+  36 1a 36 36 36  // Button 32: Comma, W, Comma, Comma, Comma
+  37 19 37 37 37  // Button 33: Period, V, Period, Period, Period
+  38 1d 38 38 38  // Button 34: Slash, Z, Slash, Slash, Slash
+  e5 e5 e5 e5 e5  // Button 35: Right Shift
+  e3 e3 e3 e3 e3  // Button 36: Meta (Command, Windows)
+  e2 e2 e2 e2 e2  // Button 37: Alt
+  00 00 00 00 00  // Button 38: <Special case navigation/space>
+  2c 2c 2c 2c 2c  // Button 39: Space
+  00 00 00 00 00  // Button 40: <Special case Symbol>
+  00 00 00 00 00  // Button 41: <Special case Function/Enter>
 ]];
 
 const SHIFT_IMAGE = [[
@@ -1588,6 +1592,8 @@ func updateDisplay0() {
       drawText(0, DISPLAY_WIDTH/2, DISPLAY_HEIGHT/2 - 12, FONT_ID_NORMAL, TEXT_ALIGNMENT_MIDDLE, "Colemak");
     } else if (alphabeticLayout == ALPHABETIC_LAYOUT_WORKMAN) {
       drawText(0, DISPLAY_WIDTH/2, DISPLAY_HEIGHT/2 - 12, FONT_ID_NORMAL, TEXT_ALIGNMENT_MIDDLE, "Workman");
+    } else if (alphabeticLayout == ALPHABETIC_LAYOUT_COLEMAK_DH) {
+      drawText(0, DISPLAY_WIDTH/2, DISPLAY_HEIGHT/2 - 12, FONT_ID_NORMAL, TEXT_ALIGNMENT_MIDDLE, "ColemakDH");
     }
   }
 }
@@ -2080,7 +2086,7 @@ func onRelease4() {
 }
 
 func onPress5() {
-  handlePress(5, SK_STAR1 | KEY_STENO, SC_5, SC_NONE, SC_NONE, SC_NONE);
+  handlePress(5, SK_STAR1 | KEY_STENO, SC_5, SC_NONE, SC_CONSUMER_BRIGHTNESS_UP, SC_NONE);
 
   if (isSettingsLayer()) {
     setPreferredConnection(CONNECTION_USB2, CONNECTION_USB, CONNECTION_BLE);
@@ -2090,7 +2096,7 @@ func onPress5() {
     }
   }
 }
-func onRelease5() { handleRelease(5, SK_STAR1 | KEY_STENO, SC_5, SC_NONE, SC_NONE, SC_NONE); }
+func onRelease5() { handleRelease(5, SK_STAR1 | KEY_STENO, SC_5, SC_NONE, SC_CONSUMER_BRIGHTNESS_UP, SC_NONE); }
 
 func onPress6() {
   handlePress(6, SK_STAR2 | KEY_STENO, SC_6, SC_NONE, SC_CONSUMER_VOLUME_UP, SC_NONE);
@@ -2258,7 +2264,7 @@ func onPress16() {
 func onRelease16() { handleRelease(16, SK_RL | KEY_STENO, SC_4 | KEY_SHIFT, SC_F8, SC_L_SHIFT, SC_L_SHIFT); }
 
 func onPress17() {
-  handlePress(17, SK_STAR3 | KEY_STENO, SC_5 | KEY_SHIFT, SC_NONE, SC_NONE, SC_NONE);
+  handlePress(17, SK_STAR3 | KEY_STENO, SC_5 | KEY_SHIFT, SC_NONE, SC_CONSUMER_BRIGHTNESS_DOWN, SC_NONE);
 
   if (isSettingsLayer()) {
     console("set_steno_mode plover_hid");
@@ -2272,7 +2278,7 @@ func onPress17() {
     }
   }
 }
-func onRelease17() { handleRelease(17, SK_STAR3 | KEY_STENO, SC_5 | KEY_SHIFT, SC_NONE, SC_NONE, SC_NONE); }
+func onRelease17() { handleRelease(17, SK_STAR3 | KEY_STENO, SC_5 | KEY_SHIFT, SC_NONE, SC_CONSUMER_BRIGHTNESS_DOWN, SC_NONE); }
 
 func onPress18() {
   handlePress(18, SK_STAR4 | KEY_STENO, SC_6 | KEY_SHIFT, SC_NONE, SC_CONSUMER_VOLUME_DOWN, SC_NONE);
@@ -2550,6 +2556,8 @@ func onPress35() {
       drawText(0, DISPLAY_WIDTH/2, DISPLAY_HEIGHT * 3 / 4, FONT_ID_NORMAL, TEXT_ALIGNMENT_MIDDLE, "Colemak");
     } else if (alphabeticLayout == ALPHABETIC_LAYOUT_WORKMAN) {
       drawText(0, DISPLAY_WIDTH/2, DISPLAY_HEIGHT * 3 / 4, FONT_ID_NORMAL, TEXT_ALIGNMENT_MIDDLE, "Workman");
+    } else if (alphabeticLayout == ALPHABETIC_LAYOUT_COLEMAK_DH) {
+      drawText(0, DISPLAY_WIDTH/2, DISPLAY_HEIGHT * 3 / 4, FONT_ID_NORMAL, TEXT_ALIGNMENT_MIDDLE, "ColemakDH");
     }
   }
 
