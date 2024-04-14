@@ -306,7 +306,7 @@ const LED_STATUS_KANA = 4;
 //
 //                22  23    24  25
 //
-// Bootsel Button (B button on the back of the Uni) is button 26.
+// Bootsel Button (B button on the front plate) is button 26.
 //
 //---------------------------------------------------------------------------
 // Example global variable:

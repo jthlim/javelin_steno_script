@@ -603,7 +603,7 @@ class ForStatementAstNode extends AstNode {
   });
 
   final AstNode? initialization;
-  final AstNode condition;
+  final AstNode? condition;
   final AstNode? update;
   final AstNode body;
 
@@ -616,10 +616,16 @@ class ForStatementAstNode extends AstNode {
   @override
   void mark(ScriptReachability context) {
     initialization?.mark(context);
-    condition.mark(context);
-    if (!condition.isConstant() || condition.constantValue() != 0) {
+    final condition = this.condition;
+    if (condition == null) {
       update?.mark(context);
       body.mark(context);
+    } else {
+      condition.mark(context);
+      if (!condition.isConstant() || condition.constantValue() != 0) {
+        update?.mark(context);
+        body.mark(context);
+      }
     }
   }
 
@@ -635,7 +641,15 @@ class ForStatementAstNode extends AstNode {
     //  end:
 
     initialization?.addInstructions(builder);
-    if (!condition.isConstant() || condition.constantValue() != 0) {
+    final condition = this.condition;
+    if (condition == null) {
+      final jumpToStartInstruction = JumpInstruction();
+      builder.addInstruction(jumpToStartInstruction.target);
+
+      body.addInstructions(builder);
+      update?.addInstructions(builder);
+      builder.addInstruction(jumpToStartInstruction);
+    } else if (!condition.isConstant() || condition.constantValue() != 0) {
       final jumpToConditionInstruction = JumpInstruction();
       builder.addInstruction(jumpToConditionInstruction.target);
       condition.addInstructions(builder);
@@ -655,6 +669,53 @@ class ForStatementAstNode extends AstNode {
       builder.addInstruction(jumpToConditionInstruction);
       builder.addInstruction(jumpToEndInstruction.target);
     }
+  }
+}
+
+class DoWhileStatementAstNode extends AstNode {
+  DoWhileStatementAstNode({
+    required this.body,
+    required this.condition,
+  });
+
+  final AstNode body;
+  final AstNode condition;
+
+  @override
+  bool isConstant() => false;
+
+  @override
+  int constantValue() => throw UnsupportedError('Should not be invoked');
+
+  @override
+  void mark(ScriptReachability context) {
+    body.mark(context);
+    condition.mark(context);
+  }
+
+  @override
+  void addInstructions(ScriptByteCodeBuilder builder) {
+    // Layout is:
+    //  start:
+    //   body
+    //   condition -> start
+
+    final startMarker = NopInstruction();
+    builder.addInstruction(startMarker);
+    body.addInstructions(builder);
+    condition.addInstructions(builder);
+
+    final lastInstruction = builder.instructions.last;
+    late final JumpInstructionBase jumpToEndInstruction;
+    if (lastInstruction is OpcodeInstruction &&
+        lastInstruction.opcode == ScriptOperatorOpcode.not) {
+      builder.instructions.removeLast();
+      jumpToEndInstruction = JumpIfZeroInstruction();
+    } else {
+      jumpToEndInstruction = JumpIfNotZeroInstruction();
+    }
+    builder.addInstruction(jumpToEndInstruction);
+    startMarker.insertAfter(jumpToEndInstruction.target);
   }
 }
 

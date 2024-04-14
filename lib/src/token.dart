@@ -3,6 +3,8 @@ enum TokenType {
   elseKeyword,
   forKeyword,
   funcKeyword,
+  doKeyword,
+  whileKeyword,
   ifKeyword,
   returnKeyword,
   varKeyword,

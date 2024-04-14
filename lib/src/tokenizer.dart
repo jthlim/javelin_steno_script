@@ -334,12 +334,14 @@ class Tokenizer {
 
           const identifierToTokenContentMap = {
             'const': TokenType.constKeyword,
+            'do': TokenType.doKeyword,
             'else': TokenType.elseKeyword,
             'for': TokenType.forKeyword,
             'func': TokenType.funcKeyword,
             'if': TokenType.ifKeyword,
             'return': TokenType.returnKeyword,
             'var': TokenType.varKeyword,
+            'while': TokenType.whileKeyword,
           };
 
           final tokenContent = identifierToTokenContentMap[identifier];

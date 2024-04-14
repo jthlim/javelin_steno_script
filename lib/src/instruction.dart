@@ -96,7 +96,7 @@ enum ScriptOperatorOpcode {
   ScriptOperatorOpcode? get opposite => _opposites[this];
 }
 
-abstract class ScriptInstruction extends LinkedListEntry<ScriptInstruction> {
+sealed class ScriptInstruction extends LinkedListEntry<ScriptInstruction> {
   int get byteCodeLength;
 
   bool get isBooleanResult => false;
@@ -148,7 +148,7 @@ abstract class ScriptInstruction extends LinkedListEntry<ScriptInstruction> {
   }
 }
 
-class LoadLocalValueInstruction extends ScriptInstruction {
+final class LoadLocalValueInstruction extends ScriptInstruction {
   LoadLocalValueInstruction(this.index);
 
   @override
@@ -176,7 +176,7 @@ class LoadLocalValueInstruction extends ScriptInstruction {
   String toString() => '  load l$index';
 }
 
-class StoreLocalValueInstruction extends ScriptInstruction {
+final class StoreLocalValueInstruction extends ScriptInstruction {
   StoreLocalValueInstruction(this.index);
 
   @override
@@ -204,7 +204,7 @@ class StoreLocalValueInstruction extends ScriptInstruction {
   String toString() => '  store l$index';
 }
 
-class LoadGlobalValueInstruction extends ScriptInstruction {
+final class LoadGlobalValueInstruction extends ScriptInstruction {
   LoadGlobalValueInstruction(this.index);
 
   @override
@@ -232,7 +232,7 @@ class LoadGlobalValueInstruction extends ScriptInstruction {
   String toString() => '  load g$index';
 }
 
-class LoadIndexedGlobalValueInstruction extends ScriptInstruction {
+final class LoadIndexedGlobalValueInstruction extends ScriptInstruction {
   LoadIndexedGlobalValueInstruction(this.index);
 
   final int index;
@@ -250,7 +250,7 @@ class LoadIndexedGlobalValueInstruction extends ScriptInstruction {
   String toString() => '  load g$index[]';
 }
 
-class StoreGlobalValueInstruction extends ScriptInstruction {
+final class StoreGlobalValueInstruction extends ScriptInstruction {
   StoreGlobalValueInstruction(this.index);
 
   @override
@@ -278,7 +278,7 @@ class StoreGlobalValueInstruction extends ScriptInstruction {
   String toString() => '  store g$index';
 }
 
-class StoreIndexedGlobalValueInstruction extends ScriptInstruction {
+final class StoreIndexedGlobalValueInstruction extends ScriptInstruction {
   StoreIndexedGlobalValueInstruction(this.index);
 
   final int index;
@@ -296,7 +296,7 @@ class StoreIndexedGlobalValueInstruction extends ScriptInstruction {
   String toString() => '  store g$index[]';
 }
 
-class PopValueInstruction extends ScriptInstruction {
+final class PopValueInstruction extends ScriptInstruction {
   @override
   int get byteCodeLength => 1;
 
@@ -309,7 +309,7 @@ class PopValueInstruction extends ScriptInstruction {
   String toString() => '  pop';
 }
 
-class CallInBuiltFunctionInstruction extends ScriptInstruction {
+final class CallInBuiltFunctionInstruction extends ScriptInstruction {
   CallInBuiltFunctionInstruction(this.function);
 
   @override
@@ -331,7 +331,7 @@ class CallInBuiltFunctionInstruction extends ScriptInstruction {
       '(${function.functionName})';
 }
 
-class CallFunctionInstruction extends ScriptInstruction {
+final class CallFunctionInstruction extends ScriptInstruction {
   CallFunctionInstruction(this.functionName);
 
   @override
@@ -353,7 +353,7 @@ class CallFunctionInstruction extends ScriptInstruction {
   String toString() => '  call $functionName';
 }
 
-class CallValueInstruction extends ScriptInstruction {
+final class CallValueInstruction extends ScriptInstruction {
   @override
   int get byteCodeLength => 1;
 
@@ -366,7 +366,7 @@ class CallValueInstruction extends ScriptInstruction {
   String toString() => '  call_value';
 }
 
-class JumpValueInstruction extends ScriptInstruction {
+final class JumpValueInstruction extends ScriptInstruction {
   @override
   int get byteCodeLength => 1;
 
@@ -379,7 +379,7 @@ class JumpValueInstruction extends ScriptInstruction {
   String toString() => '  jump_value';
 }
 
-class PushFunctionAddressInstruction extends ScriptInstruction {
+final class PushFunctionAddressInstruction extends ScriptInstruction {
   PushFunctionAddressInstruction(this.functionName);
 
   @override
@@ -401,7 +401,7 @@ class PushFunctionAddressInstruction extends ScriptInstruction {
   String toString() => '  push @$functionName';
 }
 
-abstract class JumpFunctionInstructionBase extends ScriptInstruction {
+sealed class JumpFunctionInstructionBase extends ScriptInstruction {
   JumpFunctionInstructionBase(this.functionName);
 
   @override
@@ -422,7 +422,7 @@ abstract class JumpFunctionInstructionBase extends ScriptInstruction {
   final String functionName;
 }
 
-class JumpFunctionInstruction extends JumpFunctionInstructionBase {
+final class JumpFunctionInstruction extends JumpFunctionInstructionBase {
   JumpFunctionInstruction(super.functionName);
 
   @override
@@ -435,7 +435,7 @@ class JumpFunctionInstruction extends JumpFunctionInstructionBase {
   String toString() => '  jmp $functionName';
 }
 
-class JumpIfZeroFunctionInstruction extends JumpFunctionInstructionBase {
+final class JumpIfZeroFunctionInstruction extends JumpFunctionInstructionBase {
   JumpIfZeroFunctionInstruction(super.functionName);
 
   @override
@@ -445,7 +445,8 @@ class JumpIfZeroFunctionInstruction extends JumpFunctionInstructionBase {
   String toString() => '  jz $functionName';
 }
 
-class JumpIfNotZeroFunctionInstruction extends JumpFunctionInstructionBase {
+final class JumpIfNotZeroFunctionInstruction
+    extends JumpFunctionInstructionBase {
   JumpIfNotZeroFunctionInstruction(super.functionName);
 
   @override
@@ -455,7 +456,7 @@ class JumpIfNotZeroFunctionInstruction extends JumpFunctionInstructionBase {
   String toString() => '  jnz $functionName';
 }
 
-abstract class JumpInstructionBase extends ScriptInstruction {
+sealed class JumpInstructionBase extends ScriptInstruction {
   JumpInstructionBase() {
     target = NopInstruction(this);
   }
@@ -535,7 +536,7 @@ abstract class JumpInstructionBase extends ScriptInstruction {
   late final NopInstruction target;
 }
 
-class JumpInstruction extends JumpInstructionBase {
+final class JumpInstruction extends JumpInstructionBase {
   @override
   bool get implicitNext => false;
 
@@ -549,7 +550,7 @@ class JumpInstruction extends JumpInstructionBase {
   String toString() => '  jump 0x${target.offset.toRadixString(16)}';
 }
 
-class JumpIfZeroInstruction extends JumpInstructionBase {
+final class JumpIfZeroInstruction extends JumpInstructionBase {
   @override
   ScriptOpcode get shortOpcode => ScriptOpcode.jumpIfZeroShortBegin;
 
@@ -563,7 +564,7 @@ class JumpIfZeroInstruction extends JumpInstructionBase {
   bool isConditional() => true;
 }
 
-class JumpIfNotZeroInstruction extends JumpInstructionBase {
+final class JumpIfNotZeroInstruction extends JumpInstructionBase {
   @override
   ScriptOpcode get shortOpcode => ScriptOpcode.jumpIfNotZeroShortBegin;
 
@@ -577,7 +578,7 @@ class JumpIfNotZeroInstruction extends JumpInstructionBase {
   bool isConditional() => true;
 }
 
-class PushStringValueInstruction extends ScriptInstruction {
+final class PushStringValueInstruction extends ScriptInstruction {
   PushStringValueInstruction(this.value);
 
   @override
@@ -601,7 +602,7 @@ class PushStringValueInstruction extends ScriptInstruction {
   final String value;
 }
 
-class PushIntValueInstruction extends ScriptInstruction {
+final class PushIntValueInstruction extends ScriptInstruction {
   PushIntValueInstruction(this.value);
 
   @override
@@ -659,25 +660,25 @@ class PushIntValueInstruction extends ScriptInstruction {
   String toString() => '  push $value';
 }
 
-class NopInstruction extends ScriptInstruction {
-  NopInstruction(this.reference);
+final class NopInstruction extends ScriptInstruction {
+  NopInstruction([this.reference]);
 
   @override
   int get byteCodeLength => 0;
 
   @override
-  bool get hasReference => true;
+  bool get hasReference => reference != null || super.hasReference;
 
   @override
   void addByteCode(ScriptByteCodeBuilder builder) {}
 
-  final ScriptInstruction reference;
+  final ScriptInstruction? reference;
 
   @override
   String toString() => ' 0x${offset.toRadixString(16)}:';
 }
 
-class OpcodeInstruction extends ScriptInstruction {
+final class OpcodeInstruction extends ScriptInstruction {
   OpcodeInstruction(this.opcode);
 
   @override
@@ -697,7 +698,7 @@ class OpcodeInstruction extends ScriptInstruction {
   String toString() => '  ${opcode.name}';
 }
 
-class ReturnInstruction extends ScriptInstruction {
+final class ReturnInstruction extends ScriptInstruction {
   @override
   int get byteCodeLength => 1;
 
@@ -713,7 +714,7 @@ class ReturnInstruction extends ScriptInstruction {
   String toString() => '  ret';
 }
 
-class FunctionStartInstruction extends ScriptInstruction {
+final class FunctionStartInstruction extends ScriptInstruction {
   FunctionStartInstruction(this.function);
 
   final ScriptFunctionDefinition function;

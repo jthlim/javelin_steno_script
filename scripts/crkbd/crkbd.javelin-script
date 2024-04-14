@@ -14,7 +14,7 @@
 //                           | Cmd  |   A  |   O  |  |   E  |   U  |  #2  |
 //                           `--------------------'  `--------------------'
 //
-// * Tapping Alpha key will switch to Alphabetic mode -- QWERTY, Dvbrak, Colemak, Workman
+// * Tapping Alpha key will switch to Alphabetic mode -- QWERTY, Dvorak, Colemak, Workman
 // * Holding it down and pressing other buttons will cause the keyboard to return to steno mode when
 //   releasing it. This will also give access to the Symbols, Navigation and Function layers by
 //   pressing those keys on the Alphabetic layer.
@@ -554,7 +554,7 @@ const HAS_U2F = JAVELIN_HAS_U2F ?? 0;
 // Inferred
 
 const USE_STATUS_BAR = HAS_DISPLAY && HAS_BLE;
-const USE_SCREEN_SAVER = HAS_DISPLAY && 0;
+const USE_SCREEN_SAVER = HAS_DISPLAY;
 const ENABLE_BLE_TRANSMIT_POWER_CONTROLS = HAS_BLE && 0;
 
 //---------------------------------------------------------------------------
@@ -577,7 +577,6 @@ var hueSpread = 4;
 var hueShift = 0;
 var brightness = 3;
 var saturation = 5;
-var lastActionTime = 0;
 
 var keyColorData[42];
 
@@ -623,7 +622,7 @@ const KEY_STENO = 0x200;
 const KEY_SHIFT = 0x100;
 const TAP_THRESHOLD = 200; // milliseconds for keys that have alternates
 const RELEASE_TO_TAP_THRESHOLD = 200;
-const SCREEN_OFF_TIMEOUT = 30000; // 30 seconds.
+const SCREEN_SAVER_TIMEOUT = 900000; // 15 minutes.
 
 const STENO_DISPLAY_WPM = 0;
 const STENO_DISPLAY_PAPER_TAPE = 1;
@@ -631,7 +630,7 @@ const STENO_DISPLAY_STROKES_WPM = 2;
 
 const TIMER_ID_RGB_UPDATE = 0;
 const TIMER_ID_FUZZY_LAYER = 1;
-const TIMER_ID_SCREEN_ON_TIMER = 2;
+const TIMER_ID_SCREEN_SAVER = 2;
 const TIMER_ID_PAIRING_HOLD = 3;
 const TIMER_ID_CAPS_HOLD = 4;
 const TIMER_ID_CAPS_RELEASE = 5;
@@ -1032,16 +1031,13 @@ func init() {
     setScript(SCRIPT_ID_U2F_STATUS_UPDATE, @onU2fStatusUpdate);
   }
 
-  if (USE_SCREEN_SAVER) {
-    startTimer(TIMER_ID_SCREEN_ON_TIMER, 1000, 1, @updateScreenOn);
-  }
-
   updateAllButtonColors();
 
   setLayer(layer);
   updateScreenContrast();
 
   updateBoardPower();
+  updateScreenSaverTimer();
 }
 
 // Uncomment this function when developing to ensure callbacks and timers
@@ -1060,18 +1056,80 @@ func init() {
 //     setScript(SCRIPT_ID_BLE_ADVERTISING_UPDATE, @onConnectionUpdate);
 //   }
 //
-//   if (USE_SCREEN_SAVER) {
-//     startTimer(TIMER_ID_SCREEN_ON_TIMER, 1000, 1, @updateScreenOn);
-//   }
-//
 //   updateBoardPower();
 // }
 
-func updateScreenOn() {
-  var time = getTime();
-  var screenOn = time - lastActionTime <= SCREEN_OFF_TIMEOUT;
-  setScreenOn(0, screenOn);
-  setScreenOn(1, screenOn);
+
+func shouldUseScreenSaver() var {
+  if (HAS_BLE && getActivePairConnection() == PAIR_CONNECTION_BLE) {
+    return isPairPowered() && isMainPowered();
+  } else {
+    // No pair, or cable pair.
+    return isPairPowered() || isMainPowered();
+  }
+}
+
+var isShowingScreenSaver = 0;
+var screenSaverStartTime;
+var screenSaverPosition[8];
+var screenSaverVelocity[8];
+func startScreenSaver() {
+  if (!shouldUseScreenSaver()) return;
+
+  setAutoDraw(0, AUTO_DRAW_NONE);
+  setAutoDraw(1, AUTO_DRAW_NONE);
+
+  isShowingScreenSaver = 1;
+  screenSaverStartTime = getTime();
+  for (var i = 0; i < 8; i = i + 2) {
+    screenSaverPosition[i] = rand();
+    screenSaverPosition[i + 1] = rand();
+  }
+  for (var i = 0; i < 8; i = i + 1) {
+    var velocity = (rand() & 0x1ff) - 256;
+    velocity = velocity + (velocity < 0 ? -32 : 32);
+    screenSaverVelocity[i] = velocity;
+  }
+  drawScreenSaver();
+  startTimer(TIMER_ID_SCREEN_SAVER, 50, 1, @drawScreenSaver);
+}
+
+func wrap(x, max) var {
+  x = x % (2 * max);
+  if (x < 0) x = -x;
+  return x < max ? x : 2 * max - x;
+}
+
+const OVERLAY_HEIGHT = 16;
+
+func drawScreenSaver() {
+  var timeElapsed = getTime() - screenSaverStartTime;
+
+  for (var display = 0; display < 2; display = display + 1) {
+    var index = 4 * display;
+    clearDisplay(display);
+
+    for (var i = 0; i < 5; i = i + 1) {
+      var effectiveTime = timeElapsed + i * 100;
+      drawLine(
+        display,
+        wrap(screenSaverPosition[index    ] + (effectiveTime * screenSaverVelocity[index    ] >> 13), DISPLAY_WIDTH),
+        wrap(screenSaverPosition[index + 1] + (effectiveTime * screenSaverVelocity[index + 1] >> 13), DISPLAY_HEIGHT - OVERLAY_HEIGHT) + OVERLAY_HEIGHT,
+        wrap(screenSaverPosition[index + 2] + (effectiveTime * screenSaverVelocity[index + 2] >> 13), DISPLAY_WIDTH),
+        wrap(screenSaverPosition[index + 3] + (effectiveTime * screenSaverVelocity[index + 3] >> 13), DISPLAY_HEIGHT - OVERLAY_HEIGHT) + OVERLAY_HEIGHT,
+      );
+    }
+  }
+}
+
+func updateScreenSaverTimer() {
+  if (!USE_SCREEN_SAVER) return;
+
+  if (isShowingScreenSaver) {
+    isShowingScreenSaver = 0;
+    updateDisplay0();
+  }
+  startTimer(TIMER_ID_SCREEN_SAVER, SCREEN_SAVER_TIMEOUT, 1, @startScreenSaver);
 }
 
 const BLE_PROFILE_DOTS = [[
@@ -1085,7 +1143,7 @@ func drawDisplayOverlay() {
 
   // Clear the region.
   setDrawColor(0, 0);
-  drawRect(0, 0, 0, DISPLAY_WIDTH, 16);
+  drawRect(0, 0, 0, DISPLAY_WIDTH, OVERLAY_HEIGHT);
   setDrawColor(0, 1);
 
   drawImage(
@@ -1414,6 +1472,7 @@ const ICON_POSITIONS = [[
 
 func drawDisplay0(layerImage) {
   if (!HAS_DISPLAY) return;
+  isShowingScreenSaver = 0;
 
   setAutoDraw(0, AUTO_DRAW_NONE);
   setAutoDraw(1, AUTO_DRAW_WPM);
@@ -1894,7 +1953,8 @@ func handlePress(buttonIndex, stenoKey, symbolsKey, functionKey, navKey, numPadK
   if (!isInPressAll()) {
     updateButtonColor(buttonIndex);
   }
-  lastActionTime = getTime();
+  updateScreenSaverTimer();
+
   var alphabeticKey = buttonScanCodes[ALPHABETIC_LAYOUT_COUNT * buttonIndex + alphabeticLayout];
   if (isSettingsLayer()) {
     return;
@@ -1943,7 +2003,7 @@ func handlePress(buttonIndex, stenoKey, symbolsKey, functionKey, navKey, numPadK
   }
 }
 func handleRelease(buttonIndex, stenoKey, symbolsKey, functionKey, navKey, numPadKey) {
-  lastActionTime = getTime();
+  updateScreenSaverTimer();
   if (isSettingsLayer()) {
     return;
   } else if (layer & NUMPAD_MASK) {
@@ -2708,7 +2768,13 @@ func onRelease41() {
     setLayer(layer ^ FUNCTION_MASK);
     pressAll();
 
-    if (layer == 0) {
+    if (layer == ALPHABETIC_LAYER) {
+      if (!wasSteno24 && isButtonPressed(24)) {
+        wasShiftPressed24 = 1;
+        press(SC_L_SHIFT);
+        updateDisplay0();
+      }
+
       // Give extra time for enter tapping.
       if (pressCount41 == startPressCount && getTime() - functionLayerPressTimestamp < 2*TAP_THRESHOLD) {
         tap(SC_ENTER);

@@ -850,7 +850,10 @@ class Parser {
         );
     }
 
-    final condition = _parseExpression();
+    AstNode? condition;
+    if (_currentToken.type != TokenType.semiColon) {
+      condition = _parseExpression();
+    }
     _assertToken(TokenType.semiColon);
 
     AstNode? update;
@@ -880,6 +883,37 @@ class Parser {
     );
   }
 
+  AstNode _parseWhileStatement() {
+    // Start a new scope.
+    _assertToken(TokenType.whileKeyword);
+    _assertToken(TokenType.openParen);
+
+    _function?.beginLocalScope();
+
+    final condition = _parseExpression();
+    _assertToken(TokenType.closeParen);
+
+    final body = _parseBlock();
+
+    _function?.endLocalScope();
+
+    return ForStatementAstNode(condition: condition, body: body);
+  }
+
+  AstNode _parseDoWhileStatement() {
+    _assertToken(TokenType.doKeyword);
+
+    final body = _parseBlock();
+
+    _assertToken(TokenType.whileKeyword);
+    _assertToken(TokenType.openParen);
+    final condition = _parseExpression();
+    _assertToken(TokenType.closeParen);
+    _assertToken(TokenType.semiColon);
+
+    return DoWhileStatementAstNode(condition: condition, body: body);
+  }
+
   AstNode _parseStatement() {
     switch (_currentToken.type) {
       case TokenType.constKeyword:
@@ -897,6 +931,10 @@ class Parser {
         return _parseReturn();
       case TokenType.forKeyword:
         return _parseForStatement();
+      case TokenType.whileKeyword:
+        return _parseWhileStatement();
+      case TokenType.doKeyword:
+        return _parseDoWhileStatement();
       default:
         throw FormatException('Expected statement, found $_currentToken');
     }
