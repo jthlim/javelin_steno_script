@@ -18,7 +18,7 @@
 // * Holding it down and pressing other buttons will cause the keyboard to return to steno mode when
 //   releasing it. This will also give access to the Symbols, Navigation and Function layers by
 //   pressing those keys on the Alphabetic layer.
-// * Command and Control activate a temporary qwerty layer
+// * Control activates a temporary qwerty layer
 
 // Alphabetic QWERTY
 //
