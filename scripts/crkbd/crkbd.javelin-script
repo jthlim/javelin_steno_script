@@ -2685,14 +2685,17 @@ var pressCount38;
 func onPress38() {
   handlePress(38, SK_O | KEY_STENO, SC_L_CTRL, SC_NONE, SC_NONE, SC_NONE);
 
+  if (!isInPressAll()) {
+    timer38 = getTime();
+  }
+
   if (layer == 0) {
     setLayer(layer | NAV_MASK);
-    pressAll();
-    navLayerPressTimestamp = getTime();
-    pressCount38 = pressCount;
-  } else if (layer & SYMBOL_MASK) {
-    timer38 = getTime();
-    pressCount38 = pressCount;
+    if (!isInPressAll()) {
+      pressAll();
+      navLayerPressTimestamp = getTime();
+      pressCount38 = pressCount;
+    }
   } else if (layer & TEMPORARY_QWERTY_MASK) {
     press(SC_SPACE);
   }
@@ -2712,7 +2715,7 @@ func onRelease38() {
     deferredLayerKey = 0;
     deferredAlphabeticKey = 0;
   } else if (layer & SYMBOL_MASK) {
-    if (pressCount38 == pressCount && getTime() - timer38 < TAP_THRESHOLD) {
+    if (getTime() - timer38 < TAP_THRESHOLD) {
       tap(SC_SPACE);
     }
   } else if (layer & TEMPORARY_QWERTY_MASK) {
@@ -2725,9 +2728,9 @@ func onRelease39() { handleRelease(39, SK_E | KEY_STENO, SC_NONE, SC_NONE, SC_SP
 
 func onPress40() {
   handlePress(40, SK_U | KEY_STENO, SC_NONE, SC_NONE, SC_NONE, SC_KP_0);
-  if ((layer | FUNCTION_MASK) == FUNCTION_MASK
+  if ((layer | (NAV_MASK | FUNCTION_MASK)) == (NAV_MASK | FUNCTION_MASK)
       || layer == (STENO_MASK | TEMPORARY_QWERTY_MASK)) {
-    setLayer(layer | SYMBOL_MASK);
+    setLayer((layer | SYMBOL_MASK) & ~NAV_MASK);
     pressAll();
 
     if (HAS_BLE && isSettingsLayer()) {

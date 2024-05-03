@@ -331,25 +331,31 @@ class Parser {
         _nextToken();
         switch (_currentToken.type) {
           case TokenType.identifier:
+            final functionNameToken = _currentToken;
             final functionName = _currentToken.stringValue!;
             _nextToken();
-            return PushFunctionAddress(name: functionName);
+            return PushFunctionAddress(
+              token: functionNameToken,
+              name: functionName,
+            );
 
           case TokenType.varKeyword:
           case TokenType.openBrace:
           case TokenType.openParen:
+            final lambdaToken = _currentToken;
             final lambdaName = _parseLambda();
-            return PushFunctionAddress(name: lambdaName);
+            return PushFunctionAddress(token: lambdaToken, name: lambdaName);
 
           default:
             throw FormatException(
-              'Expected name of function or inline lamba '
+              'Expected name of function or inline lambda '
               'near $_currentToken',
             );
         }
 
       case TokenType.identifier:
         // Global, local, constant or function call
+        final nameToken = _currentToken;
         final name = _currentToken.stringValue!;
         _nextToken();
 
@@ -362,6 +368,7 @@ class Parser {
           // Function call.
           final parameters = _parseParameterList();
           return CallFunctionAstNode(
+            token: nameToken,
             usesValue: true,
             name: name,
             parameters: parameters,
@@ -802,6 +809,7 @@ class Parser {
         final parameters = _parseParameterList();
         _assertToken(TokenType.semiColon);
         return CallFunctionAstNode(
+          token: nameToken,
           usesValue: false,
           name: name,
           parameters: parameters,

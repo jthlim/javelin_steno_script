@@ -17,6 +17,11 @@
 //
 //---------------------------------------------------------------------------
 
+func init() {
+  // Disable liatris power light.
+  // setGpioPin(24, 1);
+}
+
 func onPress0() { }
 func onRelease0() { }
 

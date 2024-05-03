@@ -1,3 +1,5 @@
+import 'package:javelin_steno_script/src/token.dart';
+
 import 'instruction.dart';
 import 'functions.dart';
 import 'byte_code_builder.dart';
@@ -960,6 +962,7 @@ class LoadValueAstNode extends AstNode {
 
 class CallFunctionAstNode extends AstNode {
   CallFunctionAstNode({
+    required this.token,
     required this.usesValue,
     required this.name,
     required this.parameters,
@@ -1000,12 +1003,13 @@ class CallFunctionAstNode extends AstNode {
     }
     if (definition.numberOfParameters != parameters.length) {
       throw FormatException(
-        '$name expects ${definition.numberOfParameters} parameters '
-        'but ${parameters.length} provided',
+        '$name (${token.location()}) expects ${definition.numberOfParameters} '
+        'parameters but ${parameters.length} provided',
       );
     }
     if (usesValue && !definition.hasReturnValue) {
-      throw FormatException('$name does not return a value');
+      throw FormatException(
+          '$name (${token.location()}) does not return a value');
     }
 
     if (definition is InBuiltScriptFunction) {
@@ -1033,13 +1037,15 @@ class CallFunctionAstNode extends AstNode {
     }
   }
 
+  final Token token;
+
   final bool usesValue;
   final String name;
   final List<AstNode> parameters;
 }
 
 class PushFunctionAddress extends AstNode {
-  PushFunctionAddress({required this.name});
+  PushFunctionAddress({required this.token, required this.name});
 
   @override
   bool isConstant() => false;
@@ -1059,11 +1065,12 @@ class PushFunctionAddress extends AstNode {
   void addInstructions(ScriptByteCodeBuilder builder) {
     final definition = builder.module.functions[name];
     if (definition == null) {
-      throw FormatException('No such function $name');
+      throw FormatException('No such function $name (${token.location()})');
     }
     builder.addInstruction(PushFunctionAddressInstruction(name));
   }
 
+  final Token token;
   final String name;
 }
 

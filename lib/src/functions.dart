@@ -73,6 +73,8 @@ enum InBuiltScriptFunction implements ScriptFunctionDefinition {
   readGpioPin('readGpioPin', 1, true, 0x40, true),
   drawGrayscaleRange('drawGrayscaleRange', 6, false, 0x41, false),
   setGpioPinDutyCycle('setGpioPinDutyCycle', 2, false, 0x42, false),
+  cancelAllStenoKeys('cancelAllStenoKeys', 0, false, 0x43, false),
+  cancelStenoKey('cancelStenoKey', 1, false, 0x44, false),
   ;
 
   const InBuiltScriptFunction(

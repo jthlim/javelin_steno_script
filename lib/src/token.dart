@@ -82,6 +82,8 @@ class Token {
         stringValue == other.stringValue;
   }
 
+  String location() => '$line:$column';
+
   @override
-  String toString() => "$type:$line:$column";
+  String toString() => '$type:$line:$column';
 }
