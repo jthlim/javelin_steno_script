@@ -2234,6 +2234,10 @@ func onPress12() {
     wasSteno12 = layer == STENO_MASK;
     if (wasSteno12) {
       setLayer(layer | TEMPORARY_QWERTY_MASK);
+      pressAll();
+      timer12 = getTime();
+      pressCount12 = pressCount;
+      return;
     }
   }
   handlePress(12, SC_NONE, SC_GRAVE | KEY_SHIFT, SC_NONE, SC_NONE, SC_NONE);
@@ -2256,7 +2260,7 @@ func onRelease12() {
     update24();
   }
 
-  if ((layer == 0 || wasSteno12)
+  if (((layer & TEMPORARY_QWERTY_MASK) || layer == ALPHABETIC_LAYER || wasSteno12)
       && pressCount12 == pressCount
       && getTime() - timer12 < TAP_THRESHOLD) {
     tap(SC_ESC);
@@ -2642,6 +2646,8 @@ func onPress36() {
     wasSteno36 = layer == STENO_MASK;
     if (wasSteno36) {
       setLayer(layer | TEMPORARY_QWERTY_MASK);
+      pressAll();
+      return;
     }
   }
   handlePress(36, SC_NONE, SC_L_META, SC_NONE, SC_NONE, SC_NONE);
@@ -2664,7 +2670,7 @@ func onPress37() {
     pressCount37 = pressCount37;
 
   }
-  if ((layer & (NAV_MASK | NUMPAD_MASK))  == NAV_MASK) {
+  if ((layer & (NAV_MASK | NUMPAD_MASK)) == NAV_MASK) {
     setLayer(layer | NUMPAD_MASK);
     pressAll();
   }
@@ -2711,9 +2717,11 @@ func onRelease38() {
     if (layer == 0 && pressCount38 == startPressCount && getTime() - navLayerPressTimestamp < TAP_THRESHOLD) {
       tap(SC_SPACE);
     }
-    tap(deferredAlphabeticKey);
-    deferredLayerKey = 0;
-    deferredAlphabeticKey = 0;
+    if (deferredAlphabeticKey != 0 && !isModifierKey(deferredAlphabeticKey)) {
+      tap(deferredAlphabeticKey);
+      deferredLayerKey = 0;
+      deferredAlphabeticKey = 0;
+    }
   } else if (layer & SYMBOL_MASK) {
     if (getTime() - timer38 < TAP_THRESHOLD) {
       tap(SC_SPACE);
@@ -2783,7 +2791,9 @@ func onRelease41() {
         tap(SC_ENTER);
       }
 
-      tap(deferredAlphabeticKey);
+      if (deferredAlphabeticKey != 0 && !isModifierKey(deferredAlphabeticKey)) {
+        tap(deferredAlphabeticKey);
+      }
     }
     deferredLayerKey = 0;
     deferredAlphabeticKey = 0;
