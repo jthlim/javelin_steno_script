@@ -15,11 +15,13 @@ dev_dependencies:
 
 dependencies:
   crclib: 3.0.0
-  drop_zone: ^1.0.2
+  drop_zone:
+    path: ../../third_party/dropzone
   flutter:
     sdk: flutter
   google_fonts: ^6.2.1
   image: ^4.0.15
+  web: ^0.5.1
 
 # The following section is specific to Flutter packages.
 flutter:

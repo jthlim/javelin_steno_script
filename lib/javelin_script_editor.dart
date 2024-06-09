@@ -1,10 +1,11 @@
-import 'dart:html' as html;
+import 'dart:js_interop';
 import 'dart:typed_data';
 
 import 'package:drop_zone/drop_zone.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image/image.dart' show Pixel, decodePng;
+import 'package:web/web.dart' as html;
 
 import 'javelin_script_text_editing_controller.dart';
 
@@ -71,14 +72,15 @@ class JavelinScriptEditorState extends State<JavelinScriptEditor> {
 
     final reader = html.FileReader();
     reader.readAsArrayBuffer(file);
-    await reader.onLoad.first;
+    await reader.onLoadEnd.first;
 
-    final data = reader.result as Uint8List?;
+    final data = reader.result;
     if (data == null) {
       return '/* Unable to read file data. */';
     }
 
-    final image = decodePng(data);
+    final bytes = data as JSArrayBuffer;
+    final image = decodePng(bytes.toDart.asUint8List());
     if (image == null) {
       return '/* Unable to decode PNG. */';
     }

@@ -75,8 +75,8 @@
 // For keys marked with two options, holding or pressing with other keys will cause the first option
 // to be used, tapping briefly will trigger the second.
 //
-// Tapping right shift twice will turn on single word capitalization.
-// Tapping right shift once then holding it will toggle on and off caps lock.
+// Press left & right shift together to enable word caps.
+// Press left & right shift with alt to toggle on and off caps lock.
 
 
 //
@@ -632,8 +632,7 @@ const TIMER_ID_RGB_UPDATE = 0;
 const TIMER_ID_FUZZY_LAYER = 1;
 const TIMER_ID_SCREEN_SAVER = 2;
 const TIMER_ID_PAIRING_HOLD = 3;
-const TIMER_ID_CAPS_HOLD = 4;
-const TIMER_ID_CAPS_RELEASE = 5;
+const TIMER_ID_CAPS_RELEASE = 4;
 
 var stenoDisplay = STENO_DISPLAY_WPM;
 var wordCaps = 0;
@@ -1323,6 +1322,23 @@ func updateKeyRgbHueCycle(hShift, sat, spreadMultiplier, value) {
   }
 }
 
+func updateUnderglowRgbHueCycle(hShift, sat, spreadMultiplier, value) {
+  const COLOR_OFFSETS = [[
+    02 0b 0d  1d 1e 28
+    06 0f 14  16 1b 24
+  ]];
+
+  for (var i = 0; i < 12; i = i + 1) {
+    setHsv(
+      i + 42,
+      spreadMultiplier * COLOR_OFFSETS[i] + hShift,
+      sat,
+      value
+    );
+  }
+}
+
+
 func updateKeyRgbConstantColor(r, g, b) {
   for (var i = 0; i < 42; i = i + 1) {
     setRgb(i, r, g, b);
@@ -1409,9 +1425,17 @@ func updateKeyRgb() {
     updateKeyRgbConnectingCycle();
   } else if (isHostSleeping()) {
     updateKeyRgbBreatheCycle();
+    setUnderglowRgb(8, 8, 8);
   } else if (layer == STENO_MASK) {
+    var hue = animationTime() * SPEED_VALUES[speed] + hueShift;
     updateKeyRgbHueCycle(
-      animationTime() * SPEED_VALUES[speed] + hueShift,
+      hue,
+      SATURATION_VALUES[saturation] * 2,
+      HUE_SPREAD_VALUES[hueSpread] * 16,
+      BRIGHTNESS_VALUES[brightness]
+    );
+    updateUnderglowRgbHueCycle(
+      hue,
       SATURATION_VALUES[saturation] * 2,
       HUE_SPREAD_VALUES[hueSpread] * 16,
       BRIGHTNESS_VALUES[brightness]
@@ -1429,7 +1453,7 @@ func updateKeyRgb() {
   // }
 }
 
-func setUnderglow(r, g, b) {
+func setUnderglowRgb(r, g, b) {
   r = r * brightness >> 3;
   g = g * brightness >> 3;
   b = b * brightness >> 3;
@@ -1440,18 +1464,28 @@ func setUnderglow(r, g, b) {
 
 func updateUnderglowRgb() {
   if (HAS_U2F && isWaitingForUserPresence()) {
-    setUnderglow(0, 0, 0);
+    setUnderglowRgb(0, 0, 0);
     return;
   }
   if (HAS_BLE && isBleAdvertising()) {
-    setUnderglow(0, 0, 0);
+    setUnderglowRgb(0, 0, 0);
+    return;
+  }
+  if (isHostSleeping()) {
+    setUnderglowRgb(8, 8, 8);
     return;
   }
 
   if (layer & STENO_MASK) {
-    setUnderglow(192, 192, 192);
+//    setUnderglowRgb(192, 192, 192);
+    updateUnderglowRgbHueCycle(
+      animationTime() * SPEED_VALUES[speed] + hueShift,
+      SATURATION_VALUES[saturation] * 2,
+      HUE_SPREAD_VALUES[hueSpread] * 16,
+      BRIGHTNESS_VALUES[brightness]
+    );
   } else {
-    setUnderglow(159, 96, 192);
+    setUnderglowRgb(128, 128, 128);
   }
 }
 
@@ -1812,14 +1846,14 @@ func drawSaturation() {
 func setLayer(value) {
   releaseAll();
   if (HAS_BLE) stopTimer(TIMER_ID_PAIRING_HOLD);
-  stopTimer(TIMER_ID_CAPS_HOLD);
+  if (value & STENO_MASK) {
+    wordCaps = 0;
+  }
   layer = value;
   sendLayerEvent();
   updateKeyRgb();
   updateUnderglowRgb();
   updateDisplay0();
-
-  setInputHint(value == STENO_MASK ? INPUT_HINT_STENOGRAPHY : INPUT_HINT_KEYBOARD);
 }
 
 func isModifierKey(key) var {
@@ -2041,6 +2075,21 @@ func handleRelease(buttonIndex, stenoKey, symbolsKey, functionKey, navKey, numPa
 
 func onPairingHoldTimer() {
   startBlePairing();
+}
+
+func handleWordCapsAndCapsLock() {
+  if (isInPressAll()) return;
+
+  // Word caps when both shifts are pressed on qwerty layer.
+  // Caps lock when both shifts, alt and sym pressed.
+  if (checkButtonState("000000000000000000000000100000000001000000")) {
+    wordCaps = !wordCaps;
+    pressCount = pressCount + 1;
+  } else if (checkButtonState("000000000000000000000000100000000001010000")) {
+    tapCapsLock();
+    wordCaps = 0;
+    pressCount = pressCount + 1;
+  }
 }
 
 func onPress0() {
@@ -2428,7 +2477,7 @@ func update24() {
   }
 }
 func onPress24() {
-  handlePress(24, SC_NONE, SC_SLASH | KEY_SHIFT, SC_NONE, SC_NONE, SC_NONE);
+  handlePress(24, SC_NONE, SC_NONE, SC_NONE, SC_NONE, SC_NONE);
 
   if (isInPressAll()) {
     update24();
@@ -2454,9 +2503,11 @@ func onPress24() {
     pressCount24 = pressCount;
   }
   timer24 = getTime();
+
+  handleWordCapsAndCapsLock();
 }
 func onRelease24() {
-  handleRelease(24, SC_NONE, SC_SLASH | KEY_SHIFT, SC_NONE, SC_NONE, SC_NONE);
+  handleRelease(24, SC_NONE, SC_NONE, SC_NONE, SC_NONE, SC_NONE);
 
   if (wasShiftPressed24) {
     release(SC_L_SHIFT);
@@ -2473,9 +2524,8 @@ func onRelease24() {
       && checkButtonState("000000000000000000000000000000000000000000")) {
     // A tap of the key turns on steno mode.
     // Automatically turn off word caps when entering steno mode.
-    wordCaps = 0;
 
-    setLayer(layer | STENO_MASK);
+    setLayer(STENO_MASK);
   }
   updateUnderglowRgb();
 }
@@ -2557,14 +2607,9 @@ func tapCapsLock() {
   pressScanCode(SC_CAPS);
   startTimer(TIMER_ID_CAPS_RELEASE, 200, 0, @{
     releaseScanCode(SC_CAPS);
-    wordCaps = 0;
   });
 }
 
-var timer35;
-var releaseTimer35;
-var tapCount35;
-var pressCount35;
 var magicKey35;
 func onPress35() {
   // Magic key handling.
@@ -2587,27 +2632,7 @@ func onPress35() {
 
   handlePress(35, SC_NONE, magicKey35, SC_NONE, SC_NONE, magicKey35);
 
-  if ((layer >> 1) == 0) {
-    timer35 = getTime();
-    pressCount35 = pressCount;
-    if (timer35 - releaseTimer35 < RELEASE_TO_TAP_THRESHOLD) {
-      tapCount35 = tapCount35 + 1;
-      if (tapCount35 == 1) {
-        if (wordCaps) {
-          wordCaps = 0;
-          updateDisplay0();
-        } else if (getLedStatus(LED_STATUS_CAPS_LOCK)) {
-          tapCapsLock();
-        } else if (layer == 0) {
-          wordCaps = wordCaps ^ 1;
-          updateDisplay0();
-          startTimer(TIMER_ID_CAPS_HOLD, TAP_THRESHOLD, 0, @tapCapsLock);
-        }
-      }
-    } else {
-      tapCount35 = 0;
-    }
-  }
+  handleWordCapsAndCapsLock();
 
   if (isSettingsLayer()) {
     alphabeticLayout = (alphabeticLayout + 1) % ALPHABETIC_LAYOUT_COUNT;
@@ -2631,11 +2656,6 @@ func onPress35() {
 }
 func onRelease35() {
   handleRelease(35, SC_NONE, magicKey35, SC_NONE, SC_NONE, magicKey35);
-  stopTimer(TIMER_ID_CAPS_HOLD);
-
-  if ((layer >> 1) == 0 && pressCount35 == pressCount && getTime() - timer35 < TAP_THRESHOLD) {
-    releaseTimer35 = getTime();
-  }
 }
 
 // 4th row
@@ -2674,6 +2694,7 @@ func onPress37() {
     setLayer(layer | NUMPAD_MASK);
     pressAll();
   }
+  handleWordCapsAndCapsLock();
 }
 func onRelease37() {
   handleRelease(37, SK_A | KEY_STENO, SC_L_ALT, SC_NONE, SC_NONE, SC_NONE);
@@ -2697,8 +2718,8 @@ func onPress38() {
 
   if (layer == 0) {
     setLayer(layer | NAV_MASK);
+    pressAll();
     if (!isInPressAll()) {
-      pressAll();
       navLayerPressTimestamp = getTime();
       pressCount38 = pressCount;
     }
