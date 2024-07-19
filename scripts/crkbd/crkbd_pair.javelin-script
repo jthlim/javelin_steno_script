@@ -133,20 +133,6 @@ func init() {
   updateBoardPower();
 }
 
-// Uncomment this function when developing to ensure callbacks and timers
-// work properly, otherwise they may call a wrong address in the script.
-//
-// func tick() {
-//   if (USE_STATUS_BAR) {
-//     setScript(SCRIPT_ID_DISPLAY_OVERLAY, @drawDisplayOverlay);
-//   }
-//   setScript(SCRIPT_ID_BATTERY_UPDATE, @onBatteryUpdate);
-//   setScript(SCRIPT_ID_CONNECTION_UPDATE, @onConnectionUpdate);
-//   setScript(SCRIPT_ID_PAIR_CONNECTION_UPDATE, @onPairConnectionUpdate);
-//
-//   updateBoardPower();
-// }
-
 func onBatteryUpdate() {
   updateBoardPower();
   redrawDisplayOverlay();

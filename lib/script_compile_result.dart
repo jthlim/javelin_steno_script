@@ -1,5 +1,7 @@
 import 'dart:typed_data';
 
+import 'package:crclib/catalog.dart';
+
 import 'src/byte_code_builder.dart';
 import 'src/module.dart';
 import 'src/parser.dart';
@@ -32,13 +34,13 @@ class ScriptCompileResult {
         );
       }
 
-      return ScriptCompileResult.ok(byteCode.length, byteCode);
+      return ScriptCompileResult.ok(byteCode.length, byteCode, script);
     } on Exception catch (e) {
       return ScriptCompileResult.failed(e.toString());
     }
   }
 
-  ScriptCompileResult.ok(this.size, Uint8List this.data)
+  ScriptCompileResult.ok(this.size, Uint8List this.data, String this.script)
       : success = true,
         message = 'OK, $size bytes';
   ScriptCompileResult.failed(this.message)
@@ -49,4 +51,7 @@ class ScriptCompileResult {
   String message;
   int size;
   Uint8List? data;
+  String? script;
+
+  int get crc => Crc32().convert(data ?? []).toBigInt().toInt();
 }

@@ -1040,26 +1040,6 @@ func init() {
   updateScreenSaverTimer();
 }
 
-// Uncomment this function when developing to ensure callbacks and timers
-// work properly, otherwise they may call a wrong address in the script.
-//
-// func tick() {
-//   if (USE_STATUS_BAR) {
-//     setScript(SCRIPT_ID_DISPLAY_OVERLAY, @drawDisplayOverlay);
-//   }
-//   setScript(SCRIPT_ID_BATTERY_UPDATE, @onBatteryUpdate);
-//   setScript(SCRIPT_ID_CONNECTION_UPDATE, @onConnectionUpdate);
-//   setScript(SCRIPT_ID_PAIR_CONNECTION_UPDATE, @onConnectionUpdate);
-//   setScript(SCRIPT_ID_KEYBOARD_LED_STATUS_UPDATE, @onKeyboardLedStatusUpdate);
-//
-//   if (HAS_BLE) {
-//     setScript(SCRIPT_ID_BLE_ADVERTISING_UPDATE, @onConnectionUpdate);
-//   }
-//
-//   updateBoardPower();
-// }
-
-
 func shouldUseScreenSaver() var {
   if (HAS_BLE && getActivePairConnection() == PAIR_CONNECTION_BLE) {
     return isPairPowered() && isMainPowered();

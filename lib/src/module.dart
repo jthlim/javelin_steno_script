@@ -16,10 +16,10 @@ class ScriptLocals {
 }
 
 class ScriptFunction implements ScriptFunctionDefinition {
-  ScriptFunction(this.name);
+  ScriptFunction(this.functionName);
 
   @override
-  final String name;
+  final String functionName;
 
   @override
   bool hasReturnValue = false;

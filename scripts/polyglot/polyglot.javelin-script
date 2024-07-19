@@ -1,557 +1,85 @@
-//---------------------------------------------------------------------------
-// Default Polyglot script.
-//
-// Pressing the four corner keys in steno mode will switch between Embedded
-// and Gemini modes.
-//---------------------------------------------------------------------------
+// Generated from polyglot.javelin-layout
 
-// Steno
-//
-// ,-------------------------------------------.        ,-------------------------------------------.
-// |        |  S1  |   T  |   P  |   H  |  *1  |        |  *2  |   F  |   P  |   L  |   T  |    D   |
-// |--------+------+------+------+------+------|        |------+------+------+------+------+--------|
-// |        |  S2  |   K  |   W  |   R  |  *3  |        |  *4  |   R  |   B  |   G  |   S  |    Z   |
-// |--------+------+------+------+------+------|        |------+------+------+------+------+--------|
-// | QWERTY | Shift| Ctrl |  Alt | Meta | Space|        | Vol- | Left | Down |  Up  | Right|  Vol+  |
-// `----------------------+------+------+------+        |------+------+------+----------------------'
-//                        |  #1  |   A  |   O  |        |   E  |   U  |  #2  |
-//                        `--------------------'        `--------------------'
-//
-// * Tapping QWERTY key will switch to QWERTY mode
-// * Holding it down and pressing other buttons will cause the keyboard to return to steno mode when
-//   releasing it. This will also give access to the Symbols, Navigation and Function layers by
-//   pressing those keys on the QWERTY layer.
-
-// QWERTY
-//
-// ,-------------------------------------------.        ,-------------------------------------------.
-// |   Tab  |   Q  |   W  |   E  |   R  |   T  |        |   Y  |   U  |   I  |   O  |   P  |  Bksp  |
-// |--------+------+------+------+------+------|        |------+------+------+------+------+--------|
-// |Ctrl/Esc|   A  |   S  |   D  |   F  |   G  |        |   H  |   J  |   K  |   L  | ;  : |Ctrl/' "|
-// |--------+------+------+------+------+------|        |------+------+------+------+------+--------|
-// |Shf/Sten|   Z  |   X  |   C  |   V  |   B  |        |   N  |   M  | ,  < | .  > | /  ? | RShift |
-// `----------------------+------+------+------+        |------+------+------+----------------------'
-//                        | Meta |Alt/Sp|  Nav |        |  Sym | Space|Fn/Ent|
-//                        `--------------------'        `--------------------'
-//
-// For keys marked with two options, holding or pressing with other keys will cause the first option
-// to be used, tapping briefly will trigger the second.
-
-//
-// Symbols
-//
-// ,-------------------------------------------.        ,-------------------------------------------.
-// |    `   |  1   |  2   |  3   |  4   |  5   |        |   6  |  7   |  8   |  9   |  0   |   =    |
-// |--------+------+------+------+------+------|        |------+------+------+------+------+--------|
-// |    ~   |  !   |  @   |  #   |  $   |  %   |        |   ^  |  &   |  *   |  (   |  )   |   +    |
-// |--------+------+------+------+------+------|        |------+------+------+------+------+--------|
-// |        |  |   |  \   |  -   |  [   |  {   |        |   }  |  ]   |  _   |  /   |      |        |
-// `----------------------+------+------+------|        |------+------+------+----------------------'
-//                        | Meta |  Alt | Ctrl |        |      |      |      |
-//                        `--------------------'        `--------------------'
-//
-
-//
-// Function
-//
-// ,-------------------------------------------.        ,-------------------------------------------.
-// |        |  F9  | F10  | F11  | F12  |      |        |      |      |      |      |      |        |
-// |--------+------+------+------+------+------|        |------+------+------+------+------+--------|
-// |        |  F5  |  F6  |  F7  |  F8  |      |        |      | Shift| Ctrl |  Alt |  GUI |        |
-// |--------+------+------+------+------+------|        |------+------+------+------+------+--------|
-// |        |  F1  |  F2  |  F3  |  F4  |      |        |      |      |      |      |      |        |
-// `----------------------+------+------+------|        |------+------+------+----------------------'
-//                        |      |      |      |        |      |      |      |
-//                        `--------------------'        `--------------------'
-
-//
-// Navigation/Media
-//
-// ,-------------------------------------------.        ,-------------------------------------------.
-// |        |      |      |      |      |      |        | Vol+ | BkSp |   ↑  | Del  | PgUp |  Home  |
-// |--------+------+------+------+------+------|        |------+------+------+------+------+--------|
-// |        |  GUI |  Alt | Ctrl | Shift|      |        | Vol- |  ←   |   ↓  |   →  | PgDn |   End  |
-// |--------+------+------+------+------+------+        +------+------+------+------+------+--------|
-// |        |      |      |      |      |      |        | Mute |      |      |      |      |        |
-// `----------------------+------+------+------+        +------+------+------+----------------------'
-//                        |      |      |      |        |      | Space| Enter|
-//                        `---------------------        ---------------------'
-//
-
-//---------------------------------------------------------------------------
-// USB Scan code values.
-//
-// These constants are used with inbuilt functions:
-//  * func pressScanCode(SC_xxx)
-//  * func releaseScanCode(SC_xxx)
-//  * func tapScanCode(SC_xxx)
-//  * func isScanCodePressed(SC_xxx) var
-//
-//---------------------------------------------------------------------------
-
-const SC_NONE = 0;
-
-const SC_A = 0x04;
-const SC_B = 0x05;
-const SC_C = 0x06;
-const SC_D = 0x07;
-const SC_E = 0x08;
-const SC_F = 0x09;
-const SC_G = 0x0a;
-const SC_H = 0x0b;
-const SC_I = 0x0c;
-const SC_J = 0x0d;
-const SC_K = 0x0e;
-const SC_L = 0x0f;
-const SC_M = 0x10;
-const SC_N = 0x11;
-const SC_O = 0x12;
-const SC_P = 0x13;
-const SC_Q = 0x14;
-const SC_R = 0x15;
-const SC_S = 0x16;
-const SC_T = 0x17;
-const SC_U = 0x18;
-const SC_V = 0x19;
-const SC_W = 0x1a;
-const SC_X = 0x1b;
-const SC_Y = 0x1c;
-const SC_Z = 0x1d;
-
-const SC_1 = 0x1e;
-const SC_2 = 0x1f;
-const SC_3 = 0x20;
-const SC_4 = 0x21;
-const SC_5 = 0x22;
-const SC_6 = 0x23;
-const SC_7 = 0x24;
-const SC_8 = 0x25;
-const SC_9 = 0x26;
-const SC_0 = 0x27;
-
-const SC_ENTER = 0x28;
-const SC_ESC = 0x29;
-const SC_BACKSPACE = 0x2a;
-const SC_TAB = 0x2b;
-const SC_SPACE = 0x2c;
-const SC_MINUS = 0x2d;
-const SC_EQUAL = 0x2e;
-const SC_L_BRACKET = 0x2f;
-const SC_R_BRACKET = 0x30;
-const SC_BACKSLASH = 0x31;
-const SC_HASH_TILDE = 0x32;
-const SC_SEMICOLON = 0x33;
-const SC_APOSTROPHE = 0x34;
-const SC_GRAVE = 0x35;
-const SC_COMMA = 0x36;
-const SC_DOT = 0x37;
-const SC_SLASH = 0x38;
-const SC_CAPS = 0x39;
-
-const SC_F1 = 0x3a;
-const SC_F2 = 0x3b;
-const SC_F3 = 0x3c;
-const SC_F4 = 0x3d;
-const SC_F5 = 0x3e;
-const SC_F6 = 0x3f;
-const SC_F7 = 0x40;
-const SC_F8 = 0x41;
-const SC_F9 = 0x42;
-const SC_F10 = 0x43;
-const SC_F11 = 0x44;
-const SC_F12 = 0x45;
-
-const SC_SYS_RQ = 0x46;
-const SC_SCROLL_LOCK = 0x47;
-const SC_PAUSE = 0x48;
-const SC_INSERT = 0x49;
-const SC_HOME = 0x4a;
-const SC_PAGE_UP = 0x4b;
-const SC_DELETE = 0x4c;
-const SC_END = 0x4d;
-const SC_PAGE_DOWN = 0x4e;
-const SC_RIGHT = 0x4f;
-const SC_LEFT = 0x50;
-const SC_DOWN = 0x51;
-const SC_UP = 0x52;
-
-const SC_NUM_LOCK = 0x53;
-const SC_KP_SLASH = 0x54;
-const SC_KP_ASTERISK = 0x55;
-const SC_KP_MINUS = 0x56;
-const SC_KP_PLUS = 0x57;
-const SC_KP_ENTER = 0x58;
-const SC_KP_1 = 0x59;
-const SC_KP_2 = 0x5a;
-const SC_KP_3 = 0x5b;
-const SC_KP_4 = 0x5c;
-const SC_KP_5 = 0x5d;
-const SC_KP_6 = 0x5e;
-const SC_KP_7 = 0x5f;
-const SC_KP_8 = 0x60;
-const SC_KP_9 = 0x61;
-const SC_KP_0 = 0x62;
-const SC_KP_DOT = 0x63;
-
-const SC_BACKSLASH_PIPE = 0x64;
-const SC_COMPOSE = 0x65;
-const SC_POWER = 0x66;
-const SC_KP_EQUAL = 0x67;
-
-const SC_F13 = 0x68;
-const SC_F14 = 0x69;
-const SC_F15 = 0x6a;
-const SC_F16 = 0x6b;
-const SC_F17 = 0x6c;
-const SC_F18 = 0x6d;
-const SC_F19 = 0x6e;
-const SC_F20 = 0x6f;
-const SC_F21 = 0x70;
-const SC_F22 = 0x71;
-const SC_F23 = 0x72;
-const SC_F24 = 0x73;
-
-const SC_OPEN = 0x74;
-const SC_HELP = 0x75;
-const SC_MENU = 0x76;
-const SC_SELECT = 0x77;
-const SC_STOP = 0x78;
-const SC_AGAIN = 0x79;
-const SC_UNDO = 0x7a;
-const SC_CUT = 0x7b;
-const SC_COPY = 0x7c;
-const SC_PASTE = 0x7d;
-const SC_FIND = 0x7e;
-const SC_MUTE = 0x7f;
-const SC_VOLUME_UP = 0x80;
-const SC_VOLUME_DOWN = 0x81;
-const SC_KP_COMMA = 0x85;
-
-const SC_L_CTRL = 0xe0;
-const SC_L_SHIFT = 0xe1;
-const SC_L_ALT = 0xe2;
-const SC_L_META = 0xe3;
-const SC_R_CTRL = 0xe4;
-const SC_R_SHIFT = 0xe5;
-const SC_R_ALT = 0xe6;
-const SC_R_META = 0xe7;
-
-// From Consumer Page (0x0c)
-const SC_CONSUMER_PLAY = 0xa0;                // UsageId 0xb0
-const SC_CONSUMER_PAUSE = 0xa1;               // UsageId 0xb1
-const SC_CONSUMER_RECORD = 0xa2;              // UsageId 0xb2
-const SC_CONSUMER_FAST_FORWARD = 0xa3;        // UsageId 0xb3
-const SC_CONSUMER_REWIND = 0xa4;              // UsageId 0xb4
-const SC_CONSUMER_SCAN_NEXT_TRACK = 0xa5;     // UsageId 0xb5
-const SC_CONSUMER_SCAN_PREVIOUS_TRACK = 0xa6; // UsageId 0xb6
-const SC_CONSUMER_STOP = 0xa7;                // UsageId 0xb7
-const SC_CONSUMER_EJECT = 0xa8;               // UsageId 0xb8
-
-const SC_CONSUMER_STOP_EJECT = 0xbc;          // UsageId 0xcc
-const SC_CONSUMER_PLAY_PAUSE = 0xbd;          // UsageId 0xcd
-const SC_CONSUMER_PLAY_SKIP = 0xbe;           // UsageId 0xce
-
-const SC_CONSUMER_MUTE = 0xd2;                // UsageId 0xe2
-const SC_CONSUMER_VOLUME_UP = 0xd9;           // UsageId 0xe9
-const SC_CONSUMER_VOLUME_DOWN = 0xda;         // UsageId 0xea
-
-//---------------------------------------------------------------------------
-// javelin-steno steno key values.
-//
-// These constants are used with inbuilt functions:
-//  * func pressStenoKey(SK_xxx)
-//  * func releaseStenoKey(SK_xxx)
-//  * func isStenoKeyPressed(SK_xxx) var
-//
-//---------------------------------------------------------------------------
-
-const SK_NONE = -1;
-const SK_S1 = 0;
-const SK_S2 = 1;
-const SK_TL = 2;
-const SK_KL = 3;
-const SK_PL = 4;
-const SK_WL = 5;
-const SK_HL = 6;
-const SK_RL = 7;
-const SK_A = 8;
-const SK_O = 9;
-const SK_STAR1 = 10;
-const SK_STAR2 = 11;
-const SK_STAR3 = 12;
-const SK_STAR4 = 13;
-const SK_E = 14;
-const SK_U = 15;
-const SK_FR = 16;
-const SK_RR = 17;
-const SK_PR = 18;
-const SK_BR = 19;
-const SK_LR = 20;
-const SK_GR = 21;
-const SK_TR = 22;
-const SK_SR = 23;
-const SK_DR = 24;
-const SK_ZR = 25;
-const SK_NUM1 = 26;
-const SK_NUM2 = 27;
-const SK_NUM3 = 28;
-const SK_NUM4 = 29;
-const SK_NUM5 = 30;
-const SK_NUM6 = 31;
-const SK_NUM7 = 32;
-const SK_NUM8 = 33;
-const SK_NUM9 = 34;
-const SK_NUM10 = 35;
-const SK_NUM11 = 36;
-const SK_NUM12 = 37;
-const SK_FUNCTION = 38;
-const SK_POWER = 39;
-const SK_RES1 = 40;
-const SK_RES2 = 41;
-
-//---------------------------------------------------------------------------
-// Other functions:
-//
-//  * func releaseAll()
-//    - releases all pressed scan codes and steno keys.
-//  * func pressAll()
-//    - call all press scripts for buttons that are pressed.
-//  * func isInPressAll() var
-//    - returns non-zero if a pressAll is being processed.
-//  * func isButtonPressed(buttonIndex) var
-//    - Returns 1 if the physical button is pressed.
-//  * func checkButtonState("01 10") var
-//    - Returns if the current button state matches the string.
-//    - 0 = not pressed, space = ignore, all others = pressed.
-//      - The example string checks that:
-//        - button 0 is off.
-//        - button 1 is on.
-//        - button 3 is on.
-//        - button 4 is off.
-//    - The string should be the same length as the number of buttons.
-//  * func sendText("Example")
-//    - Sends all of the key presses required to emit the specified string.
-//    - e.g.,
-//      - Press Shift
-//      - Press E
-//      - Release E
-//      - Release Shift
-//      - Press X
-//      - Release X
-//      - etc.
-//  * func setRgb(id, r, g, b)
-//    - For boards with rgb lights, sets an individual light to the r, g, b.
-//  * func setHsv(id, h, s, v)
-//    - For boards with rgb lights, sets an individual light to h, s, v.
-//      - h = hue,        0-65536 represents 0°  - 360°
-//      - s = saturation, 0-256   represents 0.0 - 1.0
-//      - v = value,      0-255   represents 0.0 - 1.0
-//  * func getTime() var
-//    - Returns milliseconds since launch.
-//  * func getLedStatus(id) var
-//    - Returns whether the led statues is on. See LED_STATUS constants.
-//
-// releaseAll() and pressAll() are useful for changing modes/layers, e.g.:
-//
-// if (layer != SYMBOL_LAYER) {
-//   releaseAll();
-//   layer = SYMBOL_LAYER;
-//   pressAll();
-// }
-//
-// This will allow keys on the symbol layer to be pressed 'out-of-order' but
-// still behave as expected.
-//
-// It is important that every pressAll() call in an onPress handler is guarded
-// to prevent infinite recursion, since the onPress will be re-run even for the
-// current key. The easiest way to do this is using isInPressAll() function.
-//
-
-const LED_STATUS_NUM_LOCK = 0;
-const LED_STATUS_CAPS_LOCK = 1;
-const LED_STATUS_SCROLL_LOCK = 2;
-const LED_STATUS_COMPOSE = 3;
-const LED_STATUS_KANA = 4;
-
-//---------------------------------------------------------------------------
-//
-// Polyglot button layout:
-//
-// Button indexes
-//
-//      0   1   2   3   4   5  |   6   7   8   9  10  11
-//     12  13  14  15  16  17  |  18  19  20  21  22  23
-//     24  25  26  27  28  29  |  30  31  32  33  34  35
-//                 36  37  38  |  39  40  41
-//
-// Bootsel Button (B button on the back of the Polyglot) is button 42.
-//
-//---------------------------------------------------------------------------
-// Example global variable:
-//   var layers = 0;
-
-// Example local functions:
-//
-//   func useNavLayer() var {
-//     return isButtonPressed(22);
-//   }
-//
-//   func handlePress(stenoKey, navKey) {
-//     if (useNavLayer()) {
-//       pressScanCode(navKey);
-//     } else {
-//       pressStenoKey(stenoKey);
-//     }
-//   }
-//
-// Then the onPress handler could call handlePress(SK_S1 | KEY_STENO, SC_TAB);
-
-//---------------------------------------------------------------------------
-// The script needs to have onPress## and onRelease## functions for every
-// physical button.
-//---------------------------------------------------------------------------
-
-const QWERTY_LAYER = 0;
-const STENO_MASK = 1;
-const SYMBOL_MASK = 2;
-const FUNCTION_MASK = 4;
-const NAV_MASK = 8;
-
-var layer = STENO_MASK;
-var otherPressCount = 0;
-
-var underglowMode = layer;
-var speed = 3;
-var hueSpread = 4;
-var hueShift = 0;
-var brightness = 3;
-var saturation = 5;
-
-const KEY_STENO = 0x200;
-const KEY_SHIFT = 0x100;
-const TAP_THRESHOLD = 200; // milliseconds for keys that have alternates
-
-func init() {
-  updateUnderglowRgb();
+var layer;
+func setLayer(layerIndex, layerIdEvent) {
+  releaseAll();
+  layer = layerIndex;
+  sendEvent(layerIdEvent);
 }
 
-const RGB_UPDATE_TIME = 20;
-var lastRgbUpdateTime = 0;
-
-func tick() {
-  var time = getTime();
-  if (time - lastRgbUpdateTime >= RGB_UPDATE_TIME) {
-    lastRgbUpdateTime = time;
-    updateUnderglowRgb();
+func dispatchToLayer(layer0Func, layer1Func, layer2Func, layer3Func, layer4Func) {
+  if (layer == 0) {
+    if (layer0Func) layer0Func();
+  } else if (layer == 1) {
+    if (layer1Func) layer1Func();
+  } else if (layer == 2) {
+    if (layer2Func) layer2Func();
+  } else if (layer == 3) {
+    if (layer3Func) layer3Func();
+  } else if (layer == 4) {
+    if (layer4Func) layer4Func();
   }
 }
 
-const SPEED_VALUES      = [[ 00 04 08 0c 10 18 20 30 40 ]];
-const HUE_SPREAD_VALUES = [[ 00 10 20 28 30 38 40 48 50 ]];
-const SATURATION_VALUES = [[ 00 20 40 50 60 68 70 78 80 ]];
-const BRIGHTNESS_VALUES = [[ 00 08 10 20 30 40 50 60 80 ]];
+func activateGlobal() {
 
-func updateUnderglowRgbHueCycle(hShift, sat, spreadMultiplier, value) {
-  for (var i = 0; i < 32; i = i + 1) {
-    setHsv(
-      i,
-      spreadMultiplier*i + hShift,
-      sat,
-      value
-    );
-  }
+}
+func deactivateGlobal() {
+
+}
+func activate0() {
+  sendEventUnique("layer: steno");
 }
 
-func updateUnderglowRgbConstant(r, g, b) {
-  var finalR = r * brightness >> 3;
-  var finalG = g * brightness >> 3;
-  var finalB = b * brightness >> 3;
-  for (var i = 0; i < 32; i = i + 1) {
-    setRgb(i, finalR, finalG, finalB);
-  }
+func deactivate0() {
+
 }
 
-func updateUnderglowRgb() {
-  if (underglowMode == 0) {
-    updateUnderglowRgbConstant(64, 64, 64);
-  } else {
-    updateUnderglowRgbHueCycle(
-      getTime() * SPEED_VALUES[speed] + hueShift,
-      SATURATION_VALUES[saturation] * 2,
-      HUE_SPREAD_VALUES[hueSpread] * 64,
-      BRIGHTNESS_VALUES[brightness]
-    );
-  }
+func activate1() {
+  sendEventUnique("layer: qwerty");
 }
 
+func deactivate1() {
+
+}
+
+func activate2() {
+
+}
+
+func deactivate2() {
+
+}
+
+func activate3() {
+
+}
+
+func deactivate3() {
+
+}
+
+func activate4() {
+
+}
+
+func deactivate4() {
+
+}
+
+func activateDynamic() {
+  dispatchToLayer(@activate0, @activate1, 0, 0, 0);
+}
+func deactivateDynamic() {}
 func updateStenoMode() {
   // Four corner keys are 0, 11, 36, 41.
-  if ((layer & STENO_MASK)
-      && checkButtonState("100000000001000000000000000000000000100001")) {
+  if (checkButtonState("100000000001000000000000000000000000100001")) {
     if (getParameter("steno_mode") != "embedded") {
       console("set_steno_mode embedded");
     } else {
       console("set_steno_mode gemini");
     }
     releaseAll();
-  }
-}
-
-func press(key) {
-  if (key == SC_NONE || key == SK_NONE) {
-    return;
-  }
-
-  otherPressCount = otherPressCount + 1;
-  if (key & KEY_STENO) {
-    pressStenoKey(key & 0xff);
-  } else {
-    if (key & KEY_SHIFT) {
-      pressScanCode(SC_L_SHIFT);
-    }
-    pressScanCode(key & 0xff);
-  }
-}
-
-func release(key) {
-  if (key == SC_NONE || key == SK_NONE) {
-    return;
-  }
-
-  if (key & KEY_STENO) {
-    releaseStenoKey(key & 0xff);
-  } else {
-    if (key & KEY_SHIFT) {
-      releaseScanCode(SC_L_SHIFT);
-    }
-    releaseScanCode(key & 0xff);
-  }
-}
-
-func handlePress(qwertyKey, stenoKey, symbolsKey, functionKey, navKey) {
-  if (layer & NAV_MASK) {
-    press(navKey);
-  } else if (layer & FUNCTION_MASK) {
-    press(functionKey);
-  } else if (layer & SYMBOL_MASK) {
-    press(symbolsKey);
-  } else if (layer & STENO_MASK) {
-    press(stenoKey);
-  } else {
-    press(qwertyKey);
-  }
-}
-func handleRelease(qwertyKey, stenoKey, symbolsKey, functionKey, navKey) {
-  if (layer & NAV_MASK) {
-    release(navKey);
-  } if (layer & FUNCTION_MASK) {
-    release(functionKey);
-  } else if (layer & SYMBOL_MASK) {
-    release(symbolsKey);
-  } else if (layer & STENO_MASK) {
-    release(stenoKey);
-  } else {
-    release(qwertyKey);
   }
 }
 
@@ -564,303 +92,1551 @@ func sendEventUnique(event) {
   sendEvent(event);
 }
 
-func sendLayerEvent() {
-  if (layer & NAV_MASK) {
-    // sendEventUnique("layer: navigation");
-  } else if (layer & FUNCTION_MASK) {
-    // sendEventUnique("layer: function");
-  } else if (layer & SYMBOL_MASK) {
-    // sendEventUnique("layer: symbol");
-  } else if (layer & STENO_MASK) {
-    // var mode = getParameter("steno_mode");
-    // if (mode == "gemini")  {
-    //   sendEventUnique("layer: steno_gemini");
-    // } else if(mode == "plover_hid") {
-    //   sendEventUnique("layer: steno_plover_hid");
-    // } else {
-    //   sendEventUnique("layer: steno");
-    // }
-    sendEventUnique("layer: steno");
-  } else {
-    sendEventUnique("layer: qwerty");
+const RGB_UPDATE_TIME = 20;
+var lastRgbUpdateTime = 0;
+
+func tick() {
+  var time = getTime();
+  if (time - lastRgbUpdateTime >= RGB_UPDATE_TIME) {
+    lastRgbUpdateTime = time;
+    dispatchToLayer(@updateUnderglowRgbHueCycle, @updateUnderglowWhite, @updateUnderglowWhite, @updateUnderglowWhite, @updateUnderglowWhite);
   }
 }
 
-func setLayer(value) {
-  layer = value;
-  sendLayerEvent();
+func updateUnderglowRgbConstant(r, g, b) {
+  var finalR = r;
+  var finalG = g;
+  var finalB = b;
+  for (var i = 0; i < 32; i = i + 1) {
+    setRgb(i, finalR, finalG, finalB);
+  }
+}
+
+func updateUnderglowOff() {
+  updateUnderglowRgbConstant(0, 0, 0);
+}
+
+func updateUnderglowWhite() {
+  updateUnderglowRgbConstant(64, 64, 64);
+}
+
+func updateUnderglowRgbHueCycle() {
+  const speed = 3;
+  const hueSpread = 4;
+  const hueShift = 0;
+  const brightness = 3;
+  const saturation = 5;
+
+  const SPEED_VALUES      = [[ 00 04 08 0c 10 18 20 30 40 ]];
+  const HUE_SPREAD_VALUES = [[ 00 10 20 28 30 38 40 48 50 ]];
+  const SATURATION_VALUES = [[ 00 20 40 50 60 68 70 78 80 ]];
+  const BRIGHTNESS = 0x20;
+
+  var hShift = getTime() * SPEED_VALUES[speed] + hueShift;
+  var sat = SATURATION_VALUES[saturation] * 2;
+  var spreadMultiplier = HUE_SPREAD_VALUES[hueSpread] * 64;
+
+  for (var i = 0; i < 32; i = i + 1) {
+    setHsv(
+    i,
+    spreadMultiplier*i + hShift,
+    sat,
+    BRIGHTNESS,
+    );
+  }
+}
+
+func init() {
+  activate0();
 }
 
 func onPress0() {
-  handlePress(SC_TAB, SK_NONE, SC_GRAVE, SC_NONE, SC_NONE);
+  dispatchToLayer(@onPress0_0, @onPress0_1, @onPress0_2, 0, 0);
+}
+func onRelease0() {
+  dispatchToLayer(@onRelease0_0, @onRelease0_1, @onRelease0_2, 0, 0);
+}
+
+func onPress0_0() {
   updateStenoMode();
 }
-func onRelease0() { handleRelease(SC_TAB, SK_NONE, SC_GRAVE, SC_NONE, SC_NONE); }
+func onRelease0_0() {
 
-func onPress1() { handlePress(SC_Q, SK_S1 | KEY_STENO, SC_1, SC_F9, SC_NONE); }
-func onRelease1() { handleRelease(SC_Q, SK_S1 | KEY_STENO, SC_1, SC_F9, SC_NONE); }
+}
 
-func onPress2() { handlePress(SC_W, SK_TL | KEY_STENO, SC_2, SC_F10, SC_NONE); }
-func onRelease2() { handleRelease(SC_W, SK_TL | KEY_STENO, SC_2, SC_F10, SC_NONE); }
+func onPress0_1() {
+  pressScanCode(43 /* "⇥" */);
+}
+func onRelease0_1() {
+  releaseScanCode(43 /* "⇥" */);
+}
 
-func onPress3() { handlePress(SC_E, SK_PL | KEY_STENO, SC_3, SC_F11, SC_NONE); }
-func onRelease3() { handleRelease(SC_E, SK_PL | KEY_STENO, SC_3, SC_F11, SC_NONE); }
+func onPress0_2() {
+  pressScanCode(53 /* "`" */);
+}
+func onRelease0_2() {
+  releaseScanCode(53 /* "`" */);
+}
 
-func onPress4() { handlePress(SC_R, SK_HL | KEY_STENO, SC_4, SC_F12, SC_NONE); }
-func onRelease4() { handleRelease(SC_R, SK_HL | KEY_STENO, SC_4, SC_F12, SC_NONE); }
+func onPress1() {
+  dispatchToLayer(@onPress1_0, @onPress1_1, @onPress1_2, @onPress1_3, 0);
+}
+func onRelease1() {
+  dispatchToLayer(@onRelease1_0, @onRelease1_1, @onRelease1_2, @onRelease1_3, 0);
+}
 
-func onPress5() { handlePress(SC_T, SK_STAR1 | KEY_STENO, SC_5, SC_NONE, SC_NONE); }
-func onRelease5() { handleRelease(SC_T, SK_STAR1 | KEY_STENO, SC_5, SC_NONE, SC_NONE); }
+func onPress1_0() {
+  pressStenoKey(0 /* "S1" */);
+}
+func onRelease1_0() {
+  releaseStenoKey(0 /* "S1" */);
+}
 
-func onPress6() { handlePress(SC_Y, SK_STAR2 | KEY_STENO, SC_6, SC_NONE, SC_CONSUMER_VOLUME_UP); }
-func onRelease6() { handleRelease(SC_Y, SK_STAR2 | KEY_STENO, SC_6, SC_NONE, SC_CONSUMER_VOLUME_UP); }
+func onPress1_1() {
+  pressScanCode(20 /* "Q" */);
+}
+func onRelease1_1() {
+  releaseScanCode(20 /* "Q" */);
+}
 
-func onPress7() { handlePress(SC_U, SK_FR | KEY_STENO, SC_7, SC_NONE, SC_BACKSPACE); }
-func onRelease7() { handleRelease(SC_U, SK_FR | KEY_STENO, SC_7, SC_NONE, SC_BACKSPACE); }
+func onPress1_2() {
+  pressScanCode(30 /* "1" */);
+}
+func onRelease1_2() {
+  releaseScanCode(30 /* "1" */);
+}
 
-func onPress8() { handlePress(SC_I, SK_PR | KEY_STENO, SC_8, SC_NONE, SC_UP); }
-func onRelease8() { handleRelease(SC_I, SK_PR | KEY_STENO, SC_8, SC_NONE, SC_UP); }
+func onPress1_3() {
+  pressScanCode(66 /* "F9" */);
+}
+func onRelease1_3() {
+  releaseScanCode(66 /* "F9" */);
+}
 
-func onPress9() { handlePress(SC_O, SK_LR | KEY_STENO, SC_9, SC_NONE, SC_DELETE); }
-func onRelease9() { handleRelease(SC_O, SK_LR | KEY_STENO, SC_9, SC_NONE, SC_DELETE); }
+func onPress2() {
+  dispatchToLayer(@onPress2_0, @onPress2_1, @onPress2_2, @onPress2_3, 0);
+}
+func onRelease2() {
+  dispatchToLayer(@onRelease2_0, @onRelease2_1, @onRelease2_2, @onRelease2_3, 0);
+}
 
-func onPress10() { handlePress(SC_P, SK_TR | KEY_STENO, SC_0, SC_NONE, SC_PAGE_UP); }
-func onRelease10() { handleRelease(SC_P, SK_TR | KEY_STENO, SC_0, SC_NONE, SC_PAGE_UP); }
+func onPress2_0() {
+  pressStenoKey(2 /* "T-" */);
+}
+func onRelease2_0() {
+  releaseStenoKey(2 /* "T-" */);
+}
+
+func onPress2_1() {
+  pressScanCode(26 /* "W" */);
+}
+func onRelease2_1() {
+  releaseScanCode(26 /* "W" */);
+}
+
+func onPress2_2() {
+  pressScanCode(31 /* "2" */);
+}
+func onRelease2_2() {
+  releaseScanCode(31 /* "2" */);
+}
+
+func onPress2_3() {
+  pressScanCode(67 /* "F10" */);
+}
+func onRelease2_3() {
+  releaseScanCode(67 /* "F10" */);
+}
+
+func onPress3() {
+  dispatchToLayer(@onPress3_0, @onPress3_1, @onPress3_2, @onPress3_3, 0);
+}
+func onRelease3() {
+  dispatchToLayer(@onRelease3_0, @onRelease3_1, @onRelease3_2, @onRelease3_3, 0);
+}
+
+func onPress3_0() {
+  pressStenoKey(4 /* "P-" */);
+}
+func onRelease3_0() {
+  releaseStenoKey(4 /* "P-" */);
+}
+
+func onPress3_1() {
+  pressScanCode(8 /* "E" */);
+}
+func onRelease3_1() {
+  releaseScanCode(8 /* "E" */);
+}
+
+func onPress3_2() {
+  pressScanCode(32 /* "3" */);
+}
+func onRelease3_2() {
+  releaseScanCode(32 /* "3" */);
+}
+
+func onPress3_3() {
+  pressScanCode(68 /* "F11" */);
+}
+func onRelease3_3() {
+  releaseScanCode(68 /* "F11" */);
+}
+
+func onPress4() {
+  dispatchToLayer(@onPress4_0, @onPress4_1, @onPress4_2, @onPress4_3, 0);
+}
+func onRelease4() {
+  dispatchToLayer(@onRelease4_0, @onRelease4_1, @onRelease4_2, @onRelease4_3, 0);
+}
+
+func onPress4_0() {
+  pressStenoKey(6 /* "H-" */);
+}
+func onRelease4_0() {
+  releaseStenoKey(6 /* "H-" */);
+}
+
+func onPress4_1() {
+  pressScanCode(21 /* "R" */);
+}
+func onRelease4_1() {
+  releaseScanCode(21 /* "R" */);
+}
+
+func onPress4_2() {
+  pressScanCode(33 /* "4" */);
+}
+func onRelease4_2() {
+  releaseScanCode(33 /* "4" */);
+}
+
+func onPress4_3() {
+  pressScanCode(69 /* "F12" */);
+}
+func onRelease4_3() {
+  releaseScanCode(69 /* "F12" */);
+}
+
+func onPress5() {
+  dispatchToLayer(@onPress5_0, @onPress5_1, @onPress5_2, 0, 0);
+}
+func onRelease5() {
+  dispatchToLayer(@onRelease5_0, @onRelease5_1, @onRelease5_2, 0, 0);
+}
+
+func onPress5_0() {
+  pressStenoKey(10 /* "*1" */);
+}
+func onRelease5_0() {
+  releaseStenoKey(10 /* "*1" */);
+}
+
+func onPress5_1() {
+  pressScanCode(23 /* "T" */);
+}
+func onRelease5_1() {
+  releaseScanCode(23 /* "T" */);
+}
+
+func onPress5_2() {
+  pressScanCode(34 /* "5" */);
+}
+func onRelease5_2() {
+  releaseScanCode(34 /* "5" */);
+}
+
+func onPress6() {
+  dispatchToLayer(@onPress6_0, @onPress6_1, @onPress6_2, 0, @onPress6_4);
+}
+func onRelease6() {
+  dispatchToLayer(@onRelease6_0, @onRelease6_1, @onRelease6_2, 0, @onRelease6_4);
+}
+
+func onPress6_0() {
+  pressStenoKey(11 /* "*2" */);
+}
+func onRelease6_0() {
+  releaseStenoKey(11 /* "*2" */);
+}
+
+func onPress6_1() {
+  pressScanCode(28 /* "Y" */);
+}
+func onRelease6_1() {
+  releaseScanCode(28 /* "Y" */);
+}
+
+func onPress6_2() {
+  pressScanCode(35 /* "6" */);
+}
+func onRelease6_2() {
+  releaseScanCode(35 /* "6" */);
+}
+
+func onPress6_4() {
+  pressScanCode(217 /* "🔊" */);
+}
+func onRelease6_4() {
+  releaseScanCode(217 /* "🔊" */);
+}
+
+func onPress7() {
+  dispatchToLayer(@onPress7_0, @onPress7_1, @onPress7_2, 0, @onPress7_4);
+}
+func onRelease7() {
+  dispatchToLayer(@onRelease7_0, @onRelease7_1, @onRelease7_2, 0, @onRelease7_4);
+}
+
+func onPress7_0() {
+  pressStenoKey(16 /* "-F" */);
+}
+func onRelease7_0() {
+  releaseStenoKey(16 /* "-F" */);
+}
+
+func onPress7_1() {
+  pressScanCode(24 /* "U" */);
+}
+func onRelease7_1() {
+  releaseScanCode(24 /* "U" */);
+}
+
+func onPress7_2() {
+  pressScanCode(36 /* "7" */);
+}
+func onRelease7_2() {
+  releaseScanCode(36 /* "7" */);
+}
+
+func onPress7_4() {
+  pressScanCode(42 /* "⌫" */);
+}
+func onRelease7_4() {
+  releaseScanCode(42 /* "⌫" */);
+}
+
+func onPress8() {
+  dispatchToLayer(@onPress8_0, @onPress8_1, @onPress8_2, 0, @onPress8_4);
+}
+func onRelease8() {
+  dispatchToLayer(@onRelease8_0, @onRelease8_1, @onRelease8_2, 0, @onRelease8_4);
+}
+
+func onPress8_0() {
+  pressStenoKey(18 /* "-P" */);
+}
+func onRelease8_0() {
+  releaseStenoKey(18 /* "-P" */);
+}
+
+func onPress8_1() {
+  pressScanCode(12 /* "I" */);
+}
+func onRelease8_1() {
+  releaseScanCode(12 /* "I" */);
+}
+
+func onPress8_2() {
+  pressScanCode(37 /* "8" */);
+}
+func onRelease8_2() {
+  releaseScanCode(37 /* "8" */);
+}
+
+func onPress8_4() {
+  pressScanCode(82 /* "↑" */);
+}
+func onRelease8_4() {
+  releaseScanCode(82 /* "↑" */);
+}
+
+func onPress9() {
+  dispatchToLayer(@onPress9_0, @onPress9_1, @onPress9_2, 0, @onPress9_4);
+}
+func onRelease9() {
+  dispatchToLayer(@onRelease9_0, @onRelease9_1, @onRelease9_2, 0, @onRelease9_4);
+}
+
+func onPress9_0() {
+  pressStenoKey(20 /* "-L" */);
+}
+func onRelease9_0() {
+  releaseStenoKey(20 /* "-L" */);
+}
+
+func onPress9_1() {
+  pressScanCode(18 /* "O" */);
+}
+func onRelease9_1() {
+  releaseScanCode(18 /* "O" */);
+}
+
+func onPress9_2() {
+  pressScanCode(38 /* "9" */);
+}
+func onRelease9_2() {
+  releaseScanCode(38 /* "9" */);
+}
+
+func onPress9_4() {
+  pressScanCode(76 /* "⌦" */);
+}
+func onRelease9_4() {
+  releaseScanCode(76 /* "⌦" */);
+}
+
+func onPress10() {
+  dispatchToLayer(@onPress10_0, @onPress10_1, @onPress10_2, 0, @onPress10_4);
+}
+func onRelease10() {
+  dispatchToLayer(@onRelease10_0, @onRelease10_1, @onRelease10_2, 0, @onRelease10_4);
+}
+
+func onPress10_0() {
+  pressStenoKey(22 /* "-T" */);
+}
+func onRelease10_0() {
+  releaseStenoKey(22 /* "-T" */);
+}
+
+func onPress10_1() {
+  pressScanCode(19 /* "P" */);
+}
+func onRelease10_1() {
+  releaseScanCode(19 /* "P" */);
+}
+
+func onPress10_2() {
+  pressScanCode(39 /* "0" */);
+}
+func onRelease10_2() {
+  releaseScanCode(39 /* "0" */);
+}
+
+func onPress10_4() {
+  pressScanCode(75 /* "⇞" */);
+}
+func onRelease10_4() {
+  releaseScanCode(75 /* "⇞" */);
+}
 
 func onPress11() {
-  handlePress(SC_BACKSPACE, SK_DR | KEY_STENO, SC_EQUAL, SC_NONE, SC_HOME);
+  dispatchToLayer(@onPress11_0, @onPress11_1, @onPress11_2, 0, @onPress11_4);
+}
+func onRelease11() {
+  dispatchToLayer(@onRelease11_0, @onRelease11_1, @onRelease11_2, 0, @onRelease11_4);
+}
+
+func onPress11_0() {
+  pressStenoKey(24 /* "-D" */);
   updateStenoMode();
 }
-func onRelease11() { handleRelease(SC_BACKSPACE, SK_DR | KEY_STENO, SC_EQUAL, SC_NONE, SC_HOME); }
+func onRelease11_0() {
+  releaseStenoKey(24 /* "-D" */);
 
-// 2nd row
+}
 
-var timer12;
+func onPress11_1() {
+  pressScanCode(42 /* "⌫" */);
+}
+func onRelease11_1() {
+  releaseScanCode(42 /* "⌫" */);
+}
+
+func onPress11_2() {
+  pressScanCode(46 /* "=" */);
+}
+func onRelease11_2() {
+  releaseScanCode(46 /* "=" */);
+}
+
+func onPress11_4() {
+  pressScanCode(74 /* "⇱" */);
+}
+func onRelease11_4() {
+  releaseScanCode(74 /* "⇱" */);
+}
+
 func onPress12() {
-  handlePress(SC_L_CTRL, SK_NONE, SC_GRAVE | KEY_SHIFT, SC_NONE, SC_NONE);
-  timer12 = getTime();
-  otherPressCount = 0;
+  dispatchToLayer(0, @onPress12_1, @onPress12_2, 0, 0);
 }
 func onRelease12() {
-  handleRelease(SC_L_CTRL, SK_NONE, SC_GRAVE | KEY_SHIFT, SC_NONE, SC_NONE);
-  if ((layer | otherPressCount) == 0 && getTime() - timer12 < TAP_THRESHOLD) {
-    tapScanCode(SC_ESC);
+  dispatchToLayer(0, @onRelease12_1, @onRelease12_2, 0, 0);
+}
+
+var timer12_1;
+func onPress12_1() {
+  timer12_1 = getTime();
+  pressScanCode(224 /* "⌃" */);
+}
+func onRelease12_1() {
+  releaseScanCode(224 /* "⌃" */);
+  if (getTime() - timer12_1 <= 200) {
+    pressScanCode(41 /* "⎋" */);
+    releaseScanCode(41 /* "⎋" */);
+
   }
 }
 
-func onPress13() { handlePress(SC_A, SK_S2 | KEY_STENO, SC_1 | KEY_SHIFT, SC_F5, SC_L_META); }
-func onRelease13() { handleRelease(SC_A, SK_S2 | KEY_STENO, SC_1 | KEY_SHIFT, SC_F5, SC_L_META); }
+func onPress12_2() {
+  pressScanCode(225 /* "⇧" */);
+  pressScanCode(53 /* "`" */);
+}
+func onRelease12_2() {
+  releaseScanCode(53 /* "`" */);
+  releaseScanCode(225 /* "⇧" */);
+}
 
-func onPress14() { handlePress(SC_S, SK_KL | KEY_STENO, SC_2 | KEY_SHIFT, SC_F6, SC_L_ALT); }
-func onRelease14() { handleRelease(SC_S, SK_KL | KEY_STENO, SC_2 | KEY_SHIFT, SC_F6, SC_L_ALT); }
+func onPress13() {
+  dispatchToLayer(@onPress13_0, @onPress13_1, @onPress13_2, @onPress13_3, @onPress13_4);
+}
+func onRelease13() {
+  dispatchToLayer(@onRelease13_0, @onRelease13_1, @onRelease13_2, @onRelease13_3, @onRelease13_4);
+}
 
-func onPress15() { handlePress(SC_D, SK_WL | KEY_STENO, SC_3 | KEY_SHIFT, SC_F7, SC_L_CTRL); }
-func onRelease15() { handleRelease(SC_D, SK_WL | KEY_STENO, SC_3 | KEY_SHIFT, SC_F7, SC_L_CTRL); }
+func onPress13_0() {
+  pressStenoKey(1 /* "S2" */);
+}
+func onRelease13_0() {
+  releaseStenoKey(1 /* "S2" */);
+}
 
-func onPress16() { handlePress(SC_F, SK_RL | KEY_STENO, SC_4 | KEY_SHIFT, SC_F8, SC_L_SHIFT); }
-func onRelease16() { handleRelease(SC_F, SK_RL | KEY_STENO, SC_4 | KEY_SHIFT, SC_F8, SC_L_SHIFT); }
+func onPress13_1() {
+  pressScanCode(4 /* "A" */);
+}
+func onRelease13_1() {
+  releaseScanCode(4 /* "A" */);
+}
 
-func onPress17() { handlePress(SC_G, SK_STAR3 | KEY_STENO, SC_5 | KEY_SHIFT, SC_NONE, SC_NONE); }
-func onRelease17() { handleRelease(SC_G, SK_STAR3 | KEY_STENO, SC_5 | KEY_SHIFT, SC_NONE, SC_NONE); }
+func onPress13_2() {
+  pressScanCode(225 /* "⇧" */);
+  pressScanCode(30 /* "1" */);
+}
+func onRelease13_2() {
+  releaseScanCode(30 /* "1" */);
+  releaseScanCode(225 /* "⇧" */);
+}
 
-func onPress18() { handlePress(SC_H, SK_STAR4 | KEY_STENO, SC_6 | KEY_SHIFT, SC_NONE, SC_CONSUMER_VOLUME_DOWN); }
-func onRelease18() { handleRelease(SC_H, SK_STAR4 | KEY_STENO, SC_6 | KEY_SHIFT, SC_NONE, SC_CONSUMER_VOLUME_DOWN); }
+func onPress13_3() {
+  pressScanCode(62 /* "F5" */);
+}
+func onRelease13_3() {
+  releaseScanCode(62 /* "F5" */);
+}
 
-func onPress19() { handlePress(SC_J, SK_RR | KEY_STENO, SC_7 | KEY_SHIFT, SC_L_SHIFT, SC_LEFT); }
-func onRelease19() { handleRelease(SC_J, SK_RR | KEY_STENO, SC_7 | KEY_SHIFT, SC_L_SHIFT, SC_LEFT); }
+func onPress13_4() {
+  pressScanCode(227 /* "⌘" */);
+}
+func onRelease13_4() {
+  releaseScanCode(227 /* "⌘" */);
+}
 
-func onPress20() { handlePress(SC_K, SK_BR | KEY_STENO, SC_8 | KEY_SHIFT, SC_L_CTRL, SC_DOWN); }
-func onRelease20() { handleRelease(SC_K, SK_BR | KEY_STENO, SC_8 | KEY_SHIFT, SC_L_CTRL, SC_DOWN); }
+func onPress14() {
+  dispatchToLayer(@onPress14_0, @onPress14_1, @onPress14_2, @onPress14_3, @onPress14_4);
+}
+func onRelease14() {
+  dispatchToLayer(@onRelease14_0, @onRelease14_1, @onRelease14_2, @onRelease14_3, @onRelease14_4);
+}
 
-func onPress21() { handlePress(SC_L, SK_GR | KEY_STENO, SC_9 | KEY_SHIFT, SC_L_ALT, SC_RIGHT); }
-func onRelease21() { handleRelease(SC_L, SK_GR | KEY_STENO, SC_9 | KEY_SHIFT, SC_L_ALT, SC_RIGHT); }
+func onPress14_0() {
+  pressStenoKey(3 /* "K-" */);
+}
+func onRelease14_0() {
+  releaseStenoKey(3 /* "K-" */);
+}
 
-func onPress22() { handlePress(SC_SEMICOLON, SK_SR | KEY_STENO, SC_0 | KEY_SHIFT, SC_L_META, SC_PAGE_DOWN); }
-func onRelease22() { handleRelease(SC_SEMICOLON, SK_SR | KEY_STENO, SC_0 | KEY_SHIFT, SC_L_META, SC_PAGE_DOWN); }
+func onPress14_1() {
+  pressScanCode(22 /* "S" */);
+}
+func onRelease14_1() {
+  releaseScanCode(22 /* "S" */);
+}
 
-var timer23;
+func onPress14_2() {
+  pressScanCode(225 /* "⇧" */);
+  pressScanCode(31 /* "2" */);
+}
+func onRelease14_2() {
+  releaseScanCode(31 /* "2" */);
+  releaseScanCode(225 /* "⇧" */);
+}
+
+func onPress14_3() {
+  pressScanCode(63 /* "F6" */);
+}
+func onRelease14_3() {
+  releaseScanCode(63 /* "F6" */);
+}
+
+func onPress14_4() {
+  pressScanCode(226 /* "⌥" */);
+}
+func onRelease14_4() {
+  releaseScanCode(226 /* "⌥" */);
+}
+
+func onPress15() {
+  dispatchToLayer(@onPress15_0, @onPress15_1, @onPress15_2, @onPress15_3, @onPress15_4);
+}
+func onRelease15() {
+  dispatchToLayer(@onRelease15_0, @onRelease15_1, @onRelease15_2, @onRelease15_3, @onRelease15_4);
+}
+
+func onPress15_0() {
+  pressStenoKey(5 /* "W-" */);
+}
+func onRelease15_0() {
+  releaseStenoKey(5 /* "W-" */);
+}
+
+func onPress15_1() {
+  pressScanCode(7 /* "D" */);
+}
+func onRelease15_1() {
+  releaseScanCode(7 /* "D" */);
+}
+
+func onPress15_2() {
+  pressScanCode(225 /* "⇧" */);
+  pressScanCode(32 /* "3" */);
+}
+func onRelease15_2() {
+  releaseScanCode(32 /* "3" */);
+  releaseScanCode(225 /* "⇧" */);
+}
+
+func onPress15_3() {
+  pressScanCode(64 /* "F7" */);
+}
+func onRelease15_3() {
+  releaseScanCode(64 /* "F7" */);
+}
+
+func onPress15_4() {
+  pressScanCode(224 /* "⌃" */);
+}
+func onRelease15_4() {
+  releaseScanCode(224 /* "⌃" */);
+}
+
+func onPress16() {
+  dispatchToLayer(@onPress16_0, @onPress16_1, @onPress16_2, @onPress16_3, @onPress16_4);
+}
+func onRelease16() {
+  dispatchToLayer(@onRelease16_0, @onRelease16_1, @onRelease16_2, @onRelease16_3, @onRelease16_4);
+}
+
+func onPress16_0() {
+  pressStenoKey(7 /* "R-" */);
+}
+func onRelease16_0() {
+  releaseStenoKey(7 /* "R-" */);
+}
+
+func onPress16_1() {
+  pressScanCode(9 /* "F" */);
+}
+func onRelease16_1() {
+  releaseScanCode(9 /* "F" */);
+}
+
+func onPress16_2() {
+  pressScanCode(225 /* "⇧" */);
+  pressScanCode(33 /* "4" */);
+}
+func onRelease16_2() {
+  releaseScanCode(33 /* "4" */);
+  releaseScanCode(225 /* "⇧" */);
+}
+
+func onPress16_3() {
+  pressScanCode(65 /* "F8" */);
+}
+func onRelease16_3() {
+  releaseScanCode(65 /* "F8" */);
+}
+
+func onPress16_4() {
+  pressScanCode(225 /* "⇧" */);
+}
+func onRelease16_4() {
+  releaseScanCode(225 /* "⇧" */);
+}
+
+func onPress17() {
+  dispatchToLayer(@onPress17_0, @onPress17_1, @onPress17_2, 0, 0);
+}
+func onRelease17() {
+  dispatchToLayer(@onRelease17_0, @onRelease17_1, @onRelease17_2, 0, 0);
+}
+
+func onPress17_0() {
+  pressStenoKey(12 /* "*3" */);
+}
+func onRelease17_0() {
+  releaseStenoKey(12 /* "*3" */);
+}
+
+func onPress17_1() {
+  pressScanCode(10 /* "G" */);
+}
+func onRelease17_1() {
+  releaseScanCode(10 /* "G" */);
+}
+
+func onPress17_2() {
+  pressScanCode(225 /* "⇧" */);
+  pressScanCode(34 /* "5" */);
+}
+func onRelease17_2() {
+  releaseScanCode(34 /* "5" */);
+  releaseScanCode(225 /* "⇧" */);
+}
+
+func onPress18() {
+  dispatchToLayer(@onPress18_0, @onPress18_1, @onPress18_2, 0, @onPress18_4);
+}
+func onRelease18() {
+  dispatchToLayer(@onRelease18_0, @onRelease18_1, @onRelease18_2, 0, @onRelease18_4);
+}
+
+func onPress18_0() {
+  pressStenoKey(13 /* "*4" */);
+}
+func onRelease18_0() {
+  releaseStenoKey(13 /* "*4" */);
+}
+
+func onPress18_1() {
+  pressScanCode(11 /* "H" */);
+}
+func onRelease18_1() {
+  releaseScanCode(11 /* "H" */);
+}
+
+func onPress18_2() {
+  pressScanCode(225 /* "⇧" */);
+  pressScanCode(35 /* "6" */);
+}
+func onRelease18_2() {
+  releaseScanCode(35 /* "6" */);
+  releaseScanCode(225 /* "⇧" */);
+}
+
+func onPress18_4() {
+  pressScanCode(218 /* "🔈" */);
+}
+func onRelease18_4() {
+  releaseScanCode(218 /* "🔈" */);
+}
+
+func onPress19() {
+  dispatchToLayer(@onPress19_0, @onPress19_1, @onPress19_2, @onPress19_3, @onPress19_4);
+}
+func onRelease19() {
+  dispatchToLayer(@onRelease19_0, @onRelease19_1, @onRelease19_2, @onRelease19_3, @onRelease19_4);
+}
+
+func onPress19_0() {
+  pressStenoKey(17 /* "-R" */);
+}
+func onRelease19_0() {
+  releaseStenoKey(17 /* "-R" */);
+}
+
+func onPress19_1() {
+  pressScanCode(13 /* "J" */);
+}
+func onRelease19_1() {
+  releaseScanCode(13 /* "J" */);
+}
+
+func onPress19_2() {
+  pressScanCode(225 /* "⇧" */);
+  pressScanCode(36 /* "7" */);
+}
+func onRelease19_2() {
+  releaseScanCode(36 /* "7" */);
+  releaseScanCode(225 /* "⇧" */);
+}
+
+func onPress19_3() {
+  pressScanCode(225 /* "⇧" */);
+}
+func onRelease19_3() {
+  releaseScanCode(225 /* "⇧" */);
+}
+
+func onPress19_4() {
+  pressScanCode(80 /* "←" */);
+}
+func onRelease19_4() {
+  releaseScanCode(80 /* "←" */);
+}
+
+func onPress20() {
+  dispatchToLayer(@onPress20_0, @onPress20_1, @onPress20_2, @onPress20_3, @onPress20_4);
+}
+func onRelease20() {
+  dispatchToLayer(@onRelease20_0, @onRelease20_1, @onRelease20_2, @onRelease20_3, @onRelease20_4);
+}
+
+func onPress20_0() {
+  pressStenoKey(19 /* "-B" */);
+}
+func onRelease20_0() {
+  releaseStenoKey(19 /* "-B" */);
+}
+
+func onPress20_1() {
+  pressScanCode(14 /* "K" */);
+}
+func onRelease20_1() {
+  releaseScanCode(14 /* "K" */);
+}
+
+func onPress20_2() {
+  pressScanCode(225 /* "⇧" */);
+  pressScanCode(37 /* "8" */);
+}
+func onRelease20_2() {
+  releaseScanCode(37 /* "8" */);
+  releaseScanCode(225 /* "⇧" */);
+}
+
+func onPress20_3() {
+  pressScanCode(224 /* "⌃" */);
+}
+func onRelease20_3() {
+  releaseScanCode(224 /* "⌃" */);
+}
+
+func onPress20_4() {
+  pressScanCode(81 /* "↓" */);
+}
+func onRelease20_4() {
+  releaseScanCode(81 /* "↓" */);
+}
+
+func onPress21() {
+  dispatchToLayer(@onPress21_0, @onPress21_1, @onPress21_2, @onPress21_3, @onPress21_4);
+}
+func onRelease21() {
+  dispatchToLayer(@onRelease21_0, @onRelease21_1, @onRelease21_2, @onRelease21_3, @onRelease21_4);
+}
+
+func onPress21_0() {
+  pressStenoKey(21 /* "-G" */);
+}
+func onRelease21_0() {
+  releaseStenoKey(21 /* "-G" */);
+}
+
+func onPress21_1() {
+  pressScanCode(15 /* "L" */);
+}
+func onRelease21_1() {
+  releaseScanCode(15 /* "L" */);
+}
+
+func onPress21_2() {
+  pressScanCode(225 /* "⇧" */);
+  pressScanCode(38 /* "9" */);
+}
+func onRelease21_2() {
+  releaseScanCode(38 /* "9" */);
+  releaseScanCode(225 /* "⇧" */);
+}
+
+func onPress21_3() {
+  pressScanCode(226 /* "⌥" */);
+}
+func onRelease21_3() {
+  releaseScanCode(226 /* "⌥" */);
+}
+
+func onPress21_4() {
+  pressScanCode(79 /* "→" */);
+}
+func onRelease21_4() {
+  releaseScanCode(79 /* "→" */);
+}
+
+func onPress22() {
+  dispatchToLayer(@onPress22_0, @onPress22_1, @onPress22_2, @onPress22_3, @onPress22_4);
+}
+func onRelease22() {
+  dispatchToLayer(@onRelease22_0, @onRelease22_1, @onRelease22_2, @onRelease22_3, @onRelease22_4);
+}
+
+func onPress22_0() {
+  pressStenoKey(23 /* "-S" */);
+}
+func onRelease22_0() {
+  releaseStenoKey(23 /* "-S" */);
+}
+
+func onPress22_1() {
+  pressScanCode(51 /* ";" */);
+}
+func onRelease22_1() {
+  releaseScanCode(51 /* ";" */);
+}
+
+func onPress22_2() {
+  pressScanCode(225 /* "⇧" */);
+  pressScanCode(39 /* "0" */);
+}
+func onRelease22_2() {
+  releaseScanCode(39 /* "0" */);
+  releaseScanCode(225 /* "⇧" */);
+}
+
+func onPress22_3() {
+  pressScanCode(227 /* "⌘" */);
+}
+func onRelease22_3() {
+  releaseScanCode(227 /* "⌘" */);
+}
+
+func onPress22_4() {
+  pressScanCode(78 /* "⇟" */);
+}
+func onRelease22_4() {
+  releaseScanCode(78 /* "⇟" */);
+}
+
 func onPress23() {
-  handlePress(SC_R_CTRL, SK_ZR | KEY_STENO, SC_EQUAL | KEY_SHIFT, SC_NONE, SC_END);
-  timer23 = getTime();
-  otherPressCount = 0;
+  dispatchToLayer(@onPress23_0, @onPress23_1, @onPress23_2, 0, @onPress23_4);
 }
 func onRelease23() {
-  handleRelease(SC_R_CTRL, SK_ZR | KEY_STENO, SC_EQUAL | KEY_SHIFT, SC_NONE, SC_END);
-  if ((layer | otherPressCount) == 0 && getTime() - timer23 < TAP_THRESHOLD) {
-    tapScanCode(SC_APOSTROPHE);
-  }
+  dispatchToLayer(@onRelease23_0, @onRelease23_1, @onRelease23_2, 0, @onRelease23_4);
 }
 
-// 3rd row
+func onPress23_0() {
+  pressStenoKey(25 /* "-Z" */);
+}
+func onRelease23_0() {
+  releaseStenoKey(25 /* "-Z" */);
+}
 
-var timer24;
-var wasSteno24;
+func onPress23_1() {
+  pressScanCode(52 /* "'" */);
+}
+func onRelease23_1() {
+  releaseScanCode(52 /* "'" */);
+}
+
+func onPress23_2() {
+  pressScanCode(225 /* "⇧" */);
+  pressScanCode(46 /* "=" */);
+}
+func onRelease23_2() {
+  releaseScanCode(46 /* "=" */);
+  releaseScanCode(225 /* "⇧" */);
+}
+
+func onPress23_4() {
+  pressScanCode(77 /* "⇲" */);
+}
+func onRelease23_4() {
+  releaseScanCode(77 /* "⇲" */);
+}
+
 func onPress24() {
-  if (isInPressAll()) {
-    return;
-  }
-  if (layer >> 1) {
-    return;
-  }
-  wasSteno24 = layer & STENO_MASK;
-  if (wasSteno24) {
-    releaseAll();
-    setLayer(layer ^ STENO_MASK);
-    otherPressCount = 0;
-    pressAll();
-  } else {
-    pressScanCode(SC_L_SHIFT);
-    otherPressCount = 0;
-  }
-  timer24 = getTime();
+  dispatchToLayer(@onPress24_0, @onPress24_1, 0, 0, 0);
 }
 func onRelease24() {
-  // Exit early if this was triggered from a releaseAll() script.
-  if (isButtonPressed(24)) {
-    return;
-  }
-
-  if (wasSteno24) {
-    // If the keypress was in steno mode, and other keys were pressed, drop
-    // immediately back to steno mode, and drop all masks.
-    if (otherPressCount || layer) {
-      releaseAll();
-      setLayer(STENO_MASK);
-      sendEvent("layer: steno");
-    }
-  } else {
-    releaseScanCode(SC_L_SHIFT);
-
-    // A tap of the key turns on steno mode.
-    if ((layer | otherPressCount) == 0 && getTime() - timer24 < TAP_THRESHOLD) {
-      releaseAll();
-      setLayer(layer | STENO_MASK);
-      sendEvent("layer: steno");
-    }
-  }
-  underglowMode = layer & STENO_MASK;
+  dispatchToLayer(@onRelease24_0, @onRelease24_1, 0, 0, 0);
 }
 
-func onPress25() { handlePress(SC_Z, SC_L_SHIFT, SC_BACKSLASH | KEY_SHIFT, SC_F1, SC_NONE); }
-func onRelease25() { handleRelease(SC_Z, SC_L_SHIFT, SC_BACKSLASH | KEY_SHIFT, SC_F1, SC_NONE); }
+func onPress24_0() {
+  deactivateGlobal();
+  deactivate0();
+  setLayer(1, "layer_id: 136543802");
+  activateGlobal();
+  activate1();
+}
+func onRelease24_0() {
+}
 
-func onPress26() { handlePress(SC_X, SC_L_CTRL, SC_BACKSLASH, SC_F2, SC_NONE); }
-func onRelease26() { handleRelease(SC_X, SC_L_CTRL, SC_BACKSLASH, SC_F2, SC_NONE); }
+var timer24_1;
+func onPress24_1() {
+  timer24_1 = getTime();
+  pressScanCode(225 /* "⇧" */);
+}
+func onRelease24_1() {
+  releaseScanCode(225 /* "⇧" */);
+  if (getTime() - timer24_1 <= 200) {
+    deactivateGlobal();
+    deactivate1();
+    setLayer(0, "layer_id: 156387993");
+    activateGlobal();
+    activate0();
 
-func onPress27() { handlePress(SC_C, SC_L_ALT, SC_MINUS, SC_F3, SC_NONE); }
-func onRelease27() { handleRelease(SC_C, SC_L_ALT, SC_MINUS, SC_F3, SC_NONE); }
+  }
+}
 
-func onPress28() { handlePress(SC_V, SC_L_META, SC_L_BRACKET, SC_F4, SC_NONE); }
-func onRelease28() { handleRelease(SC_V, SC_L_META, SC_L_BRACKET, SC_F4, SC_NONE); }
+func onPress25() {
+  dispatchToLayer(@onPress25_0, @onPress25_1, @onPress25_2, @onPress25_3, 0);
+}
+func onRelease25() {
+  dispatchToLayer(@onRelease25_0, @onRelease25_1, @onRelease25_2, @onRelease25_3, 0);
+}
 
-func onPress29() { handlePress(SC_B, SC_SPACE, SC_L_BRACKET | KEY_SHIFT, SC_NONE, SC_NONE); }
-func onRelease29() { handleRelease(SC_B, SC_SPACE, SC_L_BRACKET | KEY_SHIFT, SC_NONE, SC_NONE); }
+func onPress25_0() {
+  pressScanCode(225 /* "⇧" */);
+}
+func onRelease25_0() {
+  releaseScanCode(225 /* "⇧" */);
+}
 
-func onPress30() { handlePress(SC_N, SC_CONSUMER_VOLUME_DOWN, SC_R_BRACKET | KEY_SHIFT, SC_NONE, SC_CONSUMER_MUTE); }
-func onRelease30() { handleRelease(SC_N, SC_CONSUMER_VOLUME_DOWN, SC_R_BRACKET | KEY_SHIFT, SC_NONE, SC_CONSUMER_MUTE); }
+func onPress25_1() {
+  pressScanCode(29 /* "Z" */);
+}
+func onRelease25_1() {
+  releaseScanCode(29 /* "Z" */);
+}
 
-func onPress31() { handlePress(SC_M, SC_LEFT, SC_R_BRACKET, SC_NONE, SC_NONE); }
-func onRelease31() { handleRelease(SC_M, SC_LEFT, SC_R_BRACKET, SC_NONE, SC_NONE); }
+func onPress25_2() {
+  pressScanCode(225 /* "⇧" */);
+  pressScanCode(49 /* "\" */);
+}
+func onRelease25_2() {
+  releaseScanCode(49 /* "\" */);
+  releaseScanCode(225 /* "⇧" */);
+}
 
-func onPress32() { handlePress(SC_COMMA, SC_DOWN, SC_MINUS | KEY_SHIFT, SC_NONE, SC_NONE); }
-func onRelease32() { handleRelease(SC_COMMA, SC_DOWN, SC_MINUS | KEY_SHIFT, SC_NONE, SC_NONE); }
+func onPress25_3() {
+  pressScanCode(58 /* "F1" */);
+}
+func onRelease25_3() {
+  releaseScanCode(58 /* "F1" */);
+}
 
-func onPress33() { handlePress(SC_DOT, SC_UP, SC_SLASH, SC_NONE, SC_NONE); }
-func onRelease33() { handleRelease(SC_DOT, SC_UP, SC_SLASH, SC_NONE, SC_NONE); }
+func onPress26() {
+  dispatchToLayer(@onPress26_0, @onPress26_1, @onPress26_2, @onPress26_3, 0);
+}
+func onRelease26() {
+  dispatchToLayer(@onRelease26_0, @onRelease26_1, @onRelease26_2, @onRelease26_3, 0);
+}
 
-func onPress34() { handlePress(SC_SLASH, SC_RIGHT, SC_NONE, SC_NONE, SC_NONE); }
-func onRelease34() { handleRelease(SC_SLASH, SC_RIGHT, SC_NONE, SC_NONE, SC_NONE); }
+func onPress26_0() {
+  pressScanCode(224 /* "⌃" */);
+}
+func onRelease26_0() {
+  releaseScanCode(224 /* "⌃" */);
+}
 
-func onPress35() { handlePress(SC_R_SHIFT, SC_CONSUMER_VOLUME_UP, SC_NONE, SC_NONE, SC_NONE); }
-func onRelease35() { handleRelease(SC_R_SHIFT, SC_CONSUMER_VOLUME_UP, SC_NONE, SC_NONE, SC_NONE); }
+func onPress26_1() {
+  pressScanCode(27 /* "X" */);
+}
+func onRelease26_1() {
+  releaseScanCode(27 /* "X" */);
+}
 
-// 4th row
+func onPress26_2() {
+  pressScanCode(49 /* "\" */);
+}
+func onRelease26_2() {
+  releaseScanCode(49 /* "\" */);
+}
+
+func onPress26_3() {
+  pressScanCode(59 /* "F2" */);
+}
+func onRelease26_3() {
+  releaseScanCode(59 /* "F2" */);
+}
+
+func onPress27() {
+  dispatchToLayer(@onPress27_0, @onPress27_1, @onPress27_2, @onPress27_3, 0);
+}
+func onRelease27() {
+  dispatchToLayer(@onRelease27_0, @onRelease27_1, @onRelease27_2, @onRelease27_3, 0);
+}
+
+func onPress27_0() {
+  pressScanCode(226 /* "⌥" */);
+}
+func onRelease27_0() {
+  releaseScanCode(226 /* "⌥" */);
+}
+
+func onPress27_1() {
+  pressScanCode(6 /* "C" */);
+}
+func onRelease27_1() {
+  releaseScanCode(6 /* "C" */);
+}
+
+func onPress27_2() {
+  pressScanCode(45 /* "-" */);
+}
+func onRelease27_2() {
+  releaseScanCode(45 /* "-" */);
+}
+
+func onPress27_3() {
+  pressScanCode(60 /* "F3" */);
+}
+func onRelease27_3() {
+  releaseScanCode(60 /* "F3" */);
+}
+
+func onPress28() {
+  dispatchToLayer(@onPress28_0, @onPress28_1, @onPress28_2, @onPress28_3, 0);
+}
+func onRelease28() {
+  dispatchToLayer(@onRelease28_0, @onRelease28_1, @onRelease28_2, @onRelease28_3, 0);
+}
+
+func onPress28_0() {
+  pressScanCode(227 /* "⌘" */);
+}
+func onRelease28_0() {
+  releaseScanCode(227 /* "⌘" */);
+}
+
+func onPress28_1() {
+  pressScanCode(25 /* "V" */);
+}
+func onRelease28_1() {
+  releaseScanCode(25 /* "V" */);
+}
+
+func onPress28_2() {
+  pressScanCode(47 /* "[" */);
+}
+func onRelease28_2() {
+  releaseScanCode(47 /* "[" */);
+}
+
+func onPress28_3() {
+  pressScanCode(61 /* "F4" */);
+}
+func onRelease28_3() {
+  releaseScanCode(61 /* "F4" */);
+}
+
+func onPress29() {
+  dispatchToLayer(@onPress29_0, @onPress29_1, @onPress29_2, 0, 0);
+}
+func onRelease29() {
+  dispatchToLayer(@onRelease29_0, @onRelease29_1, @onRelease29_2, 0, 0);
+}
+
+func onPress29_0() {
+  pressScanCode(44 /* "⎵" */);
+}
+func onRelease29_0() {
+  releaseScanCode(44 /* "⎵" */);
+}
+
+func onPress29_1() {
+  pressScanCode(5 /* "B" */);
+}
+func onRelease29_1() {
+  releaseScanCode(5 /* "B" */);
+}
+
+func onPress29_2() {
+  pressScanCode(225 /* "⇧" */);
+  pressScanCode(47 /* "[" */);
+}
+func onRelease29_2() {
+  releaseScanCode(47 /* "[" */);
+  releaseScanCode(225 /* "⇧" */);
+}
+
+func onPress30() {
+  dispatchToLayer(@onPress30_0, @onPress30_1, @onPress30_2, 0, @onPress30_4);
+}
+func onRelease30() {
+  dispatchToLayer(@onRelease30_0, @onRelease30_1, @onRelease30_2, 0, @onRelease30_4);
+}
+
+func onPress30_0() {
+  pressScanCode(218 /* "🔈" */);
+}
+func onRelease30_0() {
+  releaseScanCode(218 /* "🔈" */);
+}
+
+func onPress30_1() {
+  pressScanCode(17 /* "N" */);
+}
+func onRelease30_1() {
+  releaseScanCode(17 /* "N" */);
+}
+
+func onPress30_2() {
+  pressScanCode(225 /* "⇧" */);
+  pressScanCode(48 /* "]" */);
+}
+func onRelease30_2() {
+  releaseScanCode(48 /* "]" */);
+  releaseScanCode(225 /* "⇧" */);
+}
+
+func onPress30_4() {
+  pressScanCode(210 /* "🔇" */);
+}
+func onRelease30_4() {
+  releaseScanCode(210 /* "🔇" */);
+}
+
+func onPress31() {
+  dispatchToLayer(@onPress31_0, @onPress31_1, @onPress31_2, 0, 0);
+}
+func onRelease31() {
+  dispatchToLayer(@onRelease31_0, @onRelease31_1, @onRelease31_2, 0, 0);
+}
+
+func onPress31_0() {
+  pressScanCode(80 /* "←" */);
+}
+func onRelease31_0() {
+  releaseScanCode(80 /* "←" */);
+}
+
+func onPress31_1() {
+  pressScanCode(16 /* "M" */);
+}
+func onRelease31_1() {
+  releaseScanCode(16 /* "M" */);
+}
+
+func onPress31_2() {
+  pressScanCode(48 /* "]" */);
+}
+func onRelease31_2() {
+  releaseScanCode(48 /* "]" */);
+}
+
+func onPress32() {
+  dispatchToLayer(@onPress32_0, @onPress32_1, @onPress32_2, 0, 0);
+}
+func onRelease32() {
+  dispatchToLayer(@onRelease32_0, @onRelease32_1, @onRelease32_2, 0, 0);
+}
+
+func onPress32_0() {
+  pressScanCode(81 /* "↓" */);
+}
+func onRelease32_0() {
+  releaseScanCode(81 /* "↓" */);
+}
+
+func onPress32_1() {
+  pressScanCode(54 /* "," */);
+}
+func onRelease32_1() {
+  releaseScanCode(54 /* "," */);
+}
+
+func onPress32_2() {
+  pressScanCode(225 /* "⇧" */);
+  pressScanCode(45 /* "-" */);
+}
+func onRelease32_2() {
+  releaseScanCode(45 /* "-" */);
+  releaseScanCode(225 /* "⇧" */);
+}
+
+func onPress33() {
+  dispatchToLayer(@onPress33_0, @onPress33_1, @onPress33_2, 0, 0);
+}
+func onRelease33() {
+  dispatchToLayer(@onRelease33_0, @onRelease33_1, @onRelease33_2, 0, 0);
+}
+
+func onPress33_0() {
+  pressScanCode(82 /* "↑" */);
+}
+func onRelease33_0() {
+  releaseScanCode(82 /* "↑" */);
+}
+
+func onPress33_1() {
+  pressScanCode(55 /* "." */);
+}
+func onRelease33_1() {
+  releaseScanCode(55 /* "." */);
+}
+
+func onPress33_2() {
+  pressScanCode(56 /* "/" */);
+}
+func onRelease33_2() {
+  releaseScanCode(56 /* "/" */);
+}
+
+func onPress34() {
+  dispatchToLayer(@onPress34_0, @onPress34_1, 0, 0, 0);
+}
+func onRelease34() {
+  dispatchToLayer(@onRelease34_0, @onRelease34_1, 0, 0, 0);
+}
+
+func onPress34_0() {
+  pressScanCode(79 /* "→" */);
+}
+func onRelease34_0() {
+  releaseScanCode(79 /* "→" */);
+}
+
+func onPress34_1() {
+  pressScanCode(56 /* "/" */);
+}
+func onRelease34_1() {
+  releaseScanCode(56 /* "/" */);
+}
+
+func onPress35() {
+  dispatchToLayer(@onPress35_0, @onPress35_1, 0, 0, 0);
+}
+func onRelease35() {
+  dispatchToLayer(@onRelease35_0, @onRelease35_1, 0, 0, 0);
+}
+
+func onPress35_0() {
+  pressScanCode(217 /* "🔊" */);
+}
+func onRelease35_0() {
+  releaseScanCode(217 /* "🔊" */);
+}
+
+func onPress35_1() {
+  pressScanCode(229 /* "⇧" */);
+}
+func onRelease35_1() {
+  releaseScanCode(229 /* "⇧" */);
+}
 
 func onPress36() {
-  handlePress(SC_L_META, SK_NUM1 | KEY_STENO, SC_L_META, SC_NONE, SC_NONE);
+  dispatchToLayer(@onPress36_0, @onPress36_1, @onPress36_2, 0, 0);
+}
+func onRelease36() {
+  dispatchToLayer(@onRelease36_0, @onRelease36_1, @onRelease36_2, 0, 0);
+}
+
+func onPress36_0() {
+  pressStenoKey(26 /* "#1" */);
   updateStenoMode();
 }
-func onRelease36() { handleRelease(SC_L_META, SK_NUM1 | KEY_STENO, SC_L_META, SC_NONE, SC_NONE); }
+func onRelease36_0() {
+  releaseStenoKey(26 /* "#1" */);
 
-var timer37;
+}
+
+func onPress36_1() {
+  pressScanCode(227 /* "⌘" */);
+}
+func onRelease36_1() {
+  releaseScanCode(227 /* "⌘" */);
+}
+
+func onPress36_2() {
+  pressScanCode(227 /* "⌘" */);
+}
+func onRelease36_2() {
+  releaseScanCode(227 /* "⌘" */);
+}
+
 func onPress37() {
-  handlePress(SC_L_ALT, SK_A | KEY_STENO, SC_L_ALT, SC_NONE, SC_NONE);
-  timer37 = getTime();
-  otherPressCount = 0;
+  dispatchToLayer(@onPress37_0, @onPress37_1, @onPress37_2, 0, 0);
 }
 func onRelease37() {
-  handleRelease(SC_L_ALT, SK_A | KEY_STENO, SC_L_ALT, SC_NONE, SC_NONE);
-  if ((layer | otherPressCount) == 0 && getTime() - timer37 < TAP_THRESHOLD) {
-    tapScanCode(SC_SPACE);
+  dispatchToLayer(@onRelease37_0, @onRelease37_1, @onRelease37_2, 0, 0);
+}
+
+func onPress37_0() {
+  pressStenoKey(8 /* "A" */);
+}
+func onRelease37_0() {
+  releaseStenoKey(8 /* "A" */);
+}
+
+var timer37_1;
+func onPress37_1() {
+  timer37_1 = getTime();
+  pressScanCode(226 /* "⌥" */);
+}
+func onRelease37_1() {
+  releaseScanCode(226 /* "⌥" */);
+  if (getTime() - timer37_1 <= 200) {
+    pressScanCode(44 /* "⎵" */);
+    releaseScanCode(44 /* "⎵" */);
+
   }
+}
+
+func onPress37_2() {
+  pressScanCode(226 /* "⌥" */);
+}
+func onRelease37_2() {
+  releaseScanCode(226 /* "⌥" */);
 }
 
 func onPress38() {
-  if (layer != 0) {
-    handlePress(SC_NONE, SK_O | KEY_STENO, SC_L_CTRL, SC_NONE, SC_NONE);
-  } else {
-    otherPressCount = otherPressCount + 1;
-    releaseAll();
-    setLayer(layer | NAV_MASK);
-    pressAll();
-  }
+  dispatchToLayer(@onPress38_0, @onPress38_1, @onPress38_2, 0, @onPress38_4);
+}
+func onRelease38() {
+  dispatchToLayer(@onRelease38_0, @onRelease38_1, @onRelease38_2, 0, @onRelease38_4);
 }
 
-func onRelease38() {
-  if (layer & NAV_MASK) {
-    releaseAll();
-    setLayer(layer ^ NAV_MASK);
-  } else {
-    handleRelease(SC_NONE, SK_O | KEY_STENO, SC_L_CTRL, SC_NONE, SC_NONE);
-  }
+func onPress38_0() {
+  pressStenoKey(9 /* "O" */);
+}
+func onRelease38_0() {
+  releaseStenoKey(9 /* "O" */);
+}
+
+func onPress38_1() {
+  deactivateGlobal();
+  deactivate1();
+  setLayer(4, "layer_id: 259868619");
+  activateGlobal();
+  activate4();
+}
+func onRelease38_1() {
+}
+
+func onPress38_2() {
+  pressScanCode(224 /* "⌃" */);
+}
+func onRelease38_2() {
+  releaseScanCode(224 /* "⌃" */);
+}
+
+func onPress38_4() {
+}
+func onRelease38_4() {
+  deactivateGlobal();
+  deactivate4();
+  setLayer(1, "layer_id: 136543802");
+  activateGlobal();
+  activate1();
+  onRelease38_1();
 }
 
 func onPress39() {
-  if (layer != 0) {
-    handlePress(SC_NONE, SK_E | KEY_STENO, SC_NONE, SC_NONE, SC_NONE);
-  } else {
-    otherPressCount = otherPressCount + 1;
-    releaseAll();
-    setLayer(layer | SYMBOL_MASK);
-    pressAll();
-  }
+  dispatchToLayer(@onPress39_0, @onPress39_1, @onPress39_2, 0, 0);
 }
-
 func onRelease39() {
-  if (layer & SYMBOL_MASK) {
-    releaseAll();
-    setLayer(layer ^ SYMBOL_MASK);
-  } else {
-    handleRelease(SC_NONE, SK_E | KEY_STENO, SC_L_CTRL, SC_NONE, SC_NONE);
-  }
+  dispatchToLayer(@onRelease39_0, @onRelease39_1, @onRelease39_2, 0, 0);
 }
 
-func onPress40() { handlePress(SC_SPACE, SK_U | KEY_STENO, SC_NONE, SC_NONE, SC_SPACE); }
-func onRelease40() { handleRelease(SC_SPACE, SK_U | KEY_STENO, SC_NONE, SC_NONE, SC_SPACE); }
+func onPress39_0() {
+  pressStenoKey(14 /* "E" */);
+}
+func onRelease39_0() {
+  releaseStenoKey(14 /* "E" */);
+}
 
-var timer41;
+func onPress39_1() {
+  deactivateGlobal();
+  deactivate1();
+  setLayer(2, "layer_id: 148942692");
+  activateGlobal();
+  activate2();
+}
+func onRelease39_1() {
+}
+
+func onPress39_2() {
+}
+func onRelease39_2() {
+  deactivateGlobal();
+  deactivate2();
+  setLayer(1, "layer_id: 136543802");
+  activateGlobal();
+  activate1();
+  onRelease39_1();
+}
+
+func onPress40() {
+  dispatchToLayer(@onPress40_0, @onPress40_1, 0, 0, @onPress40_4);
+}
+func onRelease40() {
+  dispatchToLayer(@onRelease40_0, @onRelease40_1, 0, 0, @onRelease40_4);
+}
+
+func onPress40_0() {
+  pressStenoKey(15 /* "U" */);
+}
+func onRelease40_0() {
+  releaseStenoKey(15 /* "U" */);
+}
+
+func onPress40_1() {
+  pressScanCode(44 /* "⎵" */);
+}
+func onRelease40_1() {
+  releaseScanCode(44 /* "⎵" */);
+}
+
+func onPress40_4() {
+  pressScanCode(44 /* "⎵" */);
+}
+func onRelease40_4() {
+  releaseScanCode(44 /* "⎵" */);
+}
+
 func onPress41() {
-  handlePress(SC_NONE, SK_NUM2 | KEY_STENO, SC_NONE, SC_NONE, SC_ENTER);
-  if (layer == 0) {
-    timer41 = getTime();
-    releaseAll();
-    setLayer(layer | FUNCTION_MASK);
-    otherPressCount = 0;
-    pressAll();
-  }
-  updateStenoMode();
+  dispatchToLayer(@onPress41_0, @onPress41_1, 0, @onPress41_3, 0);
 }
 func onRelease41() {
-  handleRelease(SC_NONE, SK_NUM2 | KEY_STENO, SC_NONE, SC_NONE, SC_ENTER);
-  if (layer & FUNCTION_MASK) {
-    if (otherPressCount == 0 && getTime() - timer41 < TAP_THRESHOLD) {
-      tapScanCode(SC_ENTER);
-    }
-    releaseAll();
-    setLayer(layer ^ FUNCTION_MASK);
+  dispatchToLayer(@onRelease41_0, @onRelease41_1, 0, @onRelease41_3, 0);
+}
+
+func onPress41_0() {
+  pressStenoKey(27 /* "#2" */);
+  updateStenoMode();
+}
+func onRelease41_0() {
+  releaseStenoKey(27 /* "#2" */);
+
+}
+
+var timer41_1;
+func onPress41_1() {
+  timer41_1 = getTime();
+  deactivateGlobal();
+  deactivate1();
+  setLayer(3, "layer_id: 105007919");
+  activateGlobal();
+  activate3();
+}
+func onRelease41_1() {
+  if (getTime() - timer41_1 <= 200) {
+    pressScanCode(40 /* "↵" */);
+    releaseScanCode(40 /* "↵" */);
+
   }
 }
 
-func onPress42() { console("launch_bootloader"); }
-func onRelease42() {}
+func onPress41_3() {
+}
+func onRelease41_3() {
+  deactivateGlobal();
+  deactivate3();
+  setLayer(1, "layer_id: 136543802");
+  activateGlobal();
+  activate1();
+  onRelease41_1();
+}
+
+var timer42;
+func onPress42() {
+  timer42 = getTime();
+}
+func onRelease42() {
+  if (getTime() - timer42 <= 200) {
+    console("launch_bootloader");
+
+  }
+}
 

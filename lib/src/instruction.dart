@@ -743,10 +743,10 @@ final class FunctionStartInstruction extends ScriptInstruction {
   @override
   String toString() {
     if (function.numberOfParameters == 0 && function.numberOfLocals == 0) {
-      return '\n${function.name} (0x${offset.toRadixString(16)}):';
+      return '\n${function.functionName} (0x${offset.toRadixString(16)}):';
     } else {
       return '\n'
-          '${function.name} (0x${offset.toRadixString(16)}):'
+          '${function.functionName} (0x${offset.toRadixString(16)}):'
           '\n  enterFunction ${function.numberOfParameters} ${function.numberOfLocals - function.numberOfParameters}';
     }
   }

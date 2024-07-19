@@ -48,14 +48,14 @@ class ScriptByteCodeBuilder {
   void _createInstructionList() {
     for (final function in module.functions.values) {
       if (function is! ScriptFunction) continue;
-      if (!reachability.functions.contains(function.name)) continue;
+      if (!reachability.functions.contains(function.functionName)) continue;
 
-      if (function != module.functions[function.name]) {
+      if (function != module.functions[function.functionName]) {
         throw Exception('Internal error - inconsistent function name');
       }
       // Set up placeholder instruction.
       final functionStart = FunctionStartInstruction(function);
-      functions[function.name] = functionStart;
+      functions[function.functionName] = functionStart;
       addInstruction(functionStart);
 
       // Add function instructions

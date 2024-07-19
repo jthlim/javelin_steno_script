@@ -132,49 +132,45 @@ class JavelinScriptEditorState extends State<JavelinScriptEditor> {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        DropZone(
-          onDragEnter: () {
-            if (_borderColor == null) {
-              setState(() => _borderColor = Colors.green);
-            }
-          },
-          onDragExit: () => setState(() => _borderColor = null),
-          onDrop: (files) {
-            if (files == null) return;
-            for (final file in files) {
-              _handleDrop(file);
-            }
-          },
-          child: Scrollbar(
-            controller: _scrollController,
-            child: ScrollConfiguration(
-              behavior: HideScrollbarBehavior(),
-              child: TextField(
-                controller: _textEditingController,
-                scrollController: _scrollController,
-                autofocus: true,
-                maxLines: null,
-                expands: true,
-                style: GoogleFonts.robotoMono(),
-                decoration: InputDecoration(
-                  contentPadding: widget.padding,
-                  border: InputBorder.none,
-                ),
-                onChanged: widget.onChanged,
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        border: _borderColor == null
+            ? null
+            : Border.all(color: _borderColor!, width: 2),
+      ),
+      child: DropZone(
+        onDragEnter: () {
+          if (_borderColor == null) {
+            setState(() => _borderColor = Colors.green);
+          }
+        },
+        onDragExit: () => setState(() => _borderColor = null),
+        onDrop: (files) {
+          if (files == null) return;
+          for (final file in files) {
+            _handleDrop(file);
+          }
+        },
+        child: Scrollbar(
+          controller: _scrollController,
+          child: ScrollConfiguration(
+            behavior: HideScrollbarBehavior(),
+            child: TextField(
+              controller: _textEditingController,
+              scrollController: _scrollController,
+              autofocus: true,
+              maxLines: null,
+              expands: true,
+              style: GoogleFonts.robotoMono(),
+              decoration: InputDecoration(
+                contentPadding: widget.padding,
+                border: InputBorder.none,
               ),
+              onChanged: widget.onChanged,
             ),
           ),
         ),
-        if (_borderColor != null)
-          DecoratedBox(
-            decoration: BoxDecoration(
-              border: Border.all(color: _borderColor!, width: 2),
-            ),
-            child: const SizedBox.expand(),
-          ),
-      ],
+      ),
     );
   }
 }

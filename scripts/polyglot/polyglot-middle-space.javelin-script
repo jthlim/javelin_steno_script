@@ -537,13 +537,6 @@ func init() {
   startTimer(TIMER_ID_RGB_UPDATE, RGB_UPDATE_TIME, 1, @updateUnderglowRgb);
 }
 
-// Uncomment this function when developing to ensure callbacks and timers
-// work properly, otherwise they may call a wrong address in the script.
-//
-// func tick() {
-//   startTimer(TIMER_ID_RGB_UPDATE, RGB_UPDATE_TIME, 1, @updateUnderglowRgb);
-// }
-
 const SPEED_VALUES      = [[ 00 02 04 08 0c 10 18 20 30 ]];
 const HUE_SPREAD_VALUES = [[ 00 10 20 28 30 38 40 48 50 ]];
 const SATURATION_VALUES = [[ 00 20 40 50 60 68 70 78 80 ]];
