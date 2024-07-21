@@ -1,0 +1,3623 @@
+// Javelin constants
+const SC_NONE = 0;
+
+const SC_A = 0x04;
+const SC_B = 0x05;
+const SC_C = 0x06;
+const SC_D = 0x07;
+const SC_E = 0x08;
+const SC_F = 0x09;
+const SC_G = 0x0a;
+const SC_H = 0x0b;
+const SC_I = 0x0c;
+const SC_J = 0x0d;
+const SC_K = 0x0e;
+const SC_L = 0x0f;
+const SC_M = 0x10;
+const SC_N = 0x11;
+const SC_O = 0x12;
+const SC_P = 0x13;
+const SC_Q = 0x14;
+const SC_R = 0x15;
+const SC_S = 0x16;
+const SC_T = 0x17;
+const SC_U = 0x18;
+const SC_V = 0x19;
+const SC_W = 0x1a;
+const SC_X = 0x1b;
+const SC_Y = 0x1c;
+const SC_Z = 0x1d;
+
+const SC_1 = 0x1e;
+const SC_2 = 0x1f;
+const SC_3 = 0x20;
+const SC_4 = 0x21;
+const SC_5 = 0x22;
+const SC_6 = 0x23;
+const SC_7 = 0x24;
+const SC_8 = 0x25;
+const SC_9 = 0x26;
+const SC_0 = 0x27;
+
+const SC_ENTER = 0x28;
+const SC_ESC = 0x29;
+const SC_BACKSPACE = 0x2a;
+const SC_TAB = 0x2b;
+const SC_SPACE = 0x2c;
+const SC_MINUS = 0x2d;
+const SC_EQUAL = 0x2e;
+const SC_L_BRACKET = 0x2f;
+const SC_R_BRACKET = 0x30;
+const SC_BACKSLASH = 0x31;
+const SC_HASH_TILDE = 0x32;
+const SC_SEMICOLON = 0x33;
+const SC_APOSTROPHE = 0x34;
+const SC_GRAVE = 0x35;
+const SC_COMMA = 0x36;
+const SC_DOT = 0x37;
+const SC_SLASH = 0x38;
+const SC_CAPS = 0x39;
+
+const SC_F1 = 0x3a;
+const SC_F2 = 0x3b;
+const SC_F3 = 0x3c;
+const SC_F4 = 0x3d;
+const SC_F5 = 0x3e;
+const SC_F6 = 0x3f;
+const SC_F7 = 0x40;
+const SC_F8 = 0x41;
+const SC_F9 = 0x42;
+const SC_F10 = 0x43;
+const SC_F11 = 0x44;
+const SC_F12 = 0x45;
+
+const SC_SYS_RQ = 0x46;
+const SC_SCROLL_LOCK = 0x47;
+const SC_PAUSE = 0x48;
+const SC_INSERT = 0x49;
+const SC_HOME = 0x4a;
+const SC_PAGE_UP = 0x4b;
+const SC_DELETE = 0x4c;
+const SC_END = 0x4d;
+const SC_PAGE_DOWN = 0x4e;
+const SC_RIGHT = 0x4f;
+const SC_LEFT = 0x50;
+const SC_DOWN = 0x51;
+const SC_UP = 0x52;
+
+const SC_NUM_LOCK = 0x53;
+const SC_KP_SLASH = 0x54;
+const SC_KP_ASTERISK = 0x55;
+const SC_KP_MINUS = 0x56;
+const SC_KP_PLUS = 0x57;
+const SC_KP_ENTER = 0x58;
+const SC_KP_1 = 0x59;
+const SC_KP_2 = 0x5a;
+const SC_KP_3 = 0x5b;
+const SC_KP_4 = 0x5c;
+const SC_KP_5 = 0x5d;
+const SC_KP_6 = 0x5e;
+const SC_KP_7 = 0x5f;
+const SC_KP_8 = 0x60;
+const SC_KP_9 = 0x61;
+const SC_KP_0 = 0x62;
+const SC_KP_DOT = 0x63;
+
+const SC_BACKSLASH_PIPE = 0x64;
+const SC_COMPOSE = 0x65;
+const SC_POWER = 0x66;
+const SC_KP_EQUAL = 0x67;
+
+const SC_F13 = 0x68;
+const SC_F14 = 0x69;
+const SC_F15 = 0x6a;
+const SC_F16 = 0x6b;
+const SC_F17 = 0x6c;
+const SC_F18 = 0x6d;
+const SC_F19 = 0x6e;
+const SC_F20 = 0x6f;
+const SC_F21 = 0x70;
+const SC_F22 = 0x71;
+const SC_F23 = 0x72;
+const SC_F24 = 0x73;
+
+const SC_OPEN = 0x74;
+const SC_HELP = 0x75;
+const SC_MENU = 0x76;
+const SC_SELECT = 0x77;
+const SC_STOP = 0x78;
+const SC_AGAIN = 0x79;
+const SC_UNDO = 0x7a;
+const SC_CUT = 0x7b;
+const SC_COPY = 0x7c;
+const SC_PASTE = 0x7d;
+const SC_FIND = 0x7e;
+const SC_MUTE = 0x7f;
+const SC_VOLUME_UP = 0x80;
+const SC_VOLUME_DOWN = 0x81;
+const SC_KP_COMMA = 0x85;
+
+const SC_L_CTRL = 0xe0;
+const SC_L_SHIFT = 0xe1;
+const SC_L_ALT = 0xe2;
+const SC_L_META = 0xe3;
+const SC_R_CTRL = 0xe4;
+const SC_R_SHIFT = 0xe5;
+const SC_R_ALT = 0xe6;
+const SC_R_META = 0xe7;
+
+// From Consumer Page (0x0c)
+const SC_CONSUMER_PLAY = 0xa0;                // UsageId 0xb0
+const SC_CONSUMER_PAUSE = 0xa1;               // UsageId 0xb1
+const SC_CONSUMER_RECORD = 0xa2;              // UsageId 0xb2
+const SC_CONSUMER_FAST_FORWARD = 0xa3;        // UsageId 0xb3
+const SC_CONSUMER_REWIND = 0xa4;              // UsageId 0xb4
+const SC_CONSUMER_SCAN_NEXT_TRACK = 0xa5;     // UsageId 0xb5
+const SC_CONSUMER_SCAN_PREVIOUS_TRACK = 0xa6; // UsageId 0xb6
+const SC_CONSUMER_STOP = 0xa7;                // UsageId 0xb7
+const SC_CONSUMER_EJECT = 0xa8;               // UsageId 0xb8
+
+const SC_CONSUMER_STOP_EJECT = 0xbc;          // UsageId 0xcc
+const SC_CONSUMER_PLAY_PAUSE = 0xbd;          // UsageId 0xcd
+const SC_CONSUMER_PLAY_SKIP = 0xbe;           // UsageId 0xce
+
+const SC_CONSUMER_MUTE = 0xd2;                // UsageId 0xe2
+const SC_CONSUMER_VOLUME_UP = 0xd9;           // UsageId 0xe9
+const SC_CONSUMER_VOLUME_DOWN = 0xda;         // UsageId 0xea
+
+const SC_CONSUMER_BRIGHTNESS_UP = 0xde;       // UsageId 0x6f
+const SC_CONSUMER_BRIGHTNESS_DOWN = 0xdf;     // UsageId 0x70
+
+const LED_STATUS_NUM_LOCK = 0;
+const LED_STATUS_CAPS_LOCK = 1;
+const LED_STATUS_SCROLL_LOCK = 2;
+const LED_STATUS_COMPOSE = 3;
+const LED_STATUS_KANA = 4;
+
+const AUTO_DRAW_NONE = 0;
+const AUTO_DRAW_PAPER_TAPE = 1;
+const AUTO_DRAW_STENO_LAYOUT = 2;
+const AUTO_DRAW_WPM = 3;
+const AUTO_DRAW_STROKES = 4;
+
+const TEXT_ALIGNMENT_LEFT = 0;
+const TEXT_ALIGNMENT_MIDDLE = 1;
+const TEXT_ALIGNMENT_RIGHT = 2;
+
+const FONT_ID_NORMAL = 0;
+const FONT_ID_SMALL_DIGITS = 1;
+const FONT_ID_MEDIUM_DIGITS = 2;
+const FONT_ID_LARGE_DIGITS = 3;
+
+const CONNECTION_NONE = 0;
+const CONNECTION_BLE = 1;
+const CONNECTION_USB = 2;
+const CONNECTION_USB2 = 3;
+
+const PAIR_CONNECTION_NONE = 0;
+const PAIR_CONNECTION_BLE = 1;
+const PAIR_CONNECTION_CABLE = 2;
+
+const SCRIPT_ID_DISPLAY_OVERLAY = 0;
+const SCRIPT_ID_BATTERY_UPDATE = 1;
+const SCRIPT_ID_CONNECTION_UPDATE = 2;
+const SCRIPT_ID_PAIR_CONNECTION_UPDATE = 3;
+const SCRIPT_ID_KEYBOARD_LED_STATUS_UPDATE = 4;
+const SCRIPT_ID_BLE_ADVERTISING_UPDATE = 5;
+const SCRIPT_ID_BLE_SCANNING_UPDATE = 6;
+const SCRIPT_ID_U2F_STATUS_UPDATE = 7;
+const SCRIPT_ID_STENO_MODE_UPDATE = 9;
+const SCRIPT_ID_BLE_PAIR_COMPLETE = 10;
+
+// Layout constants
+
+const DISPLAY_WIDTH = JAVELIN_DISPLAY_WIDTH ?? 32;
+const DISPLAY_HEIGHT = JAVELIN_DISPLAY_HEIGHT ?? 128;
+const HAS_AUDIO = JAVELIN_HAS_AUDIO ?? 0;
+
+func noop() {}
+
+var speed = 1;
+var hueSpread = 4;
+var hueShift = 0;
+var brightness = 3;
+var saturation = 5;
+
+var keyColorData[42];
+
+const TIMER_ID_RGB_UPDATE = 0;
+const TIMER_ID_FUZZY_LAYER = 1;
+const TIMER_ID_SCREEN_SAVER = 2;
+const TIMER_ID_PAIRING_HOLD = 3;
+const TIMER_ID_CAPS_RELEASE = 4;
+const TIMER_ID_FUZZY_LAYER_STARTED = 5;
+const TIMER_ID_FUZZY_LAYER_PRESS_DELAY = 6;
+
+const DYNAMIC_STENO_DISPLAY_WPM = 0;
+const DYNAMIC_STENO_DISPLAY_PAPER_TAPE = 1;
+const DYNAMIC_STENO_DISPLAY_STROKES = 2;
+
+const MODIFIER_SHIFT = 2;
+
+var lastButtonIndex;
+var wordCaps;
+var isBleSummaryActive;
+var dynamicStenoDisplay;
+var lastScanCodePressed;
+var wasSteno12;
+var wasSteno24;
+var global24PressCount;
+var wasSteno36;
+
+const KEY_SHIFT = 0x100;
+
+// Defined globally since drawBleSummary() also needs it.
+const SETTINGS_IMAGE = [[
+20 20 00 00 00 00 00 c0 03 00 00 e0 07 00 00 e0
+07 00 c0 e0 07 03 e0 f3 cf 07 f0 ff ff 0f f0 ff
+ff 0f e0 ff ff 07 e0 ff ff 07 c0 ff ff 03 c0 7f
+fe 03 e0 1f f8 07 fc 0f f0 3f fe 0f f0 7f fe 07
+e0 7f fe 07 e0 7f fe 0f f0 7f fc 0f f0 3f e0 1f
+f8 07 c0 7f fe 03 c0 ff ff 03 e0 ff ff 07 e0 ff
+ff 07 f0 ff ff 0f f0 ff ff 0f e0 f3 cf 07 c0 e0
+07 03 00 e0 07 00 00 e0 07 00 00 c0 03 00 00 00
+00 00
+]];
+
+var layer;
+func setLayer(layerIndex, layerIdEvent) {
+  releaseAll();
+  layer = layerIndex;
+  sendEvent(layerIdEvent);
+}
+
+func resolveLayerIndex() var {
+  if (isWaitingForUserPresence()) {
+    return 7;
+  }
+  return layer;
+}
+
+func dispatchToLayer(layer0Func, layer1Func, layer2Func, layer3Func, layer4Func, layer5Func, layer6Func, layer7Func) {
+  var resolvedLayer = resolveLayerIndex();
+  if (resolvedLayer == 0) {
+    if (layer0Func) layer0Func();
+  } else if (resolvedLayer == 1) {
+    if (layer1Func) layer1Func();
+  } else if (resolvedLayer == 2) {
+    if (layer2Func) layer2Func();
+  } else if (resolvedLayer == 3) {
+    if (layer3Func) layer3Func();
+  } else if (resolvedLayer == 4) {
+    if (layer4Func) layer4Func();
+  } else if (resolvedLayer == 5) {
+    if (layer5Func) layer5Func();
+  } else if (resolvedLayer == 6) {
+    if (layer6Func) layer6Func();
+  } else if (resolvedLayer == 7) {
+    if (layer7Func) layer7Func();
+  }
+}
+
+func activateGlobal() {
+  if (([[00 01 01 01 01 00 01 00]][resolveLayerIndex()])) {
+    pressAll();
+  }
+  updateDisplay();
+  rgbUpdate();
+  rgbUpdateUnderglow();
+
+}
+func deactivateGlobal() {
+
+}
+func activate0() {
+  wordCaps = 0;
+  sendEvent("layer: steno");
+}
+
+func deactivate0() {
+
+}
+
+func activate1() {
+  sendEvent("layer: qwerty");
+
+}
+
+func deactivate1() {
+
+}
+
+func activate2() {
+
+}
+
+func deactivate2() {
+
+}
+
+func activate3() {
+
+}
+
+func deactivate3() {
+
+}
+
+func activate4() {
+  if (isButtonPressed(37)) {
+    onPress37();
+  }
+}
+
+func deactivate4() {
+
+}
+
+func activate5() {
+
+}
+
+func deactivate5() {
+  isBleSummaryActive = 0;
+  // This is used to ensure that all hold to pair timers
+  // do not trigger after the layer is left.
+  callAllReleaseScripts();
+
+}
+
+func activate6() {
+
+}
+
+func deactivate6() {
+
+}
+
+func activate7() {
+
+}
+
+func deactivate7() {
+
+}
+
+func activateDynamic() {
+  dispatchToLayer(@activate0, @activate1, 0, 0, @activate4, 0, 0, 0);
+}
+func deactivateDynamic() {
+  dispatchToLayer(0, 0, 0, 0, 0, @deactivate5, 0, 0);
+}
+const SPEED_VALUES      = [[ 00 04 08 0c 10 18 20 30 40 ]];
+const HUE_SPREAD_VALUES = [[ 00 10 20 28 30 38 40 48 50 ]];
+const SATURATION_VALUES = [[ 00 20 40 50 60 68 70 78 80 ]];
+const BRIGHTNESS_VALUES = [[ 00 08 10 20 40 60 80 c0 ff ]];
+
+func rgbUpdateKeyHueCycle(hShift, sat, spreadMultiplier, value) {
+  const HUE_CYCLE_RGB_ORDER = [[
+  00
+  0c 01
+  18 0d 02
+  19 0e 03
+  1a 0f 04
+  1b 10 05
+  24 1c 11
+  25 1d
+  26
+
+  27
+  28 1e
+  29 1f 12
+  20 13 06
+  21 14 07
+  22 15 08
+  23 16 09
+  17 0a
+  0b
+  ]];
+
+  for (var i = 0; i < 42; i = i + 1) {
+    setHsv(
+    HUE_CYCLE_RGB_ORDER[i],
+    spreadMultiplier*i + hShift,
+    sat,
+    value
+    );
+  }
+}
+
+func rgbUpdateUnderglowHueCycle(hShift, sat, spreadMultiplier, value) {
+  const COLOR_OFFSETS = [[
+  02 0b 0d  1d 1e 28
+  06 0f 14  16 1b 24
+  ]];
+
+  for (var i = 0; i < 12; i = i + 1) {
+    setHsv(
+    i + 42,
+    spreadMultiplier * COLOR_OFFSETS[i] + hShift,
+    sat,
+    value
+    );
+  }
+}
+
+func rgbUpdateHueCycle() {
+  var hue = animationTime() * SPEED_VALUES[speed] + hueShift;
+  rgbUpdateKeyHueCycle(
+  hue,
+  SATURATION_VALUES[saturation] * 2,
+  HUE_SPREAD_VALUES[hueSpread] * 16,
+  BRIGHTNESS_VALUES[brightness]
+  );
+  rgbUpdateUnderglowHueCycle(
+  hue,
+  SATURATION_VALUES[saturation] * 2,
+  HUE_SPREAD_VALUES[hueSpread] * 16,
+  BRIGHTNESS_VALUES[brightness]
+  );
+}
+
+func rgbUpdateKeyConstantColor(r, g, b) {
+  for (var i = 0; i < 42; i = i + 1) {
+    setRgb(i, r, g, b);
+  }
+}
+
+func rgbUpdateAllConstantColor(r, g, b) {
+  for (var i = 0; i < 54; i = i + 1) {
+    setRgb(i, r, g, b);
+  }
+}
+
+func rgbUpdateKeyRandomColors(hShift, b, s) {
+  var alwaysFullBrightness = !shouldShowKeyAnimations();
+  for (var i = 0; i < 42; i = i + 1) {
+    var v = keyColorData[i];
+    if ((v >>> 24) < 32) {
+      v = alwaysFullBrightness
+      ? (v | 0x20000000)
+      : (v + 0x1000000);
+      keyColorData[i] = v;
+    }
+    setHsv(i, hShift + v, s, b * (v >>> 24) >> 5);
+  }
+}
+
+func rgbUpdateButtonRandomColor(buttonIndex) {
+  keyColorData[buttonIndex] = rand() & 0xffff;
+
+  // If there's no update of keys in the tick loop, update it now.
+  if (!isTimerActive(TIMER_ID_RGB_UPDATE)) {
+    rgbUpdate();
+  }
+}
+
+func rgbInitRandomColors() {
+  for (var i = 0; i < 42; i = i + 1) {
+    keyColorData[i] = (rand() & 0xffff) | 0x20000000;
+  }
+}
+
+// 256 step sine table.
+const SINE_TABLE = [[ 80 83 86 89 8c 8f 92 95 98 9b 9e a2 a5 a7 aa ad b0 b3 b6 b9 bc be c1 c4 c6 c9 cb ce d0 d3 d5 d7 da dc de e0 e2 e4 e6 e8 ea eb ed ee f0 f1 f3 f4 f5 f6 f8 f9 fa fa fb fc fd fd fe fe fe ff ff ff ff ff ff ff fe fe fe fd fd fc fb fa fa f9 f8 f6 f5 f4 f3 f1 f0 ee ed eb ea e8 e6 e4 e2 e0 de dc da d7 d5 d3 d0 ce cb c9 c6 c4 c1 be bc b9 b6 b3 b0 ad aa a7 a5 a2 9e 9b 98 95 92 8f 8c 89 86 83 80 7c 79 76 73 70 6d 6a 67 64 61 5d 5a 58 55 52 4f 4c 49 46 43 41 3e 3b 39 36 34 31 2f 2c 2a 28 25 23 21 1f 1d 1b 19 17 15 14 12 11 0f 0e 0c 0b 0a 09 07 06 05 05 04 03 02 02 01 01 01 00 00 00 00 00 00 00 01 01 01 02 02 03 04 05 05 06 07 09 0a 0b 0c 0e 0f 11 12 14 15 17 19 1b 1d 1f 21 23 25 28 2a 2c 2f 31 34 36 39 3b 3e 41 43 46 49 4c 4f 52 55 58 5a 5d 61 64 67 6a 6d 70 73 76 79 7c ]];
+
+func rgbUpdateKeyBreatheCycle() {
+  // Sine wave between 4-20 brightness, with staggering of r, g, b values
+  // to reduce harsh steps.
+  var w = (0xc00 + (SINE_TABLE[(animationTime() >> 5) & 0xff] - 0x80) * (2 * 8));
+  rgbUpdateAllConstantColor((w + 0x53) >> 8, w >> 8, (w + 0xa6) >> 8);
+}
+
+const DISCONNECTED_KEY_ORDER = [[ 00 01 02 03 04 05 04 03 02 01 ]];
+func rgbUpdateKeyConnectingCycle() {
+  for (var i = 0; i < 54; i = i + 1) {
+    setRgb(i, 0, 0, 0);
+  }
+
+  var index = getTime() >> 6;
+  var keyId = DISCONNECTED_KEY_ORDER[index % 10];
+  setHsv(keyId, index << 10, 0xf0, 16);
+}
+
+func shouldShowKeyAnimations() var {
+  var activePairConnection = getActivePairConnection();
+  if (activePairConnection == PAIR_CONNECTION_NONE) {
+    // To avoid flicker at startup while connecting to BLE
+    // do not show button animations when disconnected.
+    return 0;
+  }
+
+  if (activePairConnection == PAIR_CONNECTION_BLE) {
+    // To avoid power drain over BLE, only show animations if
+    // both sides are powered.
+    return isMainPowered() && isPairPowered();
+  }
+
+  return isMainPowered() || isPairPowered();
+}
+
+func animationTime() var {
+  return shouldShowKeyAnimations() ? getTime() : 0;
+}
+
+func rgbUpdateRandomColors() {
+  rgbUpdateKeyRandomColors(
+  animationTime() * SPEED_VALUES[speed] + hueShift,
+  BRIGHTNESS_VALUES[brightness],
+  SATURATION_VALUES[saturation] * 2,
+  );
+}
+
+func rgbUpdate() {
+  if (isBleAdvertising()) {
+    rgbUpdateKeyConnectingCycle();
+  } else if (isHostSleeping()) {
+    rgbUpdateKeyBreatheCycle();
+    setUnderglowRgb(8, 8, 8);
+  } else {
+    dispatchToLayer(@rgbUpdateHueCycle, @rgbUpdateRandomColors, @rgbUpdateRandomColors, @rgbUpdateRandomColors, @rgbUpdateRandomColors, @rgbUpdateRandomColors, @rgbUpdateRandomColors, @rgbUpdateKeyU2fAlertCycle);
+  }
+}
+
+func setKeyRgb(r, g, b) {
+  r = r * brightness >> 3;
+  g = g * brightness >> 3;
+  b = b * brightness >> 3;
+  for(var i = 0; i < 42; i = i + 1) {
+    setRgb(i, r, g, b);
+  }
+}
+
+func setUnderglowRgb(r, g, b) {
+  r = r * brightness >> 3;
+  g = g * brightness >> 3;
+  b = b * brightness >> 3;
+  for(var i = 42; i < 54; i = i + 1) {
+    setRgb(i, r, g, b);
+  }
+}
+
+func rgbUpdateUnderglow() {
+  if (isWaitingForUserPresence() || isBleAdvertising()) {
+    setUnderglowRgb(0, 0, 0);
+    return;
+  }
+  if (isHostSleeping()) {
+    setUnderglowRgb(8, 8, 8);
+    return;
+  }
+
+  dispatchToLayer(@noop, @rgbUpdateUnderglowWhite, @rgbUpdateUnderglowWhite, @rgbUpdateUnderglowWhite, @rgbUpdateUnderglowWhite, @rgbUpdateUnderglowWhite, @rgbUpdateUnderglowWhite, @rgbUpdateUnderglowWhite);
+}
+
+func rgbUpdateUnderglowWhite() {
+  setUnderglowRgb(128, 128, 128);
+}
+
+func rgbButtonPressRandomColor() {
+  keyColorData[lastButtonIndex] = rand() & 0xffff;
+
+  // If there's no update of keys in the tick loop, update it now.
+  if (!isTimerActive(TIMER_ID_RGB_UPDATE)) {
+    rgbUpdate();
+  }
+}
+
+func rgbUpdateRed() {
+  setKeyRgb(255, 0, 0);
+}
+
+func rgbUpdateUnderglowRed() {
+  setUnderglowRgb(255, 0, 0);
+}
+
+func rgbUpdateGreen() {
+  setKeyRgb(0, 255, 0);
+}
+
+func rgbUpdateUnderglowGreen() {
+  setUnderglowRgb(0, 255, 0);
+}
+
+func rgbUpdateBlue() {
+  setKeyRgb(0, 0, 255);
+}
+
+func rgbUpdateUnderglowBlue() {
+  setUnderglowRgb(0, 0, 255);
+}
+
+func updateBoardPower() {
+  const RGB_UPDATE_TIME = 10;
+  const BLE_UPDATE_TIME = 50;
+
+  if (isWaitingForUserPresence()) {
+    startTimer(TIMER_ID_RGB_UPDATE, 32, 1, @rgbUpdate);
+    setBoardPower(1);
+  } else if (isBleAdvertising()) {
+    startTimer(TIMER_ID_RGB_UPDATE, 32, 1, @rgbUpdate);
+    setBoardPower(1);
+  } else if (brightness == 0) {
+    stopTimer(TIMER_ID_RGB_UPDATE);
+    setBoardPower(getActivePairConnection() == PAIR_CONNECTION_CABLE);
+  } else if (getActivePairConnection() == PAIR_CONNECTION_BLE) {
+    if (isPairPowered() && isMainPowered()) {
+      startTimer(TIMER_ID_RGB_UPDATE, BLE_UPDATE_TIME, 1, @rgbUpdate);
+    } else {
+      stopTimer(TIMER_ID_RGB_UPDATE);
+    }
+    setBoardPower(isMainPowered());
+  } else {
+    // No pair, or cable pair.
+    if (isPairPowered() || isMainPowered()) {
+      startTimer(TIMER_ID_RGB_UPDATE, RGB_UPDATE_TIME, 1, @rgbUpdate);
+      setBoardPower(1);
+    } else {
+      stopTimer(TIMER_ID_RGB_UPDATE);
+      setBoardPower(0);
+    }
+  }
+  rgbUpdate();
+  rgbUpdateUnderglow();
+}
+
+func updateDisplay() {
+  dispatchToLayer(@drawDisplayDynamicSteno, @drawDisplayAbc, @drawDisplaySymbol, @drawDisplayFunction, @drawDisplayNavigation, @drawBleSummary, @drawDisplayNumpad, @drawDisplaySecurityKey);
+}
+
+func blankDisplay() {
+  clearDisplay(0);
+  clearDisplay(1);
+  setAutoDraw(0, AUTO_DRAW_NONE);
+  setAutoDraw(1, AUTO_DRAW_NONE);
+}
+
+func drawPaperTape() {
+  setAutoDraw(0, AUTO_DRAW_PAPER_TAPE);
+  setAutoDraw(1, AUTO_DRAW_PAPER_TAPE);
+}
+
+func drawStrokes() {
+  setAutoDraw(0, AUTO_DRAW_STROKES);
+  setAutoDraw(1, AUTO_DRAW_WPM);
+}
+
+func drawDisplay0(layerImage) {
+  const ICON_POSITIONS = [[
+  08 00 00 00 00 00 00 00
+  00 00 10 00 00 00 00 00
+  00 00 10 00 08 12 00 00
+  00 00 10 00 00 12 10 12
+  ]];
+
+  const SHIFT_IMAGE = [[
+  10 10
+  00 01 80 01 c0 01 e0 01 f0 7f f8 7f fc 7f fe 7f
+  fe 7f fc 7f f8 7f f0 7f e0 01 c0 01 80 01 00 01
+  ]];
+
+  const CONTROL_IMAGE = [[
+  10 10
+  00 00 00 00 40 00 60 00 30 00 18 00 0c 00 06 00
+  06 00 0c 00 18 00 30 00 60 00 40 00 00 00 00 00
+  ]];
+
+  const ALT_IMAGE = [[
+  10 10
+  00 00 00 30 00 30 00 30 00 30 00 38 00 1e 80 07
+  e0 01 78 30 1c 30 0c 30 0c 30 0c 30 0c 30 00 00
+  ]];
+
+  const COMMAND_IMAGE = [[
+  10 10
+  00 00 3c 3c 7e 7e 66 66 66 66 fe 7f fc 3f 60 06
+  60 06 fc 3f fe 7f 66 66 66 66 7e 7e 3c 3c 00 00
+  ]];
+
+  const CAPS_LOCK_IMAGE = [[
+  10 10
+  00 01 80 01 c0 01 e0 01 f0 67 f8 67 fc 67 fe 67
+  fe 67 fc 67 f8 67 f0 67 e0 01 c0 01 80 01 00 01
+  ]];
+
+  setAutoDraw(0, AUTO_DRAW_NONE);
+  isBleSummaryActive = 0;
+
+  clearDisplay(0);
+  drawImage(0, (DISPLAY_WIDTH - layerImage[0]) >> 1, DISPLAY_HEIGHT/2 - 48, layerImage);
+
+  var iconCount = (isScanCodePressed(SC_L_SHIFT) || isScanCodePressed(SC_R_SHIFT))
+  + (isScanCodePressed(SC_L_CTRL) || isScanCodePressed(SC_R_CTRL))
+  + (isScanCodePressed(SC_L_ALT) || isScanCodePressed(SC_R_ALT))
+  + (isScanCodePressed(SC_L_META) || isScanCodePressed(SC_R_META));
+  var positions = ICON_POSITIONS + 8 * (iconCount - 1);
+  var xOffset = DISPLAY_WIDTH/2 - 16;
+  var yOffset = DISPLAY_HEIGHT/2;
+
+  if (isScanCodePressed(SC_L_SHIFT) || isScanCodePressed(SC_R_SHIFT)) {
+    drawImage(0, xOffset+positions[0], yOffset+positions[1], SHIFT_IMAGE);
+    positions = positions + 2;
+  }
+  if (isScanCodePressed(SC_L_CTRL) || isScanCodePressed(SC_R_CTRL)) {
+    drawImage(0, xOffset+positions[0], yOffset+positions[1], CONTROL_IMAGE);
+    positions = positions + 2;
+  }
+  if (isScanCodePressed(SC_L_ALT) || isScanCodePressed(SC_R_ALT)) {
+    drawImage(0, xOffset+positions[0], yOffset+positions[1], ALT_IMAGE);
+    positions = positions + 2;
+  }
+  if (isScanCodePressed(SC_L_META) || isScanCodePressed(SC_R_META)) {
+    drawImage(0, xOffset+positions[0], yOffset+positions[1], COMMAND_IMAGE);
+  }
+
+  if (getLedStatus(LED_STATUS_CAPS_LOCK)) {
+    drawImage(0, DISPLAY_WIDTH/2 - 8, DISPLAY_HEIGHT/2 + 48, CAPS_LOCK_IMAGE);
+  } else if (wordCaps) {
+    drawImage(0, DISPLAY_WIDTH/2 - 8, DISPLAY_HEIGHT/2 + 48, SHIFT_IMAGE);
+  }
+}
+
+func drawDisplaySteno() {
+  const STENO_IMAGE = [[
+  20 20 ff ff 3f 00 ff ff ff 00 ff ff ff 03 ff ff
+  ff 07 ff ff ff 0f ff ff ff 1f ff f9 f3 3f ff f0
+  e1 3f ff f0 e1 7f ff e1 f0 7f ff e3 f8 ff ff 47
+  fc ff ff 07 fc ff ff 0f fe ff 0f 00 00 fe 0f 00
+  00 fe 0f 00 00 fe ff 0f fe ff ff 07 fc ff ff 47
+  fc ff ff e3 f8 ff ff e1 f0 7f ff f0 e1 7f ff f0
+  e1 3f ff f9 f3 3f ff ff ff 1f ff ff ff 0f ff ff
+  ff 07 ff ff ff 03 ff ff ff 00 ff ff 3f 00 00 00
+  00 00
+  ]];
+
+  drawDisplay0(STENO_IMAGE);
+  setAutoDraw(1, AUTO_DRAW_WPM);
+
+  var mode = getParameter("steno_mode");
+  var text = "";
+  if (mode == "gemini")  {
+    text = "Gemini";
+  } else if(mode == "tx_bolt") {
+    text = "TX Bolt";
+  } else if(mode == "procat") {
+    text = "ProCAT";
+  } else if(mode == "plover_hid") {
+    text = "Plover HID";
+  }
+  drawText(0, DISPLAY_WIDTH/2, DISPLAY_HEIGHT - 48 + 10, FONT_ID_NORMAL, TEXT_ALIGNMENT_MIDDLE, text);
+}
+
+func drawDisplayAbc() {
+  const ABC_IMAGE = [[
+  20 20 00 00 00 00 00 00 08 00 00 00 0c 00 00 00
+  0f 00 00 c0 0f 00 00 f0 09 00 00 bc 00 00 80 8f
+  00 00 80 bf 00 00 00 fc 08 00 00 f0 0f 00 00 c0
+  0f 00 00 00 0e 00 00 00 08 00 80 00 08 00 80 ff
+  0f 00 80 ff 0f 00 00 30 0c 00 00 10 08 00 00 30
+  0c 00 00 f0 0f 00 00 e0 07 00 00 00 00 00 00 e0
+  07 00 00 f0 0f 00 00 30 0c 00 00 10 08 00 00 30
+  0c 00 00 70 0e 00 00 60 06 00 00 00 00 00 00 00
+  00 00
+  ]];
+
+  drawDisplay0(ABC_IMAGE);
+  setAutoDraw(1, AUTO_DRAW_WPM);
+}
+
+func drawDisplayFunction() {
+  const FUNCTION_IMAGE = [[
+  20 20
+  f0 ff ff 0f f8 ff ff 1f 0c 00 00 30 06 00 00 60
+  03 00 00 c0 03 00 06 c0 03 00 06 c0 03 c0 ff c7
+  03 e0 ff c7 03 60 06 c0 03 60 06 c0 03 00 00 c0
+  03 00 fe c7 03 00 fe c7 03 00 0c c0 03 00 06 c0
+  03 00 0e c0 03 00 fc c7 03 00 f8 c7 03 00 00 c0
+  03 00 00 c0 03 00 00 c0 03 00 00 c0 03 00 00 c0
+  03 00 00 c0 03 00 00 c0 03 00 00 c0 03 00 00 c0
+  06 00 00 60 0c 00 00 30 f8 ff ff 1f f0 ff ff 0f
+  ]];
+
+  drawDisplay0(FUNCTION_IMAGE);
+  setAutoDraw(1, AUTO_DRAW_WPM);
+}
+
+func drawDisplaySymbol() {
+  const SYMBOL_IMAGE = [[
+  20 20 00 00 00 00 00 00 00 00 18 00 00 00 18 00
+  00 00 1c 00 00 00 fe 3f ff 1b fe 3f ff 1b fe 3f
+  ff 1b 00 00 00 00 00 00 fc 0f 00 00 fe 1f 1c 38
+  ff 3f 1e 3c 07 38 1e 3e f3 33 06 3f f3 37 86 37
+  f3 37 c6 33 07 36 fe 31 ff 3b fe 30 fe 3b 3c 30
+  fc 19 00 00 00 00 1c 0c 00 03 1e 1c 18 3f 1e 3c
+  f8 3f c6 38 ff 3f c6 30 ff 03 e6 30 1f 3f fe 39
+  f8 3f fe 3f ff 3f bc 1f ff 03 00 0e 1f 03 00 00
+  18 00
+  ]];
+
+  drawDisplay0(SYMBOL_IMAGE);
+  setAutoDraw(1, AUTO_DRAW_WPM);
+}
+
+func drawDisplayNavigation() {
+  const NAVIGATION_IMAGE = [[
+  20 20 00 00 00 00 00 80 01 00 00 c0 03 00 00 e0
+  07 00 00 f0 0f 00 00 f8 1f 00 00 fc 3f 00 00 e0
+  07 00 00 e0 07 00 00 e0 07 00 40 e0 07 02 60 e0
+  07 06 70 00 00 0e f8 0f f0 1f fc 0f f0 3f fe 0f
+  f0 7f fe 0f f0 7f fc 0f f0 3f f8 0f f0 1f 70 00
+  00 0e 60 e0 07 06 40 e0 07 02 00 e0 07 00 00 e0
+  07 00 00 e0 07 00 00 fc 3f 00 00 f8 1f 00 00 f0
+  0f 00 00 e0 07 00 00 c0 03 00 00 80 01 00 00 00
+  00 00
+  ]];
+
+  drawDisplay0(NAVIGATION_IMAGE);
+  setAutoDraw(1, AUTO_DRAW_WPM);
+}
+
+func drawDisplaySettings() {
+  drawDisplay0(SETTINGS_IMAGE);
+  setAutoDraw(1, AUTO_DRAW_WPM);
+}
+
+func drawDisplayNumpad() {
+  const NUMPAD_IMAGE = [[
+  20 20 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  00 00 00 00 00 00 00 00 00 00 7e 7e 7e 7e 7e 7e
+  7e 7e 7e 7e 7e 7e 7e 7e 7e 7e 7e 7e 7e 7e 7e 7e
+  7e 7e 00 00 00 7e 00 00 00 7e 7e 7e 7e 7e 7e 7e
+  7e 7e 7e 7e 7e 7e 7e 7e 7e 7e 7e 7e 7e 7e 7e 7e
+  7e 7e 00 00 00 00 00 00 00 00 7e 7e 7e 7e 7e 7e
+  7e 7e 7e 7e 7e 7e 7e 7e 7e 7e 7e 7e 7e 7e 7e 7e
+  7e 7e 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  00 00
+  ]];
+
+  drawDisplay0(NUMPAD_IMAGE);
+  setAutoDraw(1, AUTO_DRAW_WPM);
+}
+
+func drawDisplaySecurityKey() {
+  const SECURITY_KEY_IMAGE = [[
+  20 20 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  00 00 00 00 00 00 00 00 00 00 c0 ff ff 00 e0 ff
+  ff 01 60 00 80 03 70 00 00 07 30 00 00 06 38 00
+  00 0c 18 00 18 1c 18 00 7e 18 0c 00 66 38 0c ff
+  c3 30 0c ff c3 30 0c 1b 66 38 18 1b 7e 18 18 01
+  18 1c 38 00 00 0c 30 00 00 06 70 00 00 07 60 00
+  80 03 e0 ff ff 01 c0 ff ff 00 00 00 00 00 00 00
+  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  00 00
+  ]];
+
+  drawDisplay0(SECURITY_KEY_IMAGE);
+  setAutoDraw(1, AUTO_DRAW_WPM);
+}
+
+func drawDisplayDynamicSteno() {
+  if (dynamicStenoDisplay == 0) {
+    drawDisplaySteno();
+  } else if (dynamicStenoDisplay == 1) {
+    drawPaperTape();
+  } else if (dynamicStenoDisplay == 2) {
+    drawStrokes();
+  }
+}
+
+func drawDisplayOverlay() {
+  const OVERLAY_HEIGHT = 16;
+
+  const PAIR_CONNECTED_STATUS_IMAGE_OFFSETS = [[ 00 02 1c ]];
+  const PAIR_CONNECTED_STATUS_IMAGES = [[
+  // None
+  00 00
+
+  // BLE
+  0c 0c 00 00 98 00 98 01 98 03 98 07 98 01 98 01
+  9e 01 9c 01 98 01 90 01 00 00
+
+  // Cable
+  0c 0c 00 00 60 00 f0 00 f8 01 fc 03 f0 00 f0 00
+  fc 03 f8 01 f0 00 60 00 00 00
+  ]];
+
+  const USB_STATUS_IMAGE = [[
+  09 0c 30 00 78 00 b0 00 06 0d ff 0f 86 0c 58 00
+  3c 00 18 00
+  ]];
+
+  const BLUETOOTH_STATUS_IMAGE = [[
+  06 0c 08 01 90 00 ff 0f 62 04 94 02 08 01
+  ]];
+
+  const BATTERY_LEVEL_STATUS_IMAGES = [[
+  // battery0
+  0c 0c f8 01 08 01 08 01 08 01 08 01 08 01 08 01
+  08 01 08 01 08 01 f8 01 f0 00
+
+  // battery1
+  0c 0c f8 01 f8 01 08 01 08 01 08 01 08 01 08 01
+  08 01 08 01 08 01 f8 01 f0 00
+
+  // battery2
+  0c 0c f8 01 f8 01 f8 01 08 01 08 01 08 01 08 01
+  08 01 08 01 08 01 f8 01 f0 00
+
+  // battery3
+  0c 0c f8 01 f8 01 f8 01 f8 01 08 01 08 01 08 01
+  08 01 08 01 08 01 f8 01 f0 00
+
+  // battery4
+  0c 0c f8 01 f8 01 f8 01 f8 01 f8 01 08 01 08 01
+  08 01 08 01 08 01 f8 01 f0 00
+
+  // battery5
+  0c 0c f8 01 f8 01 f8 01 f8 01 f8 01 f8 01 08 01
+  08 01 08 01 08 01 f8 01 f0 00
+
+  // battery6
+  0c 0c f8 01 f8 01 f8 01 f8 01 f8 01 f8 01 f8 01
+  08 01 08 01 08 01 f8 01 f0 00
+
+  // battery7
+  0c 0c f8 01 f8 01 f8 01 f8 01 f8 01 f8 01 f8 01
+  f8 01 08 01 08 01 f8 01 f0 00
+
+  // battery8
+  0c 0c f8 01 f8 01 f8 01 f8 01 f8 01 f8 01 f8 01
+  f8 01 f8 01 08 01 f8 01 f0 00
+
+  // battery9
+  0c 0c f8 01 f8 01 f8 01 f8 01 f8 01 f8 01 f8 01
+  f8 01 f8 01 f8 01 f8 01 f0 00
+  ]];
+
+  const CHARGING_STATUS_IMAGE = [[
+  0c 0c f8 01 08 01 08 01 68 01 70 04 78 03 ec 01
+  e2 00 68 01 08 01 f8 01 f0 00
+  ]];
+
+  const BLE_PROFILE_DOTS = [[
+  02 10 c0 00 c0 00
+  02 10 b0 01 b0 01
+  02 10 d8 06 d8 06
+  02 10 b6 0d b6 0d
+  ]];
+
+  // Clear the region.
+  setDrawColor(0, 0);
+  drawRect(0, 0, 0, DISPLAY_WIDTH, OVERLAY_HEIGHT);
+  setDrawColor(0, 1);
+
+  drawImage(
+  0,
+  2, 2,
+  PAIR_CONNECTED_STATUS_IMAGES
+  + PAIR_CONNECTED_STATUS_IMAGE_OFFSETS[getActivePairConnection()]
+  );
+
+  var x = 15;
+  var activeConnection = getActiveConnection();
+  var activeConnectionCount = 0;
+  var activeConnectionPosition;
+  var activeConnectionUnderlineLength;
+  if (isConnected(CONNECTION_USB)) {
+    drawImage(0, x, 1, USB_STATUS_IMAGE);
+    if (activeConnection == CONNECTION_USB) {
+      activeConnectionPosition = x;
+      activeConnectionUnderlineLength = 9;
+    }
+    activeConnectionCount = activeConnectionCount + 1;
+    x = x + 11;
+  }
+  if (isConnected(CONNECTION_BLE)) {
+    drawImage(0, x+2, 1, BLUETOOTH_STATUS_IMAGE);
+    if (activeConnection == CONNECTION_BLE) {
+      activeConnectionPosition = x;
+      activeConnectionUnderlineLength = 13;
+    }
+
+    drawImage(0, x+9, 0, BLE_PROFILE_DOTS + 6*getBleProfile());
+
+    activeConnectionCount = activeConnectionCount + 1;
+    x = x + 15;
+  }
+  if (isConnected(CONNECTION_USB2)) {
+    drawImage(0, x, 1, USB_STATUS_IMAGE);
+    if (activeConnection == CONNECTION_USB2) {
+      activeConnectionPosition = x;
+      activeConnectionUnderlineLength = 9;
+    }
+    activeConnectionCount = activeConnectionCount + 1;
+    // x = x + 11;
+  }
+
+  if (activeConnectionCount > 1) {
+    drawRect(0,
+    activeConnectionPosition,
+    14,
+    activeConnectionPosition+activeConnectionUnderlineLength,
+    16);
+  }
+
+  if (isMainPowered()) {
+    if (isCharging()) {
+      drawImage(0, DISPLAY_WIDTH-14, 0, CHARGING_STATUS_IMAGE);
+    }
+  } else {
+    // Map 0-100 -> 0-9.
+    // (value * 9 + 50) / 100
+    var batteryIndex = (getBatteryPercentage() * 9 + 50) / 100;
+    drawImage(0, DISPLAY_WIDTH-14, 0, BATTERY_LEVEL_STATUS_IMAGES + batteryIndex * 26);
+  }
+}
+
+func redrawDisplayOverlay() {
+  // Mark the screen dirty
+  drawRect(0, 0, 0, 0, 0);
+}
+
+func onConnectionUpdate() {
+  if (isBleSummaryActive) {
+    drawBleSummary();
+  }
+  redrawDisplayOverlay();
+  updateBoardPower();
+}
+
+const LAYER_PRESS_TO_KEY_PRESS_THRESHOLD = 100;
+const KEY_PRESS_TO_LAYER_RELEASE_THRESHOLD = 50;
+
+var deferredButtonIndex;
+
+func isModifierKey(key) var {
+  return SC_L_CTRL <= key && key <= SC_R_META;
+}
+
+func isWordCapsKey(key) var {
+  return SC_A <= key && key <= SC_Z;
+}
+
+func isWordCapsContinuingKey(key, modifiers) var {
+  if (key == SC_BACKSPACE) return 1;
+  if (SC_1 <= key && key <= SC_0) return 1;
+  if (key == SC_MINUS && (modifiers & 0x22)) {
+    return 1;
+  }
+  key = key | 4;
+  if (key == SC_R_SHIFT || key == SC_R_ALT) return 1;
+  return 0;
+}
+
+var wordPressActivatedShift = 0;
+var lastPressScanCode = 0;
+var lastPressModifiers = 0;
+
+func pressScanCodeButton(buttonIndex, modifiers, scanCode, isModifier) {
+  if (isInPressAll()) {
+    if(isModifier) return;
+    if(!isModifierKey(scanCode) || (wasSteno24 && scanCode == SC_L_SHIFT)) {
+      return;
+    }
+  }
+
+  // When rapidly pressing a pair of keys, where the first includes shift,
+  // and the second one doesn't, the second can easily end up with the shift
+  // version unintentionally. This is especially evident with symbols, so
+  // release it here if the last key has shift, but the new key doesn't.
+  if (isScanCodePressed(lastPressScanCode) && !isModifierKey(scanCode)) {
+    if ((lastPressModifiers & MODIFIER_SHIFT) && (modifiers & MODIFIER_SHIFT) == 0) {
+      // Makes it possible to tap "+=" quickly.
+      releaseScanCode(lastPressScanCode);
+      releaseScanCode(SC_L_SHIFT);
+    }
+  }
+
+  if (isTimerActive(TIMER_ID_FUZZY_LAYER_STARTED)) {
+    stopTimer(TIMER_ID_FUZZY_LAYER_STARTED);
+    deferredButtonIndex = buttonIndex;
+    startTimer(TIMER_ID_FUZZY_LAYER_PRESS_DELAY, KEY_PRESS_TO_LAYER_RELEASE_THRESHOLD, 0, @{
+      callPress(deferredButtonIndex);
+    });
+    return;
+  } else if (isTimerActive(TIMER_ID_FUZZY_LAYER_PRESS_DELAY)) {
+    if (buttonIndex == deferredButtonIndex) return;
+    stopTimer(TIMER_ID_FUZZY_LAYER_PRESS_DELAY);
+    callPress(deferredButtonIndex);
+  }
+
+  var displayNeedsUpdate = 0;
+  if (wordCaps) {
+    if (isWordCapsKey(scanCode)) {
+      if (!isScanCodePressed(SC_L_SHIFT)) {
+        pressScanCode(SC_L_SHIFT);
+        wordPressActivatedShift = 1;
+      }
+    } else if(!isWordCapsContinuingKey(scanCode, modifiers)) {
+      wordCaps = 0;
+      displayNeedsUpdate = 1;
+    }
+  }
+
+  pressScanCode(scanCode);
+
+  if (!isModifier) {
+    lastPressScanCode = scanCode;
+    lastPressModifiers = modifiers;
+    lastScanCodePressed = scanCode | ((modifiers & MODIFIER_SHIFT) ? KEY_SHIFT : 0);
+  }
+
+  if (displayNeedsUpdate || isModifierKey(scanCode)) {
+    updateDisplay();
+  }
+}
+
+func releaseScanCodeButton(scanCode) {
+  if (isTimerActive(TIMER_ID_FUZZY_LAYER_PRESS_DELAY)) {
+    stopTimer(TIMER_ID_FUZZY_LAYER_PRESS_DELAY);
+    callPress(deferredButtonIndex);
+  }
+  releaseScanCode(scanCode);
+
+  if (wordCaps) {
+    if (wordPressActivatedShift && isWordCapsKey(scanCode)) {
+      releaseScanCode(SC_L_SHIFT);
+      wordPressActivatedShift = 0;
+    }
+  }
+
+  if (isModifierKey(scanCode)) {
+    updateDisplay();
+  }
+}
+
+func pressStenoKeyButton(scanCode) {
+  if (isInPressAll()) return;
+  pressStenoKey(scanCode);
+}
+
+func globalPress(buttonIndex) {
+  lastButtonIndex = buttonIndex;
+  updateScreenSaverTimer();
+  dispatchToLayer(@noop, @rgbButtonPressRandomColor, @rgbButtonPressRandomColor, @rgbButtonPressRandomColor, @rgbButtonPressRandomColor, @rgbButtonPressRandomColor, @rgbButtonPressRandomColor, @noop);
+}
+
+func globalRelease() {
+  updateScreenSaverTimer();
+}
+
+func startFuzzyLayer() {
+  startTimer(TIMER_ID_FUZZY_LAYER_STARTED, LAYER_PRESS_TO_KEY_PRESS_THRESHOLD, 0, @{});
+}
+
+var doFuzzyLayerAction;
+func stopFuzzyLayerPreSetLayer() {
+  stopTimer(TIMER_ID_FUZZY_LAYER_STARTED);
+  if (isTimerActive(TIMER_ID_FUZZY_LAYER_PRESS_DELAY)) {
+    stopTimer(TIMER_ID_FUZZY_LAYER_PRESS_DELAY);
+    doFuzzyLayerAction = 1;
+  }
+}
+
+func stopFuzzyLayerPostSetLayer() {
+  if (!doFuzzyLayerAction) return;
+  doFuzzyLayerAction = 0;
+  callPress(deferredButtonIndex);
+}
+
+const SCREEN_SAVER_TIMEOUT = 900000; // 15 minutes.
+
+func shouldUseScreenSaver() var {
+  if (getActivePairConnection() == PAIR_CONNECTION_BLE) {
+    return isPairPowered() && isMainPowered();
+  } else {
+    // No pair, or cable pair.
+    return isPairPowered() || isMainPowered();
+  }
+}
+
+var isShowingScreenSaver = 0;
+var screenSaverStartTime;
+var screenSaverPosition[8];
+var screenSaverVelocity[8];
+func startScreenSaver() {
+  if (!shouldUseScreenSaver()) return;
+
+  setAutoDraw(0, AUTO_DRAW_NONE);
+  setAutoDraw(1, AUTO_DRAW_NONE);
+
+  isShowingScreenSaver = 1;
+  screenSaverStartTime = getTime();
+  for (var i = 0; i < 8; i = i + 2) {
+    screenSaverPosition[i] = rand();
+    screenSaverPosition[i + 1] = rand();
+  }
+  for (var i = 0; i < 8; i = i + 1) {
+    var velocity = (rand() & 0x1ff) - 256;
+    velocity = velocity + (velocity < 0 ? -32 : 32);
+    screenSaverVelocity[i] = velocity;
+  }
+  drawScreenSaver();
+  startTimer(TIMER_ID_SCREEN_SAVER, 50, 1, @drawScreenSaver);
+}
+
+func wrap(x, max) var {
+  x = x % (2 * max);
+  if (x < 0) x = -x;
+  return x < max ? x : 2 * max - x;
+}
+
+func drawScreenSaver() {
+  const OVERLAY_HEIGHT = 16;
+
+  var timeElapsed = getTime() - screenSaverStartTime;
+
+  for (var display = 0; display < 2; display = display + 1) {
+    var index = 4 * display;
+    clearDisplay(display);
+
+    for (var i = 0; i < 5; i = i + 1) {
+      var effectiveTime = timeElapsed + i * 100;
+      drawLine(
+      display,
+      wrap(screenSaverPosition[index    ] + (effectiveTime * screenSaverVelocity[index    ] >> 13), DISPLAY_WIDTH),
+      wrap(screenSaverPosition[index + 1] + (effectiveTime * screenSaverVelocity[index + 1] >> 13), DISPLAY_HEIGHT - OVERLAY_HEIGHT) + OVERLAY_HEIGHT,
+      wrap(screenSaverPosition[index + 2] + (effectiveTime * screenSaverVelocity[index + 2] >> 13), DISPLAY_WIDTH),
+      wrap(screenSaverPosition[index + 3] + (effectiveTime * screenSaverVelocity[index + 3] >> 13), DISPLAY_HEIGHT - OVERLAY_HEIGHT) + OVERLAY_HEIGHT,
+      );
+    }
+  }
+}
+
+func updateScreenSaverTimer() {
+  if (isShowingScreenSaver) {
+    isShowingScreenSaver = 0;
+    updateDisplay();
+  }
+  startTimer(TIMER_ID_SCREEN_SAVER, SCREEN_SAVER_TIMEOUT, 1, @startScreenSaver);
+}
+
+var magicKey;
+
+func pressMagicKey(buttonIndex) {
+  magicKey = SC_NONE;
+  if (lastScanCodePressed == SC_MINUS
+  || lastScanCodePressed == SC_EQUAL) {
+    magicKey = SC_DOT | KEY_SHIFT;
+  } else if (lastScanCodePressed == (SC_9 | KEY_SHIFT)
+  || lastScanCodePressed == SC_BACKSLASH
+  || lastScanCodePressed == (SC_APOSTROPHE | KEY_SHIFT)) {
+    magicKey = SC_APOSTROPHE | KEY_SHIFT;
+  } else if (SC_1 <= lastScanCodePressed && lastScanCodePressed <= SC_0) {
+    magicKey = SC_COMMA;
+  } else if (SC_KP_1 <= lastScanCodePressed && lastScanCodePressed <= SC_KP_0) {
+    magicKey = SC_COMMA;
+  } else if ((lastScanCodePressed | KEY_SHIFT) == (SC_L_BRACKET | KEY_SHIFT)) {
+    magicKey = SC_ENTER;
+  } else if (lastScanCodePressed == SC_COMMA
+  || lastScanCodePressed == SC_DOT
+  || lastScanCodePressed == SC_KP_DOT) {
+    magicKey = SC_SPACE;
+  }
+
+  if (magicKey & KEY_SHIFT) {
+    pressScanCodeButton(buttonIndex, 0, SC_L_SHIFT, 1);
+  }
+  pressScanCodeButton(buttonIndex, (magicKey & KEY_SHIFT) ? MODIFIER_SHIFT : 0, magicKey & (KEY_SHIFT - 1), 0);
+}
+
+func releaseMagicKey() {
+  releaseScanCodeButton(magicKey & (KEY_SHIFT - 1));
+  if (magicKey & KEY_SHIFT) {
+    releaseScanCodeButton(SC_L_SHIFT);
+  }
+}
+
+func checkWordCapsAndCapsLock() {
+  // Word caps when both shifts are pressed.
+  // Caps lock when both shifts, alt and sym pressed.
+  if (checkButtonState("000000000000000000000000100000000001000000")) {
+    wordCaps = !wordCaps;
+    updateDisplay();
+  } else if (checkButtonState("000000000000000000000000100000000001010000")) {
+    tapCapsLock();
+    wordCaps = 0;
+    updateDisplay();
+  }
+}
+
+func tapCapsLock() {
+  // Tapping caps lock on macOS does not activate it.
+  // There needs to be a delay, so a timer is used to trigger the release.
+  pressScanCode(SC_CAPS);
+  startTimer(TIMER_ID_CAPS_RELEASE, 200, 0, @{
+    releaseScanCode(SC_CAPS);
+  });
+}
+
+func startPairing() {
+  if (HAS_AUDIO) {
+    // G-7 for 160ms, pause 160ms, G-7 for 160ms.
+    playSequence([[5d 08 01 08 5d 08 00]]);
+  }
+  startBlePairing();
+}
+
+func drawSettings() {
+  setAutoDraw(0, AUTO_DRAW_NONE);
+  clearDisplay(0);
+  drawImage(0, (DISPLAY_WIDTH - SETTINGS_IMAGE[0]) >> 1, DISPLAY_HEIGHT/2 - 48, SETTINGS_IMAGE);
+}
+
+func drawBleSummary() {
+  const BLE_ICONS = [[
+  // Laptop
+  10 10 fc 67 fe 6f 06 6c 06 6c 06 6c 06 6c 06 6c
+  06 6c 06 6c 06 6c 06 6c 06 6c 06 6c 06 6c fe 6f
+  fc 67
+
+  // Desktop
+  10 10 fe 07 ff 0f 03 0e 03 0e 03 8e 03 8e 03 fe
+  03 fe 03 fe 03 fe 03 8e 03 8e 03 0e 03 0e ff 0f
+  fe 07
+
+  // Phone
+  10 10 00 00 00 00 fe 7f ff ff 03 c0 03 c0 07 c0
+  07 c0 07 c0 07 c0 03 c0 03 c0 ff ff fe 7f 00 00
+  00 00
+
+  // Tablet
+  10 10 00 00 00 00 fe 7f ff ff 07 f0 07 f0 07 f0
+  07 90 07 90 07 f0 07 f0 07 f0 ff ff fe 7f 00 00
+  00 00
+  ]];
+
+  const SLEEPING_ICON = [[
+  20 10 00 00 00 00 10 04 10 06 10 05 90 04 50 04
+  30 04 10 04 00 00 10 04 10 06 10 05 90 04 50 04
+  30 04 10 04 00 00 10 04 10 06 10 05 90 04 50 04
+  30 04 10 04 00 00 00 04 00 00 00 04 00 00 00 04
+  00 00
+  ]];
+
+  const CONNECTED_ICON = [[
+  10 10 30 00 38 00 9c 01 cc 01 ce 00 66 0c 66 0e
+  66 66 66 66 66 0e 66 0c ce 00 cc 01 9c 01 38 00
+  30 00
+  ]];
+
+  const DISCONNECTED_ICON = [[
+  10 10 30 00 38 00 9c 01 cc 01 ce 70 66 7c 06 1f
+  c6 47 f0 61 7c 0c 1f 0c c7 00 c0 01 9c 01 38 00
+  30 00
+  ]];
+
+  const UNPAIRED_ICON = [[
+  10 10 00 00 00 00 80 01 80 01 80 01 80 01 80 01
+  80 01 80 01 80 01 80 01 80 01 80 01 80 01 00 00
+  00 00
+  ]];
+
+  isBleSummaryActive = 1;
+
+  drawSettings();
+
+  const yOffset = DISPLAY_HEIGHT/2 + (DISPLAY_HEIGHT/2 - 76) / 2;
+
+  for (var i = 0; i < 4; i = i + 1) {
+    var y = i * 19 + yOffset;
+    drawText(0, 11, y + 12, FONT_ID_NORMAL, TEXT_ALIGNMENT_MIDDLE, "1\02\03\04\0" + i*2);
+
+    drawImage(0, 20, y, BLE_ICONS + i * 0x22);
+
+    if (isBleProfileSleeping(i)) {
+      drawImage(0, 40, y+2, SLEEPING_ICON);
+    } else if (isBleProfileConnected(i)) {
+      drawImage(0, 44, y, CONNECTED_ICON);
+    } else if (isBleProfilePaired(i)) {
+      drawImage(0, 44, y, DISCONNECTED_ICON);
+    } else {
+      drawImage(0, 44, y, UNPAIRED_ICON);
+    }
+  }
+
+  var activeY = yOffset + getBleProfile() * 19;
+  drawLine(0, 2, activeY - 2, DISPLAY_WIDTH-2, activeY - 2);
+  drawLine(0, 2, activeY - 2, 2, activeY + 17);
+  drawLine(0, 2, activeY + 17, DISPLAY_WIDTH-2, activeY + 17);
+  drawLine(0, DISPLAY_WIDTH-2, activeY - 2, DISPLAY_WIDTH-2, activeY + 17);
+}
+
+func drawSettingsFeedbackText(text) {
+  drawSettings();
+  drawText(0, DISPLAY_WIDTH/2, DISPLAY_HEIGHT - 48 + 10, FONT_ID_NORMAL, TEXT_ALIGNMENT_MIDDLE, text);
+}
+
+const BRIGHTNESS_IMAGE = [[
+10 10 80 01 86 61 8e 71 1c 38 d8 1b e0 07 70 0e
+37 ec 37 ec 70 0e e0 07 d8 1b 1c 38 8e 71 86 61
+80 01
+]];
+
+const BAR_IMAGES = [[
+// BAR_000_IMAGE
+08 40 fc ff ff ff ff ff ff 3f 02 00 00 00 00 00
+00 40 01 00 00 00 00 00 00 80 01 00 00 00 00 00
+00 80 01 00 00 00 00 00 00 80 01 00 00 00 00 00
+00 80 02 00 00 00 00 00 00 40 fc ff ff ff ff ff
+ff 3f
+
+// BAR_125_IMAGE
+08 40 fc ff ff ff ff ff ff 3f 02 00 00 00 00 00
+00 7f 01 00 00 00 00 00 00 ff 01 00 00 00 00 00
+00 ff 01 00 00 00 00 00 00 ff 01 00 00 00 00 00
+00 ff 02 00 00 00 00 00 00 7f fc ff ff ff ff ff
+ff 3f
+
+// BAR_250_IMAGE
+08 40 fc ff ff ff ff ff ff 3f 02 00 00 00 00 00
+ff 7f 01 00 00 00 00 00 ff ff 01 00 00 00 00 00
+ff ff 01 00 00 00 00 00 ff ff 01 00 00 00 00 00
+ff ff 02 00 00 00 00 00 ff 7f fc ff ff ff ff ff
+ff 3f
+
+// BAR_375_IMAGE
+08 40 fc ff ff ff ff ff ff 3f 02 00 00 00 00 ff
+ff 7f 01 00 00 00 00 ff ff ff 01 00 00 00 00 ff
+ff ff 01 00 00 00 00 ff ff ff 01 00 00 00 00 ff
+ff ff 02 00 00 00 00 ff ff 7f fc ff ff ff ff ff
+ff 3f
+
+// BAR_500_IMAGE
+08 40 fc ff ff ff ff ff ff 3f 02 00 00 00 ff ff
+ff 7f 01 00 00 00 ff ff ff ff 01 00 00 00 ff ff
+ff ff 01 00 00 00 ff ff ff ff 01 00 00 00 ff ff
+ff ff 02 00 00 00 ff ff ff 7f fc ff ff ff ff ff
+ff 3f
+
+// BAR_625_IMAGE
+08 40 fc ff ff ff ff ff ff 3f 02 00 00 ff ff ff
+ff 7f 01 00 00 ff ff ff ff ff 01 00 00 ff ff ff
+ff ff 01 00 00 ff ff ff ff ff 01 00 00 ff ff ff
+ff ff 02 00 00 ff ff ff ff 7f fc ff ff ff ff ff
+ff 3f
+
+// BAR_750_IMAGE
+08 40 fc ff ff ff ff ff ff 3f 02 00 ff ff ff ff
+ff 7f 01 00 ff ff ff ff ff ff 01 00 ff ff ff ff
+ff ff 01 00 ff ff ff ff ff ff 01 00 ff ff ff ff
+ff ff 02 00 ff ff ff ff ff 7f fc ff ff ff ff ff
+ff 3f
+
+// BAR_875_IMAGE
+08 40 fc ff ff ff ff ff ff 3f 02 ff ff ff ff ff
+ff 7f 01 ff ff ff ff ff ff ff 01 ff ff ff ff ff
+ff ff 01 ff ff ff ff ff ff ff 01 ff ff ff ff ff
+ff ff 02 ff ff ff ff ff ff 7f fc ff ff ff ff ff
+ff 3f
+
+// BAR_1000_IMAGE
+08 40 fc ff ff ff ff ff ff 3f fe ff ff ff ff ff
+ff 7f ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+ff ff fe ff ff ff ff ff ff 7f fc ff ff ff ff ff
+ff 3f
+]];
+
+func drawBar(image, value) {
+  drawSettings();
+  drawImage(0, DISPLAY_WIDTH/2 - 16, DISPLAY_HEIGHT/2 + 24, image);
+  drawImage(0, DISPLAY_WIDTH/2 + 4, DISPLAY_HEIGHT/2, BAR_IMAGES + value * 66);
+}
+
+func checkUserPresenceReply() {
+  if (checkButtonState("000000000000000000000000100000000001110010")) {
+    replyUserPresence(1);
+  }
+}
+
+const U2F_KEY_ORDER = [[ 00 01 02 03 04 05 06 07 08 09 0a 0b 0a 09 08 07 06 05 04 03 02 01 ]];
+
+func rgbUpdateKeyU2fAlertCycle() {
+  for (var i = 0; i < 54; i = i + 1) {
+    setRgb(i, 0, 0, 0);
+  }
+
+  var index = getTime() >> 6;
+  var keyId = U2F_KEY_ORDER[index % 22];
+  setRgb(keyId, 16, 16, 16);
+
+  setRgb(12, 32, 0, 0);
+  setRgb(24, 0, 32, 0);
+  setRgb(35, 0, 32, 0);
+  setRgb(36, 0, 32, 0);
+  setRgb(37, 0, 32, 0);
+  setRgb(40, 0, 32, 0);
+}
+
+func init() {
+  rgbInitRandomColors();
+
+  setScript(SCRIPT_ID_DISPLAY_OVERLAY, @drawDisplayOverlay);
+  setScript(SCRIPT_ID_BATTERY_UPDATE, @{
+    redrawDisplayOverlay();
+    updateBoardPower();
+  });
+  setScript(SCRIPT_ID_CONNECTION_UPDATE, @onConnectionUpdate);
+  setScript(SCRIPT_ID_PAIR_CONNECTION_UPDATE, @onConnectionUpdate);
+  setScript(SCRIPT_ID_KEYBOARD_LED_STATUS_UPDATE, @{
+    rgbUpdate();
+    if (isBleSummaryActive) {
+      drawBleSummary();
+    } else {
+      updateDisplay();
+    }
+  });
+  setScript(SCRIPT_ID_STENO_MODE_UPDATE, @{
+    if (isBleSummaryActive) {
+      drawBleSummary();
+    } else {
+      updateDisplay();
+    }
+  });
+  setScript(SCRIPT_ID_BLE_ADVERTISING_UPDATE, @onConnectionUpdate);
+  setScript(SCRIPT_ID_U2F_STATUS_UPDATE, @{
+    updateDisplay();
+    updateBoardPower();
+  });
+  if (HAS_AUDIO) {
+    setScript(SCRIPT_ID_BLE_PAIR_COMPLETE, @{
+      // C-7 G-7 C-8 G-7 C-8 each for 100ms.
+      playSequence([[56 05 5d 05 62 05 5d 05 62 05 00]]);
+    });
+  }
+
+  updateBoardPower();
+  updateScreenSaverTimer();
+
+  setLayer(0, "layer_id: 0");
+  activate0();
+  if (([[00 01 01 01 01 00 01 00]][resolveLayerIndex()])) {
+    pressAll();
+  }
+  updateDisplay();
+  rgbUpdate();
+  rgbUpdateUnderglow();
+
+}
+
+func onPress0() {
+  dispatchToLayer(@onPress0_0, @onPress0_1, @onPress0_2, 0, 0, @onPress0_5, 0, 0);
+}
+func onRelease0() {
+  dispatchToLayer(@onRelease0_0, @onRelease0_1, @onRelease0_2, 0, 0, @onRelease0_5, 0, 0);
+}
+
+func onPress0_0() {
+  pressScanCodeButton(0, 0, 43 /* "⇥" */, 0);
+}
+func onRelease0_0() {
+  releaseScanCodeButton(43 /* "⇥" */);
+}
+
+func onPress0_1() {
+  pressScanCodeButton(0, 0, 43 /* "⇥" */, 0);
+}
+func onRelease0_1() {
+  releaseScanCodeButton(43 /* "⇥" */);
+}
+
+func onPress0_2() {
+  pressScanCodeButton(0, 0, 53 /* "`" */, 0);
+}
+func onRelease0_2() {
+  releaseScanCodeButton(53 /* "`" */);
+}
+
+func onPress0_5() {
+  // USB L
+  setPreferredConnection(CONNECTION_USB, CONNECTION_USB2, CONNECTION_BLE);
+  redrawDisplayOverlay();
+
+}
+func onRelease0_5() {
+}
+
+func onPress1() {
+  dispatchToLayer(@onPress1_0, @onPress1_1, @onPress1_2, @onPress1_3, 0, @onPress1_5, 0, 0);
+}
+func onRelease1() {
+  dispatchToLayer(@onRelease1_0, @onRelease1_1, @onRelease1_2, @onRelease1_3, 0, @onRelease1_5, 0, 0);
+}
+
+func onPress1_0() {
+  pressStenoKeyButton(0 /* "S1" */);
+}
+func onRelease1_0() {
+  releaseStenoKey(0 /* "S1" */);
+}
+
+func onPress1_1() {
+  pressScanCodeButton(1, 0, 20 /* "Q" */, 0);
+}
+func onRelease1_1() {
+  releaseScanCodeButton(20 /* "Q" */);
+}
+
+func onPress1_2() {
+  pressScanCodeButton(1, 0, 30 /* "1" */, 0);
+}
+func onRelease1_2() {
+  releaseScanCodeButton(30 /* "1" */);
+}
+
+func onPress1_3() {
+  pressScanCodeButton(1, 0, 66 /* "F9" */, 0);
+}
+func onRelease1_3() {
+  releaseScanCodeButton(66 /* "F9" */);
+}
+
+func onPress1_5() {
+  // BLE 1
+  setPreferredConnection(CONNECTION_BLE, CONNECTION_USB, CONNECTION_USB2);
+  setBleProfile(0);
+  drawBleSummary();
+
+  startTimer(100, 2000, 0, @{
+    // Hold to Pair
+    startPairing();
+
+  });
+}
+func onRelease1_5() {
+  stopTimer(100);
+}
+
+func onPress2() {
+  dispatchToLayer(@onPress2_0, @onPress2_1, @onPress2_2, @onPress2_3, 0, @onPress2_5, 0, 0);
+}
+func onRelease2() {
+  dispatchToLayer(@onRelease2_0, @onRelease2_1, @onRelease2_2, @onRelease2_3, 0, @onRelease2_5, 0, 0);
+}
+
+func onPress2_0() {
+  pressStenoKeyButton(2 /* "T-" */);
+}
+func onRelease2_0() {
+  releaseStenoKey(2 /* "T-" */);
+}
+
+func onPress2_1() {
+  pressScanCodeButton(2, 0, 26 /* "W" */, 0);
+}
+func onRelease2_1() {
+  releaseScanCodeButton(26 /* "W" */);
+}
+
+func onPress2_2() {
+  pressScanCodeButton(2, 0, 31 /* "2" */, 0);
+}
+func onRelease2_2() {
+  releaseScanCodeButton(31 /* "2" */);
+}
+
+func onPress2_3() {
+  pressScanCodeButton(2, 0, 67 /* "F10" */, 0);
+}
+func onRelease2_3() {
+  releaseScanCodeButton(67 /* "F10" */);
+}
+
+func onPress2_5() {
+  // BLE 2
+  setPreferredConnection(CONNECTION_BLE, CONNECTION_USB, CONNECTION_USB2);
+  setBleProfile(1);
+  drawBleSummary();
+
+  startTimer(101, 2000, 0, @{
+    // Hold to Pair
+    startPairing();
+
+  });
+}
+func onRelease2_5() {
+  stopTimer(101);
+}
+
+func onPress3() {
+  dispatchToLayer(@onPress3_0, @onPress3_1, @onPress3_2, @onPress3_3, 0, @onPress3_5, 0, 0);
+}
+func onRelease3() {
+  dispatchToLayer(@onRelease3_0, @onRelease3_1, @onRelease3_2, @onRelease3_3, 0, @onRelease3_5, 0, 0);
+}
+
+func onPress3_0() {
+  pressStenoKeyButton(4 /* "P-" */);
+}
+func onRelease3_0() {
+  releaseStenoKey(4 /* "P-" */);
+}
+
+func onPress3_1() {
+  pressScanCodeButton(3, 0, 8 /* "E" */, 0);
+}
+func onRelease3_1() {
+  releaseScanCodeButton(8 /* "E" */);
+}
+
+func onPress3_2() {
+  pressScanCodeButton(3, 0, 32 /* "3" */, 0);
+}
+func onRelease3_2() {
+  releaseScanCodeButton(32 /* "3" */);
+}
+
+func onPress3_3() {
+  pressScanCodeButton(3, 0, 68 /* "F11" */, 0);
+}
+func onRelease3_3() {
+  releaseScanCodeButton(68 /* "F11" */);
+}
+
+func onPress3_5() {
+  // BLE 3
+  setPreferredConnection(CONNECTION_BLE, CONNECTION_USB, CONNECTION_USB2);
+  setBleProfile(2);
+  drawBleSummary();
+
+  startTimer(102, 2000, 0, @{
+    // Hold to Pair
+    startPairing();
+
+  });
+}
+func onRelease3_5() {
+  stopTimer(102);
+}
+
+func onPress4() {
+  dispatchToLayer(@onPress4_0, @onPress4_1, @onPress4_2, @onPress4_3, 0, @onPress4_5, 0, 0);
+}
+func onRelease4() {
+  dispatchToLayer(@onRelease4_0, @onRelease4_1, @onRelease4_2, @onRelease4_3, 0, @onRelease4_5, 0, 0);
+}
+
+func onPress4_0() {
+  pressStenoKeyButton(6 /* "H-" */);
+}
+func onRelease4_0() {
+  releaseStenoKey(6 /* "H-" */);
+}
+
+func onPress4_1() {
+  pressScanCodeButton(4, 0, 21 /* "R" */, 0);
+}
+func onRelease4_1() {
+  releaseScanCodeButton(21 /* "R" */);
+}
+
+func onPress4_2() {
+  pressScanCodeButton(4, 0, 33 /* "4" */, 0);
+}
+func onRelease4_2() {
+  releaseScanCodeButton(33 /* "4" */);
+}
+
+func onPress4_3() {
+  pressScanCodeButton(4, 0, 69 /* "F12" */, 0);
+}
+func onRelease4_3() {
+  releaseScanCodeButton(69 /* "F12" */);
+}
+
+func onPress4_5() {
+  // BLE 4
+  setPreferredConnection(CONNECTION_BLE, CONNECTION_USB, CONNECTION_USB2);
+  setBleProfile(3);
+  drawBleSummary();
+
+  startTimer(103, 2000, 0, @{
+    // Hold to Pair
+    startPairing();
+
+  });
+}
+func onRelease4_5() {
+  stopTimer(103);
+}
+
+func onPress5() {
+  dispatchToLayer(@onPress5_0, @onPress5_1, @onPress5_2, 0, @onPress5_4, @onPress5_5, 0, 0);
+}
+func onRelease5() {
+  dispatchToLayer(@onRelease5_0, @onRelease5_1, @onRelease5_2, 0, @onRelease5_4, @onRelease5_5, 0, 0);
+}
+
+func onPress5_0() {
+  pressStenoKeyButton(10 /* "*1" */);
+}
+func onRelease5_0() {
+  releaseStenoKey(10 /* "*1" */);
+}
+
+func onPress5_1() {
+  pressScanCodeButton(5, 0, 23 /* "T" */, 0);
+}
+func onRelease5_1() {
+  releaseScanCodeButton(23 /* "T" */);
+}
+
+func onPress5_2() {
+  pressScanCodeButton(5, 0, 34 /* "5" */, 0);
+}
+func onRelease5_2() {
+  releaseScanCodeButton(34 /* "5" */);
+}
+
+func onPress5_4() {
+  pressScanCodeButton(5, 0, 222 /* "🔆" */, 0);
+}
+func onRelease5_4() {
+  releaseScanCodeButton(222 /* "🔆" */);
+}
+
+func onPress5_5() {
+  // USB R
+  setPreferredConnection(CONNECTION_USB2, CONNECTION_USB, CONNECTION_BLE);
+  redrawDisplayOverlay();
+
+}
+func onRelease5_5() {
+}
+
+func onPress6() {
+  dispatchToLayer(@onPress6_0, @onPress6_1, @onPress6_2, 0, @onPress6_4, 0, 0, 0);
+}
+func onRelease6() {
+  dispatchToLayer(@onRelease6_0, @onRelease6_1, @onRelease6_2, 0, @onRelease6_4, 0, 0, 0);
+}
+
+func onPress6_0() {
+  pressStenoKeyButton(11 /* "*2" */);
+}
+func onRelease6_0() {
+  releaseStenoKey(11 /* "*2" */);
+}
+
+func onPress6_1() {
+  pressScanCodeButton(6, 0, 28 /* "Y" */, 0);
+}
+func onRelease6_1() {
+  releaseScanCodeButton(28 /* "Y" */);
+}
+
+func onPress6_2() {
+  pressScanCodeButton(6, 0, 35 /* "6" */, 0);
+}
+func onRelease6_2() {
+  releaseScanCodeButton(35 /* "6" */);
+}
+
+func onPress6_4() {
+  pressScanCodeButton(6, 0, 217 /* "🔊" */, 0);
+}
+func onRelease6_4() {
+  releaseScanCodeButton(217 /* "🔊" */);
+}
+
+func onPress7() {
+  dispatchToLayer(@onPress7_0, @onPress7_1, @onPress7_2, 0, @onPress7_4, 0, @onPress7_6, 0);
+}
+func onRelease7() {
+  dispatchToLayer(@onRelease7_0, @onRelease7_1, @onRelease7_2, 0, @onRelease7_4, 0, @onRelease7_6, 0);
+}
+
+func onPress7_0() {
+  pressStenoKeyButton(16 /* "-F" */);
+}
+func onRelease7_0() {
+  releaseStenoKey(16 /* "-F" */);
+}
+
+func onPress7_1() {
+  pressScanCodeButton(7, 0, 24 /* "U" */, 0);
+}
+func onRelease7_1() {
+  releaseScanCodeButton(24 /* "U" */);
+}
+
+func onPress7_2() {
+  pressScanCodeButton(7, 0, 36 /* "7" */, 0);
+}
+func onRelease7_2() {
+  releaseScanCodeButton(36 /* "7" */);
+}
+
+func onPress7_4() {
+  pressScanCodeButton(7, 0, 42 /* "⌫" */, 0);
+}
+func onRelease7_4() {
+  releaseScanCodeButton(42 /* "⌫" */);
+}
+
+func onPress7_6() {
+  pressScanCodeButton(7, 0, 95 /* "7" */, 0);
+}
+func onRelease7_6() {
+  releaseScanCodeButton(95 /* "7" */);
+}
+
+func onPress8() {
+  dispatchToLayer(@onPress8_0, @onPress8_1, @onPress8_2, 0, @onPress8_4, @onPress8_5, @onPress8_6, 0);
+}
+func onRelease8() {
+  dispatchToLayer(@onRelease8_0, @onRelease8_1, @onRelease8_2, 0, @onRelease8_4, @onRelease8_5, @onRelease8_6, 0);
+}
+
+func onPress8_0() {
+  pressStenoKeyButton(18 /* "-P" */);
+}
+func onRelease8_0() {
+  releaseStenoKey(18 /* "-P" */);
+}
+
+func onPress8_1() {
+  pressScanCodeButton(8, 0, 12 /* "I" */, 0);
+}
+func onRelease8_1() {
+  releaseScanCodeButton(12 /* "I" */);
+}
+
+func onPress8_2() {
+  pressScanCodeButton(8, 0, 37 /* "8" */, 0);
+}
+func onRelease8_2() {
+  releaseScanCodeButton(37 /* "8" */);
+}
+
+func onPress8_4() {
+  pressScanCodeButton(8, 0, 82 /* "↑" */, 0);
+}
+func onRelease8_4() {
+  releaseScanCodeButton(82 /* "↑" */);
+}
+
+func onPress8_5() {
+  // Brightness Up
+  if (brightness < 8) {
+    brightness = brightness + 1;
+    updateBoardPower();
+    noop();
+    drawBar(BRIGHTNESS_IMAGE, brightness);
+  }
+}
+func onRelease8_5() {
+}
+
+func onPress8_6() {
+  pressScanCodeButton(8, 0, 96 /* "8" */, 0);
+}
+func onRelease8_6() {
+  releaseScanCodeButton(96 /* "8" */);
+}
+
+func onPress9() {
+  dispatchToLayer(@onPress9_0, @onPress9_1, @onPress9_2, 0, @onPress9_4, 0, @onPress9_6, 0);
+}
+func onRelease9() {
+  dispatchToLayer(@onRelease9_0, @onRelease9_1, @onRelease9_2, 0, @onRelease9_4, 0, @onRelease9_6, 0);
+}
+
+func onPress9_0() {
+  pressStenoKeyButton(20 /* "-L" */);
+}
+func onRelease9_0() {
+  releaseStenoKey(20 /* "-L" */);
+}
+
+func onPress9_1() {
+  pressScanCodeButton(9, 0, 18 /* "O" */, 0);
+}
+func onRelease9_1() {
+  releaseScanCodeButton(18 /* "O" */);
+}
+
+func onPress9_2() {
+  pressScanCodeButton(9, 0, 38 /* "9" */, 0);
+}
+func onRelease9_2() {
+  releaseScanCodeButton(38 /* "9" */);
+}
+
+func onPress9_4() {
+  pressScanCodeButton(9, 0, 76 /* "⌦" */, 0);
+}
+func onRelease9_4() {
+  releaseScanCodeButton(76 /* "⌦" */);
+}
+
+func onPress9_6() {
+  pressScanCodeButton(9, 0, 97 /* "9" */, 0);
+}
+func onRelease9_6() {
+  releaseScanCodeButton(97 /* "9" */);
+}
+
+func onPress10() {
+  dispatchToLayer(@onPress10_0, @onPress10_1, @onPress10_2, 0, @onPress10_4, 0, @onPress10_6, 0);
+}
+func onRelease10() {
+  dispatchToLayer(@onRelease10_0, @onRelease10_1, @onRelease10_2, 0, @onRelease10_4, 0, @onRelease10_6, 0);
+}
+
+func onPress10_0() {
+  pressStenoKeyButton(22 /* "-T" */);
+}
+func onRelease10_0() {
+  releaseStenoKey(22 /* "-T" */);
+}
+
+func onPress10_1() {
+  pressScanCodeButton(10, 0, 19 /* "P" */, 0);
+}
+func onRelease10_1() {
+  releaseScanCodeButton(19 /* "P" */);
+}
+
+func onPress10_2() {
+  pressScanCodeButton(10, 0, 39 /* "0" */, 0);
+}
+func onRelease10_2() {
+  releaseScanCodeButton(39 /* "0" */);
+}
+
+func onPress10_4() {
+  pressScanCodeButton(10, 0, 75 /* "⇞" */, 0);
+}
+func onRelease10_4() {
+  releaseScanCodeButton(75 /* "⇞" */);
+}
+
+func onPress10_6() {
+  pressScanCodeButton(10, 0, 85 /* "*" */, 0);
+}
+func onRelease10_6() {
+  releaseScanCodeButton(85 /* "*" */);
+}
+
+func onPress11() {
+  dispatchToLayer(@onPress11_0, @onPress11_1, @onPress11_2, 0, @onPress11_4, @onPress11_5, @onPress11_6, 0);
+}
+func onRelease11() {
+  dispatchToLayer(@onRelease11_0, @onRelease11_1, @onRelease11_2, 0, @onRelease11_4, @onRelease11_5, @onRelease11_6, 0);
+}
+
+func onPress11_0() {
+  pressStenoKeyButton(24 /* "-D" */);
+}
+func onRelease11_0() {
+  releaseStenoKey(24 /* "-D" */);
+}
+
+func onPress11_1() {
+  pressScanCodeButton(11, 0, 42 /* "⌫" */, 0);
+}
+func onRelease11_1() {
+  releaseScanCodeButton(42 /* "⌫" */);
+}
+
+func onPress11_2() {
+  pressScanCodeButton(11, 0, 225 /* "⇧" */, 1);
+  pressScanCodeButton(11, 2, 46 /* "=" */, 0);
+}
+func onRelease11_2() {
+  releaseScanCodeButton(46 /* "=" */);
+  releaseScanCodeButton(225 /* "⇧" */);
+}
+
+func onPress11_4() {
+  pressScanCodeButton(11, 0, 74 /* "⇱" */, 0);
+}
+func onRelease11_4() {
+  releaseScanCodeButton(74 /* "⇱" */);
+}
+
+func onPress11_5() {
+  // Disconnect BLE
+  disconnectBle();
+
+}
+func onRelease11_5() {
+}
+
+func onPress11_6() {
+  pressScanCodeButton(11, 0, 42 /* "⌫" */, 0);
+}
+func onRelease11_6() {
+  releaseScanCodeButton(42 /* "⌫" */);
+}
+
+func onPress12() {
+  dispatchToLayer(@onPress12_0, @onPress12_1, @onPress12_2, 0, 0, 0, 0, @onPress12_7);
+}
+func onRelease12() {
+  dispatchToLayer(@onRelease12_0, @onRelease12_1, @onRelease12_2, 0, 0, 0, 0, @onRelease12_7);
+  // Temp-QWERTY
+
+  // Returning here prevents the next sequence, SetLayer, from occurring.
+  if (isInReleaseAll()) {
+    return;
+  }
+  if (!wasSteno12) {
+    return;
+  }
+  wasSteno12 = 0;
+
+  deactivateGlobal();
+  deactivateDynamic();
+  setLayer(0, "layer_id: 0");
+  activateDynamic();
+  activateGlobal();
+  onRelease12_0();
+}
+
+var timer12_0;
+func onPress12_0() {
+  timer12_0 = getTime();
+  // Auto-Return
+  // Tag this so the global layer can return to steno later
+  wasSteno12 = 1;
+  deactivateGlobal();
+  deactivate0();
+  setLayer(1, "layer_id: 116348565");
+  activate1();
+  activateGlobal();
+  pressScanCodeButton(12, 0, 224 /* "⌃" */, 0);
+}
+func onRelease12_0() {
+  releaseScanCodeButton(224 /* "⌃" */);
+  if (getTime() - timer12_0 <= 200) {
+    pressScanCodeButton(12, 0, 41 /* "⎋" */, 1);
+    releaseScanCodeButton(41 /* "⎋" */);
+
+  }
+}
+
+var timer12_1;
+func onPress12_1() {
+  timer12_1 = getTime();
+  pressScanCodeButton(12, 0, 224 /* "⌃" */, 0);
+}
+func onRelease12_1() {
+  releaseScanCodeButton(224 /* "⌃" */);
+  if (getTime() - timer12_1 <= 200) {
+    pressScanCodeButton(12, 0, 41 /* "⎋" */, 1);
+    releaseScanCodeButton(41 /* "⎋" */);
+
+  }
+}
+
+func onPress12_2() {
+  pressScanCodeButton(12, 0, 225 /* "⇧" */, 1);
+  pressScanCodeButton(12, 2, 53 /* "`" */, 0);
+}
+func onRelease12_2() {
+  releaseScanCodeButton(53 /* "`" */);
+  releaseScanCodeButton(225 /* "⇧" */);
+}
+
+func onPress12_7() {
+  pressScanCodeButton(12, 0, 41 /* "⎋" */, 1);
+  releaseScanCodeButton(41 /* "⎋" */);
+  // Cancel
+  replyUserPresence(0);
+}
+func onRelease12_7() {
+}
+
+func onPress13() {
+  dispatchToLayer(@onPress13_0, @onPress13_1, @onPress13_2, @onPress13_3, @onPress13_4, @onPress13_5, @onPress13_6, 0);
+}
+func onRelease13() {
+  dispatchToLayer(@onRelease13_0, @onRelease13_1, @onRelease13_2, @onRelease13_3, @onRelease13_4, @onRelease13_5, @onRelease13_6, 0);
+}
+
+func onPress13_0() {
+  pressStenoKeyButton(1 /* "S2" */);
+}
+func onRelease13_0() {
+  releaseStenoKey(1 /* "S2" */);
+}
+
+func onPress13_1() {
+  pressScanCodeButton(13, 0, 4 /* "A" */, 0);
+}
+func onRelease13_1() {
+  releaseScanCodeButton(4 /* "A" */);
+}
+
+func onPress13_2() {
+  pressScanCodeButton(13, 0, 225 /* "⇧" */, 1);
+  pressScanCodeButton(13, 2, 30 /* "1" */, 0);
+}
+func onRelease13_2() {
+  releaseScanCodeButton(30 /* "1" */);
+  releaseScanCodeButton(225 /* "⇧" */);
+}
+
+func onPress13_3() {
+  pressScanCodeButton(13, 0, 62 /* "F5" */, 0);
+}
+func onRelease13_3() {
+  releaseScanCodeButton(62 /* "F5" */);
+}
+
+func onPress13_4() {
+  pressScanCodeButton(13, 0, 227 /* "⌘" */, 0);
+}
+func onRelease13_4() {
+  releaseScanCodeButton(227 /* "⌘" */);
+}
+
+func onPress13_5() {
+  console("set_steno_mode embedded");
+  //
+  drawSettingsFeedbackText("Javelin");
+
+}
+func onRelease13_5() {
+}
+
+func onPress13_6() {
+  pressScanCodeButton(13, 0, 227 /* "⌘" */, 0);
+}
+func onRelease13_6() {
+  releaseScanCodeButton(227 /* "⌘" */);
+}
+
+func onPress14() {
+  dispatchToLayer(@onPress14_0, @onPress14_1, @onPress14_2, @onPress14_3, @onPress14_4, @onPress14_5, @onPress14_6, 0);
+}
+func onRelease14() {
+  dispatchToLayer(@onRelease14_0, @onRelease14_1, @onRelease14_2, @onRelease14_3, @onRelease14_4, @onRelease14_5, @onRelease14_6, 0);
+}
+
+func onPress14_0() {
+  pressStenoKeyButton(3 /* "K-" */);
+}
+func onRelease14_0() {
+  releaseStenoKey(3 /* "K-" */);
+}
+
+func onPress14_1() {
+  pressScanCodeButton(14, 0, 22 /* "S" */, 0);
+}
+func onRelease14_1() {
+  releaseScanCodeButton(22 /* "S" */);
+}
+
+func onPress14_2() {
+  pressScanCodeButton(14, 0, 225 /* "⇧" */, 1);
+  pressScanCodeButton(14, 2, 31 /* "2" */, 0);
+}
+func onRelease14_2() {
+  releaseScanCodeButton(31 /* "2" */);
+  releaseScanCodeButton(225 /* "⇧" */);
+}
+
+func onPress14_3() {
+  pressScanCodeButton(14, 0, 63 /* "F6" */, 0);
+}
+func onRelease14_3() {
+  releaseScanCodeButton(63 /* "F6" */);
+}
+
+func onPress14_4() {
+  pressScanCodeButton(14, 0, 226 /* "⌥" */, 0);
+}
+func onRelease14_4() {
+  releaseScanCodeButton(226 /* "⌥" */);
+}
+
+func onPress14_5() {
+  console("set_steno_mode gemini");
+  //
+  drawSettingsFeedbackText("Gemini");
+}
+func onRelease14_5() {
+}
+
+func onPress14_6() {
+  pressScanCodeButton(14, 0, 226 /* "⌥" */, 0);
+}
+func onRelease14_6() {
+  releaseScanCodeButton(226 /* "⌥" */);
+}
+
+func onPress15() {
+  dispatchToLayer(@onPress15_0, @onPress15_1, @onPress15_2, @onPress15_3, @onPress15_4, @onPress15_5, @onPress15_6, 0);
+}
+func onRelease15() {
+  dispatchToLayer(@onRelease15_0, @onRelease15_1, @onRelease15_2, @onRelease15_3, @onRelease15_4, @onRelease15_5, @onRelease15_6, 0);
+}
+
+func onPress15_0() {
+  pressStenoKeyButton(5 /* "W-" */);
+}
+func onRelease15_0() {
+  releaseStenoKey(5 /* "W-" */);
+}
+
+func onPress15_1() {
+  pressScanCodeButton(15, 0, 7 /* "D" */, 0);
+}
+func onRelease15_1() {
+  releaseScanCodeButton(7 /* "D" */);
+}
+
+func onPress15_2() {
+  pressScanCodeButton(15, 0, 225 /* "⇧" */, 1);
+  pressScanCodeButton(15, 2, 32 /* "3" */, 0);
+}
+func onRelease15_2() {
+  releaseScanCodeButton(32 /* "3" */);
+  releaseScanCodeButton(225 /* "⇧" */);
+}
+
+func onPress15_3() {
+  pressScanCodeButton(15, 0, 64 /* "F7" */, 0);
+}
+func onRelease15_3() {
+  releaseScanCodeButton(64 /* "F7" */);
+}
+
+func onPress15_4() {
+  pressScanCodeButton(15, 0, 224 /* "⌃" */, 0);
+}
+func onRelease15_4() {
+  releaseScanCodeButton(224 /* "⌃" */);
+}
+
+func onPress15_5() {
+  console("set_steno_mode tx_bolt");
+  //
+  drawSettingsFeedbackText("TX Bolt");
+}
+func onRelease15_5() {
+}
+
+func onPress15_6() {
+  pressScanCodeButton(15, 0, 224 /* "⌃" */, 0);
+}
+func onRelease15_6() {
+  releaseScanCodeButton(224 /* "⌃" */);
+}
+
+func onPress16() {
+  dispatchToLayer(@onPress16_0, @onPress16_1, @onPress16_2, @onPress16_3, @onPress16_4, @onPress16_5, @onPress16_6, 0);
+}
+func onRelease16() {
+  dispatchToLayer(@onRelease16_0, @onRelease16_1, @onRelease16_2, @onRelease16_3, @onRelease16_4, @onRelease16_5, @onRelease16_6, 0);
+}
+
+func onPress16_0() {
+  pressStenoKeyButton(7 /* "R-" */);
+}
+func onRelease16_0() {
+  releaseStenoKey(7 /* "R-" */);
+}
+
+func onPress16_1() {
+  pressScanCodeButton(16, 0, 9 /* "F" */, 0);
+}
+func onRelease16_1() {
+  releaseScanCodeButton(9 /* "F" */);
+}
+
+func onPress16_2() {
+  pressScanCodeButton(16, 0, 225 /* "⇧" */, 1);
+  pressScanCodeButton(16, 2, 33 /* "4" */, 0);
+}
+func onRelease16_2() {
+  releaseScanCodeButton(33 /* "4" */);
+  releaseScanCodeButton(225 /* "⇧" */);
+}
+
+func onPress16_3() {
+  pressScanCodeButton(16, 0, 65 /* "F8" */, 0);
+}
+func onRelease16_3() {
+  releaseScanCodeButton(65 /* "F8" */);
+}
+
+func onPress16_4() {
+  pressScanCodeButton(16, 0, 225 /* "⇧" */, 0);
+}
+func onRelease16_4() {
+  releaseScanCodeButton(225 /* "⇧" */);
+}
+
+func onPress16_5() {
+  console("set_steno_mode plover_hid");
+  //
+  drawSettingsFeedbackText("Plover HID");
+}
+func onRelease16_5() {
+}
+
+func onPress16_6() {
+  pressScanCodeButton(16, 0, 225 /* "⇧" */, 0);
+}
+func onRelease16_6() {
+  releaseScanCodeButton(225 /* "⇧" */);
+}
+
+func onPress17() {
+  dispatchToLayer(@onPress17_0, @onPress17_1, @onPress17_2, 0, @onPress17_4, 0, 0, 0);
+}
+func onRelease17() {
+  dispatchToLayer(@onRelease17_0, @onRelease17_1, @onRelease17_2, 0, @onRelease17_4, 0, 0, 0);
+}
+
+func onPress17_0() {
+  pressStenoKeyButton(12 /* "*3" */);
+}
+func onRelease17_0() {
+  releaseStenoKey(12 /* "*3" */);
+}
+
+func onPress17_1() {
+  pressScanCodeButton(17, 0, 10 /* "G" */, 0);
+}
+func onRelease17_1() {
+  releaseScanCodeButton(10 /* "G" */);
+}
+
+func onPress17_2() {
+  pressScanCodeButton(17, 0, 225 /* "⇧" */, 1);
+  pressScanCodeButton(17, 2, 34 /* "5" */, 0);
+}
+func onRelease17_2() {
+  releaseScanCodeButton(34 /* "5" */);
+  releaseScanCodeButton(225 /* "⇧" */);
+}
+
+func onPress17_4() {
+  pressScanCodeButton(17, 0, 223 /* "🔅" */, 0);
+}
+func onRelease17_4() {
+  releaseScanCodeButton(223 /* "🔅" */);
+}
+
+func onPress18() {
+  dispatchToLayer(@onPress18_0, @onPress18_1, @onPress18_2, 0, @onPress18_4, 0, 0, 0);
+}
+func onRelease18() {
+  dispatchToLayer(@onRelease18_0, @onRelease18_1, @onRelease18_2, 0, @onRelease18_4, 0, 0, 0);
+}
+
+func onPress18_0() {
+  pressStenoKeyButton(13 /* "*4" */);
+}
+func onRelease18_0() {
+  releaseStenoKey(13 /* "*4" */);
+}
+
+func onPress18_1() {
+  pressScanCodeButton(18, 0, 11 /* "H" */, 0);
+}
+func onRelease18_1() {
+  releaseScanCodeButton(11 /* "H" */);
+}
+
+func onPress18_2() {
+  pressScanCodeButton(18, 0, 225 /* "⇧" */, 1);
+  pressScanCodeButton(18, 2, 35 /* "6" */, 0);
+}
+func onRelease18_2() {
+  releaseScanCodeButton(35 /* "6" */);
+  releaseScanCodeButton(225 /* "⇧" */);
+}
+
+func onPress18_4() {
+  pressScanCodeButton(18, 0, 218 /* "🔈" */, 0);
+}
+func onRelease18_4() {
+  releaseScanCodeButton(218 /* "🔈" */);
+}
+
+func onPress19() {
+  dispatchToLayer(@onPress19_0, @onPress19_1, @onPress19_2, @onPress19_3, @onPress19_4, 0, @onPress19_6, 0);
+}
+func onRelease19() {
+  dispatchToLayer(@onRelease19_0, @onRelease19_1, @onRelease19_2, @onRelease19_3, @onRelease19_4, 0, @onRelease19_6, 0);
+}
+
+func onPress19_0() {
+  pressStenoKeyButton(17 /* "-R" */);
+}
+func onRelease19_0() {
+  releaseStenoKey(17 /* "-R" */);
+}
+
+func onPress19_1() {
+  pressScanCodeButton(19, 0, 13 /* "J" */, 0);
+}
+func onRelease19_1() {
+  releaseScanCodeButton(13 /* "J" */);
+}
+
+func onPress19_2() {
+  pressScanCodeButton(19, 0, 225 /* "⇧" */, 1);
+  pressScanCodeButton(19, 2, 36 /* "7" */, 0);
+}
+func onRelease19_2() {
+  releaseScanCodeButton(36 /* "7" */);
+  releaseScanCodeButton(225 /* "⇧" */);
+}
+
+func onPress19_3() {
+  pressScanCodeButton(19, 0, 225 /* "⇧" */, 0);
+}
+func onRelease19_3() {
+  releaseScanCodeButton(225 /* "⇧" */);
+}
+
+func onPress19_4() {
+  pressScanCodeButton(19, 0, 80 /* "←" */, 0);
+}
+func onRelease19_4() {
+  releaseScanCodeButton(80 /* "←" */);
+}
+
+func onPress19_6() {
+  pressScanCodeButton(19, 0, 92 /* "4" */, 0);
+}
+func onRelease19_6() {
+  releaseScanCodeButton(92 /* "4" */);
+}
+
+func onPress20() {
+  dispatchToLayer(@onPress20_0, @onPress20_1, @onPress20_2, @onPress20_3, @onPress20_4, @onPress20_5, @onPress20_6, 0);
+}
+func onRelease20() {
+  dispatchToLayer(@onRelease20_0, @onRelease20_1, @onRelease20_2, @onRelease20_3, @onRelease20_4, @onRelease20_5, @onRelease20_6, 0);
+}
+
+func onPress20_0() {
+  pressStenoKeyButton(19 /* "-B" */);
+}
+func onRelease20_0() {
+  releaseStenoKey(19 /* "-B" */);
+}
+
+func onPress20_1() {
+  pressScanCodeButton(20, 0, 14 /* "K" */, 0);
+}
+func onRelease20_1() {
+  releaseScanCodeButton(14 /* "K" */);
+}
+
+func onPress20_2() {
+  pressScanCodeButton(20, 0, 225 /* "⇧" */, 1);
+  pressScanCodeButton(20, 2, 37 /* "8" */, 0);
+}
+func onRelease20_2() {
+  releaseScanCodeButton(37 /* "8" */);
+  releaseScanCodeButton(225 /* "⇧" */);
+}
+
+func onPress20_3() {
+  pressScanCodeButton(20, 0, 224 /* "⌃" */, 0);
+}
+func onRelease20_3() {
+  releaseScanCodeButton(224 /* "⌃" */);
+}
+
+func onPress20_4() {
+  pressScanCodeButton(20, 0, 81 /* "↓" */, 0);
+}
+func onRelease20_4() {
+  releaseScanCodeButton(81 /* "↓" */);
+}
+
+func onPress20_5() {
+  // Brightness Down
+  if (brightness > 0) {
+    brightness = brightness - 1;
+    updateBoardPower();
+    noop();
+    drawBar(BRIGHTNESS_IMAGE, brightness);
+  }
+}
+func onRelease20_5() {
+}
+
+func onPress20_6() {
+  pressScanCodeButton(20, 0, 93 /* "5" */, 0);
+}
+func onRelease20_6() {
+  releaseScanCodeButton(93 /* "5" */);
+}
+
+func onPress21() {
+  dispatchToLayer(@onPress21_0, @onPress21_1, @onPress21_2, @onPress21_3, @onPress21_4, 0, @onPress21_6, 0);
+}
+func onRelease21() {
+  dispatchToLayer(@onRelease21_0, @onRelease21_1, @onRelease21_2, @onRelease21_3, @onRelease21_4, 0, @onRelease21_6, 0);
+}
+
+func onPress21_0() {
+  pressStenoKeyButton(21 /* "-G" */);
+}
+func onRelease21_0() {
+  releaseStenoKey(21 /* "-G" */);
+}
+
+func onPress21_1() {
+  pressScanCodeButton(21, 0, 15 /* "L" */, 0);
+}
+func onRelease21_1() {
+  releaseScanCodeButton(15 /* "L" */);
+}
+
+func onPress21_2() {
+  pressScanCodeButton(21, 0, 225 /* "⇧" */, 1);
+  pressScanCodeButton(21, 2, 38 /* "9" */, 0);
+}
+func onRelease21_2() {
+  releaseScanCodeButton(38 /* "9" */);
+  releaseScanCodeButton(225 /* "⇧" */);
+}
+
+func onPress21_3() {
+  pressScanCodeButton(21, 0, 226 /* "⌥" */, 0);
+}
+func onRelease21_3() {
+  releaseScanCodeButton(226 /* "⌥" */);
+}
+
+func onPress21_4() {
+  pressScanCodeButton(21, 0, 79 /* "→" */, 0);
+}
+func onRelease21_4() {
+  releaseScanCodeButton(79 /* "→" */);
+}
+
+func onPress21_6() {
+  pressScanCodeButton(21, 0, 94 /* "6" */, 0);
+}
+func onRelease21_6() {
+  releaseScanCodeButton(94 /* "6" */);
+}
+
+func onPress22() {
+  dispatchToLayer(@onPress22_0, @onPress22_1, @onPress22_2, @onPress22_3, @onPress22_4, 0, @onPress22_6, 0);
+}
+func onRelease22() {
+  dispatchToLayer(@onRelease22_0, @onRelease22_1, @onRelease22_2, @onRelease22_3, @onRelease22_4, 0, @onRelease22_6, 0);
+}
+
+func onPress22_0() {
+  pressStenoKeyButton(23 /* "-S" */);
+}
+func onRelease22_0() {
+  releaseStenoKey(23 /* "-S" */);
+}
+
+func onPress22_1() {
+  pressScanCodeButton(22, 0, 51 /* ";" */, 0);
+}
+func onRelease22_1() {
+  releaseScanCodeButton(51 /* ";" */);
+}
+
+func onPress22_2() {
+  pressScanCodeButton(22, 0, 225 /* "⇧" */, 1);
+  pressScanCodeButton(22, 2, 39 /* "0" */, 0);
+}
+func onRelease22_2() {
+  releaseScanCodeButton(39 /* "0" */);
+  releaseScanCodeButton(225 /* "⇧" */);
+}
+
+func onPress22_3() {
+  pressScanCodeButton(22, 0, 227 /* "⌘" */, 0);
+}
+func onRelease22_3() {
+  releaseScanCodeButton(227 /* "⌘" */);
+}
+
+func onPress22_4() {
+  pressScanCodeButton(22, 0, 78 /* "⇟" */, 0);
+}
+func onRelease22_4() {
+  releaseScanCodeButton(78 /* "⇟" */);
+}
+
+func onPress22_6() {
+  pressScanCodeButton(22, 0, 86 /* "-" */, 0);
+}
+func onRelease22_6() {
+  releaseScanCodeButton(86 /* "-" */);
+}
+
+func onPress23() {
+  dispatchToLayer(@onPress23_0, @onPress23_1, @onPress23_2, 0, @onPress23_4, 0, @onPress23_6, 0);
+}
+func onRelease23() {
+  dispatchToLayer(@onRelease23_0, @onRelease23_1, @onRelease23_2, 0, @onRelease23_4, 0, @onRelease23_6, 0);
+}
+
+func onPress23_0() {
+  pressStenoKeyButton(25 /* "-Z" */);
+}
+func onRelease23_0() {
+  releaseStenoKey(25 /* "-Z" */);
+}
+
+func onPress23_1() {
+  pressScanCodeButton(23, 0, 52 /* "'" */, 0);
+}
+func onRelease23_1() {
+  releaseScanCodeButton(52 /* "'" */);
+}
+
+func onPress23_2() {
+  pressScanCodeButton(23, 0, 46 /* "=" */, 0);
+}
+func onRelease23_2() {
+  releaseScanCodeButton(46 /* "=" */);
+}
+
+func onPress23_4() {
+  pressScanCodeButton(23, 0, 77 /* "⇲" */, 0);
+}
+func onRelease23_4() {
+  releaseScanCodeButton(77 /* "⇲" */);
+}
+
+func onPress23_6() {
+  pressScanCodeButton(23, 0, 87 /* "+" */, 0);
+}
+func onRelease23_6() {
+  releaseScanCodeButton(87 /* "+" */);
+}
+
+func onPress24() {
+  dispatchToLayer(@onPress24_0, @onPress24_1, 0, 0, 0, 0, 0, @onPress24_7);
+}
+func onRelease24() {
+  dispatchToLayer(@onRelease24_0, @onRelease24_1, 0, 0, 0, 0, 0, @onRelease24_7);
+  // Temp-QWERTY
+
+  // Returning here prevents the next sequence, SetLayer, from occurring.
+  if (isInReleaseAll()) {
+    return;
+  }
+  if (!wasSteno24) {
+    return;
+  }
+  wasSteno24 = 0;
+  if (global24PressCount == getPressCount()) {
+    return;
+  }
+
+  deactivateGlobal();
+  deactivateDynamic();
+  setLayer(0, "layer_id: 0");
+  activateDynamic();
+  activateGlobal();
+  onRelease24_0();
+}
+
+func onPress24_0() {
+  // Auto-Return
+  // Tag this so the global layer can return to steno later
+  if (!isInPressAll()) {
+    wasSteno24 = 1;
+    if (checkButtonState("000000000000000000000000100000000000000000")) {
+      global24PressCount = getPressCount();
+    }
+  }
+
+  deactivateGlobal();
+  deactivate0();
+  setLayer(1, "layer_id: 116348565");
+  activate1();
+  activateGlobal();
+}
+func onRelease24_0() {
+}
+var timer24_1;
+var pressCount24_1;
+var releaseCount24_1;
+
+func onPress24_1() {
+  timer24_1 = getTime();
+  pressScanCodeButton(24, 0, 225 /* "⇧" */, 0);
+  pressCount24_1 = getPressCount();
+  releaseCount24_1 = getReleaseCount();
+  checkWordCapsAndCapsLock();
+
+}
+func onRelease24_1() {
+  releaseScanCodeButton(225 /* "⇧" */);
+  if (getTime() - timer24_1 <= 200 && pressCount24_1 == getPressCount() && releaseCount24_1 + 1 == getReleaseCount()) {
+    //
+    // Prevent changing back to steno layer in some situations.
+    // Returning here prevents the next sequence, SetLayer, from occurring.
+    if (wasSteno24) return;
+    if (isInReleaseAll()) return;
+    if (!checkButtonState("000000000000000000000000000000000000000000")) return;
+
+    deactivateGlobal();
+    deactivate1();
+    setLayer(0, "layer_id: 0");
+    activate0();
+    activateGlobal();
+
+  }
+
+}
+
+func onPress24_7() {
+  // Confirm
+  checkUserPresenceReply();
+}
+func onRelease24_7() {
+}
+
+func onPress25() {
+  dispatchToLayer(0, @onPress25_1, @onPress25_2, @onPress25_3, 0, @onPress25_5, 0, 0);
+}
+func onRelease25() {
+  dispatchToLayer(0, @onRelease25_1, @onRelease25_2, @onRelease25_3, 0, @onRelease25_5, 0, 0);
+}
+
+func onPress25_1() {
+  pressScanCodeButton(25, 0, 29 /* "Z" */, 0);
+}
+func onRelease25_1() {
+  releaseScanCodeButton(29 /* "Z" */);
+}
+
+func onPress25_2() {
+  pressScanCodeButton(25, 0, 49 /* "\" */, 0);
+}
+func onRelease25_2() {
+  releaseScanCodeButton(49 /* "\" */);
+}
+
+func onPress25_3() {
+  pressScanCodeButton(25, 0, 58 /* "F1" */, 0);
+}
+func onRelease25_3() {
+  releaseScanCodeButton(58 /* "F1" */);
+}
+
+func onPress25_5() {
+  // WPM
+  // Needs Display set to Dynamic Steno to use.
+  dynamicStenoDisplay = DYNAMIC_STENO_DISPLAY_WPM;
+  drawSettingsFeedbackText("WPM");
+}
+func onRelease25_5() {
+}
+
+func onPress26() {
+  dispatchToLayer(0, @onPress26_1, @onPress26_2, @onPress26_3, 0, @onPress26_5, 0, 0);
+}
+func onRelease26() {
+  dispatchToLayer(0, @onRelease26_1, @onRelease26_2, @onRelease26_3, 0, @onRelease26_5, 0, 0);
+}
+
+func onPress26_1() {
+  pressScanCodeButton(26, 0, 27 /* "X" */, 0);
+}
+func onRelease26_1() {
+  releaseScanCodeButton(27 /* "X" */);
+}
+
+func onPress26_2() {
+  pressScanCodeButton(26, 0, 225 /* "⇧" */, 1);
+  pressScanCodeButton(26, 2, 49 /* "\" */, 0);
+}
+func onRelease26_2() {
+  releaseScanCodeButton(49 /* "\" */);
+  releaseScanCodeButton(225 /* "⇧" */);
+}
+
+func onPress26_3() {
+  pressScanCodeButton(26, 0, 59 /* "F2" */, 0);
+}
+func onRelease26_3() {
+  releaseScanCodeButton(59 /* "F2" */);
+}
+
+func onPress26_5() {
+  // Paper Tape
+  // Needs Display set to Dynamic Steno to use.
+  dynamicStenoDisplay = DYNAMIC_STENO_DISPLAY_PAPER_TAPE;
+  drawSettingsFeedbackText("Tape");
+}
+func onRelease26_5() {
+}
+
+func onPress27() {
+  dispatchToLayer(0, @onPress27_1, @onPress27_2, @onPress27_3, 0, @onPress27_5, 0, 0);
+}
+func onRelease27() {
+  dispatchToLayer(0, @onRelease27_1, @onRelease27_2, @onRelease27_3, 0, @onRelease27_5, 0, 0);
+}
+
+func onPress27_1() {
+  pressScanCodeButton(27, 0, 6 /* "C" */, 0);
+}
+func onRelease27_1() {
+  releaseScanCodeButton(6 /* "C" */);
+}
+
+func onPress27_2() {
+  pressScanCodeButton(27, 0, 45 /* "-" */, 0);
+}
+func onRelease27_2() {
+  releaseScanCodeButton(45 /* "-" */);
+}
+
+func onPress27_3() {
+  pressScanCodeButton(27, 0, 60 /* "F3" */, 0);
+}
+func onRelease27_3() {
+  releaseScanCodeButton(60 /* "F3" */);
+}
+
+func onPress27_5() {
+  // Strokes
+  // Needs Display set to Dynamic Steno to use.
+  dynamicStenoDisplay = DYNAMIC_STENO_DISPLAY_STROKES;
+  drawSettingsFeedbackText("Strokes");
+}
+func onRelease27_5() {
+}
+
+func onPress28() {
+  dispatchToLayer(0, @onPress28_1, @onPress28_2, @onPress28_3, 0, 0, 0, 0);
+}
+func onRelease28() {
+  dispatchToLayer(0, @onRelease28_1, @onRelease28_2, @onRelease28_3, 0, 0, 0, 0);
+}
+
+func onPress28_1() {
+  pressScanCodeButton(28, 0, 25 /* "V" */, 0);
+}
+func onRelease28_1() {
+  releaseScanCodeButton(25 /* "V" */);
+}
+
+func onPress28_2() {
+  pressScanCodeButton(28, 0, 47 /* "[" */, 0);
+}
+func onRelease28_2() {
+  releaseScanCodeButton(47 /* "[" */);
+}
+
+func onPress28_3() {
+  pressScanCodeButton(28, 0, 61 /* "F4" */, 0);
+}
+func onRelease28_3() {
+  releaseScanCodeButton(61 /* "F4" */);
+}
+
+func onPress29() {
+  dispatchToLayer(0, @onPress29_1, @onPress29_2, 0, 0, 0, 0, 0);
+}
+func onRelease29() {
+  dispatchToLayer(0, @onRelease29_1, @onRelease29_2, 0, 0, 0, 0, 0);
+}
+
+func onPress29_1() {
+  pressScanCodeButton(29, 0, 5 /* "B" */, 0);
+}
+func onRelease29_1() {
+  releaseScanCodeButton(5 /* "B" */);
+}
+
+func onPress29_2() {
+  pressScanCodeButton(29, 0, 225 /* "⇧" */, 1);
+  pressScanCodeButton(29, 2, 47 /* "[" */, 0);
+}
+func onRelease29_2() {
+  releaseScanCodeButton(47 /* "[" */);
+  releaseScanCodeButton(225 /* "⇧" */);
+}
+
+func onPress30() {
+  dispatchToLayer(0, @onPress30_1, @onPress30_2, 0, @onPress30_4, 0, 0, 0);
+}
+func onRelease30() {
+  dispatchToLayer(0, @onRelease30_1, @onRelease30_2, 0, @onRelease30_4, 0, 0, 0);
+}
+
+func onPress30_1() {
+  pressScanCodeButton(30, 0, 17 /* "N" */, 0);
+}
+func onRelease30_1() {
+  releaseScanCodeButton(17 /* "N" */);
+}
+
+func onPress30_2() {
+  pressScanCodeButton(30, 0, 225 /* "⇧" */, 1);
+  pressScanCodeButton(30, 2, 48 /* "]" */, 0);
+}
+func onRelease30_2() {
+  releaseScanCodeButton(48 /* "]" */);
+  releaseScanCodeButton(225 /* "⇧" */);
+}
+
+func onPress30_4() {
+  pressScanCodeButton(30, 0, 210 /* "🔇" */, 0);
+}
+func onRelease30_4() {
+  releaseScanCodeButton(210 /* "🔇" */);
+}
+
+func onPress31() {
+  dispatchToLayer(0, @onPress31_1, @onPress31_2, 0, 0, 0, @onPress31_6, 0);
+}
+func onRelease31() {
+  dispatchToLayer(0, @onRelease31_1, @onRelease31_2, 0, 0, 0, @onRelease31_6, 0);
+}
+
+func onPress31_1() {
+  pressScanCodeButton(31, 0, 16 /* "M" */, 0);
+}
+func onRelease31_1() {
+  releaseScanCodeButton(16 /* "M" */);
+}
+
+func onPress31_2() {
+  pressScanCodeButton(31, 0, 48 /* "]" */, 0);
+}
+func onRelease31_2() {
+  releaseScanCodeButton(48 /* "]" */);
+}
+
+func onPress31_6() {
+  pressScanCodeButton(31, 0, 89 /* "1" */, 0);
+}
+func onRelease31_6() {
+  releaseScanCodeButton(89 /* "1" */);
+}
+
+func onPress32() {
+  dispatchToLayer(0, @onPress32_1, @onPress32_2, 0, 0, 0, @onPress32_6, 0);
+}
+func onRelease32() {
+  dispatchToLayer(0, @onRelease32_1, @onRelease32_2, 0, 0, 0, @onRelease32_6, 0);
+}
+
+func onPress32_1() {
+  pressScanCodeButton(32, 0, 54 /* "," */, 0);
+}
+func onRelease32_1() {
+  releaseScanCodeButton(54 /* "," */);
+}
+
+func onPress32_2() {
+  pressScanCodeButton(32, 0, 225 /* "⇧" */, 1);
+  pressScanCodeButton(32, 2, 45 /* "-" */, 0);
+}
+func onRelease32_2() {
+  releaseScanCodeButton(45 /* "-" */);
+  releaseScanCodeButton(225 /* "⇧" */);
+}
+
+func onPress32_6() {
+  pressScanCodeButton(32, 0, 90 /* "2" */, 0);
+}
+func onRelease32_6() {
+  releaseScanCodeButton(90 /* "2" */);
+}
+
+func onPress33() {
+  dispatchToLayer(0, @onPress33_1, @onPress33_2, 0, 0, 0, @onPress33_6, 0);
+}
+func onRelease33() {
+  dispatchToLayer(0, @onRelease33_1, @onRelease33_2, 0, 0, 0, @onRelease33_6, 0);
+}
+
+func onPress33_1() {
+  pressScanCodeButton(33, 0, 55 /* "." */, 0);
+}
+func onRelease33_1() {
+  releaseScanCodeButton(55 /* "." */);
+}
+
+func onPress33_2() {
+  pressScanCodeButton(33, 0, 55 /* "." */, 0);
+}
+func onRelease33_2() {
+  releaseScanCodeButton(55 /* "." */);
+}
+
+func onPress33_6() {
+  pressScanCodeButton(33, 0, 91 /* "3" */, 0);
+}
+func onRelease33_6() {
+  releaseScanCodeButton(91 /* "3" */);
+}
+
+func onPress34() {
+  dispatchToLayer(0, @onPress34_1, @onPress34_2, 0, 0, 0, @onPress34_6, 0);
+}
+func onRelease34() {
+  dispatchToLayer(0, @onRelease34_1, @onRelease34_2, 0, 0, 0, @onRelease34_6, 0);
+}
+
+func onPress34_1() {
+  pressScanCodeButton(34, 0, 56 /* "/" */, 0);
+}
+func onRelease34_1() {
+  releaseScanCodeButton(56 /* "/" */);
+}
+
+func onPress34_2() {
+  pressScanCodeButton(34, 0, 56 /* "/" */, 0);
+}
+func onRelease34_2() {
+  releaseScanCodeButton(56 /* "/" */);
+}
+
+func onPress34_6() {
+  pressScanCodeButton(34, 0, 84 /* "/" */, 0);
+}
+func onRelease34_6() {
+  releaseScanCodeButton(84 /* "/" */);
+}
+
+func onPress35() {
+  dispatchToLayer(0, @onPress35_1, @onPress35_2, 0, 0, @onPress35_5, @onPress35_6, @onPress35_7);
+}
+func onRelease35() {
+  dispatchToLayer(0, @onRelease35_1, @onRelease35_2, 0, 0, @onRelease35_5, @onRelease35_6, @onRelease35_7);
+}
+
+func onPress35_1() {
+  pressScanCodeButton(35, 0, 229 /* "⇧" */, 0);
+  checkWordCapsAndCapsLock();
+}
+func onRelease35_1() {
+  releaseScanCodeButton(229 /* "⇧" */);
+
+}
+
+func onPress35_2() {
+  // Magic Key
+  // Code is in Global -> User Scripts
+  pressMagicKey(35);
+}
+func onRelease35_2() {
+  //
+  releaseMagicKey();
+}
+
+func onPress35_5() {
+  // Unpair BLE
+  unpairBle();
+  drawBleSummary();
+
+}
+func onRelease35_5() {
+}
+
+func onPress35_6() {
+  // Magic Key
+  // Code is in Global -> User Scripts
+  pressMagicKey(35);
+}
+func onRelease35_6() {
+  //
+  releaseMagicKey();
+}
+
+func onPress35_7() {
+  // Confirm
+  checkUserPresenceReply();
+}
+func onRelease35_7() {
+}
+
+func onPress36() {
+  dispatchToLayer(@onPress36_0, @onPress36_1, @onPress36_2, 0, 0, 0, 0, @onPress36_7);
+}
+func onRelease36() {
+  dispatchToLayer(@onRelease36_0, @onRelease36_1, @onRelease36_2, 0, 0, 0, 0, @onRelease36_7);
+  // Temp-QWERTY
+
+  // Returning here prevents the next sequence, SetLayer, from occurring.
+  if (isInReleaseAll()) {
+    return;
+  }
+  if (!wasSteno36) {
+    return;
+  }
+  wasSteno36 = 0;
+
+  deactivateGlobal();
+  deactivateDynamic();
+  setLayer(0, "layer_id: 0");
+  activateDynamic();
+  activateGlobal();
+  onRelease36_0();
+}
+
+func onPress36_0() {
+  // Auto-Return
+  // Tag this so the global layer can return to steno later
+  wasSteno36 = 1;
+  deactivateGlobal();
+  deactivate0();
+  setLayer(1, "layer_id: 116348565");
+  activate1();
+  activateGlobal();
+  pressScanCodeButton(36, 0, 227 /* "⌘" */, 0);
+}
+func onRelease36_0() {
+  releaseScanCodeButton(227 /* "⌘" */);
+}
+
+func onPress36_1() {
+  pressScanCodeButton(36, 0, 227 /* "⌘" */, 0);
+}
+func onRelease36_1() {
+  releaseScanCodeButton(227 /* "⌘" */);
+}
+
+func onPress36_2() {
+  pressScanCodeButton(36, 0, 227 /* "⌘" */, 0);
+}
+func onRelease36_2() {
+  releaseScanCodeButton(227 /* "⌘" */);
+}
+
+func onPress36_7() {
+  // Confirm
+  checkUserPresenceReply();
+}
+func onRelease36_7() {
+}
+
+func onPress37() {
+  dispatchToLayer(@onPress37_0, @onPress37_1, @onPress37_2, 0, @onPress37_4, 0, @onPress37_6, @onPress37_7);
+}
+func onRelease37() {
+  dispatchToLayer(@onRelease37_0, @onRelease37_1, @onRelease37_2, 0, @onRelease37_4, 0, @onRelease37_6, @onRelease37_7);
+}
+
+func onPress37_0() {
+  pressStenoKeyButton(8 /* "A" */);
+}
+func onRelease37_0() {
+  releaseStenoKey(8 /* "A" */);
+}
+
+func onPress37_1() {
+  pressScanCodeButton(37, 0, 226 /* "⌥" */, 0);
+  checkWordCapsAndCapsLock();
+}
+func onRelease37_1() {
+  releaseScanCodeButton(226 /* "⌥" */);
+
+}
+
+func onPress37_2() {
+  pressScanCodeButton(37, 0, 226 /* "⌥" */, 0);
+}
+func onRelease37_2() {
+  releaseScanCodeButton(226 /* "⌥" */);
+}
+
+func onPress37_4() {
+  deactivateGlobal();
+  deactivate4();
+  setLayer(6, "layer_id: 58064650");
+  activate6();
+  activateGlobal();
+}
+func onRelease37_4() {
+}
+
+func onPress37_6() {
+}
+func onRelease37_6() {
+  deactivateGlobal();
+  deactivate6();
+  setLayer(4, "layer_id: 212846523");
+  activate4();
+  activateGlobal();
+  onRelease37_4();
+}
+
+func onPress37_7() {
+  // Confirm
+  checkUserPresenceReply();
+}
+func onRelease37_7() {
+}
+
+func onPress38() {
+  dispatchToLayer(@onPress38_0, @onPress38_1, @onPress38_2, 0, @onPress38_4, 0, @onPress38_6, 0);
+}
+func onRelease38() {
+  dispatchToLayer(@onRelease38_0, @onRelease38_1, @onRelease38_2, 0, @onRelease38_4, 0, @onRelease38_6, 0);
+}
+
+func onPress38_0() {
+  pressStenoKeyButton(9 /* "O" */);
+}
+func onRelease38_0() {
+  releaseStenoKey(9 /* "O" */);
+}
+
+var timer38_1;
+func onPress38_1() {
+  timer38_1 = getTime();
+  deactivateGlobal();
+  deactivate1();
+  setLayer(4, "layer_id: 212846523");
+  activate4();
+  activateGlobal();
+  //
+  startFuzzyLayer();
+}
+func onRelease38_1() {
+  if (getTime() - timer38_1 <= 200) {
+    pressScanCodeButton(38, 0, 44 /* "⎵" */, 1);
+    releaseScanCodeButton(44 /* "⎵" */);
+
+  }
+}
+
+var timer38_2;
+func onPress38_2() {
+  timer38_2 = getTime();
+  pressScanCodeButton(38, 0, 224 /* "⌃" */, 0);
+}
+func onRelease38_2() {
+  releaseScanCodeButton(224 /* "⌃" */);
+  if (getTime() - timer38_2 <= 200) {
+    pressScanCodeButton(38, 0, 44 /* "⎵" */, 1);
+    releaseScanCodeButton(44 /* "⎵" */);
+
+  }
+}
+
+func onPress38_4() {
+}
+func onRelease38_4() {
+  //
+  stopFuzzyLayerPreSetLayer();
+  deactivateGlobal();
+  deactivate4();
+  setLayer(1, "layer_id: 116348565");
+  activate1();
+  activateGlobal();
+  onRelease38_1();
+  //
+  stopFuzzyLayerPostSetLayer();
+}
+
+func onPress38_6() {
+}
+func onRelease38_6() {
+  deactivateGlobal();
+  deactivate6();
+  setLayer(1, "layer_id: 116348565");
+  activate1();
+  activateGlobal();
+  onRelease38_1();
+}
+
+func onPress39() {
+  dispatchToLayer(@onPress39_0, @onPress39_1, 0, 0, @onPress39_4, 0, @onPress39_6, 0);
+}
+func onRelease39() {
+  dispatchToLayer(@onRelease39_0, @onRelease39_1, 0, 0, @onRelease39_4, 0, @onRelease39_6, 0);
+}
+
+func onPress39_0() {
+  pressStenoKeyButton(14 /* "E" */);
+}
+func onRelease39_0() {
+  releaseStenoKey(14 /* "E" */);
+}
+
+func onPress39_1() {
+  pressScanCodeButton(39, 0, 44 /* "⎵" */, 0);
+}
+func onRelease39_1() {
+  releaseScanCodeButton(44 /* "⎵" */);
+}
+
+func onPress39_4() {
+  pressScanCodeButton(39, 0, 44 /* "⎵" */, 0);
+}
+func onRelease39_4() {
+  releaseScanCodeButton(44 /* "⎵" */);
+}
+
+func onPress39_6() {
+  pressScanCodeButton(39, 0, 44 /* "⎵" */, 0);
+}
+func onRelease39_6() {
+  releaseScanCodeButton(44 /* "⎵" */);
+}
+
+func onPress40() {
+  dispatchToLayer(@onPress40_0, @onPress40_1, @onPress40_2, @onPress40_3, 0, @onPress40_5, @onPress40_6, @onPress40_7);
+}
+func onRelease40() {
+  dispatchToLayer(@onRelease40_0, @onRelease40_1, @onRelease40_2, @onRelease40_3, 0, @onRelease40_5, @onRelease40_6, @onRelease40_7);
+}
+
+func onPress40_0() {
+  pressStenoKeyButton(15 /* "U" */);
+}
+func onRelease40_0() {
+  releaseStenoKey(15 /* "U" */);
+}
+
+func onPress40_1() {
+  deactivateGlobal();
+  deactivate1();
+  setLayer(2, "layer_id: 262857896");
+  activate2();
+  activateGlobal();
+}
+func onRelease40_1() {
+}
+
+func onPress40_2() {
+}
+func onRelease40_2() {
+  deactivateGlobal();
+  deactivate2();
+  setLayer(1, "layer_id: 116348565");
+  activate1();
+  activateGlobal();
+  onRelease40_1();
+}
+
+func onPress40_3() {
+  deactivateGlobal();
+  deactivate3();
+  setLayer(5, "layer_id: 125635709");
+  activate5();
+  activateGlobal();
+}
+func onRelease40_3() {
+}
+
+func onPress40_5() {
+}
+func onRelease40_5() {
+  //
+  // Since Settings -> Scripts -> deactivateLayer calls CallAllReleaseScripts,
+  // this prevents infinite recursion.
+  if (isInReleaseAll()) return;
+
+  deactivateGlobal();
+  deactivate5();
+  setLayer(3, "layer_id: 41429312");
+  activate3();
+  activateGlobal();
+  onRelease40_3();
+}
+
+func onPress40_6() {
+  pressScanCodeButton(40, 0, 98 /* "0" */, 0);
+}
+func onRelease40_6() {
+  releaseScanCodeButton(98 /* "0" */);
+}
+
+func onPress40_7() {
+  // Confirm
+  checkUserPresenceReply();
+}
+func onRelease40_7() {
+}
+
+func onPress41() {
+  dispatchToLayer(@onPress41_0, @onPress41_1, @onPress41_2, @onPress41_3, @onPress41_4, @onPress41_5, @onPress41_6, 0);
+}
+func onRelease41() {
+  dispatchToLayer(@onRelease41_0, @onRelease41_1, @onRelease41_2, @onRelease41_3, @onRelease41_4, @onRelease41_5, @onRelease41_6, 0);
+}
+
+func onPress41_0() {
+  pressStenoKeyButton(27 /* "#2" */);
+}
+func onRelease41_0() {
+  releaseStenoKey(27 /* "#2" */);
+}
+
+var timer41_1;
+func onPress41_1() {
+  timer41_1 = getTime();
+  deactivateGlobal();
+  deactivate1();
+  setLayer(3, "layer_id: 41429312");
+  activate3();
+  activateGlobal();
+  //
+  startFuzzyLayer();
+
+}
+func onRelease41_1() {
+  if (getTime() - timer41_1 <= 200) {
+    pressScanCodeButton(41, 0, 40 /* "↵" */, 1);
+    releaseScanCodeButton(40 /* "↵" */);
+
+  }
+}
+
+func onPress41_2() {
+  deactivateGlobal();
+  deactivate2();
+  setLayer(5, "layer_id: 125635709");
+  activate5();
+  activateGlobal();
+}
+func onRelease41_2() {
+}
+
+func onPress41_3() {
+}
+func onRelease41_3() {
+  //
+  stopFuzzyLayerPreSetLayer();
+  deactivateGlobal();
+  deactivate3();
+  setLayer(1, "layer_id: 116348565");
+  activate1();
+  activateGlobal();
+  onRelease41_1();
+  //
+  stopFuzzyLayerPostSetLayer();
+}
+
+func onPress41_4() {
+  pressScanCodeButton(41, 0, 40 /* "↵" */, 0);
+}
+func onRelease41_4() {
+  releaseScanCodeButton(40 /* "↵" */);
+}
+
+func onPress41_5() {
+}
+func onRelease41_5() {
+  //
+  // Since Settings -> Scripts -> deactivateLayer calls CallAllReleaseScripts,
+  // this prevents infinite recursion.
+  if (isInReleaseAll()) return;
+
+  deactivateGlobal();
+  deactivate5();
+  setLayer(2, "layer_id: 262857896");
+  activate2();
+  activateGlobal();
+  onRelease41_2();
+}
+
+func onPress41_6() {
+  pressScanCodeButton(41, 0, 99 /* "." */, 0);
+}
+func onRelease41_6() {
+  releaseScanCodeButton(99 /* "." */);
+}
+

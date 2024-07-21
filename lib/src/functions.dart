@@ -84,6 +84,8 @@ enum InBuiltScriptFunction implements ScriptFunctionDefinition {
   getPressCount(0, true, 0x4b, false),
   getReleaseCount(0, true, 0x4c, false),
   isStenoJoinNext(0, true, 0x4d, true),
+  callPress(1, false, 0x4e, false),
+  callRelease(1, false, 0x4f, false),
   ;
 
   const InBuiltScriptFunction(

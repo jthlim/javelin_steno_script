@@ -624,7 +624,8 @@ class Tokenizer {
     // 'a' -> 'z'
     if (0x61 <= c && c <= 0x7a) return true;
 
-    return false;
+    // '_'
+    return c == 0x5f;
   }
 
   static bool _isIdentifierCodeUnit(int c) {
