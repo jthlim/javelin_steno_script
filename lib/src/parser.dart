@@ -308,6 +308,31 @@ class Parser {
     return name;
   }
 
+  AstNode _parseHalfWordValue() {
+    final value = _parseExpression();
+    if (value.isConstant()) {
+      return value;
+    }
+
+    if (value is PushFunctionAddress) {
+      return value;
+    }
+
+    throw FormatException(
+      'Expected constant or function name for half word list elements'
+      'near $_currentToken',
+    );
+  }
+
+  AstNode _parseHalfWordList() {
+    final values = [_parseHalfWordValue()];
+    while (_currentToken.type == TokenType.comma) {
+      _nextToken();
+      values.add(_parseHalfWordValue());
+    }
+    return HalfWordListAstNode(values);
+  }
+
   AstNode _parsePrimary() {
     // Brackets, constant or function call.
     switch (_currentToken.type) {
@@ -320,6 +345,12 @@ class Parser {
         final value = _currentToken.stringValue!;
         _nextToken();
         return StringValueAstNode(value);
+
+      case TokenType.openHalfWordList:
+        _nextToken();
+        final list = _parseHalfWordList();
+        _assertToken(TokenType.closeHalfWordList);
+        return list;
 
       case TokenType.openParen:
         _nextToken();
@@ -413,6 +444,11 @@ class Parser {
           return LoadIndexedGlobalValueAstNode(result, indexExpression);
         }
         return ByteIndexAstNode(result, indexExpression);
+      case TokenType.openHalfWordList:
+        _nextToken();
+        final indexExpression = _parseExpression();
+        _assertToken(TokenType.closeHalfWordList);
+        return HalfWordIndexAstNode(result, indexExpression);
       default:
         return result;
     }

@@ -287,12 +287,22 @@ class Tokenizer {
           if (_offset < _length && _input.codeUnitAt(_offset) == 0x5b) {
             ++_column;
             ++_offset;
-            yield Token(
-              type: TokenType.stringValue,
-              line: _line,
-              column: _column,
-              stringValue: _parseData(),
-            );
+            if (_offset < _length && _input.codeUnitAt(_offset) == 0x5b) {
+              ++_column;
+              ++_offset;
+              yield Token(
+                type: TokenType.openHalfWordList,
+                line: _line,
+                column: _column,
+              );
+            } else {
+              yield Token(
+                type: TokenType.stringValue,
+                line: _line,
+                column: _column,
+                stringValue: _parseData(),
+              );
+            }
           } else {
             yield Token(
               type: TokenType.openSquareBracket,
@@ -303,11 +313,23 @@ class Tokenizer {
           continue;
 
         case 0x5d: // ']'
-          yield Token(
-            type: TokenType.closeSquareBracket,
-            line: _line,
-            column: _column,
-          );
+          if (_offset + 1 < _length &&
+              _input.codeUnitAt(_offset) == 0x5d &&
+              _input.codeUnitAt(_offset + 1) == 0x5d) {
+            _offset += 2;
+            _column += 2;
+            yield Token(
+              type: TokenType.closeHalfWordList,
+              line: _line,
+              column: _column,
+            );
+          } else {
+            yield Token(
+              type: TokenType.closeSquareBracket,
+              line: _line,
+              column: _column,
+            );
+          }
           continue;
 
         default:

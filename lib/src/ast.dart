@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:javelin_steno_script/src/token.dart';
 
 import 'instruction.dart';
@@ -14,6 +16,9 @@ class ScriptReachability {
   final functions = <String>{};
   final globals = <int>{};
   final pendingGlobalStatements = <int, List<AstNode>>{};
+
+  // data + lengths
+  final data = <AstNode, int>{};
 }
 
 abstract class AstNode {
@@ -26,6 +31,8 @@ abstract class AstNode {
   void addInstructions(ScriptByteCodeBuilder builder);
 
   void mark(ScriptReachability context) {}
+
+  Uint8List getData() => throw UnsupportedError('Internal error');
 
   AstNode simplify() {
     if (isConstant()) {
@@ -60,6 +67,75 @@ class StringValueAstNode extends AstNode {
   final String value;
 }
 
+class HalfWordListAstNode extends AstNode {
+  HalfWordListAstNode(this.values);
+
+  // Do NOT mark this as constant, otherwise integer folding instructions
+  // will be attempted.
+  @override
+  bool isConstant() => false;
+
+  @override
+  int constantValue() => throw UnsupportedError('Should not be invoked');
+
+  @override
+  void mark(ScriptReachability context) {
+    for (final e in values) {
+      e.mark(context);
+    }
+    context.data[this] = values.length * 2;
+  }
+
+  @override
+  Uint8List getData() => bytes;
+
+  @override
+  void addInstructions(ScriptByteCodeBuilder builder) {
+    final bytesBuilder = BytesBuilder();
+    for (final e in values) {
+      if (e.isConstant()) {
+        final v = e.constantValue();
+        bytesBuilder.addByte(v & 0xff);
+        bytesBuilder.addByte(v >> 8);
+      } else if (e is PushFunctionAddress) {
+        bytesBuilder.addByte(0xff);
+        bytesBuilder.addByte(0xff);
+      }
+    }
+    bytes = bytesBuilder.toBytes();
+
+    var offset = 0;
+    for (final e in values) {
+      if (!e.isConstant() && e is PushFunctionAddress) {
+        builder.addInstruction(SetHalfWordFunctionDataValueInstruction(
+          value: bytes,
+          valueOffset: offset,
+          functionName: e.name,
+        ));
+      }
+      offset += 2;
+    }
+
+    builder.addInstruction(PushDataValueInstruction(this));
+  }
+
+  late Uint8List bytes;
+  final List<AstNode> values;
+
+  @override
+  String toString() {
+    final result = <String>[];
+    for (final e in values) {
+      if (e.isConstant()) {
+        result.add('${e.constantValue()}');
+      } else if (e is PushFunctionAddress) {
+        result.add('@${e.name}');
+      }
+    }
+    return '[${result.join(', ')}]';
+  }
+}
+
 class ByteIndexAstNode extends AstNode {
   ByteIndexAstNode(this.byteValue, this.index);
 
@@ -86,6 +162,36 @@ class ByteIndexAstNode extends AstNode {
   }
 
   final AstNode byteValue;
+  final AstNode index;
+}
+
+class HalfWordIndexAstNode extends AstNode {
+  HalfWordIndexAstNode(this.value, this.index);
+
+  // Do NOT mark this as constant, otherwise integer folding instructions
+  // will be attempted.
+  @override
+  bool isConstant() => false;
+
+  @override
+  int constantValue() => throw UnsupportedError('Should not be invoked');
+
+  @override
+  void mark(ScriptReachability context) {
+    value.mark(context);
+    index.mark(context);
+  }
+
+  @override
+  void addInstructions(ScriptByteCodeBuilder builder) {
+    value.addInstructions(builder);
+    index.addInstructions(builder);
+
+    builder
+        .addInstruction(OpcodeInstruction(ScriptOperatorOpcode.halfWordLookup));
+  }
+
+  final AstNode value;
   final AstNode index;
 }
 

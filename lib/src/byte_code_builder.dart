@@ -21,6 +21,7 @@ class ScriptByteCodeBuilder {
   late final List<String> sortedStrings;
   final stringTable = <String, int>{};
   var stringHashTableOffset = 0;
+  final data = <AstNode, int>{};
   final ScriptReachability reachability;
 
   Uint8List createByteCode(int buttonCount) {
@@ -88,6 +89,10 @@ class ScriptByteCodeBuilder {
     for (final instruction in instructions) {
       offset += instruction.layoutFinalPass(offset);
     }
+    for (final e in reachability.data.entries) {
+      data[e.key] = offset;
+      offset += e.value;
+    }
     for (final string in sortedStrings) {
       stringTable[string] = offset;
 
@@ -128,6 +133,10 @@ class ScriptByteCodeBuilder {
         );
       }
       instruction.addByteCode(this);
+    }
+
+    for (final e in data.entries) {
+      _bytesBuilder.add(e.key.getData());
     }
 
     for (final string in sortedStrings) {

@@ -46,6 +46,8 @@ enum TokenType {
   shiftLeft,
   arithmeticShiftRight,
   logicalShiftRight,
+  openHalfWordList,
+  closeHalfWordList,
 }
 
 class Token {

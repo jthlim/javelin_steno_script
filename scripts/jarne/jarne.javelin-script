@@ -339,6 +339,7 @@ var hueSpread = 4;
 var hueShift = 0;
 var brightness = 3;
 var saturation = 5;
+var lastQwertyActionTimes[2];
 
 var keyColorData[42];
 
@@ -386,6 +387,31 @@ func setLayer(layerIndex, layerIdEvent) {
   releaseAll();
   layer = layerIndex;
   sendEvent(layerIdEvent);
+}
+
+var postPress;
+var postRelease;
+
+func _pressScanCode(scanCode, isModifier) {
+  pressScanCode(scanCode);
+  if (isModifier) return;
+
+  if (postPress) {
+    var localPostPress = postPress;
+    postPress = 0;
+    localPostPress();
+  }
+}
+
+func _releaseScanCode(scanCode, isModifier) {
+  releaseScanCode(scanCode);
+  if (isModifier) return;
+
+  if (postRelease) {
+    var localPostRelease = postRelease;
+    postRelease = 0;
+    localPostRelease();
+  }
 }
 
 func resolveLayerIndex() var {
@@ -1215,7 +1241,7 @@ var lastPressModifiers = 0;
 func pressScanCodeButton(buttonIndex, modifiers, scanCode, isModifier) {
   if (isInPressAll()) {
     if(isModifier) return;
-    if(!isModifierKey(scanCode) || (wasSteno24 && scanCode == SC_L_SHIFT)) {
+    if(!isModifierKey(scanCode) || (wasSteno24 && buttonIndex == 24)) {
       return;
     }
   }
@@ -1452,6 +1478,11 @@ func tapCapsLock() {
   startTimer(TIMER_ID_CAPS_RELEASE, 200, 0, @{
     releaseScanCode(SC_CAPS);
   });
+}
+
+func updateQwertyActionTimes() {
+  lastQwertyActionTimes[0] = lastQwertyActionTimes[1];
+  lastQwertyActionTimes[1] = getTime();
 }
 
 func startPairing() {
@@ -1696,19 +1727,17 @@ func init() {
 
   setLayer(0, "layer_id: 0");
   activate0();
-  if (([[00 01 01 01 01 00 01 00]][resolveLayerIndex()])) {
-    pressAll();
-  }
-  updateDisplay();
-  rgbUpdate();
-  rgbUpdateUnderglow();
-
+  activateGlobal();
 }
 
 func onPress0() {
+  globalPress(0);
+
   dispatchToLayer(@onPress0_0, @onPress0_1, @onPress0_2, 0, 0, @onPress0_5, 0, 0);
 }
 func onRelease0() {
+  globalRelease();
+
   dispatchToLayer(@onRelease0_0, @onRelease0_1, @onRelease0_2, 0, 0, @onRelease0_5, 0, 0);
 }
 
@@ -1720,6 +1749,7 @@ func onRelease0_0() {
 }
 
 func onPress0_1() {
+  updateQwertyActionTimes();
   pressScanCodeButton(0, 0, 43 /* "⇥" */, 0);
 }
 func onRelease0_1() {
@@ -1743,9 +1773,13 @@ func onRelease0_5() {
 }
 
 func onPress1() {
+  globalPress(1);
+
   dispatchToLayer(@onPress1_0, @onPress1_1, @onPress1_2, @onPress1_3, 0, @onPress1_5, 0, 0);
 }
 func onRelease1() {
+  globalRelease();
+
   dispatchToLayer(@onRelease1_0, @onRelease1_1, @onRelease1_2, @onRelease1_3, 0, @onRelease1_5, 0, 0);
 }
 
@@ -1757,6 +1791,7 @@ func onRelease1_0() {
 }
 
 func onPress1_1() {
+  updateQwertyActionTimes();
   pressScanCodeButton(1, 0, 20 /* "Q" */, 0);
 }
 func onRelease1_1() {
@@ -1794,9 +1829,13 @@ func onRelease1_5() {
 }
 
 func onPress2() {
+  globalPress(2);
+
   dispatchToLayer(@onPress2_0, @onPress2_1, @onPress2_2, @onPress2_3, 0, @onPress2_5, 0, 0);
 }
 func onRelease2() {
+  globalRelease();
+
   dispatchToLayer(@onRelease2_0, @onRelease2_1, @onRelease2_2, @onRelease2_3, 0, @onRelease2_5, 0, 0);
 }
 
@@ -1808,6 +1847,7 @@ func onRelease2_0() {
 }
 
 func onPress2_1() {
+  updateQwertyActionTimes();
   pressScanCodeButton(2, 0, 26 /* "W" */, 0);
 }
 func onRelease2_1() {
@@ -1845,9 +1885,13 @@ func onRelease2_5() {
 }
 
 func onPress3() {
+  globalPress(3);
+
   dispatchToLayer(@onPress3_0, @onPress3_1, @onPress3_2, @onPress3_3, 0, @onPress3_5, 0, 0);
 }
 func onRelease3() {
+  globalRelease();
+
   dispatchToLayer(@onRelease3_0, @onRelease3_1, @onRelease3_2, @onRelease3_3, 0, @onRelease3_5, 0, 0);
 }
 
@@ -1859,6 +1903,7 @@ func onRelease3_0() {
 }
 
 func onPress3_1() {
+  updateQwertyActionTimes();
   pressScanCodeButton(3, 0, 8 /* "E" */, 0);
 }
 func onRelease3_1() {
@@ -1896,9 +1941,13 @@ func onRelease3_5() {
 }
 
 func onPress4() {
+  globalPress(4);
+
   dispatchToLayer(@onPress4_0, @onPress4_1, @onPress4_2, @onPress4_3, 0, @onPress4_5, 0, 0);
 }
 func onRelease4() {
+  globalRelease();
+
   dispatchToLayer(@onRelease4_0, @onRelease4_1, @onRelease4_2, @onRelease4_3, 0, @onRelease4_5, 0, 0);
 }
 
@@ -1910,6 +1959,7 @@ func onRelease4_0() {
 }
 
 func onPress4_1() {
+  updateQwertyActionTimes();
   pressScanCodeButton(4, 0, 21 /* "R" */, 0);
 }
 func onRelease4_1() {
@@ -1947,9 +1997,13 @@ func onRelease4_5() {
 }
 
 func onPress5() {
+  globalPress(5);
+
   dispatchToLayer(@onPress5_0, @onPress5_1, @onPress5_2, 0, @onPress5_4, @onPress5_5, 0, 0);
 }
 func onRelease5() {
+  globalRelease();
+
   dispatchToLayer(@onRelease5_0, @onRelease5_1, @onRelease5_2, 0, @onRelease5_4, @onRelease5_5, 0, 0);
 }
 
@@ -1961,6 +2015,7 @@ func onRelease5_0() {
 }
 
 func onPress5_1() {
+  updateQwertyActionTimes();
   pressScanCodeButton(5, 0, 23 /* "T" */, 0);
 }
 func onRelease5_1() {
@@ -1991,9 +2046,13 @@ func onRelease5_5() {
 }
 
 func onPress6() {
+  globalPress(6);
+
   dispatchToLayer(@onPress6_0, @onPress6_1, @onPress6_2, 0, @onPress6_4, 0, 0, 0);
 }
 func onRelease6() {
+  globalRelease();
+
   dispatchToLayer(@onRelease6_0, @onRelease6_1, @onRelease6_2, 0, @onRelease6_4, 0, 0, 0);
 }
 
@@ -2005,6 +2064,7 @@ func onRelease6_0() {
 }
 
 func onPress6_1() {
+  updateQwertyActionTimes();
   pressScanCodeButton(6, 0, 28 /* "Y" */, 0);
 }
 func onRelease6_1() {
@@ -2026,9 +2086,13 @@ func onRelease6_4() {
 }
 
 func onPress7() {
+  globalPress(7);
+
   dispatchToLayer(@onPress7_0, @onPress7_1, @onPress7_2, 0, @onPress7_4, 0, @onPress7_6, 0);
 }
 func onRelease7() {
+  globalRelease();
+
   dispatchToLayer(@onRelease7_0, @onRelease7_1, @onRelease7_2, 0, @onRelease7_4, 0, @onRelease7_6, 0);
 }
 
@@ -2040,6 +2104,7 @@ func onRelease7_0() {
 }
 
 func onPress7_1() {
+  updateQwertyActionTimes();
   pressScanCodeButton(7, 0, 24 /* "U" */, 0);
 }
 func onRelease7_1() {
@@ -2068,9 +2133,13 @@ func onRelease7_6() {
 }
 
 func onPress8() {
+  globalPress(8);
+
   dispatchToLayer(@onPress8_0, @onPress8_1, @onPress8_2, 0, @onPress8_4, @onPress8_5, @onPress8_6, 0);
 }
 func onRelease8() {
+  globalRelease();
+
   dispatchToLayer(@onRelease8_0, @onRelease8_1, @onRelease8_2, 0, @onRelease8_4, @onRelease8_5, @onRelease8_6, 0);
 }
 
@@ -2082,6 +2151,7 @@ func onRelease8_0() {
 }
 
 func onPress8_1() {
+  updateQwertyActionTimes();
   pressScanCodeButton(8, 0, 12 /* "I" */, 0);
 }
 func onRelease8_1() {
@@ -2107,7 +2177,7 @@ func onPress8_5() {
   if (brightness < 8) {
     brightness = brightness + 1;
     updateBoardPower();
-    noop();
+    rgbUpdateRandomColors();
     drawBar(BRIGHTNESS_IMAGE, brightness);
   }
 }
@@ -2122,9 +2192,13 @@ func onRelease8_6() {
 }
 
 func onPress9() {
+  globalPress(9);
+
   dispatchToLayer(@onPress9_0, @onPress9_1, @onPress9_2, 0, @onPress9_4, 0, @onPress9_6, 0);
 }
 func onRelease9() {
+  globalRelease();
+
   dispatchToLayer(@onRelease9_0, @onRelease9_1, @onRelease9_2, 0, @onRelease9_4, 0, @onRelease9_6, 0);
 }
 
@@ -2136,6 +2210,7 @@ func onRelease9_0() {
 }
 
 func onPress9_1() {
+  updateQwertyActionTimes();
   pressScanCodeButton(9, 0, 18 /* "O" */, 0);
 }
 func onRelease9_1() {
@@ -2164,9 +2239,13 @@ func onRelease9_6() {
 }
 
 func onPress10() {
+  globalPress(10);
+
   dispatchToLayer(@onPress10_0, @onPress10_1, @onPress10_2, 0, @onPress10_4, 0, @onPress10_6, 0);
 }
 func onRelease10() {
+  globalRelease();
+
   dispatchToLayer(@onRelease10_0, @onRelease10_1, @onRelease10_2, 0, @onRelease10_4, 0, @onRelease10_6, 0);
 }
 
@@ -2178,6 +2257,7 @@ func onRelease10_0() {
 }
 
 func onPress10_1() {
+  updateQwertyActionTimes();
   pressScanCodeButton(10, 0, 19 /* "P" */, 0);
 }
 func onRelease10_1() {
@@ -2206,9 +2286,13 @@ func onRelease10_6() {
 }
 
 func onPress11() {
+  globalPress(11);
+
   dispatchToLayer(@onPress11_0, @onPress11_1, @onPress11_2, 0, @onPress11_4, @onPress11_5, @onPress11_6, 0);
 }
 func onRelease11() {
+  globalRelease();
+
   dispatchToLayer(@onRelease11_0, @onRelease11_1, @onRelease11_2, 0, @onRelease11_4, @onRelease11_5, @onRelease11_6, 0);
 }
 
@@ -2220,6 +2304,7 @@ func onRelease11_0() {
 }
 
 func onPress11_1() {
+  updateQwertyActionTimes();
   pressScanCodeButton(11, 0, 42 /* "⌫" */, 0);
 }
 func onRelease11_1() {
@@ -2258,9 +2343,13 @@ func onRelease11_6() {
 }
 
 func onPress12() {
+  globalPress(12);
+
   dispatchToLayer(@onPress12_0, @onPress12_1, @onPress12_2, 0, 0, 0, 0, @onPress12_7);
 }
 func onRelease12() {
+  globalRelease();
+
   dispatchToLayer(@onRelease12_0, @onRelease12_1, @onRelease12_2, 0, 0, 0, 0, @onRelease12_7);
   // Temp-QWERTY
 
@@ -2305,6 +2394,7 @@ func onRelease12_0() {
 
 var timer12_1;
 func onPress12_1() {
+  updateQwertyActionTimes();
   timer12_1 = getTime();
   pressScanCodeButton(12, 0, 224 /* "⌃" */, 0);
 }
@@ -2336,9 +2426,13 @@ func onRelease12_7() {
 }
 
 func onPress13() {
+  globalPress(13);
+
   dispatchToLayer(@onPress13_0, @onPress13_1, @onPress13_2, @onPress13_3, @onPress13_4, @onPress13_5, @onPress13_6, 0);
 }
 func onRelease13() {
+  globalRelease();
+
   dispatchToLayer(@onRelease13_0, @onRelease13_1, @onRelease13_2, @onRelease13_3, @onRelease13_4, @onRelease13_5, @onRelease13_6, 0);
 }
 
@@ -2350,6 +2444,7 @@ func onRelease13_0() {
 }
 
 func onPress13_1() {
+  updateQwertyActionTimes();
   pressScanCodeButton(13, 0, 4 /* "A" */, 0);
 }
 func onRelease13_1() {
@@ -2396,9 +2491,13 @@ func onRelease13_6() {
 }
 
 func onPress14() {
+  globalPress(14);
+
   dispatchToLayer(@onPress14_0, @onPress14_1, @onPress14_2, @onPress14_3, @onPress14_4, @onPress14_5, @onPress14_6, 0);
 }
 func onRelease14() {
+  globalRelease();
+
   dispatchToLayer(@onRelease14_0, @onRelease14_1, @onRelease14_2, @onRelease14_3, @onRelease14_4, @onRelease14_5, @onRelease14_6, 0);
 }
 
@@ -2410,6 +2509,7 @@ func onRelease14_0() {
 }
 
 func onPress14_1() {
+  updateQwertyActionTimes();
   pressScanCodeButton(14, 0, 22 /* "S" */, 0);
 }
 func onRelease14_1() {
@@ -2455,9 +2555,13 @@ func onRelease14_6() {
 }
 
 func onPress15() {
+  globalPress(15);
+
   dispatchToLayer(@onPress15_0, @onPress15_1, @onPress15_2, @onPress15_3, @onPress15_4, @onPress15_5, @onPress15_6, 0);
 }
 func onRelease15() {
+  globalRelease();
+
   dispatchToLayer(@onRelease15_0, @onRelease15_1, @onRelease15_2, @onRelease15_3, @onRelease15_4, @onRelease15_5, @onRelease15_6, 0);
 }
 
@@ -2469,6 +2573,7 @@ func onRelease15_0() {
 }
 
 func onPress15_1() {
+  updateQwertyActionTimes();
   pressScanCodeButton(15, 0, 7 /* "D" */, 0);
 }
 func onRelease15_1() {
@@ -2514,9 +2619,13 @@ func onRelease15_6() {
 }
 
 func onPress16() {
+  globalPress(16);
+
   dispatchToLayer(@onPress16_0, @onPress16_1, @onPress16_2, @onPress16_3, @onPress16_4, @onPress16_5, @onPress16_6, 0);
 }
 func onRelease16() {
+  globalRelease();
+
   dispatchToLayer(@onRelease16_0, @onRelease16_1, @onRelease16_2, @onRelease16_3, @onRelease16_4, @onRelease16_5, @onRelease16_6, 0);
 }
 
@@ -2528,6 +2637,7 @@ func onRelease16_0() {
 }
 
 func onPress16_1() {
+  updateQwertyActionTimes();
   pressScanCodeButton(16, 0, 9 /* "F" */, 0);
 }
 func onRelease16_1() {
@@ -2573,9 +2683,13 @@ func onRelease16_6() {
 }
 
 func onPress17() {
+  globalPress(17);
+
   dispatchToLayer(@onPress17_0, @onPress17_1, @onPress17_2, 0, @onPress17_4, 0, 0, 0);
 }
 func onRelease17() {
+  globalRelease();
+
   dispatchToLayer(@onRelease17_0, @onRelease17_1, @onRelease17_2, 0, @onRelease17_4, 0, 0, 0);
 }
 
@@ -2587,6 +2701,7 @@ func onRelease17_0() {
 }
 
 func onPress17_1() {
+  updateQwertyActionTimes();
   pressScanCodeButton(17, 0, 10 /* "G" */, 0);
 }
 func onRelease17_1() {
@@ -2610,9 +2725,13 @@ func onRelease17_4() {
 }
 
 func onPress18() {
+  globalPress(18);
+
   dispatchToLayer(@onPress18_0, @onPress18_1, @onPress18_2, 0, @onPress18_4, 0, 0, 0);
 }
 func onRelease18() {
+  globalRelease();
+
   dispatchToLayer(@onRelease18_0, @onRelease18_1, @onRelease18_2, 0, @onRelease18_4, 0, 0, 0);
 }
 
@@ -2624,6 +2743,7 @@ func onRelease18_0() {
 }
 
 func onPress18_1() {
+  updateQwertyActionTimes();
   pressScanCodeButton(18, 0, 11 /* "H" */, 0);
 }
 func onRelease18_1() {
@@ -2647,9 +2767,13 @@ func onRelease18_4() {
 }
 
 func onPress19() {
+  globalPress(19);
+
   dispatchToLayer(@onPress19_0, @onPress19_1, @onPress19_2, @onPress19_3, @onPress19_4, 0, @onPress19_6, 0);
 }
 func onRelease19() {
+  globalRelease();
+
   dispatchToLayer(@onRelease19_0, @onRelease19_1, @onRelease19_2, @onRelease19_3, @onRelease19_4, 0, @onRelease19_6, 0);
 }
 
@@ -2661,6 +2785,7 @@ func onRelease19_0() {
 }
 
 func onPress19_1() {
+  updateQwertyActionTimes();
   pressScanCodeButton(19, 0, 13 /* "J" */, 0);
 }
 func onRelease19_1() {
@@ -2698,9 +2823,13 @@ func onRelease19_6() {
 }
 
 func onPress20() {
+  globalPress(20);
+
   dispatchToLayer(@onPress20_0, @onPress20_1, @onPress20_2, @onPress20_3, @onPress20_4, @onPress20_5, @onPress20_6, 0);
 }
 func onRelease20() {
+  globalRelease();
+
   dispatchToLayer(@onRelease20_0, @onRelease20_1, @onRelease20_2, @onRelease20_3, @onRelease20_4, @onRelease20_5, @onRelease20_6, 0);
 }
 
@@ -2712,6 +2841,7 @@ func onRelease20_0() {
 }
 
 func onPress20_1() {
+  updateQwertyActionTimes();
   pressScanCodeButton(20, 0, 14 /* "K" */, 0);
 }
 func onRelease20_1() {
@@ -2746,7 +2876,7 @@ func onPress20_5() {
   if (brightness > 0) {
     brightness = brightness - 1;
     updateBoardPower();
-    noop();
+    rgbUpdateRandomColors();
     drawBar(BRIGHTNESS_IMAGE, brightness);
   }
 }
@@ -2761,9 +2891,13 @@ func onRelease20_6() {
 }
 
 func onPress21() {
+  globalPress(21);
+
   dispatchToLayer(@onPress21_0, @onPress21_1, @onPress21_2, @onPress21_3, @onPress21_4, 0, @onPress21_6, 0);
 }
 func onRelease21() {
+  globalRelease();
+
   dispatchToLayer(@onRelease21_0, @onRelease21_1, @onRelease21_2, @onRelease21_3, @onRelease21_4, 0, @onRelease21_6, 0);
 }
 
@@ -2775,6 +2909,7 @@ func onRelease21_0() {
 }
 
 func onPress21_1() {
+  updateQwertyActionTimes();
   pressScanCodeButton(21, 0, 15 /* "L" */, 0);
 }
 func onRelease21_1() {
@@ -2812,9 +2947,13 @@ func onRelease21_6() {
 }
 
 func onPress22() {
+  globalPress(22);
+
   dispatchToLayer(@onPress22_0, @onPress22_1, @onPress22_2, @onPress22_3, @onPress22_4, 0, @onPress22_6, 0);
 }
 func onRelease22() {
+  globalRelease();
+
   dispatchToLayer(@onRelease22_0, @onRelease22_1, @onRelease22_2, @onRelease22_3, @onRelease22_4, 0, @onRelease22_6, 0);
 }
 
@@ -2826,6 +2965,7 @@ func onRelease22_0() {
 }
 
 func onPress22_1() {
+  updateQwertyActionTimes();
   pressScanCodeButton(22, 0, 51 /* ";" */, 0);
 }
 func onRelease22_1() {
@@ -2863,9 +3003,13 @@ func onRelease22_6() {
 }
 
 func onPress23() {
+  globalPress(23);
+
   dispatchToLayer(@onPress23_0, @onPress23_1, @onPress23_2, 0, @onPress23_4, 0, @onPress23_6, 0);
 }
 func onRelease23() {
+  globalRelease();
+
   dispatchToLayer(@onRelease23_0, @onRelease23_1, @onRelease23_2, 0, @onRelease23_4, 0, @onRelease23_6, 0);
 }
 
@@ -2877,6 +3021,7 @@ func onRelease23_0() {
 }
 
 func onPress23_1() {
+  updateQwertyActionTimes();
   pressScanCodeButton(23, 0, 52 /* "'" */, 0);
 }
 func onRelease23_1() {
@@ -2905,9 +3050,13 @@ func onRelease23_6() {
 }
 
 func onPress24() {
+  globalPress(24);
+
   dispatchToLayer(@onPress24_0, @onPress24_1, 0, 0, 0, 0, 0, @onPress24_7);
 }
 func onRelease24() {
+  globalRelease();
+
   dispatchToLayer(@onRelease24_0, @onRelease24_1, 0, 0, 0, 0, 0, @onRelease24_7);
   // Temp-QWERTY
 
@@ -2954,6 +3103,7 @@ var pressCount24_1;
 var releaseCount24_1;
 
 func onPress24_1() {
+  updateQwertyActionTimes();
   timer24_1 = getTime();
   pressScanCodeButton(24, 0, 225 /* "⇧" */, 0);
   pressCount24_1 = getPressCount();
@@ -2989,13 +3139,18 @@ func onRelease24_7() {
 }
 
 func onPress25() {
+  globalPress(25);
+
   dispatchToLayer(0, @onPress25_1, @onPress25_2, @onPress25_3, 0, @onPress25_5, 0, 0);
 }
 func onRelease25() {
+  globalRelease();
+
   dispatchToLayer(0, @onRelease25_1, @onRelease25_2, @onRelease25_3, 0, @onRelease25_5, 0, 0);
 }
 
 func onPress25_1() {
+  updateQwertyActionTimes();
   pressScanCodeButton(25, 0, 29 /* "Z" */, 0);
 }
 func onRelease25_1() {
@@ -3026,13 +3181,18 @@ func onRelease25_5() {
 }
 
 func onPress26() {
+  globalPress(26);
+
   dispatchToLayer(0, @onPress26_1, @onPress26_2, @onPress26_3, 0, @onPress26_5, 0, 0);
 }
 func onRelease26() {
+  globalRelease();
+
   dispatchToLayer(0, @onRelease26_1, @onRelease26_2, @onRelease26_3, 0, @onRelease26_5, 0, 0);
 }
 
 func onPress26_1() {
+  updateQwertyActionTimes();
   pressScanCodeButton(26, 0, 27 /* "X" */, 0);
 }
 func onRelease26_1() {
@@ -3065,13 +3225,18 @@ func onRelease26_5() {
 }
 
 func onPress27() {
+  globalPress(27);
+
   dispatchToLayer(0, @onPress27_1, @onPress27_2, @onPress27_3, 0, @onPress27_5, 0, 0);
 }
 func onRelease27() {
+  globalRelease();
+
   dispatchToLayer(0, @onRelease27_1, @onRelease27_2, @onRelease27_3, 0, @onRelease27_5, 0, 0);
 }
 
 func onPress27_1() {
+  updateQwertyActionTimes();
   pressScanCodeButton(27, 0, 6 /* "C" */, 0);
 }
 func onRelease27_1() {
@@ -3102,13 +3267,18 @@ func onRelease27_5() {
 }
 
 func onPress28() {
+  globalPress(28);
+
   dispatchToLayer(0, @onPress28_1, @onPress28_2, @onPress28_3, 0, 0, 0, 0);
 }
 func onRelease28() {
+  globalRelease();
+
   dispatchToLayer(0, @onRelease28_1, @onRelease28_2, @onRelease28_3, 0, 0, 0, 0);
 }
 
 func onPress28_1() {
+  updateQwertyActionTimes();
   pressScanCodeButton(28, 0, 25 /* "V" */, 0);
 }
 func onRelease28_1() {
@@ -3130,13 +3300,18 @@ func onRelease28_3() {
 }
 
 func onPress29() {
+  globalPress(29);
+
   dispatchToLayer(0, @onPress29_1, @onPress29_2, 0, 0, 0, 0, 0);
 }
 func onRelease29() {
+  globalRelease();
+
   dispatchToLayer(0, @onRelease29_1, @onRelease29_2, 0, 0, 0, 0, 0);
 }
 
 func onPress29_1() {
+  updateQwertyActionTimes();
   pressScanCodeButton(29, 0, 5 /* "B" */, 0);
 }
 func onRelease29_1() {
@@ -3153,13 +3328,18 @@ func onRelease29_2() {
 }
 
 func onPress30() {
+  globalPress(30);
+
   dispatchToLayer(0, @onPress30_1, @onPress30_2, 0, @onPress30_4, 0, 0, 0);
 }
 func onRelease30() {
+  globalRelease();
+
   dispatchToLayer(0, @onRelease30_1, @onRelease30_2, 0, @onRelease30_4, 0, 0, 0);
 }
 
 func onPress30_1() {
+  updateQwertyActionTimes();
   pressScanCodeButton(30, 0, 17 /* "N" */, 0);
 }
 func onRelease30_1() {
@@ -3183,13 +3363,18 @@ func onRelease30_4() {
 }
 
 func onPress31() {
+  globalPress(31);
+
   dispatchToLayer(0, @onPress31_1, @onPress31_2, 0, 0, 0, @onPress31_6, 0);
 }
 func onRelease31() {
+  globalRelease();
+
   dispatchToLayer(0, @onRelease31_1, @onRelease31_2, 0, 0, 0, @onRelease31_6, 0);
 }
 
 func onPress31_1() {
+  updateQwertyActionTimes();
   pressScanCodeButton(31, 0, 16 /* "M" */, 0);
 }
 func onRelease31_1() {
@@ -3211,13 +3396,18 @@ func onRelease31_6() {
 }
 
 func onPress32() {
+  globalPress(32);
+
   dispatchToLayer(0, @onPress32_1, @onPress32_2, 0, 0, 0, @onPress32_6, 0);
 }
 func onRelease32() {
+  globalRelease();
+
   dispatchToLayer(0, @onRelease32_1, @onRelease32_2, 0, 0, 0, @onRelease32_6, 0);
 }
 
 func onPress32_1() {
+  updateQwertyActionTimes();
   pressScanCodeButton(32, 0, 54 /* "," */, 0);
 }
 func onRelease32_1() {
@@ -3241,13 +3431,18 @@ func onRelease32_6() {
 }
 
 func onPress33() {
+  globalPress(33);
+
   dispatchToLayer(0, @onPress33_1, @onPress33_2, 0, 0, 0, @onPress33_6, 0);
 }
 func onRelease33() {
+  globalRelease();
+
   dispatchToLayer(0, @onRelease33_1, @onRelease33_2, 0, 0, 0, @onRelease33_6, 0);
 }
 
 func onPress33_1() {
+  updateQwertyActionTimes();
   pressScanCodeButton(33, 0, 55 /* "." */, 0);
 }
 func onRelease33_1() {
@@ -3269,13 +3464,18 @@ func onRelease33_6() {
 }
 
 func onPress34() {
+  globalPress(34);
+
   dispatchToLayer(0, @onPress34_1, @onPress34_2, 0, 0, 0, @onPress34_6, 0);
 }
 func onRelease34() {
+  globalRelease();
+
   dispatchToLayer(0, @onRelease34_1, @onRelease34_2, 0, 0, 0, @onRelease34_6, 0);
 }
 
 func onPress34_1() {
+  updateQwertyActionTimes();
   pressScanCodeButton(34, 0, 56 /* "/" */, 0);
 }
 func onRelease34_1() {
@@ -3297,13 +3497,18 @@ func onRelease34_6() {
 }
 
 func onPress35() {
+  globalPress(35);
+
   dispatchToLayer(0, @onPress35_1, @onPress35_2, 0, 0, @onPress35_5, @onPress35_6, @onPress35_7);
 }
 func onRelease35() {
+  globalRelease();
+
   dispatchToLayer(0, @onRelease35_1, @onRelease35_2, 0, 0, @onRelease35_5, @onRelease35_6, @onRelease35_7);
 }
 
 func onPress35_1() {
+  updateQwertyActionTimes();
   pressScanCodeButton(35, 0, 229 /* "⇧" */, 0);
   checkWordCapsAndCapsLock();
 }
@@ -3349,9 +3554,13 @@ func onRelease35_7() {
 }
 
 func onPress36() {
+  globalPress(36);
+
   dispatchToLayer(@onPress36_0, @onPress36_1, @onPress36_2, 0, 0, 0, 0, @onPress36_7);
 }
 func onRelease36() {
+  globalRelease();
+
   dispatchToLayer(@onRelease36_0, @onRelease36_1, @onRelease36_2, 0, 0, 0, 0, @onRelease36_7);
   // Temp-QWERTY
 
@@ -3388,6 +3597,7 @@ func onRelease36_0() {
 }
 
 func onPress36_1() {
+  updateQwertyActionTimes();
   pressScanCodeButton(36, 0, 227 /* "⌘" */, 0);
 }
 func onRelease36_1() {
@@ -3409,9 +3619,13 @@ func onRelease36_7() {
 }
 
 func onPress37() {
+  globalPress(37);
+
   dispatchToLayer(@onPress37_0, @onPress37_1, @onPress37_2, 0, @onPress37_4, 0, @onPress37_6, @onPress37_7);
 }
 func onRelease37() {
+  globalRelease();
+
   dispatchToLayer(@onRelease37_0, @onRelease37_1, @onRelease37_2, 0, @onRelease37_4, 0, @onRelease37_6, @onRelease37_7);
 }
 
@@ -3423,6 +3637,7 @@ func onRelease37_0() {
 }
 
 func onPress37_1() {
+  updateQwertyActionTimes();
   pressScanCodeButton(37, 0, 226 /* "⌥" */, 0);
   checkWordCapsAndCapsLock();
 }
@@ -3467,9 +3682,13 @@ func onRelease37_7() {
 }
 
 func onPress38() {
+  globalPress(38);
+
   dispatchToLayer(@onPress38_0, @onPress38_1, @onPress38_2, 0, @onPress38_4, 0, @onPress38_6, 0);
 }
 func onRelease38() {
+  globalRelease();
+
   dispatchToLayer(@onRelease38_0, @onRelease38_1, @onRelease38_2, 0, @onRelease38_4, 0, @onRelease38_6, 0);
 }
 
@@ -3481,8 +3700,18 @@ func onRelease38_0() {
 }
 
 var timer38_1;
+var forceQwertySpace38;
 func onPress38_1() {
+  updateQwertyActionTimes();
   timer38_1 = getTime();
+  //
+  // Suppress Layer Change if anything else was pressed in the last 100ms and it isn't temporary qwerty
+  forceQwertySpace38 = !wasSteno24 && !isButtonPressed(37) && (getTime() - lastQwertyActionTimes[0] < 100);
+  if (forceQwertySpace38) {
+    pressScanCode(44 /* space */);
+    return;
+  }
+
   deactivateGlobal();
   deactivate1();
   setLayer(4, "layer_id: 212846523");
@@ -3490,13 +3719,21 @@ func onPress38_1() {
   activateGlobal();
   //
   startFuzzyLayer();
+
 }
 func onRelease38_1() {
+  //
+  if (forceQwertySpace38) {
+    releaseScanCode(44 /* Space */);
+    return;
+  }
+  lastQwertyActionTimes[1] = 0;
   if (getTime() - timer38_1 <= 200) {
     pressScanCodeButton(38, 0, 44 /* "⎵" */, 1);
     releaseScanCodeButton(44 /* "⎵" */);
 
   }
+
 }
 
 var timer38_2;
@@ -3540,9 +3777,13 @@ func onRelease38_6() {
 }
 
 func onPress39() {
+  globalPress(39);
+
   dispatchToLayer(@onPress39_0, @onPress39_1, 0, 0, @onPress39_4, 0, @onPress39_6, 0);
 }
 func onRelease39() {
+  globalRelease();
+
   dispatchToLayer(@onRelease39_0, @onRelease39_1, 0, 0, @onRelease39_4, 0, @onRelease39_6, 0);
 }
 
@@ -3554,6 +3795,7 @@ func onRelease39_0() {
 }
 
 func onPress39_1() {
+  updateQwertyActionTimes();
   pressScanCodeButton(39, 0, 44 /* "⎵" */, 0);
 }
 func onRelease39_1() {
@@ -3575,9 +3817,13 @@ func onRelease39_6() {
 }
 
 func onPress40() {
+  globalPress(40);
+
   dispatchToLayer(@onPress40_0, @onPress40_1, @onPress40_2, @onPress40_3, 0, @onPress40_5, @onPress40_6, @onPress40_7);
 }
 func onRelease40() {
+  globalRelease();
+
   dispatchToLayer(@onRelease40_0, @onRelease40_1, @onRelease40_2, @onRelease40_3, 0, @onRelease40_5, @onRelease40_6, @onRelease40_7);
 }
 
@@ -3589,6 +3835,7 @@ func onRelease40_0() {
 }
 
 func onPress40_1() {
+  updateQwertyActionTimes();
   deactivateGlobal();
   deactivate1();
   setLayer(2, "layer_id: 262857896");
@@ -3650,9 +3897,13 @@ func onRelease40_7() {
 }
 
 func onPress41() {
+  globalPress(41);
+
   dispatchToLayer(@onPress41_0, @onPress41_1, @onPress41_2, @onPress41_3, @onPress41_4, @onPress41_5, @onPress41_6, 0);
 }
 func onRelease41() {
+  globalRelease();
+
   dispatchToLayer(@onRelease41_0, @onRelease41_1, @onRelease41_2, @onRelease41_3, @onRelease41_4, @onRelease41_5, @onRelease41_6, 0);
 }
 
@@ -3664,8 +3915,18 @@ func onRelease41_0() {
 }
 
 var timer41_1;
+var forceQwertyEnter41;
 func onPress41_1() {
+  updateQwertyActionTimes();
   timer41_1 = getTime();
+  //
+  // Suppress Layer Change if anything else was pressed in the last 150ms and it isn't temporary qwerty
+  forceQwertyEnter41 = !wasSteno24 && !isButtonPressed(40) && (getTime() - lastQwertyActionTimes[0] < 150);
+  if (forceQwertyEnter41) {
+    pressScanCode(40 /* Enter */);
+    return;
+  }
+
   deactivateGlobal();
   deactivate1();
   setLayer(3, "layer_id: 41429312");
@@ -3676,11 +3937,18 @@ func onPress41_1() {
 
 }
 func onRelease41_1() {
+  //
+  if (forceQwertyEnter41) {
+    releaseScanCode(40 /* Enter */);
+    return;
+  }
+  lastQwertyActionTimes[1] = 0;
   if (getTime() - timer41_1 <= 200) {
     pressScanCodeButton(41, 0, 40 /* "↵" */, 1);
     releaseScanCodeButton(40 /* "↵" */);
 
   }
+
 }
 
 func onPress41_2() {
