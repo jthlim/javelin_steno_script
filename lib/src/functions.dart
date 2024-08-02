@@ -86,6 +86,12 @@ enum InBuiltScriptFunction implements ScriptFunctionDefinition {
   isStenoJoinNext(0, true, 0x4d, true),
   callPress(1, false, 0x4e, false),
   callRelease(1, false, 0x4f, false),
+  pressMouseButton(1, false, 0x50, false),
+  releaseMouseButton(1, false, 0x51, false),
+  tapMouseButton(1, false, 0x52, false),
+  isMouseButtonPressed(1, true, 0x53, true),
+  moveMouse(2, false, 0x54, false),
+  wheelMouse(1, false, 0x55, false),
   ;
 
   const InBuiltScriptFunction(

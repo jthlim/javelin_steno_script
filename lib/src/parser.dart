@@ -858,6 +858,13 @@ class Parser {
     }
   }
 
+  AstNode _parseLambdaCall() {
+    final pushFunctionAddress = _parsePrimary();
+    final parameters = _parseParameterList();
+    _assertToken(TokenType.semiColon);
+    return CallValueAstNode(value: pushFunctionAddress, parameters: parameters);
+  }
+
   AstNode _parseReturn() {
     _assertToken(TokenType.returnKeyword);
 
@@ -979,6 +986,8 @@ class Parser {
         return _parseWhileStatement();
       case TokenType.doKeyword:
         return _parseDoWhileStatement();
+      case TokenType.at:
+        return _parseLambdaCall();
       default:
         throw FormatException('Expected statement, found $_currentToken');
     }

@@ -624,13 +624,12 @@ final class SetHalfWordFunctionDataValueInstruction extends ScriptInstruction {
       throw Exception('Internal error: failed lookup on data');
     }
 
-    print('Offset: $offset');
     value[valueOffset] = offset & 0xff;
     value[valueOffset + 1] = offset >> 8;
   }
 
   @override
-  String toString() => '  set_data offset $valueOffset -> $functionName';
+  String toString() => '  ((set_data offset $valueOffset -> $functionName))';
 
   final Uint8List value;
   final int valueOffset;
