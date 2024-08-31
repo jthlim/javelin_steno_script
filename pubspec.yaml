@@ -21,7 +21,7 @@ dependencies:
     sdk: flutter
   google_fonts: ^6.2.1
   image: ^4.0.15
-  web: ^0.5.1
+  web: ^1.0.0
 
 # The following section is specific to Flutter packages.
 flutter:

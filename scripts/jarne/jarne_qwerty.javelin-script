@@ -1,120 +1,4 @@
-// Steno
-//
-// ,-------------------------------------------.        ,-------------------------------------------.
-// |   Tab  |  S1  |   T  |   P  |   H  |  *1  |        |  *2  |   F  |   P  |   L  |   T  |    D   |
-// |--------+------+------+------+------+------|        |------+------+------+------+------+--------|
-// |Ctrl/Esc|  S2  |   K  |   W  |   R  |  *3  |        |  *4  |   R  |   B  |   G  |   S  |    Z   |
-// |--------+------+------+------+------+------|        |------+------+------+------+------+--------|
-// | Alpha  |      |      |      |      |      |        |      |      |      |      |      |        |
-// `----------------------+--+---+--+---+--+---+--.  ,--+---+--+---+--+---+-------------------------'
-//                           | Cmd  |   A  |   O  |  |   E  |   U  |  #2  |
-//                           `--------------------'  `--------------------'
-//
-// * Tapping Alpha key will switch to Alphabetic mode -- QWERTY, Dvorak, Colemak, Workman
-// * Holding it down and pressing other buttons will cause the keyboard to return to steno mode when
-//   releasing it. This will also give access to the Symbols, Navigation and Function layers by
-//   pressing those keys on the Alphabetic layer.
-// * Command and Control activate a temporary qwerty layer
-
-//
-// QWERTY
-//
-// ,-------------------------------------------.        ,-------------------------------------------.
-// |   Tab  |   Q  |   W  |   E  |   R  |   T  |        |   Y  |   U  |   I  |   O  |   P  |  Bksp  |
-// |--------+------+------+------+------+------|        |------+------+------+------+------+--------|
-// |Ctrl/Esc|   A  |   S  |   D  |   F  |   G  |        |   H  |   J  |   K  |   L  | ;  : |  '  "  |
-// |--------+------+------+------+------+------|        |------+------+------+------+------+--------|
-// |Shf/Sten|   Z  |   X  |   C  |   V  |   B  |        |   N  |   M  | ,  < | .  > | /  ? | RShift |
-// `----------------------+--+---+--+---+--+---+--.  ,--+---+--+---+--+---+-------------------------'
-//                           | Meta |  Alt |Nav/Sp|  | Space| Sym  |Fn/Ent|
-//                           `--------------------'  `--------------------'
-//
-// For keys marked with two options, holding or pressing with other keys will cause the first option
-// to be used, tapping briefly will trigger the second.
-//
-// Press left & right shift together to enable word caps.
-// Press left & right shift with alt to toggle on and off caps lock.
-
-//
-// Symbols
-//
-// ,-------------------------------------------.        ,-------------------------------------------.
-// |    `   |  1   |  2   |  3   |  4   |  5   |        |   6  |  7   |  8   |  9   |  0   |   =    |
-// |--------+------+------+------+------+------|        |------+------+------+------+------+--------|
-// |    ~   |  !   |  @   |  #   |  $   |  %   |        |   ^  |  &   |  *   |  (   |  )   |   +    |
-// |--------+------+------+------+------+------|        |------+------+------+------+------+--------|
-// |    ?   |  \   |  |   |  -   |  [   |  {   |        |   }  |  ]   |  _   |  .   |  /   |  Magic |
-// `----------------------+--+---+--+---+--+---+--.  ,--+---+--+---+--+---+-------------------------'
-//                           | Meta |  Alt |Ctl/Sp|  |      |      |      |
-//                           `--------------------'  `--------------------'
-//
-// * Magic has a few different meanings:
-//   - By itself, it does nothing.
-//   - Following '-' or '=', it means '>'
-//   - Following '(' or '\', it means '"'
-//   - Following a '{' or '[', it means enter (newline)
-//   - Following a digit, it means ','
-//   - Following a comma or dot, it means space ' '
-
-//
-// Function
-//
-// ,-------------------------------------------.        ,-------------------------------------------.
-// |        |  F9  | F10  | F11  | F12  |      |        |      |      |      |      |      |        |
-// |--------+------+------+------+------+------|        |------+------+------+------+------+--------|
-// |        |  F5  |  F6  |  F7  |  F8  |      |        |      | Shift| Ctrl |  Alt |  GUI |        |
-// |--------+------+------+------+------+------|        |------+------+------+------+------+--------|
-// |        |  F1  |  F2  |  F3  |  F4  |      |        |      |      |      |      |      |        |
-// `----------------------+--+---+--+---+--+---+--.  ,--+---+--+---+--+---+-------------------------'
-//                           |      |      |      |  |      |      |      |
-//                           `--------------------'  `--------------------'
-
-//
-// Navigation/Media
-//
-// ,-------------------------------------------.        ,-------------------------------------------.
-// |        |      |      |      |      | Bri+ |        | Vol+ | BkSp |   ↑  | Del  | PgUp |  Home  |
-// |--------+------+------+------+------+------|        |------+------+------+------+------+--------|
-// |        |  GUI |  Alt | Ctrl | Shift| Bri- |        | Vol- |  ←   |   ↓  |   →  | PgDn |   End  |
-// |--------+------+------+------+------+------|        |------+------+------+------+------+--------|
-// |        |      |      |      |      |      |        | Mute |      |      |      |      |        |
-// `----------------------+--+---+--+---+--+---+--.  ,--+---+--+---+--+---+-------------------------'
-//                           |      |Numpad|      |  | Space|      | Enter|
-//                           `--------------------'  `--------------------'
-//
-
-//
-// Numpad -- Pressing Alt + Nav at the same time
-//
-// ,-------------------------------------------.        ,-------------------------------------------.
-// |        |      |      |      |      |      |        |      |   7  |   8  |   9  |   *  |  Bksp  |
-// |--------+------+------+------+------+------|        |------+------+------+------+------+--------|
-// |        |  GUI |  Alt | Ctrl | Shift|      |        |      |   4  |   5  |   6  |   -  |   +    |
-// |--------+------+------+------+------+------|        |------+------+------+------+------+--------|
-// |        |      |      |      |      |      |        |      |   1  |   2  |   3  |   /  | Magic  |
-// `----------------------+--+---+--+---+--+---+--.  ,--+---+--+---+--+---+-------------------------'
-//                           |      |      |      |  | Space|   0  |   .  |
-//                           `--------------------'  `--------------------'
-//
-// * Magic has the same meaning as the symbol layer.
-
-//
-// Settings - pressing both Sym and Fn together.
-//
-// ,-------------------------------------------.        ,-------------------------------------------.
-// |  USB L | BLE1 | BLE2 | BLE3 | BLE4 | USB R|        |      |      |Brght+| Sat+ |      |Disconn |
-// |--------+------+------+------+------+------|        |------+------+------+------+------+--------|
-// |        |Embedd|Gemini|TxBolt|PloHID|      |        |      |      |Brght-| Sat- |      |        |
-// |--------+------+------+------+------+------|        |------+------+------+------+------+--------|
-// |        | WPM  | Tape |Strkes|      |      |        |      |      |      |      |      | Unpair |
-// `----------------------+--+---+--+---+--+---+--.  ,--+---+--+---+--+---+-------------------------'
-//                           |      |      |      |  |      |      |      |
-//                           `--------------------'  `--------------------'
-//
-// To pair a device to slot 1, hold BLE1 for 2 seconds. Same for BLE2-BLE4.
-
-// This script file is generated by Javelin's GUI Configuration Tool.
-
+// Generated from javelin-layout file
 // Javelin constants
 const SC_NONE = 0;
 
@@ -390,7 +274,7 @@ func setLayer(layerIndex, layerIdEvent) {
   sendEvent(layerIdEvent);
 }
 
-func dispatchToLayer(layer0Func, layer1Func, layer2Func, layer3Func, layer4Func, layer5Func, layer6Func, layer7Func) {
+func dispatchToLayer(layer0Func, layer1Func, layer2Func, layer3Func, layer4Func, layer5Func, layer6Func) {
   var resolvedLayer = resolveLayerIndex();
   if (resolvedLayer == 0) {
     if (layer0Func) layer0Func();
@@ -406,66 +290,58 @@ func dispatchToLayer(layer0Func, layer1Func, layer2Func, layer3Func, layer4Func,
     if (layer5Func) layer5Func();
   } else if (resolvedLayer == 6) {
     if (layer6Func) layer6Func();
-  } else if (resolvedLayer == 7) {
-    if (layer7Func) layer7Func();
   }
 }
 
 func resolveLayerIndex() var {
   if (isWaitingForUserPresence()) {
-    return 7;
+    return 6;
   }
   return layer;
 }
 
 func activate0() {
-  setLayer(0, "layer_id: 87377230");
-  wordCaps = 0;
+  setLayer(0, "layer_id: 1128808786");
 
 }
 
 func activate1() {
-  setLayer(1, "layer_id: 1128808786");
+  setLayer(1, "layer_id: 262857896");
 
 }
 
 func activate2() {
-  setLayer(2, "layer_id: 262857896");
+  setLayer(2, "layer_id: 41429312");
 
 }
 
 func activate3() {
-  setLayer(3, "layer_id: 41429312");
-
-}
-
-func activate4() {
-  setLayer(4, "layer_id: 212846523");
+  setLayer(3, "layer_id: 212846523");
   if (isButtonPressed(37)) {
     onPress37();
   }
 }
 
+func activate4() {
+  setLayer(4, "layer_id: 125635709");
+
+}
+
 func activate5() {
-  setLayer(5, "layer_id: 125635709");
+  setLayer(5, "layer_id: 58064650");
 
 }
 
 func activate6() {
-  setLayer(6, "layer_id: 58064650");
-
-}
-
-func activate7() {
-  setLayer(7, "layer_id: 61572736");
+  setLayer(6, "layer_id: 61572736");
 
 }
 
 func activateDynamic() {
-  dispatchToLayer(@activate0, @activate1, @activate2, @activate3, @activate4, @activate5, @activate6, @activate7);
+  dispatchToLayer(@activate0, @activate1, @activate2, @activate3, @activate4, @activate5, @activate6);
 }
 func activateGlobal() {
-  if (([[00 01 01 01 01 00 01 00]][resolveLayerIndex()])) {
+  if (([[01 01 01 01 00 01 00]][resolveLayerIndex()])) {
     pressAll();
   }
   updateDisplay();
@@ -490,11 +366,11 @@ func deactivate3() {
 }
 
 func deactivate4() {
+  isBleSummaryActive = 0;
 
 }
 
 func deactivate5() {
-  isBleSummaryActive = 0;
 
 }
 
@@ -502,12 +378,8 @@ func deactivate6() {
 
 }
 
-func deactivate7() {
-
-}
-
 func deactivateDynamic() {
-  dispatchToLayer(0, 0, 0, 0, 0, @deactivate5, 0, 0);
+  dispatchToLayer(0, 0, 0, 0, @deactivate4, 0, 0);
 }
 func deactivateGlobal() {
 
@@ -657,7 +529,7 @@ func pressStenoKeyButton(scanCode) {
 func globalPress(buttonIndex) {
   lastButtonIndex = buttonIndex;
   updateScreenSaverTimer();
-  dispatchToLayer(@noop, @rgbButtonPressRandomColor, @rgbButtonPressRandomColor, @rgbButtonPressRandomColor, @rgbButtonPressRandomColor, @rgbButtonPressRandomColor, @rgbButtonPressRandomColor, @noop);
+  dispatchToLayer(@rgbButtonPressRandomColor, @rgbButtonPressRandomColor, @rgbButtonPressRandomColor, @rgbButtonPressRandomColor, @rgbButtonPressRandomColor, @rgbButtonPressRandomColor, @noop);
 }
 
 func globalRelease() {
@@ -685,7 +557,7 @@ func stopFuzzyLayerPostSetLayer() {
 
 // Display Scripts
 func updateDisplay() {
-  dispatchToLayer(@drawDisplayDynamicSteno, @drawDisplayAbc, @drawDisplaySymbol, @drawDisplayFunction, @drawDisplayNavigation, @drawBleSummary, @drawDisplayNumpad, @drawDisplaySecurityKey);
+  dispatchToLayer(@drawDisplayAbc, @drawDisplaySymbol, @drawDisplayFunction, @drawDisplayNavigation, @drawBleSummary, @drawDisplayNumpad, @drawDisplaySecurityKey);
 }
 
 func blankDisplay() {
@@ -1291,7 +1163,7 @@ func rgbUpdate() {
     rgbUpdateKeyBreatheCycle();
     setUnderglowRgb(8, 8, 8);
   } else {
-    dispatchToLayer(@rgbUpdateHueCycle, @rgbUpdateRandomColors, @rgbUpdateRandomColors, @rgbUpdateRandomColors, @rgbUpdateRandomColors, @rgbUpdateRandomColors, @rgbUpdateRandomColors, @rgbUpdateKeyU2fAlertCycle);
+    dispatchToLayer(@rgbUpdateRandomColors, @rgbUpdateRandomColors, @rgbUpdateRandomColors, @rgbUpdateRandomColors, @rgbUpdateRandomColors, @rgbUpdateRandomColors, @rgbUpdateKeyU2fAlertCycle);
   }
 }
 
@@ -1323,7 +1195,7 @@ func rgbUpdateUnderglow() {
     return;
   }
 
-  dispatchToLayer(@noop, @rgbUpdateUnderglowWhite, @rgbUpdateUnderglowWhite, @rgbUpdateUnderglowWhite, @rgbUpdateUnderglowWhite, @rgbUpdateUnderglowWhite, @rgbUpdateUnderglowWhite, @rgbUpdateUnderglowWhite);
+  dispatchToLayer(@rgbUpdateUnderglowWhite, @rgbUpdateUnderglowWhite, @rgbUpdateUnderglowWhite, @rgbUpdateUnderglowWhite, @rgbUpdateUnderglowWhite, @rgbUpdateUnderglowWhite, @rgbUpdateUnderglowWhite);
 }
 
 func rgbUpdateUnderglowWhite() {
@@ -1691,7 +1563,7 @@ func updateBoardPower() {
   const RGB_UPDATE_TIME = 10;
   const BLE_UPDATE_TIME = 50;
 
-  if (([[00 00 00 00 00 00 00 01]][resolveLayerIndex()]) || isBleAdvertising()) {
+  if (([[00 00 00 00 00 00 01]][resolveLayerIndex()]) || isBleAdvertising()) {
     startTimer(TIMER_ID_RGB_UPDATE, 32, 1, @rgbUpdate);
     setBoardPower(1);
   } else if (brightness == 0) {
@@ -1771,15 +1643,16 @@ func init() {
 func onPress0() {
   globalPress(0);
 
-  dispatchToLayer(@onPress0_0, @onPress0_1, @onPress0_2, 0, 0, @onPress0_5, 0, 0);
+  dispatchToLayer(@onPress0_0, @onPress0_1, 0, 0, @onPress0_4, 0, 0);
 }
 func onRelease0() {
   globalRelease();
 
-  dispatchToLayer(@onRelease0_0, @onRelease0_1, @onRelease0_2, 0, 0, @onRelease0_5, 0, 0);
+  dispatchToLayer(@onRelease0_0, @onRelease0_1, 0, 0, @onRelease0_4, 0, 0);
 }
 
 func onPress0_0() {
+  updateQwertyActionTimes();
   pressScanCodeButton(0, 0, 43 /* "⇥" */, 0);
 }
 func onRelease0_0() {
@@ -1787,72 +1660,57 @@ func onRelease0_0() {
 }
 
 func onPress0_1() {
-  updateQwertyActionTimes();
-  pressScanCodeButton(0, 0, 43 /* "⇥" */, 0);
-}
-func onRelease0_1() {
-  releaseScanCodeButton(43 /* "⇥" */);
-}
-
-func onPress0_2() {
   pressScanCodeButton(0, 0, 53 /* "`" */, 0);
 }
-func onRelease0_2() {
+func onRelease0_1() {
   releaseScanCodeButton(53 /* "`" */);
 }
 
-func onPress0_5() {
+func onPress0_4() {
   // USB L
   setPreferredConnection(CONNECTION_USB, CONNECTION_USB2, CONNECTION_BLE);
   redrawDisplayOverlay();
 
 }
-func onRelease0_5() {
+func onRelease0_4() {
 }
 
 func onPress1() {
   globalPress(1);
 
-  dispatchToLayer(@onPress1_0, @onPress1_1, @onPress1_2, @onPress1_3, 0, @onPress1_5, 0, 0);
+  dispatchToLayer(@onPress1_0, @onPress1_1, @onPress1_2, 0, @onPress1_4, 0, 0);
 }
 func onRelease1() {
   globalRelease();
 
-  dispatchToLayer(@onRelease1_0, @onRelease1_1, @onRelease1_2, @onRelease1_3, 0, @onRelease1_5, 0, 0);
+  dispatchToLayer(@onRelease1_0, @onRelease1_1, @onRelease1_2, 0, @onRelease1_4, 0, 0);
 }
 
 func onPress1_0() {
-  pressStenoKeyButton(0 /* "S1" */);
-}
-func onRelease1_0() {
-  releaseStenoKey(0 /* "S1" */);
-}
-
-func onPress1_1() {
   updateQwertyActionTimes();
   pressScanCodeButton(1, 0, 20 /* "Q" */, 0);
 }
-func onRelease1_1() {
+func onRelease1_0() {
   releaseScanCodeButton(20 /* "Q" */);
 }
 
-func onPress1_2() {
+func onPress1_1() {
   pressScanCodeButton(1, 0, 30 /* "1" */, 0);
 }
-func onRelease1_2() {
+func onRelease1_1() {
   releaseScanCodeButton(30 /* "1" */);
 }
 
-func onPress1_3() {
+func onPress1_2() {
   pressScanCodeButton(1, 0, 66 /* "F9" */, 0);
 }
-func onRelease1_3() {
+func onRelease1_2() {
   releaseScanCodeButton(66 /* "F9" */);
 }
 
-func onPress1_5() {
+func onPress1_4() {
   startTimer(100, 2000, 0, @{
-    if (layer != 5) return;
+    if (layer != 4) return;
 
     if (!isButtonPressed(1)) return;
 
@@ -1866,53 +1724,46 @@ func onPress1_5() {
   drawBleSummary();
 
 }
-func onRelease1_5() {
+func onRelease1_4() {
   stopTimer(100);
 }
 
 func onPress2() {
   globalPress(2);
 
-  dispatchToLayer(@onPress2_0, @onPress2_1, @onPress2_2, @onPress2_3, 0, @onPress2_5, 0, 0);
+  dispatchToLayer(@onPress2_0, @onPress2_1, @onPress2_2, 0, @onPress2_4, 0, 0);
 }
 func onRelease2() {
   globalRelease();
 
-  dispatchToLayer(@onRelease2_0, @onRelease2_1, @onRelease2_2, @onRelease2_3, 0, @onRelease2_5, 0, 0);
+  dispatchToLayer(@onRelease2_0, @onRelease2_1, @onRelease2_2, 0, @onRelease2_4, 0, 0);
 }
 
 func onPress2_0() {
-  pressStenoKeyButton(2 /* "T-" */);
-}
-func onRelease2_0() {
-  releaseStenoKey(2 /* "T-" */);
-}
-
-func onPress2_1() {
   updateQwertyActionTimes();
   pressScanCodeButton(2, 0, 26 /* "W" */, 0);
 }
-func onRelease2_1() {
+func onRelease2_0() {
   releaseScanCodeButton(26 /* "W" */);
 }
 
-func onPress2_2() {
+func onPress2_1() {
   pressScanCodeButton(2, 0, 31 /* "2" */, 0);
 }
-func onRelease2_2() {
+func onRelease2_1() {
   releaseScanCodeButton(31 /* "2" */);
 }
 
-func onPress2_3() {
+func onPress2_2() {
   pressScanCodeButton(2, 0, 67 /* "F10" */, 0);
 }
-func onRelease2_3() {
+func onRelease2_2() {
   releaseScanCodeButton(67 /* "F10" */);
 }
 
-func onPress2_5() {
+func onPress2_4() {
   startTimer(101, 2000, 0, @{
-    if (layer != 5) return;
+    if (layer != 4) return;
 
     if (!isButtonPressed(2)) return;
 
@@ -1926,53 +1777,46 @@ func onPress2_5() {
   drawBleSummary();
 
 }
-func onRelease2_5() {
+func onRelease2_4() {
   stopTimer(101);
 }
 
 func onPress3() {
   globalPress(3);
 
-  dispatchToLayer(@onPress3_0, @onPress3_1, @onPress3_2, @onPress3_3, 0, @onPress3_5, 0, 0);
+  dispatchToLayer(@onPress3_0, @onPress3_1, @onPress3_2, 0, @onPress3_4, 0, 0);
 }
 func onRelease3() {
   globalRelease();
 
-  dispatchToLayer(@onRelease3_0, @onRelease3_1, @onRelease3_2, @onRelease3_3, 0, @onRelease3_5, 0, 0);
+  dispatchToLayer(@onRelease3_0, @onRelease3_1, @onRelease3_2, 0, @onRelease3_4, 0, 0);
 }
 
 func onPress3_0() {
-  pressStenoKeyButton(4 /* "P-" */);
-}
-func onRelease3_0() {
-  releaseStenoKey(4 /* "P-" */);
-}
-
-func onPress3_1() {
   updateQwertyActionTimes();
   pressScanCodeButton(3, 0, 8 /* "E" */, 0);
 }
-func onRelease3_1() {
+func onRelease3_0() {
   releaseScanCodeButton(8 /* "E" */);
 }
 
-func onPress3_2() {
+func onPress3_1() {
   pressScanCodeButton(3, 0, 32 /* "3" */, 0);
 }
-func onRelease3_2() {
+func onRelease3_1() {
   releaseScanCodeButton(32 /* "3" */);
 }
 
-func onPress3_3() {
+func onPress3_2() {
   pressScanCodeButton(3, 0, 68 /* "F11" */, 0);
 }
-func onRelease3_3() {
+func onRelease3_2() {
   releaseScanCodeButton(68 /* "F11" */);
 }
 
-func onPress3_5() {
+func onPress3_4() {
   startTimer(102, 2000, 0, @{
-    if (layer != 5) return;
+    if (layer != 4) return;
 
     if (!isButtonPressed(3)) return;
 
@@ -1986,53 +1830,46 @@ func onPress3_5() {
   drawBleSummary();
 
 }
-func onRelease3_5() {
+func onRelease3_4() {
   stopTimer(102);
 }
 
 func onPress4() {
   globalPress(4);
 
-  dispatchToLayer(@onPress4_0, @onPress4_1, @onPress4_2, @onPress4_3, 0, @onPress4_5, 0, 0);
+  dispatchToLayer(@onPress4_0, @onPress4_1, @onPress4_2, 0, @onPress4_4, 0, 0);
 }
 func onRelease4() {
   globalRelease();
 
-  dispatchToLayer(@onRelease4_0, @onRelease4_1, @onRelease4_2, @onRelease4_3, 0, @onRelease4_5, 0, 0);
+  dispatchToLayer(@onRelease4_0, @onRelease4_1, @onRelease4_2, 0, @onRelease4_4, 0, 0);
 }
 
 func onPress4_0() {
-  pressStenoKeyButton(6 /* "H-" */);
-}
-func onRelease4_0() {
-  releaseStenoKey(6 /* "H-" */);
-}
-
-func onPress4_1() {
   updateQwertyActionTimes();
   pressScanCodeButton(4, 0, 21 /* "R" */, 0);
 }
-func onRelease4_1() {
+func onRelease4_0() {
   releaseScanCodeButton(21 /* "R" */);
 }
 
-func onPress4_2() {
+func onPress4_1() {
   pressScanCodeButton(4, 0, 33 /* "4" */, 0);
 }
-func onRelease4_2() {
+func onRelease4_1() {
   releaseScanCodeButton(33 /* "4" */);
 }
 
-func onPress4_3() {
+func onPress4_2() {
   pressScanCodeButton(4, 0, 69 /* "F12" */, 0);
 }
-func onRelease4_3() {
+func onRelease4_2() {
   releaseScanCodeButton(69 /* "F12" */);
 }
 
-func onPress4_5() {
+func onPress4_4() {
   startTimer(103, 2000, 0, @{
-    if (layer != 5) return;
+    if (layer != 4) return;
 
     if (!isButtonPressed(4)) return;
 
@@ -2046,187 +1883,159 @@ func onPress4_5() {
   drawBleSummary();
 
 }
-func onRelease4_5() {
+func onRelease4_4() {
   stopTimer(103);
 }
 
 func onPress5() {
   globalPress(5);
 
-  dispatchToLayer(@onPress5_0, @onPress5_1, @onPress5_2, 0, @onPress5_4, @onPress5_5, 0, 0);
+  dispatchToLayer(@onPress5_0, @onPress5_1, 0, @onPress5_3, @onPress5_4, 0, 0);
 }
 func onRelease5() {
   globalRelease();
 
-  dispatchToLayer(@onRelease5_0, @onRelease5_1, @onRelease5_2, 0, @onRelease5_4, @onRelease5_5, 0, 0);
+  dispatchToLayer(@onRelease5_0, @onRelease5_1, 0, @onRelease5_3, @onRelease5_4, 0, 0);
 }
 
 func onPress5_0() {
-  pressStenoKeyButton(10 /* "*1" */);
-}
-func onRelease5_0() {
-  releaseStenoKey(10 /* "*1" */);
-}
-
-func onPress5_1() {
   updateQwertyActionTimes();
   pressScanCodeButton(5, 0, 23 /* "T" */, 0);
 }
-func onRelease5_1() {
+func onRelease5_0() {
   releaseScanCodeButton(23 /* "T" */);
 }
 
-func onPress5_2() {
+func onPress5_1() {
   pressScanCodeButton(5, 0, 34 /* "5" */, 0);
 }
-func onRelease5_2() {
+func onRelease5_1() {
   releaseScanCodeButton(34 /* "5" */);
 }
 
-func onPress5_4() {
+func onPress5_3() {
   pressScanCodeButton(5, 0, 222 /* "🔆" */, 0);
 }
-func onRelease5_4() {
+func onRelease5_3() {
   releaseScanCodeButton(222 /* "🔆" */);
 }
 
-func onPress5_5() {
+func onPress5_4() {
   // USB R
   setPreferredConnection(CONNECTION_USB2, CONNECTION_USB, CONNECTION_BLE);
   redrawDisplayOverlay();
 
 }
-func onRelease5_5() {
+func onRelease5_4() {
 }
 
 func onPress6() {
   globalPress(6);
 
-  dispatchToLayer(@onPress6_0, @onPress6_1, @onPress6_2, 0, @onPress6_4, 0, 0, 0);
+  dispatchToLayer(@onPress6_0, @onPress6_1, 0, @onPress6_3, 0, 0, 0);
 }
 func onRelease6() {
   globalRelease();
 
-  dispatchToLayer(@onRelease6_0, @onRelease6_1, @onRelease6_2, 0, @onRelease6_4, 0, 0, 0);
+  dispatchToLayer(@onRelease6_0, @onRelease6_1, 0, @onRelease6_3, 0, 0, 0);
 }
 
 func onPress6_0() {
-  pressStenoKeyButton(11 /* "*2" */);
-}
-func onRelease6_0() {
-  releaseStenoKey(11 /* "*2" */);
-}
-
-func onPress6_1() {
   updateQwertyActionTimes();
   pressScanCodeButton(6, 0, 28 /* "Y" */, 0);
 }
-func onRelease6_1() {
+func onRelease6_0() {
   releaseScanCodeButton(28 /* "Y" */);
 }
 
-func onPress6_2() {
+func onPress6_1() {
   pressScanCodeButton(6, 0, 35 /* "6" */, 0);
 }
-func onRelease6_2() {
+func onRelease6_1() {
   releaseScanCodeButton(35 /* "6" */);
 }
 
-func onPress6_4() {
+func onPress6_3() {
   pressScanCodeButton(6, 0, 217 /* "🔊" */, 0);
 }
-func onRelease6_4() {
+func onRelease6_3() {
   releaseScanCodeButton(217 /* "🔊" */);
 }
 
 func onPress7() {
   globalPress(7);
 
-  dispatchToLayer(@onPress7_0, @onPress7_1, @onPress7_2, 0, @onPress7_4, 0, @onPress7_6, 0);
+  dispatchToLayer(@onPress7_0, @onPress7_1, 0, @onPress7_3, 0, @onPress7_5, 0);
 }
 func onRelease7() {
   globalRelease();
 
-  dispatchToLayer(@onRelease7_0, @onRelease7_1, @onRelease7_2, 0, @onRelease7_4, 0, @onRelease7_6, 0);
+  dispatchToLayer(@onRelease7_0, @onRelease7_1, 0, @onRelease7_3, 0, @onRelease7_5, 0);
 }
 
 func onPress7_0() {
-  pressStenoKeyButton(16 /* "-F" */);
-}
-func onRelease7_0() {
-  releaseStenoKey(16 /* "-F" */);
-}
-
-func onPress7_1() {
   updateQwertyActionTimes();
   pressScanCodeButton(7, 0, 24 /* "U" */, 0);
 }
-func onRelease7_1() {
+func onRelease7_0() {
   releaseScanCodeButton(24 /* "U" */);
 }
 
-func onPress7_2() {
+func onPress7_1() {
   pressScanCodeButton(7, 0, 36 /* "7" */, 0);
 }
-func onRelease7_2() {
+func onRelease7_1() {
   releaseScanCodeButton(36 /* "7" */);
 }
 
-func onPress7_4() {
+func onPress7_3() {
   pressScanCodeButton(7, 0, 42 /* "⌫" */, 0);
 }
-func onRelease7_4() {
+func onRelease7_3() {
   releaseScanCodeButton(42 /* "⌫" */);
 }
 
-func onPress7_6() {
+func onPress7_5() {
   pressScanCodeButton(7, 0, 95 /* "7" */, 0);
 }
-func onRelease7_6() {
+func onRelease7_5() {
   releaseScanCodeButton(95 /* "7" */);
 }
 
 func onPress8() {
   globalPress(8);
 
-  dispatchToLayer(@onPress8_0, @onPress8_1, @onPress8_2, 0, @onPress8_4, @onPress8_5, @onPress8_6, 0);
+  dispatchToLayer(@onPress8_0, @onPress8_1, 0, @onPress8_3, @onPress8_4, @onPress8_5, 0);
 }
 func onRelease8() {
   globalRelease();
 
-  dispatchToLayer(@onRelease8_0, @onRelease8_1, @onRelease8_2, 0, @onRelease8_4, @onRelease8_5, @onRelease8_6, 0);
+  dispatchToLayer(@onRelease8_0, @onRelease8_1, 0, @onRelease8_3, @onRelease8_4, @onRelease8_5, 0);
 }
 
 func onPress8_0() {
-  pressStenoKeyButton(18 /* "-P" */);
-}
-func onRelease8_0() {
-  releaseStenoKey(18 /* "-P" */);
-}
-
-func onPress8_1() {
   updateQwertyActionTimes();
   pressScanCodeButton(8, 0, 12 /* "I" */, 0);
 }
-func onRelease8_1() {
+func onRelease8_0() {
   releaseScanCodeButton(12 /* "I" */);
 }
 
-func onPress8_2() {
+func onPress8_1() {
   pressScanCodeButton(8, 0, 37 /* "8" */, 0);
 }
-func onRelease8_2() {
+func onRelease8_1() {
   releaseScanCodeButton(37 /* "8" */);
 }
 
-func onPress8_4() {
+func onPress8_3() {
   pressScanCodeButton(8, 0, 82 /* "↑" */, 0);
 }
-func onRelease8_4() {
+func onRelease8_3() {
   releaseScanCodeButton(82 /* "↑" */);
 }
 
-func onPress8_5() {
+func onPress8_4() {
   // Brightness Up
   if (brightness < 8) {
     brightness = brightness + 1;
@@ -2235,57 +2044,50 @@ func onPress8_5() {
     drawBar(BRIGHTNESS_IMAGE, brightness);
   }
 }
-func onRelease8_5() {
+func onRelease8_4() {
 }
 
-func onPress8_6() {
+func onPress8_5() {
   pressScanCodeButton(8, 0, 96 /* "8" */, 0);
 }
-func onRelease8_6() {
+func onRelease8_5() {
   releaseScanCodeButton(96 /* "8" */);
 }
 
 func onPress9() {
   globalPress(9);
 
-  dispatchToLayer(@onPress9_0, @onPress9_1, @onPress9_2, 0, @onPress9_4, @onPress9_5, @onPress9_6, 0);
+  dispatchToLayer(@onPress9_0, @onPress9_1, 0, @onPress9_3, @onPress9_4, @onPress9_5, 0);
 }
 func onRelease9() {
   globalRelease();
 
-  dispatchToLayer(@onRelease9_0, @onRelease9_1, @onRelease9_2, 0, @onRelease9_4, @onRelease9_5, @onRelease9_6, 0);
+  dispatchToLayer(@onRelease9_0, @onRelease9_1, 0, @onRelease9_3, @onRelease9_4, @onRelease9_5, 0);
 }
 
 func onPress9_0() {
-  pressStenoKeyButton(20 /* "-L" */);
-}
-func onRelease9_0() {
-  releaseStenoKey(20 /* "-L" */);
-}
-
-func onPress9_1() {
   updateQwertyActionTimes();
   pressScanCodeButton(9, 0, 18 /* "O" */, 0);
 }
-func onRelease9_1() {
+func onRelease9_0() {
   releaseScanCodeButton(18 /* "O" */);
 }
 
-func onPress9_2() {
+func onPress9_1() {
   pressScanCodeButton(9, 0, 38 /* "9" */, 0);
 }
-func onRelease9_2() {
+func onRelease9_1() {
   releaseScanCodeButton(38 /* "9" */);
 }
 
-func onPress9_4() {
+func onPress9_3() {
   pressScanCodeButton(9, 0, 76 /* "⌦" */, 0);
 }
-func onRelease9_4() {
+func onRelease9_3() {
   releaseScanCodeButton(76 /* "⌦" */);
 }
 
-func onPress9_5() {
+func onPress9_4() {
   // Saturation Up
   if (saturation < 8) {
     saturation = saturation + 1;
@@ -2294,162 +2096,124 @@ func onPress9_5() {
     drawBar(SATURATION_IMAGE, saturation);
   }
 }
-func onRelease9_5() {
+func onRelease9_4() {
 }
 
-func onPress9_6() {
+func onPress9_5() {
   pressScanCodeButton(9, 0, 97 /* "9" */, 0);
 }
-func onRelease9_6() {
+func onRelease9_5() {
   releaseScanCodeButton(97 /* "9" */);
 }
 
 func onPress10() {
   globalPress(10);
 
-  dispatchToLayer(@onPress10_0, @onPress10_1, @onPress10_2, 0, @onPress10_4, 0, @onPress10_6, 0);
+  dispatchToLayer(@onPress10_0, @onPress10_1, 0, @onPress10_3, 0, @onPress10_5, 0);
 }
 func onRelease10() {
   globalRelease();
 
-  dispatchToLayer(@onRelease10_0, @onRelease10_1, @onRelease10_2, 0, @onRelease10_4, 0, @onRelease10_6, 0);
+  dispatchToLayer(@onRelease10_0, @onRelease10_1, 0, @onRelease10_3, 0, @onRelease10_5, 0);
 }
 
 func onPress10_0() {
-  pressStenoKeyButton(22 /* "-T" */);
-}
-func onRelease10_0() {
-  releaseStenoKey(22 /* "-T" */);
-}
-
-func onPress10_1() {
   updateQwertyActionTimes();
   pressScanCodeButton(10, 0, 19 /* "P" */, 0);
 }
-func onRelease10_1() {
+func onRelease10_0() {
   releaseScanCodeButton(19 /* "P" */);
 }
 
-func onPress10_2() {
+func onPress10_1() {
   pressScanCodeButton(10, 0, 39 /* "0" */, 0);
 }
-func onRelease10_2() {
+func onRelease10_1() {
   releaseScanCodeButton(39 /* "0" */);
 }
 
-func onPress10_4() {
+func onPress10_3() {
   pressScanCodeButton(10, 0, 75 /* "⇞" */, 0);
 }
-func onRelease10_4() {
+func onRelease10_3() {
   releaseScanCodeButton(75 /* "⇞" */);
 }
 
-func onPress10_6() {
+func onPress10_5() {
   pressScanCodeButton(10, 0, 85 /* "*" */, 0);
 }
-func onRelease10_6() {
+func onRelease10_5() {
   releaseScanCodeButton(85 /* "*" */);
 }
 
 func onPress11() {
   globalPress(11);
 
-  dispatchToLayer(@onPress11_0, @onPress11_1, @onPress11_2, 0, @onPress11_4, @onPress11_5, @onPress11_6, 0);
+  dispatchToLayer(@onPress11_0, @onPress11_1, 0, @onPress11_3, @onPress11_4, @onPress11_5, 0);
 }
 func onRelease11() {
   globalRelease();
 
-  dispatchToLayer(@onRelease11_0, @onRelease11_1, @onRelease11_2, 0, @onRelease11_4, @onRelease11_5, @onRelease11_6, 0);
+  dispatchToLayer(@onRelease11_0, @onRelease11_1, 0, @onRelease11_3, @onRelease11_4, @onRelease11_5, 0);
 }
 
 func onPress11_0() {
-  pressStenoKeyButton(24 /* "-D" */);
-}
-func onRelease11_0() {
-  releaseStenoKey(24 /* "-D" */);
-}
-
-func onPress11_1() {
   updateQwertyActionTimes();
   pressScanCodeButton(11, 0, 42 /* "⌫" */, 0);
 }
-func onRelease11_1() {
+func onRelease11_0() {
   releaseScanCodeButton(42 /* "⌫" */);
 }
 
-func onPress11_2() {
+func onPress11_1() {
   pressScanCodeButton(11, 0, 225 /* "⇧" */, 1);
   pressScanCodeButton(11, 2, 46 /* "=" */, 0);
 }
-func onRelease11_2() {
+func onRelease11_1() {
   releaseScanCodeButton(46 /* "=" */);
   releaseScanCodeButton(225 /* "⇧" */);
 }
 
-func onPress11_4() {
+func onPress11_3() {
   pressScanCodeButton(11, 0, 74 /* "⇱" */, 0);
 }
-func onRelease11_4() {
+func onRelease11_3() {
   releaseScanCodeButton(74 /* "⇱" */);
 }
 
-func onPress11_5() {
+func onPress11_4() {
   // Disconnect BLE
   disconnectBle();
 
 }
-func onRelease11_5() {
+func onRelease11_4() {
 }
 
-func onPress11_6() {
+func onPress11_5() {
   pressScanCodeButton(11, 0, 42 /* "⌫" */, 0);
 }
-func onRelease11_6() {
+func onRelease11_5() {
   releaseScanCodeButton(42 /* "⌫" */);
 }
 
 func onPress12() {
   globalPress(12);
 
-  dispatchToLayer(@onPress12_0, @onPress12_1, @onPress12_2, 0, 0, 0, 0, @onPress12_7);
+  dispatchToLayer(@onPress12_0, @onPress12_1, 0, 0, 0, 0, @onPress12_6);
 }
 func onRelease12() {
   globalRelease();
 
-  dispatchToLayer(@onRelease12_0, @onRelease12_1, @onRelease12_2, 0, 0, 0, 0, @onRelease12_7);
-  // Temp-QWERTY
-
-  // Returning here prevents the next sequence, SetLayer, from occurring.
-  if (isInReleaseAll()) {
-    return;
-  }
-  if (!wasSteno12) {
-    return;
-  }
-  wasSteno12 = 0;
-
-  deactivateGlobal();
-  deactivateDynamic();
-  activate0();
-  activateGlobal();
-  onRelease12_0();
-
+  dispatchToLayer(@onRelease12_0, @onRelease12_1, 0, 0, 0, 0, @onRelease12_6);
 }
 
 var timer12_0;
 func onPress12_0() {
+  updateQwertyActionTimes();
   if (!isInPressAll()) {
     timer12_0 = getTime();
   }
-  // Auto-Return
-  // Tag this so the global layer can return to steno later
-  wasSteno12 = 1;
-  deactivateGlobal();
-  deactivate0();
-  activate1();
-  activateGlobal();
   pressScanCodeButton(12, 0, 224 /* "⌃" */, 0);
-
 }
 func onRelease12_0() {
   releaseScanCodeButton(224 /* "⌃" */);
@@ -2460,492 +2224,419 @@ func onRelease12_0() {
   }
 }
 
-var timer12_1;
 func onPress12_1() {
-  updateQwertyActionTimes();
-  if (!isInPressAll()) {
-    timer12_1 = getTime();
-  }
-  pressScanCodeButton(12, 0, 224 /* "⌃" */, 0);
-}
-func onRelease12_1() {
-  releaseScanCodeButton(224 /* "⌃" */);
-  if (getTime() - timer12_1 <= 200) {
-    pressScanCodeButton(12, 0, 41 /* "⎋" */, 1);
-    releaseScanCodeButton(41 /* "⎋" */);
-
-  }
-}
-
-func onPress12_2() {
   pressScanCodeButton(12, 0, 225 /* "⇧" */, 1);
   pressScanCodeButton(12, 2, 53 /* "`" */, 0);
 }
-func onRelease12_2() {
+func onRelease12_1() {
   releaseScanCodeButton(53 /* "`" */);
   releaseScanCodeButton(225 /* "⇧" */);
 }
 
-func onPress12_7() {
+func onPress12_6() {
   pressScanCodeButton(12, 0, 41 /* "⎋" */, 1);
   releaseScanCodeButton(41 /* "⎋" */);
   // Cancel
   replyUserPresence(0);
 
 }
-func onRelease12_7() {
+func onRelease12_6() {
 }
 
 func onPress13() {
   globalPress(13);
 
-  dispatchToLayer(@onPress13_0, @onPress13_1, @onPress13_2, @onPress13_3, @onPress13_4, @onPress13_5, @onPress13_6, 0);
+  dispatchToLayer(@onPress13_0, @onPress13_1, @onPress13_2, @onPress13_3, @onPress13_4, @onPress13_5, 0);
 }
 func onRelease13() {
   globalRelease();
 
-  dispatchToLayer(@onRelease13_0, @onRelease13_1, @onRelease13_2, @onRelease13_3, @onRelease13_4, @onRelease13_5, @onRelease13_6, 0);
+  dispatchToLayer(@onRelease13_0, @onRelease13_1, @onRelease13_2, @onRelease13_3, @onRelease13_4, @onRelease13_5, 0);
 }
 
 func onPress13_0() {
-  pressStenoKeyButton(1 /* "S2" */);
-}
-func onRelease13_0() {
-  releaseStenoKey(1 /* "S2" */);
-}
-
-func onPress13_1() {
   updateQwertyActionTimes();
   pressScanCodeButton(13, 0, 4 /* "A" */, 0);
 }
-func onRelease13_1() {
+func onRelease13_0() {
   releaseScanCodeButton(4 /* "A" */);
 }
 
-func onPress13_2() {
+func onPress13_1() {
   pressScanCodeButton(13, 0, 225 /* "⇧" */, 1);
   pressScanCodeButton(13, 2, 30 /* "1" */, 0);
 }
-func onRelease13_2() {
+func onRelease13_1() {
   releaseScanCodeButton(30 /* "1" */);
   releaseScanCodeButton(225 /* "⇧" */);
 }
 
-func onPress13_3() {
+func onPress13_2() {
   pressScanCodeButton(13, 0, 62 /* "F5" */, 0);
 }
-func onRelease13_3() {
+func onRelease13_2() {
   releaseScanCodeButton(62 /* "F5" */);
 }
 
-func onPress13_4() {
+func onPress13_3() {
   pressScanCodeButton(13, 0, 227 /* "⌘" */, 0);
 }
-func onRelease13_4() {
+func onRelease13_3() {
   releaseScanCodeButton(227 /* "⌘" */);
 }
 
-func onPress13_5() {
+func onPress13_4() {
   console("set_steno_mode embedded");
   //
   drawSettingsFeedbackText("Javelin");
 
 }
-func onRelease13_5() {
+func onRelease13_4() {
 }
 
-func onPress13_6() {
+func onPress13_5() {
   pressScanCodeButton(13, 0, 227 /* "⌘" */, 0);
 }
-func onRelease13_6() {
+func onRelease13_5() {
   releaseScanCodeButton(227 /* "⌘" */);
 }
 
 func onPress14() {
   globalPress(14);
 
-  dispatchToLayer(@onPress14_0, @onPress14_1, @onPress14_2, @onPress14_3, @onPress14_4, @onPress14_5, @onPress14_6, 0);
+  dispatchToLayer(@onPress14_0, @onPress14_1, @onPress14_2, @onPress14_3, @onPress14_4, @onPress14_5, 0);
 }
 func onRelease14() {
   globalRelease();
 
-  dispatchToLayer(@onRelease14_0, @onRelease14_1, @onRelease14_2, @onRelease14_3, @onRelease14_4, @onRelease14_5, @onRelease14_6, 0);
+  dispatchToLayer(@onRelease14_0, @onRelease14_1, @onRelease14_2, @onRelease14_3, @onRelease14_4, @onRelease14_5, 0);
 }
 
 func onPress14_0() {
-  pressStenoKeyButton(3 /* "K-" */);
-}
-func onRelease14_0() {
-  releaseStenoKey(3 /* "K-" */);
-}
-
-func onPress14_1() {
   updateQwertyActionTimes();
   pressScanCodeButton(14, 0, 22 /* "S" */, 0);
 }
-func onRelease14_1() {
+func onRelease14_0() {
   releaseScanCodeButton(22 /* "S" */);
 }
 
-func onPress14_2() {
+func onPress14_1() {
   pressScanCodeButton(14, 0, 225 /* "⇧" */, 1);
   pressScanCodeButton(14, 2, 31 /* "2" */, 0);
 }
-func onRelease14_2() {
+func onRelease14_1() {
   releaseScanCodeButton(31 /* "2" */);
   releaseScanCodeButton(225 /* "⇧" */);
 }
 
-func onPress14_3() {
+func onPress14_2() {
   pressScanCodeButton(14, 0, 63 /* "F6" */, 0);
 }
-func onRelease14_3() {
+func onRelease14_2() {
   releaseScanCodeButton(63 /* "F6" */);
 }
 
-func onPress14_4() {
+func onPress14_3() {
   pressScanCodeButton(14, 0, 226 /* "⌥" */, 0);
 }
-func onRelease14_4() {
+func onRelease14_3() {
   releaseScanCodeButton(226 /* "⌥" */);
 }
 
-func onPress14_5() {
+func onPress14_4() {
   console("set_steno_mode gemini");
   //
   drawSettingsFeedbackText("Gemini");
 
 }
-func onRelease14_5() {
+func onRelease14_4() {
 }
 
-func onPress14_6() {
+func onPress14_5() {
   pressScanCodeButton(14, 0, 226 /* "⌥" */, 0);
 }
-func onRelease14_6() {
+func onRelease14_5() {
   releaseScanCodeButton(226 /* "⌥" */);
 }
 
 func onPress15() {
   globalPress(15);
 
-  dispatchToLayer(@onPress15_0, @onPress15_1, @onPress15_2, @onPress15_3, @onPress15_4, @onPress15_5, @onPress15_6, 0);
+  dispatchToLayer(@onPress15_0, @onPress15_1, @onPress15_2, @onPress15_3, @onPress15_4, @onPress15_5, 0);
 }
 func onRelease15() {
   globalRelease();
 
-  dispatchToLayer(@onRelease15_0, @onRelease15_1, @onRelease15_2, @onRelease15_3, @onRelease15_4, @onRelease15_5, @onRelease15_6, 0);
+  dispatchToLayer(@onRelease15_0, @onRelease15_1, @onRelease15_2, @onRelease15_3, @onRelease15_4, @onRelease15_5, 0);
 }
 
 func onPress15_0() {
-  pressStenoKeyButton(5 /* "W-" */);
-}
-func onRelease15_0() {
-  releaseStenoKey(5 /* "W-" */);
-}
-
-func onPress15_1() {
   updateQwertyActionTimes();
   pressScanCodeButton(15, 0, 7 /* "D" */, 0);
 }
-func onRelease15_1() {
+func onRelease15_0() {
   releaseScanCodeButton(7 /* "D" */);
 }
 
-func onPress15_2() {
+func onPress15_1() {
   pressScanCodeButton(15, 0, 225 /* "⇧" */, 1);
   pressScanCodeButton(15, 2, 32 /* "3" */, 0);
 }
-func onRelease15_2() {
+func onRelease15_1() {
   releaseScanCodeButton(32 /* "3" */);
   releaseScanCodeButton(225 /* "⇧" */);
 }
 
-func onPress15_3() {
+func onPress15_2() {
   pressScanCodeButton(15, 0, 64 /* "F7" */, 0);
 }
-func onRelease15_3() {
+func onRelease15_2() {
   releaseScanCodeButton(64 /* "F7" */);
 }
 
-func onPress15_4() {
+func onPress15_3() {
   pressScanCodeButton(15, 0, 224 /* "⌃" */, 0);
 }
-func onRelease15_4() {
+func onRelease15_3() {
   releaseScanCodeButton(224 /* "⌃" */);
 }
 
-func onPress15_5() {
+func onPress15_4() {
   console("set_steno_mode tx_bolt");
   //
   drawSettingsFeedbackText("TX Bolt");
 
 }
-func onRelease15_5() {
+func onRelease15_4() {
 }
 
-func onPress15_6() {
+func onPress15_5() {
   pressScanCodeButton(15, 0, 224 /* "⌃" */, 0);
 }
-func onRelease15_6() {
+func onRelease15_5() {
   releaseScanCodeButton(224 /* "⌃" */);
 }
 
 func onPress16() {
   globalPress(16);
 
-  dispatchToLayer(@onPress16_0, @onPress16_1, @onPress16_2, @onPress16_3, @onPress16_4, @onPress16_5, @onPress16_6, 0);
+  dispatchToLayer(@onPress16_0, @onPress16_1, @onPress16_2, @onPress16_3, @onPress16_4, @onPress16_5, 0);
 }
 func onRelease16() {
   globalRelease();
 
-  dispatchToLayer(@onRelease16_0, @onRelease16_1, @onRelease16_2, @onRelease16_3, @onRelease16_4, @onRelease16_5, @onRelease16_6, 0);
+  dispatchToLayer(@onRelease16_0, @onRelease16_1, @onRelease16_2, @onRelease16_3, @onRelease16_4, @onRelease16_5, 0);
 }
 
 func onPress16_0() {
-  pressStenoKeyButton(7 /* "R-" */);
-}
-func onRelease16_0() {
-  releaseStenoKey(7 /* "R-" */);
-}
-
-func onPress16_1() {
   updateQwertyActionTimes();
   pressScanCodeButton(16, 0, 9 /* "F" */, 0);
 }
-func onRelease16_1() {
+func onRelease16_0() {
   releaseScanCodeButton(9 /* "F" */);
 }
 
-func onPress16_2() {
+func onPress16_1() {
   pressScanCodeButton(16, 0, 225 /* "⇧" */, 1);
   pressScanCodeButton(16, 2, 33 /* "4" */, 0);
 }
-func onRelease16_2() {
+func onRelease16_1() {
   releaseScanCodeButton(33 /* "4" */);
   releaseScanCodeButton(225 /* "⇧" */);
 }
 
-func onPress16_3() {
+func onPress16_2() {
   pressScanCodeButton(16, 0, 65 /* "F8" */, 0);
 }
-func onRelease16_3() {
+func onRelease16_2() {
   releaseScanCodeButton(65 /* "F8" */);
 }
 
-func onPress16_4() {
+func onPress16_3() {
   pressScanCodeButton(16, 0, 225 /* "⇧" */, 0);
 }
-func onRelease16_4() {
+func onRelease16_3() {
   releaseScanCodeButton(225 /* "⇧" */);
 }
 
-func onPress16_5() {
+func onPress16_4() {
   console("set_steno_mode plover_hid");
   //
   drawSettingsFeedbackText("Plover HID");
 
 }
-func onRelease16_5() {
+func onRelease16_4() {
 }
 
-func onPress16_6() {
+func onPress16_5() {
   pressScanCodeButton(16, 0, 225 /* "⇧" */, 0);
 }
-func onRelease16_6() {
+func onRelease16_5() {
   releaseScanCodeButton(225 /* "⇧" */);
 }
 
 func onPress17() {
   globalPress(17);
 
-  dispatchToLayer(@onPress17_0, @onPress17_1, @onPress17_2, 0, @onPress17_4, 0, 0, 0);
+  dispatchToLayer(@onPress17_0, @onPress17_1, 0, @onPress17_3, 0, 0, 0);
 }
 func onRelease17() {
   globalRelease();
 
-  dispatchToLayer(@onRelease17_0, @onRelease17_1, @onRelease17_2, 0, @onRelease17_4, 0, 0, 0);
+  dispatchToLayer(@onRelease17_0, @onRelease17_1, 0, @onRelease17_3, 0, 0, 0);
 }
 
 func onPress17_0() {
-  pressStenoKeyButton(12 /* "*3" */);
-}
-func onRelease17_0() {
-  releaseStenoKey(12 /* "*3" */);
-}
-
-func onPress17_1() {
   updateQwertyActionTimes();
   pressScanCodeButton(17, 0, 10 /* "G" */, 0);
 }
-func onRelease17_1() {
+func onRelease17_0() {
   releaseScanCodeButton(10 /* "G" */);
 }
 
-func onPress17_2() {
+func onPress17_1() {
   pressScanCodeButton(17, 0, 225 /* "⇧" */, 1);
   pressScanCodeButton(17, 2, 34 /* "5" */, 0);
 }
-func onRelease17_2() {
+func onRelease17_1() {
   releaseScanCodeButton(34 /* "5" */);
   releaseScanCodeButton(225 /* "⇧" */);
 }
 
-func onPress17_4() {
+func onPress17_3() {
   pressScanCodeButton(17, 0, 223 /* "🔅" */, 0);
 }
-func onRelease17_4() {
+func onRelease17_3() {
   releaseScanCodeButton(223 /* "🔅" */);
 }
 
 func onPress18() {
   globalPress(18);
 
-  dispatchToLayer(@onPress18_0, @onPress18_1, @onPress18_2, 0, @onPress18_4, 0, 0, 0);
+  dispatchToLayer(@onPress18_0, @onPress18_1, 0, @onPress18_3, 0, 0, 0);
 }
 func onRelease18() {
   globalRelease();
 
-  dispatchToLayer(@onRelease18_0, @onRelease18_1, @onRelease18_2, 0, @onRelease18_4, 0, 0, 0);
+  dispatchToLayer(@onRelease18_0, @onRelease18_1, 0, @onRelease18_3, 0, 0, 0);
 }
 
 func onPress18_0() {
-  pressStenoKeyButton(13 /* "*4" */);
-}
-func onRelease18_0() {
-  releaseStenoKey(13 /* "*4" */);
-}
-
-func onPress18_1() {
   updateQwertyActionTimes();
   pressScanCodeButton(18, 0, 11 /* "H" */, 0);
 }
-func onRelease18_1() {
+func onRelease18_0() {
   releaseScanCodeButton(11 /* "H" */);
 }
 
-func onPress18_2() {
+func onPress18_1() {
   pressScanCodeButton(18, 0, 225 /* "⇧" */, 1);
   pressScanCodeButton(18, 2, 35 /* "6" */, 0);
 }
-func onRelease18_2() {
+func onRelease18_1() {
   releaseScanCodeButton(35 /* "6" */);
   releaseScanCodeButton(225 /* "⇧" */);
 }
 
-func onPress18_4() {
+func onPress18_3() {
   pressScanCodeButton(18, 0, 218 /* "🔈" */, 0);
 }
-func onRelease18_4() {
+func onRelease18_3() {
   releaseScanCodeButton(218 /* "🔈" */);
 }
 
 func onPress19() {
   globalPress(19);
 
-  dispatchToLayer(@onPress19_0, @onPress19_1, @onPress19_2, @onPress19_3, @onPress19_4, 0, @onPress19_6, 0);
+  dispatchToLayer(@onPress19_0, @onPress19_1, @onPress19_2, @onPress19_3, 0, @onPress19_5, 0);
 }
 func onRelease19() {
   globalRelease();
 
-  dispatchToLayer(@onRelease19_0, @onRelease19_1, @onRelease19_2, @onRelease19_3, @onRelease19_4, 0, @onRelease19_6, 0);
+  dispatchToLayer(@onRelease19_0, @onRelease19_1, @onRelease19_2, @onRelease19_3, 0, @onRelease19_5, 0);
 }
 
 func onPress19_0() {
-  pressStenoKeyButton(17 /* "-R" */);
-}
-func onRelease19_0() {
-  releaseStenoKey(17 /* "-R" */);
-}
-
-func onPress19_1() {
   updateQwertyActionTimes();
   pressScanCodeButton(19, 0, 13 /* "J" */, 0);
 }
-func onRelease19_1() {
+func onRelease19_0() {
   releaseScanCodeButton(13 /* "J" */);
 }
 
-func onPress19_2() {
+func onPress19_1() {
   pressScanCodeButton(19, 0, 225 /* "⇧" */, 1);
   pressScanCodeButton(19, 2, 36 /* "7" */, 0);
 }
-func onRelease19_2() {
+func onRelease19_1() {
   releaseScanCodeButton(36 /* "7" */);
   releaseScanCodeButton(225 /* "⇧" */);
 }
 
-func onPress19_3() {
+func onPress19_2() {
   pressScanCodeButton(19, 0, 225 /* "⇧" */, 0);
 }
-func onRelease19_3() {
+func onRelease19_2() {
   releaseScanCodeButton(225 /* "⇧" */);
 }
 
-func onPress19_4() {
+func onPress19_3() {
   pressScanCodeButton(19, 0, 80 /* "←" */, 0);
 }
-func onRelease19_4() {
+func onRelease19_3() {
   releaseScanCodeButton(80 /* "←" */);
 }
 
-func onPress19_6() {
+func onPress19_5() {
   pressScanCodeButton(19, 0, 92 /* "4" */, 0);
 }
-func onRelease19_6() {
+func onRelease19_5() {
   releaseScanCodeButton(92 /* "4" */);
 }
 
 func onPress20() {
   globalPress(20);
 
-  dispatchToLayer(@onPress20_0, @onPress20_1, @onPress20_2, @onPress20_3, @onPress20_4, @onPress20_5, @onPress20_6, 0);
+  dispatchToLayer(@onPress20_0, @onPress20_1, @onPress20_2, @onPress20_3, @onPress20_4, @onPress20_5, 0);
 }
 func onRelease20() {
   globalRelease();
 
-  dispatchToLayer(@onRelease20_0, @onRelease20_1, @onRelease20_2, @onRelease20_3, @onRelease20_4, @onRelease20_5, @onRelease20_6, 0);
+  dispatchToLayer(@onRelease20_0, @onRelease20_1, @onRelease20_2, @onRelease20_3, @onRelease20_4, @onRelease20_5, 0);
 }
 
 func onPress20_0() {
-  pressStenoKeyButton(19 /* "-B" */);
-}
-func onRelease20_0() {
-  releaseStenoKey(19 /* "-B" */);
-}
-
-func onPress20_1() {
   updateQwertyActionTimes();
   pressScanCodeButton(20, 0, 14 /* "K" */, 0);
 }
-func onRelease20_1() {
+func onRelease20_0() {
   releaseScanCodeButton(14 /* "K" */);
 }
 
-func onPress20_2() {
+func onPress20_1() {
   pressScanCodeButton(20, 0, 225 /* "⇧" */, 1);
   pressScanCodeButton(20, 2, 37 /* "8" */, 0);
 }
-func onRelease20_2() {
+func onRelease20_1() {
   releaseScanCodeButton(37 /* "8" */);
   releaseScanCodeButton(225 /* "⇧" */);
 }
 
-func onPress20_3() {
+func onPress20_2() {
   pressScanCodeButton(20, 0, 224 /* "⌃" */, 0);
 }
-func onRelease20_3() {
+func onRelease20_2() {
   releaseScanCodeButton(224 /* "⌃" */);
 }
 
-func onPress20_4() {
+func onPress20_3() {
   pressScanCodeButton(20, 0, 81 /* "↓" */, 0);
 }
-func onRelease20_4() {
+func onRelease20_3() {
   releaseScanCodeButton(81 /* "↓" */);
 }
 
-func onPress20_5() {
+func onPress20_4() {
   // Brightness Down
   if (brightness > 0) {
     brightness = brightness - 1;
@@ -2954,66 +2645,59 @@ func onPress20_5() {
     drawBar(BRIGHTNESS_IMAGE, brightness);
   }
 }
-func onRelease20_5() {
+func onRelease20_4() {
 }
 
-func onPress20_6() {
+func onPress20_5() {
   pressScanCodeButton(20, 0, 93 /* "5" */, 0);
 }
-func onRelease20_6() {
+func onRelease20_5() {
   releaseScanCodeButton(93 /* "5" */);
 }
 
 func onPress21() {
   globalPress(21);
 
-  dispatchToLayer(@onPress21_0, @onPress21_1, @onPress21_2, @onPress21_3, @onPress21_4, @onPress21_5, @onPress21_6, 0);
+  dispatchToLayer(@onPress21_0, @onPress21_1, @onPress21_2, @onPress21_3, @onPress21_4, @onPress21_5, 0);
 }
 func onRelease21() {
   globalRelease();
 
-  dispatchToLayer(@onRelease21_0, @onRelease21_1, @onRelease21_2, @onRelease21_3, @onRelease21_4, @onRelease21_5, @onRelease21_6, 0);
+  dispatchToLayer(@onRelease21_0, @onRelease21_1, @onRelease21_2, @onRelease21_3, @onRelease21_4, @onRelease21_5, 0);
 }
 
 func onPress21_0() {
-  pressStenoKeyButton(21 /* "-G" */);
-}
-func onRelease21_0() {
-  releaseStenoKey(21 /* "-G" */);
-}
-
-func onPress21_1() {
   updateQwertyActionTimes();
   pressScanCodeButton(21, 0, 15 /* "L" */, 0);
 }
-func onRelease21_1() {
+func onRelease21_0() {
   releaseScanCodeButton(15 /* "L" */);
 }
 
-func onPress21_2() {
+func onPress21_1() {
   pressScanCodeButton(21, 0, 225 /* "⇧" */, 1);
   pressScanCodeButton(21, 2, 38 /* "9" */, 0);
 }
-func onRelease21_2() {
+func onRelease21_1() {
   releaseScanCodeButton(38 /* "9" */);
   releaseScanCodeButton(225 /* "⇧" */);
 }
 
-func onPress21_3() {
+func onPress21_2() {
   pressScanCodeButton(21, 0, 226 /* "⌥" */, 0);
 }
-func onRelease21_3() {
+func onRelease21_2() {
   releaseScanCodeButton(226 /* "⌥" */);
 }
 
-func onPress21_4() {
+func onPress21_3() {
   pressScanCodeButton(21, 0, 79 /* "→" */, 0);
 }
-func onRelease21_4() {
+func onRelease21_3() {
   releaseScanCodeButton(79 /* "→" */);
 }
 
-func onPress21_5() {
+func onPress21_4() {
   // Saturation Down
   if (saturation > 0) {
     saturation = saturation - 1;
@@ -3022,397 +2706,319 @@ func onPress21_5() {
     drawBar(SATURATION_IMAGE, saturation);
   }
 }
-func onRelease21_5() {
+func onRelease21_4() {
 }
 
-func onPress21_6() {
+func onPress21_5() {
   pressScanCodeButton(21, 0, 94 /* "6" */, 0);
 }
-func onRelease21_6() {
+func onRelease21_5() {
   releaseScanCodeButton(94 /* "6" */);
 }
 
 func onPress22() {
   globalPress(22);
 
-  dispatchToLayer(@onPress22_0, @onPress22_1, @onPress22_2, @onPress22_3, @onPress22_4, 0, @onPress22_6, 0);
+  dispatchToLayer(@onPress22_0, @onPress22_1, @onPress22_2, @onPress22_3, 0, @onPress22_5, 0);
 }
 func onRelease22() {
   globalRelease();
 
-  dispatchToLayer(@onRelease22_0, @onRelease22_1, @onRelease22_2, @onRelease22_3, @onRelease22_4, 0, @onRelease22_6, 0);
+  dispatchToLayer(@onRelease22_0, @onRelease22_1, @onRelease22_2, @onRelease22_3, 0, @onRelease22_5, 0);
 }
 
 func onPress22_0() {
-  pressStenoKeyButton(23 /* "-S" */);
-}
-func onRelease22_0() {
-  releaseStenoKey(23 /* "-S" */);
-}
-
-func onPress22_1() {
   updateQwertyActionTimes();
   pressScanCodeButton(22, 0, 51 /* ";" */, 0);
 }
-func onRelease22_1() {
+func onRelease22_0() {
   releaseScanCodeButton(51 /* ";" */);
 }
 
-func onPress22_2() {
+func onPress22_1() {
   pressScanCodeButton(22, 0, 225 /* "⇧" */, 1);
   pressScanCodeButton(22, 2, 39 /* "0" */, 0);
 }
-func onRelease22_2() {
+func onRelease22_1() {
   releaseScanCodeButton(39 /* "0" */);
   releaseScanCodeButton(225 /* "⇧" */);
 }
 
-func onPress22_3() {
+func onPress22_2() {
   pressScanCodeButton(22, 0, 227 /* "⌘" */, 0);
 }
-func onRelease22_3() {
+func onRelease22_2() {
   releaseScanCodeButton(227 /* "⌘" */);
 }
 
-func onPress22_4() {
+func onPress22_3() {
   pressScanCodeButton(22, 0, 78 /* "⇟" */, 0);
 }
-func onRelease22_4() {
+func onRelease22_3() {
   releaseScanCodeButton(78 /* "⇟" */);
 }
 
-func onPress22_6() {
+func onPress22_5() {
   pressScanCodeButton(22, 0, 86 /* "-" */, 0);
 }
-func onRelease22_6() {
+func onRelease22_5() {
   releaseScanCodeButton(86 /* "-" */);
 }
 
 func onPress23() {
   globalPress(23);
 
-  dispatchToLayer(@onPress23_0, @onPress23_1, @onPress23_2, 0, @onPress23_4, 0, @onPress23_6, 0);
+  dispatchToLayer(@onPress23_0, @onPress23_1, 0, @onPress23_3, 0, @onPress23_5, 0);
 }
 func onRelease23() {
   globalRelease();
 
-  dispatchToLayer(@onRelease23_0, @onRelease23_1, @onRelease23_2, 0, @onRelease23_4, 0, @onRelease23_6, 0);
+  dispatchToLayer(@onRelease23_0, @onRelease23_1, 0, @onRelease23_3, 0, @onRelease23_5, 0);
 }
 
 func onPress23_0() {
-  pressStenoKeyButton(25 /* "-Z" */);
-}
-func onRelease23_0() {
-  releaseStenoKey(25 /* "-Z" */);
-}
-
-func onPress23_1() {
   updateQwertyActionTimes();
   pressScanCodeButton(23, 0, 52 /* "'" */, 0);
 }
-func onRelease23_1() {
+func onRelease23_0() {
   releaseScanCodeButton(52 /* "'" */);
 }
 
-func onPress23_2() {
+func onPress23_1() {
   pressScanCodeButton(23, 0, 46 /* "=" */, 0);
 }
-func onRelease23_2() {
+func onRelease23_1() {
   releaseScanCodeButton(46 /* "=" */);
 }
 
-func onPress23_4() {
+func onPress23_3() {
   pressScanCodeButton(23, 0, 77 /* "⇲" */, 0);
 }
-func onRelease23_4() {
+func onRelease23_3() {
   releaseScanCodeButton(77 /* "⇲" */);
 }
 
-func onPress23_6() {
+func onPress23_5() {
   pressScanCodeButton(23, 0, 87 /* "+" */, 0);
 }
-func onRelease23_6() {
+func onRelease23_5() {
   releaseScanCodeButton(87 /* "+" */);
 }
 
 func onPress24() {
   globalPress(24);
 
-  dispatchToLayer(@onPress24_0, @onPress24_1, 0, 0, 0, 0, 0, @onPress24_7);
+  dispatchToLayer(@onPress24_0, 0, 0, 0, 0, 0, @onPress24_6);
 }
 func onRelease24() {
   globalRelease();
 
-  dispatchToLayer(@onRelease24_0, @onRelease24_1, 0, 0, 0, 0, 0, @onRelease24_7);
-  // Temp-QWERTY
-
-  // Returning here prevents the next sequence, SetLayer, from occurring.
-  if (isInReleaseAll()) {
-    return;
-  }
-  if (!wasSteno24) {
-    return;
-  }
-  wasSteno24 = 0;
-  if (global24PressCount == getPressCount()) {
-    return;
-  }
-
-  deactivateGlobal();
-  deactivateDynamic();
-  activate0();
-  activateGlobal();
-  onRelease24_0();
-
+  dispatchToLayer(@onRelease24_0, 0, 0, 0, 0, 0, @onRelease24_6);
 }
 
 func onPress24_0() {
-  // Auto-Return
-  // Tag this so the global layer can return to steno later
-  if (!isInPressAll()) {
-    wasSteno24 = 1;
-    if (checkButtonState("000000000000000000000000100000000000000000")) {
-      global24PressCount = getPressCount();
-    }
-  }
-
-  deactivateGlobal();
-  deactivate0();
-  activate1();
-  activateGlobal();
-
-}
-func onRelease24_0() {
-}
-var pressCount24_1;
-var releaseCount24_1;
-var timer24_1;
-
-func onPress24_1() {
   updateQwertyActionTimes();
-  if (!isInPressAll()) {
-    timer24_1 = getTime();
-  }
   pressScanCodeButton(24, 0, 225 /* "⇧" */, 0);
-  pressCount24_1 = getPressCount();
-  releaseCount24_1 = getReleaseCount();
   checkWordCapsAndCapsLock();
 
 }
-func onRelease24_1() {
+func onRelease24_0() {
   releaseScanCodeButton(225 /* "⇧" */);
 
-  if (getTime() - timer24_1 <= 200 && pressCount24_1 == getPressCount() && releaseCount24_1 + 1 == getReleaseCount()) {
-    @{
-      //
-      // Prevent changing back to steno layer in some situations.
-      // Returning here prevents the next sequence, SetLayer, from occurring.
-      if (wasSteno24) return;
-      if (isInReleaseAll()) return;
-      if (!checkButtonState("000000000000000000000000000000000000000000")) return;
-
-      deactivateGlobal();
-      deactivate1();
-      activate0();
-      activateGlobal();
-
-    }();
-
-  }
 }
 
-func onPress24_7() {
+func onPress24_6() {
   // Confirm
   checkUserPresenceReply();
 }
-func onRelease24_7() {
+func onRelease24_6() {
 }
 
 func onPress25() {
   globalPress(25);
 
-  dispatchToLayer(0, @onPress25_1, @onPress25_2, @onPress25_3, 0, @onPress25_5, 0, 0);
+  dispatchToLayer(@onPress25_0, @onPress25_1, @onPress25_2, 0, @onPress25_4, 0, 0);
 }
 func onRelease25() {
   globalRelease();
 
-  dispatchToLayer(0, @onRelease25_1, @onRelease25_2, @onRelease25_3, 0, @onRelease25_5, 0, 0);
+  dispatchToLayer(@onRelease25_0, @onRelease25_1, @onRelease25_2, 0, @onRelease25_4, 0, 0);
 }
 
-func onPress25_1() {
+func onPress25_0() {
   updateQwertyActionTimes();
   pressScanCodeButton(25, 0, 29 /* "Z" */, 0);
 }
-func onRelease25_1() {
+func onRelease25_0() {
   releaseScanCodeButton(29 /* "Z" */);
 }
 
-func onPress25_2() {
+func onPress25_1() {
   pressScanCodeButton(25, 0, 49 /* "\" */, 0);
 }
-func onRelease25_2() {
+func onRelease25_1() {
   releaseScanCodeButton(49 /* "\" */);
 }
 
-func onPress25_3() {
+func onPress25_2() {
   pressScanCodeButton(25, 0, 58 /* "F1" */, 0);
 }
-func onRelease25_3() {
+func onRelease25_2() {
   releaseScanCodeButton(58 /* "F1" */);
 }
 
-func onPress25_5() {
+func onPress25_4() {
   // WPM
   // Needs Display set to Dynamic Steno to use.
   dynamicStenoDisplay = DYNAMIC_STENO_DISPLAY_WPM;
   drawSettingsFeedbackText("WPM");
 }
-func onRelease25_5() {
+func onRelease25_4() {
 }
 
 func onPress26() {
   globalPress(26);
 
-  dispatchToLayer(0, @onPress26_1, @onPress26_2, @onPress26_3, 0, @onPress26_5, 0, 0);
+  dispatchToLayer(@onPress26_0, @onPress26_1, @onPress26_2, 0, @onPress26_4, 0, 0);
 }
 func onRelease26() {
   globalRelease();
 
-  dispatchToLayer(0, @onRelease26_1, @onRelease26_2, @onRelease26_3, 0, @onRelease26_5, 0, 0);
+  dispatchToLayer(@onRelease26_0, @onRelease26_1, @onRelease26_2, 0, @onRelease26_4, 0, 0);
 }
 
-func onPress26_1() {
+func onPress26_0() {
   updateQwertyActionTimes();
   pressScanCodeButton(26, 0, 27 /* "X" */, 0);
 }
-func onRelease26_1() {
+func onRelease26_0() {
   releaseScanCodeButton(27 /* "X" */);
 }
 
-func onPress26_2() {
+func onPress26_1() {
   pressScanCodeButton(26, 0, 225 /* "⇧" */, 1);
   pressScanCodeButton(26, 2, 49 /* "\" */, 0);
 }
-func onRelease26_2() {
+func onRelease26_1() {
   releaseScanCodeButton(49 /* "\" */);
   releaseScanCodeButton(225 /* "⇧" */);
 }
 
-func onPress26_3() {
+func onPress26_2() {
   pressScanCodeButton(26, 0, 59 /* "F2" */, 0);
 }
-func onRelease26_3() {
+func onRelease26_2() {
   releaseScanCodeButton(59 /* "F2" */);
 }
 
-func onPress26_5() {
+func onPress26_4() {
   // Paper Tape
   // Needs Display set to Dynamic Steno to use.
   dynamicStenoDisplay = DYNAMIC_STENO_DISPLAY_PAPER_TAPE;
   drawSettingsFeedbackText("Tape");
 }
-func onRelease26_5() {
+func onRelease26_4() {
 }
 
 func onPress27() {
   globalPress(27);
 
-  dispatchToLayer(0, @onPress27_1, @onPress27_2, @onPress27_3, 0, @onPress27_5, 0, 0);
+  dispatchToLayer(@onPress27_0, @onPress27_1, @onPress27_2, 0, @onPress27_4, 0, 0);
 }
 func onRelease27() {
   globalRelease();
 
-  dispatchToLayer(0, @onRelease27_1, @onRelease27_2, @onRelease27_3, 0, @onRelease27_5, 0, 0);
+  dispatchToLayer(@onRelease27_0, @onRelease27_1, @onRelease27_2, 0, @onRelease27_4, 0, 0);
 }
 
-func onPress27_1() {
+func onPress27_0() {
   updateQwertyActionTimes();
   pressScanCodeButton(27, 0, 6 /* "C" */, 0);
 }
-func onRelease27_1() {
+func onRelease27_0() {
   releaseScanCodeButton(6 /* "C" */);
 }
 
-func onPress27_2() {
+func onPress27_1() {
   pressScanCodeButton(27, 0, 45 /* "-" */, 0);
 }
-func onRelease27_2() {
+func onRelease27_1() {
   releaseScanCodeButton(45 /* "-" */);
 }
 
-func onPress27_3() {
+func onPress27_2() {
   pressScanCodeButton(27, 0, 60 /* "F3" */, 0);
 }
-func onRelease27_3() {
+func onRelease27_2() {
   releaseScanCodeButton(60 /* "F3" */);
 }
 
-func onPress27_5() {
+func onPress27_4() {
   // Strokes
   // Needs Display set to Dynamic Steno to use.
   dynamicStenoDisplay = DYNAMIC_STENO_DISPLAY_STROKES;
   drawSettingsFeedbackText("Strokes");
 }
-func onRelease27_5() {
+func onRelease27_4() {
 }
 
 func onPress28() {
   globalPress(28);
 
-  dispatchToLayer(0, @onPress28_1, @onPress28_2, @onPress28_3, 0, 0, 0, 0);
+  dispatchToLayer(@onPress28_0, @onPress28_1, @onPress28_2, 0, 0, 0, 0);
 }
 func onRelease28() {
   globalRelease();
 
-  dispatchToLayer(0, @onRelease28_1, @onRelease28_2, @onRelease28_3, 0, 0, 0, 0);
+  dispatchToLayer(@onRelease28_0, @onRelease28_1, @onRelease28_2, 0, 0, 0, 0);
 }
 
-func onPress28_1() {
+func onPress28_0() {
   updateQwertyActionTimes();
   pressScanCodeButton(28, 0, 25 /* "V" */, 0);
 }
-func onRelease28_1() {
+func onRelease28_0() {
   releaseScanCodeButton(25 /* "V" */);
 }
 
-func onPress28_2() {
+func onPress28_1() {
   pressScanCodeButton(28, 0, 47 /* "[" */, 0);
 }
-func onRelease28_2() {
+func onRelease28_1() {
   releaseScanCodeButton(47 /* "[" */);
 }
 
-func onPress28_3() {
+func onPress28_2() {
   pressScanCodeButton(28, 0, 61 /* "F4" */, 0);
 }
-func onRelease28_3() {
+func onRelease28_2() {
   releaseScanCodeButton(61 /* "F4" */);
 }
 
 func onPress29() {
   globalPress(29);
 
-  dispatchToLayer(0, @onPress29_1, @onPress29_2, 0, 0, 0, 0, 0);
+  dispatchToLayer(@onPress29_0, @onPress29_1, 0, 0, 0, 0, 0);
 }
 func onRelease29() {
   globalRelease();
 
-  dispatchToLayer(0, @onRelease29_1, @onRelease29_2, 0, 0, 0, 0, 0);
+  dispatchToLayer(@onRelease29_0, @onRelease29_1, 0, 0, 0, 0, 0);
 }
 
-func onPress29_1() {
+func onPress29_0() {
   updateQwertyActionTimes();
   pressScanCodeButton(29, 0, 5 /* "B" */, 0);
 }
-func onRelease29_1() {
+func onRelease29_0() {
   releaseScanCodeButton(5 /* "B" */);
 }
 
-func onPress29_2() {
+func onPress29_1() {
   pressScanCodeButton(29, 0, 225 /* "⇧" */, 1);
   pressScanCodeButton(29, 2, 47 /* "[" */, 0);
 }
-func onRelease29_2() {
+func onRelease29_1() {
   releaseScanCodeButton(47 /* "[" */);
   releaseScanCodeButton(225 /* "⇧" */);
 }
@@ -3420,635 +3026,498 @@ func onRelease29_2() {
 func onPress30() {
   globalPress(30);
 
-  dispatchToLayer(0, @onPress30_1, @onPress30_2, 0, @onPress30_4, 0, 0, 0);
+  dispatchToLayer(@onPress30_0, @onPress30_1, 0, @onPress30_3, 0, 0, 0);
 }
 func onRelease30() {
   globalRelease();
 
-  dispatchToLayer(0, @onRelease30_1, @onRelease30_2, 0, @onRelease30_4, 0, 0, 0);
+  dispatchToLayer(@onRelease30_0, @onRelease30_1, 0, @onRelease30_3, 0, 0, 0);
 }
 
-func onPress30_1() {
+func onPress30_0() {
   updateQwertyActionTimes();
   pressScanCodeButton(30, 0, 17 /* "N" */, 0);
 }
-func onRelease30_1() {
+func onRelease30_0() {
   releaseScanCodeButton(17 /* "N" */);
 }
 
-func onPress30_2() {
+func onPress30_1() {
   pressScanCodeButton(30, 0, 225 /* "⇧" */, 1);
   pressScanCodeButton(30, 2, 48 /* "]" */, 0);
 }
-func onRelease30_2() {
+func onRelease30_1() {
   releaseScanCodeButton(48 /* "]" */);
   releaseScanCodeButton(225 /* "⇧" */);
 }
 
-func onPress30_4() {
+func onPress30_3() {
   pressScanCodeButton(30, 0, 210 /* "🔇" */, 0);
 }
-func onRelease30_4() {
+func onRelease30_3() {
   releaseScanCodeButton(210 /* "🔇" */);
 }
 
 func onPress31() {
   globalPress(31);
 
-  dispatchToLayer(0, @onPress31_1, @onPress31_2, 0, 0, 0, @onPress31_6, 0);
+  dispatchToLayer(@onPress31_0, @onPress31_1, 0, 0, 0, @onPress31_5, 0);
 }
 func onRelease31() {
   globalRelease();
 
-  dispatchToLayer(0, @onRelease31_1, @onRelease31_2, 0, 0, 0, @onRelease31_6, 0);
+  dispatchToLayer(@onRelease31_0, @onRelease31_1, 0, 0, 0, @onRelease31_5, 0);
 }
 
-func onPress31_1() {
+func onPress31_0() {
   updateQwertyActionTimes();
   pressScanCodeButton(31, 0, 16 /* "M" */, 0);
 }
-func onRelease31_1() {
+func onRelease31_0() {
   releaseScanCodeButton(16 /* "M" */);
 }
 
-func onPress31_2() {
+func onPress31_1() {
   pressScanCodeButton(31, 0, 48 /* "]" */, 0);
 }
-func onRelease31_2() {
+func onRelease31_1() {
   releaseScanCodeButton(48 /* "]" */);
 }
 
-func onPress31_6() {
+func onPress31_5() {
   pressScanCodeButton(31, 0, 89 /* "1" */, 0);
 }
-func onRelease31_6() {
+func onRelease31_5() {
   releaseScanCodeButton(89 /* "1" */);
 }
 
 func onPress32() {
   globalPress(32);
 
-  dispatchToLayer(0, @onPress32_1, @onPress32_2, 0, 0, 0, @onPress32_6, 0);
+  dispatchToLayer(@onPress32_0, @onPress32_1, 0, 0, 0, @onPress32_5, 0);
 }
 func onRelease32() {
   globalRelease();
 
-  dispatchToLayer(0, @onRelease32_1, @onRelease32_2, 0, 0, 0, @onRelease32_6, 0);
+  dispatchToLayer(@onRelease32_0, @onRelease32_1, 0, 0, 0, @onRelease32_5, 0);
 }
 
-func onPress32_1() {
+func onPress32_0() {
   updateQwertyActionTimes();
   pressScanCodeButton(32, 0, 54 /* "," */, 0);
 }
-func onRelease32_1() {
+func onRelease32_0() {
   releaseScanCodeButton(54 /* "," */);
 }
 
-func onPress32_2() {
+func onPress32_1() {
   pressScanCodeButton(32, 0, 225 /* "⇧" */, 1);
   pressScanCodeButton(32, 2, 45 /* "-" */, 0);
 }
-func onRelease32_2() {
+func onRelease32_1() {
   releaseScanCodeButton(45 /* "-" */);
   releaseScanCodeButton(225 /* "⇧" */);
 }
 
-func onPress32_6() {
+func onPress32_5() {
   pressScanCodeButton(32, 0, 90 /* "2" */, 0);
 }
-func onRelease32_6() {
+func onRelease32_5() {
   releaseScanCodeButton(90 /* "2" */);
 }
 
 func onPress33() {
   globalPress(33);
 
-  dispatchToLayer(0, @onPress33_1, @onPress33_2, 0, 0, 0, @onPress33_6, 0);
+  dispatchToLayer(@onPress33_0, @onPress33_1, 0, 0, 0, @onPress33_5, 0);
 }
 func onRelease33() {
   globalRelease();
 
-  dispatchToLayer(0, @onRelease33_1, @onRelease33_2, 0, 0, 0, @onRelease33_6, 0);
+  dispatchToLayer(@onRelease33_0, @onRelease33_1, 0, 0, 0, @onRelease33_5, 0);
+}
+
+func onPress33_0() {
+  updateQwertyActionTimes();
+  pressScanCodeButton(33, 0, 55 /* "." */, 0);
+}
+func onRelease33_0() {
+  releaseScanCodeButton(55 /* "." */);
 }
 
 func onPress33_1() {
-  updateQwertyActionTimes();
   pressScanCodeButton(33, 0, 55 /* "." */, 0);
 }
 func onRelease33_1() {
   releaseScanCodeButton(55 /* "." */);
 }
 
-func onPress33_2() {
-  pressScanCodeButton(33, 0, 55 /* "." */, 0);
-}
-func onRelease33_2() {
-  releaseScanCodeButton(55 /* "." */);
-}
-
-func onPress33_6() {
+func onPress33_5() {
   pressScanCodeButton(33, 0, 91 /* "3" */, 0);
 }
-func onRelease33_6() {
+func onRelease33_5() {
   releaseScanCodeButton(91 /* "3" */);
 }
 
 func onPress34() {
   globalPress(34);
 
-  dispatchToLayer(0, @onPress34_1, @onPress34_2, 0, 0, 0, @onPress34_6, 0);
+  dispatchToLayer(@onPress34_0, @onPress34_1, 0, 0, 0, @onPress34_5, 0);
 }
 func onRelease34() {
   globalRelease();
 
-  dispatchToLayer(0, @onRelease34_1, @onRelease34_2, 0, 0, 0, @onRelease34_6, 0);
+  dispatchToLayer(@onRelease34_0, @onRelease34_1, 0, 0, 0, @onRelease34_5, 0);
+}
+
+func onPress34_0() {
+  updateQwertyActionTimes();
+  pressScanCodeButton(34, 0, 56 /* "/" */, 0);
+}
+func onRelease34_0() {
+  releaseScanCodeButton(56 /* "/" */);
 }
 
 func onPress34_1() {
-  updateQwertyActionTimes();
   pressScanCodeButton(34, 0, 56 /* "/" */, 0);
 }
 func onRelease34_1() {
   releaseScanCodeButton(56 /* "/" */);
 }
 
-func onPress34_2() {
-  pressScanCodeButton(34, 0, 56 /* "/" */, 0);
-}
-func onRelease34_2() {
-  releaseScanCodeButton(56 /* "/" */);
-}
-
-func onPress34_6() {
+func onPress34_5() {
   pressScanCodeButton(34, 0, 84 /* "/" */, 0);
 }
-func onRelease34_6() {
+func onRelease34_5() {
   releaseScanCodeButton(84 /* "/" */);
 }
 
 func onPress35() {
   globalPress(35);
 
-  dispatchToLayer(0, @onPress35_1, @onPress35_2, 0, 0, @onPress35_5, @onPress35_6, @onPress35_7);
+  dispatchToLayer(@onPress35_0, @onPress35_1, 0, 0, @onPress35_4, @onPress35_5, @onPress35_6);
 }
 func onRelease35() {
   globalRelease();
 
-  dispatchToLayer(0, @onRelease35_1, @onRelease35_2, 0, 0, @onRelease35_5, @onRelease35_6, @onRelease35_7);
+  dispatchToLayer(@onRelease35_0, @onRelease35_1, 0, 0, @onRelease35_4, @onRelease35_5, @onRelease35_6);
 }
 
-func onPress35_1() {
+func onPress35_0() {
   updateQwertyActionTimes();
   pressScanCodeButton(35, 0, 229 /* "⇧" */, 0);
   checkWordCapsAndCapsLock();
 }
-func onRelease35_1() {
+func onRelease35_0() {
   releaseScanCodeButton(229 /* "⇧" */);
 
 }
 
-func onPress35_2() {
+func onPress35_1() {
   // Magic Key
   // Code is in Global -> User Scripts
   pressMagicKey(35);
 }
-func onRelease35_2() {
+func onRelease35_1() {
   //
   releaseMagicKey();
 }
 
-func onPress35_5() {
+func onPress35_4() {
   // Unpair BLE
   unpairBle();
   drawBleSummary();
 
 }
-func onRelease35_5() {
+func onRelease35_4() {
 }
 
-func onPress35_6() {
+func onPress35_5() {
   // Magic Key
   // Code is in Global -> User Scripts
   pressMagicKey(35);
 }
-func onRelease35_6() {
+func onRelease35_5() {
   //
   releaseMagicKey();
 }
 
-func onPress35_7() {
+func onPress35_6() {
   // Confirm
   checkUserPresenceReply();
 }
-func onRelease35_7() {
+func onRelease35_6() {
 }
 
 func onPress36() {
   globalPress(36);
 
-  dispatchToLayer(@onPress36_0, @onPress36_1, @onPress36_2, 0, 0, 0, 0, @onPress36_7);
+  dispatchToLayer(@onPress36_0, @onPress36_1, 0, 0, 0, 0, @onPress36_6);
 }
 func onRelease36() {
   globalRelease();
 
-  dispatchToLayer(@onRelease36_0, @onRelease36_1, @onRelease36_2, 0, 0, 0, 0, @onRelease36_7);
-  // Temp-QWERTY
-
-  // Returning here prevents the next sequence, SetLayer, from occurring.
-  if (isInReleaseAll()) {
-    return;
-  }
-  if (!wasSteno36) {
-    return;
-  }
-  wasSteno36 = 0;
-
-  deactivateGlobal();
-  deactivateDynamic();
-  activate0();
-  activateGlobal();
-  onRelease36_0();
-
+  dispatchToLayer(@onRelease36_0, @onRelease36_1, 0, 0, 0, 0, @onRelease36_6);
 }
 
 func onPress36_0() {
-  // Auto-Return
-  // Tag this so the global layer can return to steno later
-  wasSteno36 = 1;
-  deactivateGlobal();
-  deactivate0();
-  activate1();
-  activateGlobal();
+  updateQwertyActionTimes();
   pressScanCodeButton(36, 0, 227 /* "⌘" */, 0);
-
 }
 func onRelease36_0() {
   releaseScanCodeButton(227 /* "⌘" */);
 }
 
 func onPress36_1() {
-  updateQwertyActionTimes();
   pressScanCodeButton(36, 0, 227 /* "⌘" */, 0);
 }
 func onRelease36_1() {
   releaseScanCodeButton(227 /* "⌘" */);
 }
 
-func onPress36_2() {
-  pressScanCodeButton(36, 0, 227 /* "⌘" */, 0);
-}
-func onRelease36_2() {
-  releaseScanCodeButton(227 /* "⌘" */);
-}
-
-func onPress36_7() {
+func onPress36_6() {
   // Confirm
   checkUserPresenceReply();
 }
-func onRelease36_7() {
+func onRelease36_6() {
 }
 
 func onPress37() {
   globalPress(37);
 
-  dispatchToLayer(@onPress37_0, @onPress37_1, @onPress37_2, 0, @onPress37_4, 0, @onPress37_6, @onPress37_7);
+  dispatchToLayer(@onPress37_0, @onPress37_1, 0, @onPress37_3, 0, @onPress37_5, @onPress37_6);
 }
 func onRelease37() {
   globalRelease();
 
-  dispatchToLayer(@onRelease37_0, @onRelease37_1, @onRelease37_2, 0, @onRelease37_4, 0, @onRelease37_6, @onRelease37_7);
+  dispatchToLayer(@onRelease37_0, @onRelease37_1, 0, @onRelease37_3, 0, @onRelease37_5, @onRelease37_6);
 }
 
 func onPress37_0() {
-  pressStenoKeyButton(8 /* "A" */);
-}
-func onRelease37_0() {
-  releaseStenoKey(8 /* "A" */);
-}
-
-func onPress37_1() {
   updateQwertyActionTimes();
   pressScanCodeButton(37, 0, 226 /* "⌥" */, 0);
   checkWordCapsAndCapsLock();
 }
-func onRelease37_1() {
+func onRelease37_0() {
   releaseScanCodeButton(226 /* "⌥" */);
 
 }
 
-func onPress37_2() {
+func onPress37_1() {
   pressScanCodeButton(37, 0, 226 /* "⌥" */, 0);
 }
-func onRelease37_2() {
+func onRelease37_1() {
   releaseScanCodeButton(226 /* "⌥" */);
 }
 
-func onPress37_4() {
+func onPress37_3() {
   deactivateGlobal();
-  deactivate4();
-  activate6();
+  deactivate3();
+  activate5();
   activateGlobal();
 }
-func onRelease37_4() {
+func onRelease37_3() {
+}
+
+func onPress37_5() {
+}
+func onRelease37_5() {
+  deactivateGlobal();
+  deactivate5();
+  activate3();
+  activateGlobal();
+  onRelease37_3();
 }
 
 func onPress37_6() {
-}
-func onRelease37_6() {
-  deactivateGlobal();
-  deactivate6();
-  activate4();
-  activateGlobal();
-  onRelease37_4();
-}
-
-func onPress37_7() {
   // Confirm
   checkUserPresenceReply();
 }
-func onRelease37_7() {
+func onRelease37_6() {
 }
 
 func onPress38() {
   globalPress(38);
 
-  dispatchToLayer(@onPress38_0, @onPress38_1, @onPress38_2, 0, @onPress38_4, 0, @onPress38_6, 0);
+  dispatchToLayer(@onPress38_0, @onPress38_1, 0, @onPress38_3, 0, @onPress38_5, 0);
 }
 func onRelease38() {
   globalRelease();
 
-  dispatchToLayer(@onRelease38_0, @onRelease38_1, @onRelease38_2, 0, @onRelease38_4, 0, @onRelease38_6, 0);
+  dispatchToLayer(@onRelease38_0, @onRelease38_1, 0, @onRelease38_3, 0, @onRelease38_5, 0);
 }
 
 func onPress38_0() {
-  pressStenoKeyButton(9 /* "O" */);
+  updateQwertyActionTimes();
+  deactivateGlobal();
+  deactivate0();
+  activate3();
+  activateGlobal();
 }
 func onRelease38_0() {
-  releaseStenoKey(9 /* "O" */);
 }
 
 var timer38_1;
-var forceQwertySpace38;
-
 func onPress38_1() {
-  updateQwertyActionTimes();
-  startTimer(104, 200, 0, @{
-    if (layer != 1) return;
-
-    if (!isButtonPressed(38)) return;
-
-    //
-    // This logic is used to set the layer when held
-    if (!forceQwertySpace38) return;
-    if (onPressScanCodeCallback == @tapSpace) {
-      onPressScanCodeCallback = 0;
-    }
-
-    deactivateGlobal();
-    deactivate1();
-    activate4();
-    activateGlobal();
-
-  });
   if (!isInPressAll()) {
     timer38_1 = getTime();
   }
-  @{
-    //
-    // This key has a bunch of extra logic to it to make it behave
-    // reliably like a space bar during fast typing.
-    //
-    // * If pressed within 100ms of pressing another key, then it will
-    //   be treated as a spacebar unless held for 150ms (Hold Trigger).
-    //
-    // * If pressed without any other key, it will immediately switch to
-    //   the navigation layer, after which fuzzy layer logic will take
-    //   over to prevent
-
-    // Suppress Layer Change if anything else was pressed in the last 200ms and it isn't temporary qwerty
-    forceQwertySpace38 = !wasSteno24 && !isButtonPressed(37) && (getTime() - lastQwertyActionTimes[0] < 100);
-    if (forceQwertySpace38) {
-      // In this case, if another key is pressed, tap space.
-      // In the hold trigger, this is removed.
-      onPressScanCodeCallback = @tapSpace;
-
-      // Prevent SetLayer
-      return;
-    }
-
-    deactivateGlobal();
-    deactivate1();
-    activate4();
-    activateGlobal();
-    //
-    startFuzzyLayer();
-
-  }();
-
-}
-func onRelease38_1() {
-  stopTimer(104);
-
-  if (getTime() - timer38_1 <= 200) {
-    @{
-      //
-      // Prevent space being tapped after it's already been sent.
-      if (forceQwertySpace38 && onPressScanCodeCallback == 0) {
-        return;
-      }
-      if (onPressScanCodeCallback == @tapSpace) {
-        onPressScanCodeCallback = 0;
-      }
-      pressScanCodeButton(38, 0, 44 /* "⎵" */, 1);
-      releaseScanCodeButton(44 /* "⎵" */);
-
-    }();
-
-  }
-}
-
-var timer38_2;
-func onPress38_2() {
-  if (!isInPressAll()) {
-    timer38_2 = getTime();
-  }
   pressScanCodeButton(38, 0, 224 /* "⌃" */, 0);
 }
-func onRelease38_2() {
+func onRelease38_1() {
   releaseScanCodeButton(224 /* "⌃" */);
-  if (getTime() - timer38_2 <= 200) {
+  if (getTime() - timer38_1 <= 200) {
     pressScanCodeButton(38, 0, 44 /* "⎵" */, 1);
     releaseScanCodeButton(44 /* "⎵" */);
 
   }
 }
 
-func onPress38_4() {
+func onPress38_3() {
 }
-func onRelease38_4() {
+func onRelease38_3() {
   //
   stopFuzzyLayerPreSetLayer();
   deactivateGlobal();
-  deactivate4();
-  activate1();
+  deactivate3();
+  activate0();
   activateGlobal();
-  onRelease38_1();
+  onRelease38_0();
   //
   stopFuzzyLayerPostSetLayer();
 
 }
 
-func onPress38_6() {
+func onPress38_5() {
 }
-func onRelease38_6() {
+func onRelease38_5() {
   deactivateGlobal();
-  deactivate6();
-  activate1();
+  deactivate5();
+  activate0();
   activateGlobal();
-  onRelease38_1();
+  onRelease38_0();
 }
 
 func onPress39() {
   globalPress(39);
 
-  dispatchToLayer(@onPress39_0, @onPress39_1, 0, 0, @onPress39_4, 0, @onPress39_6, 0);
+  dispatchToLayer(@onPress39_0, 0, 0, @onPress39_3, 0, @onPress39_5, 0);
 }
 func onRelease39() {
   globalRelease();
 
-  dispatchToLayer(@onRelease39_0, @onRelease39_1, 0, 0, @onRelease39_4, 0, @onRelease39_6, 0);
+  dispatchToLayer(@onRelease39_0, 0, 0, @onRelease39_3, 0, @onRelease39_5, 0);
 }
 
 func onPress39_0() {
-  pressStenoKeyButton(14 /* "E" */);
-}
-func onRelease39_0() {
-  releaseStenoKey(14 /* "E" */);
-}
-
-func onPress39_1() {
   updateQwertyActionTimes();
   pressScanCodeButton(39, 0, 44 /* "⎵" */, 0);
 }
-func onRelease39_1() {
+func onRelease39_0() {
   releaseScanCodeButton(44 /* "⎵" */);
 }
 
-func onPress39_4() {
+func onPress39_3() {
   pressScanCodeButton(39, 0, 44 /* "⎵" */, 0);
 }
-func onRelease39_4() {
+func onRelease39_3() {
   releaseScanCodeButton(44 /* "⎵" */);
 }
 
-func onPress39_6() {
+func onPress39_5() {
   pressScanCodeButton(39, 0, 44 /* "⎵" */, 0);
 }
-func onRelease39_6() {
+func onRelease39_5() {
   releaseScanCodeButton(44 /* "⎵" */);
 }
 
 func onPress40() {
   globalPress(40);
 
-  dispatchToLayer(@onPress40_0, @onPress40_1, @onPress40_2, @onPress40_3, 0, @onPress40_5, @onPress40_6, @onPress40_7);
+  dispatchToLayer(@onPress40_0, @onPress40_1, @onPress40_2, 0, @onPress40_4, @onPress40_5, @onPress40_6);
 }
 func onRelease40() {
   globalRelease();
 
-  dispatchToLayer(@onRelease40_0, @onRelease40_1, @onRelease40_2, @onRelease40_3, 0, @onRelease40_5, @onRelease40_6, @onRelease40_7);
+  dispatchToLayer(@onRelease40_0, @onRelease40_1, @onRelease40_2, 0, @onRelease40_4, @onRelease40_5, @onRelease40_6);
 }
 
 func onPress40_0() {
-  pressStenoKeyButton(15 /* "U" */);
+  updateQwertyActionTimes();
+  deactivateGlobal();
+  deactivate0();
+  activate1();
+  activateGlobal();
 }
 func onRelease40_0() {
-  releaseStenoKey(15 /* "U" */);
 }
 
 func onPress40_1() {
-  updateQwertyActionTimes();
-  deactivateGlobal();
-  deactivate1();
-  activate2();
-  activateGlobal();
 }
 func onRelease40_1() {
+  deactivateGlobal();
+  deactivate1();
+  activate0();
+  activateGlobal();
+  onRelease40_0();
 }
 
 func onPress40_2() {
-}
-func onRelease40_2() {
   deactivateGlobal();
   deactivate2();
-  activate1();
-  activateGlobal();
-  onRelease40_1();
-}
-
-func onPress40_3() {
-  deactivateGlobal();
-  deactivate3();
-  activate5();
+  activate4();
   activateGlobal();
 }
-func onRelease40_3() {
+func onRelease40_2() {
 }
 
-func onPress40_5() {
+func onPress40_4() {
 }
-func onRelease40_5() {
+func onRelease40_4() {
   //
   // Since Settings -> Scripts -> deactivateLayer calls CallAllReleaseScripts,
   // this prevents infinite recursion.
   if (isInReleaseAll()) return;
 
   deactivateGlobal();
-  deactivate5();
-  activate3();
+  deactivate4();
+  activate2();
   activateGlobal();
-  onRelease40_3();
+  onRelease40_2();
 
 }
 
-func onPress40_6() {
+func onPress40_5() {
   pressScanCodeButton(40, 0, 98 /* "0" */, 0);
 }
-func onRelease40_6() {
+func onRelease40_5() {
   releaseScanCodeButton(98 /* "0" */);
 }
 
-func onPress40_7() {
+func onPress40_6() {
   // Confirm
   checkUserPresenceReply();
 }
-func onRelease40_7() {
+func onRelease40_6() {
 }
 
 func onPress41() {
   globalPress(41);
 
-  dispatchToLayer(@onPress41_0, @onPress41_1, @onPress41_2, @onPress41_3, @onPress41_4, @onPress41_5, @onPress41_6, 0);
+  dispatchToLayer(@onPress41_0, @onPress41_1, @onPress41_2, @onPress41_3, @onPress41_4, @onPress41_5, 0);
 }
 func onRelease41() {
   globalRelease();
 
-  dispatchToLayer(@onRelease41_0, @onRelease41_1, @onRelease41_2, @onRelease41_3, @onRelease41_4, @onRelease41_5, @onRelease41_6, 0);
+  dispatchToLayer(@onRelease41_0, @onRelease41_1, @onRelease41_2, @onRelease41_3, @onRelease41_4, @onRelease41_5, 0);
 }
 
-func onPress41_0() {
-  pressStenoKeyButton(27 /* "#2" */);
-}
-func onRelease41_0() {
-  releaseStenoKey(27 /* "#2" */);
-}
-
-var timer41_1;
+var timer41_0;
 var forceQwertyEnter41;
-func onPress41_1() {
+func onPress41_0() {
   updateQwertyActionTimes();
   if (!isInPressAll()) {
-    timer41_1 = getTime();
+    timer41_0 = getTime();
   }
   @{
     //
@@ -4060,8 +3529,8 @@ func onPress41_1() {
     }
 
     deactivateGlobal();
-    deactivate1();
-    activate3();
+    deactivate0();
+    activate2();
     activateGlobal();
     //
     startFuzzyLayer();
@@ -4069,71 +3538,71 @@ func onPress41_1() {
   }();
 
 }
-func onRelease41_1() {
+func onRelease41_0() {
   //
   if (forceQwertyEnter41) {
     releaseScanCode(40 /* Enter */);
     return;
   }
 
-  if (getTime() - timer41_1 <= 200) {
+  if (getTime() - timer41_0 <= 200) {
     pressScanCodeButton(41, 0, 40 /* "↵" */, 1);
     releaseScanCodeButton(40 /* "↵" */);
 
   }
 }
 
-func onPress41_2() {
+func onPress41_1() {
   deactivateGlobal();
-  deactivate2();
-  activate5();
+  deactivate1();
+  activate4();
   activateGlobal();
 }
-func onRelease41_2() {
+func onRelease41_1() {
 }
 
-func onPress41_3() {
+func onPress41_2() {
 }
-func onRelease41_3() {
+func onRelease41_2() {
   //
   stopFuzzyLayerPreSetLayer();
   deactivateGlobal();
-  deactivate3();
-  activate1();
+  deactivate2();
+  activate0();
   activateGlobal();
-  onRelease41_1();
+  onRelease41_0();
   //
   stopFuzzyLayerPostSetLayer();
 
 }
 
-func onPress41_4() {
+func onPress41_3() {
   pressScanCodeButton(41, 0, 40 /* "↵" */, 0);
 }
-func onRelease41_4() {
+func onRelease41_3() {
   releaseScanCodeButton(40 /* "↵" */);
 }
 
-func onPress41_5() {
+func onPress41_4() {
 }
-func onRelease41_5() {
+func onRelease41_4() {
   //
   // Since Settings -> Scripts -> deactivateLayer calls CallAllReleaseScripts,
   // this prevents infinite recursion.
   if (isInReleaseAll()) return;
 
   deactivateGlobal();
-  deactivate5();
-  activate2();
+  deactivate4();
+  activate1();
   activateGlobal();
-  onRelease41_2();
+  onRelease41_1();
 
 }
 
-func onPress41_6() {
+func onPress41_5() {
   pressScanCodeButton(41, 0, 99 /* "." */, 0);
 }
-func onRelease41_6() {
+func onRelease41_5() {
   releaseScanCodeButton(99 /* "." */);
 }
 

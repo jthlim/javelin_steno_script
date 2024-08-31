@@ -1,0 +1,1596 @@
+// Generated from javelin-layout file
+const TIMER_ID_RGB_UPDATE = 0;
+
+var speed = 1;
+var hueSpread = 4;
+var hueShift = 0;
+var brightness = 3;
+var saturation = 5;
+
+var layer;
+func setLayer(layerIndex, layerIdEvent) {
+  releaseAll();
+  layer = layerIndex;
+  sendEvent(layerIdEvent);
+}
+
+func dispatchToLayer(layer0Func, layer1Func, layer2Func, layer3Func, layer4Func) {
+  var resolvedLayer = resolveLayerIndex();
+  if (resolvedLayer == 0) {
+    if (layer0Func) layer0Func();
+  } else if (resolvedLayer == 1) {
+    if (layer1Func) layer1Func();
+  } else if (resolvedLayer == 2) {
+    if (layer2Func) layer2Func();
+  } else if (resolvedLayer == 3) {
+    if (layer3Func) layer3Func();
+  } else if (resolvedLayer == 4) {
+    if (layer4Func) layer4Func();
+  }
+}
+
+func resolveLayerIndex() var {
+  return layer;
+}
+
+func activate0() {
+  setLayer(0, "layer_id: 87377230");
+
+}
+
+func activate1() {
+  setLayer(1, "layer_id: 1128808786");
+
+}
+
+func activate2() {
+  setLayer(2, "layer_id: 50258991");
+
+}
+
+func activate3() {
+  setLayer(3, "layer_id: 175277611");
+
+}
+
+func activate4() {
+  setLayer(4, "layer_id: 122649869");
+
+}
+
+func activateDynamic() {
+  dispatchToLayer(@activate0, @activate1, @activate2, @activate3, @activate4);
+}
+func activateGlobal() {
+
+}
+func deactivate0() {
+
+}
+
+func deactivate1() {
+
+}
+
+func deactivate2() {
+
+}
+
+func deactivate3() {
+
+}
+
+func deactivate4() {
+
+}
+
+func deactivateDynamic() {}
+func deactivateGlobal() {
+
+}
+var postPress;
+var postRelease;
+
+func _pressScanCode(scanCode, isModifier) {
+  pressScanCode(scanCode);
+  if (isModifier) return;
+
+  if (postPress) {
+    var localPostPress = postPress;
+    postPress = 0;
+    localPostPress();
+  }
+}
+
+func _releaseScanCode(scanCode, isModifier) {
+  releaseScanCode(scanCode);
+  if (isModifier) return;
+
+  if (postRelease) {
+    var localPostRelease = postRelease;
+    postRelease = 0;
+    localPostRelease();
+  }
+}
+// RGB
+const SPEED_VALUES      = [[ 00 04 08 0c 10 18 20 30 40 ]];
+const HUE_SPREAD_VALUES = [[ 00 10 20 28 30 38 40 48 50 ]];
+const SATURATION_VALUES = [[ 00 20 40 50 60 68 70 78 80 ]];
+const BRIGHTNESS_VALUES = [[ 00 08 10 20 40 60 80 c0 ff ]];
+
+func rgbUpdateKeyHueCycle(hShift, sat, spreadMultiplier, value) {
+  const HUE_CYCLE_RGB_ORDER = [[
+  00
+  0e 01
+  1c 0f 02
+  1d 10 03
+  1e 11 04
+  1f 12 05
+  20 13 06
+  28 21 14
+  29
+  2a
+
+  2b
+  2c
+  2d 22 15
+  23 16 07
+  24 17 08
+  25 18 09
+  26 19 0a
+  27 1a 0b
+  1b 0c
+  0d
+  ]];
+
+  for (var i = 0; i < 46; i = i + 1) {
+    setHsv(
+    HUE_CYCLE_RGB_ORDER[i],
+    spreadMultiplier*i + hShift,
+    sat,
+    value
+    );
+  }
+}
+
+func rgbUpdateHueCycle() {
+  var hue = animationTime() * SPEED_VALUES[speed] + hueShift;
+  rgbUpdateKeyHueCycle(
+  hue,
+  SATURATION_VALUES[saturation] * 2,
+  HUE_SPREAD_VALUES[hueSpread] * 16,
+  BRIGHTNESS_VALUES[brightness]
+  );
+}
+
+func rgbUpdateKeyConstantColor(r, g, b) {
+  for (var i = 0; i < 46; i = i + 1) {
+    setRgb(i, r, g, b);
+  }
+}
+
+// 256 step sine table.
+const SINE_TABLE = [[ 80 83 86 89 8c 8f 92 95 98 9b 9e a2 a5 a7 aa ad b0 b3 b6 b9 bc be c1 c4 c6 c9 cb ce d0 d3 d5 d7 da dc de e0 e2 e4 e6 e8 ea eb ed ee f0 f1 f3 f4 f5 f6 f8 f9 fa fa fb fc fd fd fe fe fe ff ff ff ff ff ff ff fe fe fe fd fd fc fb fa fa f9 f8 f6 f5 f4 f3 f1 f0 ee ed eb ea e8 e6 e4 e2 e0 de dc da d7 d5 d3 d0 ce cb c9 c6 c4 c1 be bc b9 b6 b3 b0 ad aa a7 a5 a2 9e 9b 98 95 92 8f 8c 89 86 83 80 7c 79 76 73 70 6d 6a 67 64 61 5d 5a 58 55 52 4f 4c 49 46 43 41 3e 3b 39 36 34 31 2f 2c 2a 28 25 23 21 1f 1d 1b 19 17 15 14 12 11 0f 0e 0c 0b 0a 09 07 06 05 05 04 03 02 02 01 01 01 00 00 00 00 00 00 00 01 01 01 02 02 03 04 05 05 06 07 09 0a 0b 0c 0e 0f 11 12 14 15 17 19 1b 1d 1f 21 23 25 28 2a 2c 2f 31 34 36 39 3b 3e 41 43 46 49 4c 4f 52 55 58 5a 5d 61 64 67 6a 6d 70 73 76 79 7c ]];
+
+func rgbUpdateKeyBreatheCycle() {
+  // Sine wave between 4-20 brightness, with staggering of r, g, b values
+  // to reduce harsh steps.
+  var w = (0xc00 + (SINE_TABLE[(animationTime() >> 5) & 0xff] - 0x80) * (2 * 8));
+  rgbUpdateKeyConstantColor((w + 0x53) >> 8, w >> 8, (w + 0xa6) >> 8);
+}
+
+const DISCONNECTED_KEY_ORDER = [[ 00 01 02 03 04 05 04 03 02 01 ]];
+func rgbUpdateKeyConnectingCycle() {
+  for (var i = 0; i < 54; i = i + 1) {
+    setRgb(i, 0, 0, 0);
+  }
+
+  var index = getTime() >> 6;
+  var keyId = DISCONNECTED_KEY_ORDER[index % 10];
+  setHsv(keyId, index << 10, 0xf0, 16);
+}
+
+func animationTime() var {
+  return getTime();
+}
+
+func rgbUpdate() {
+  if (isHostSleeping()) {
+    rgbUpdateKeyBreatheCycle();
+  } else {
+    dispatchToLayer(@rgbUpdateHueCycle, @rgbUpdateBlue, @rgbUpdateBlue, @rgbUpdateBlue, @rgbUpdateBlue);
+  }
+}
+
+func setKeyRgb(r, g, b) {
+  r = r * brightness >> 3;
+  g = g * brightness >> 3;
+  b = b * brightness >> 3;
+  for(var i = 0; i < 46; i = i + 1) {
+    setRgb(i, r, g, b);
+  }
+}
+
+func rgbUpdateRed() {
+  setKeyRgb(255, 0, 0);
+}
+
+func rgbUpdateGreen() {
+  setKeyRgb(0, 255, 0);
+}
+
+func rgbUpdateBlue() {
+  setKeyRgb(0, 0, 255);
+}
+
+func init() {
+  rgbUpdate();
+  startTimer(TIMER_ID_RGB_UPDATE, 30, 1, @rgbUpdate);
+  activate0();
+}
+
+func onPress0() {
+  dispatchToLayer(0, @onPress0_1, 0, 0, 0);
+}
+func onRelease0() {
+  dispatchToLayer(0, @onRelease0_1, 0, 0, 0);
+}
+
+func onPress0_1() {
+  pressScanCode(43 /* "⇥" */);
+}
+func onRelease0_1() {
+  releaseScanCode(43 /* "⇥" */);
+}
+
+func onPress1() {
+  dispatchToLayer(@onPress1_0, @onPress1_1, @onPress1_2, @onPress1_3, 0);
+}
+func onRelease1() {
+  dispatchToLayer(@onRelease1_0, @onRelease1_1, @onRelease1_2, @onRelease1_3, 0);
+}
+
+func onPress1_0() {
+  pressStenoKey(0 /* "S1" */);
+}
+func onRelease1_0() {
+  releaseStenoKey(0 /* "S1" */);
+}
+
+func onPress1_1() {
+  pressScanCode(20 /* "Q" */);
+}
+func onRelease1_1() {
+  releaseScanCode(20 /* "Q" */);
+}
+
+func onPress1_2() {
+  pressScanCode(30 /* "1" */);
+}
+func onRelease1_2() {
+  releaseScanCode(30 /* "1" */);
+}
+
+func onPress1_3() {
+  pressScanCode(66 /* "F9" */);
+}
+func onRelease1_3() {
+  releaseScanCode(66 /* "F9" */);
+}
+
+func onPress2() {
+  dispatchToLayer(@onPress2_0, @onPress2_1, @onPress2_2, @onPress2_3, 0);
+}
+func onRelease2() {
+  dispatchToLayer(@onRelease2_0, @onRelease2_1, @onRelease2_2, @onRelease2_3, 0);
+}
+
+func onPress2_0() {
+  pressStenoKey(2 /* "T-" */);
+}
+func onRelease2_0() {
+  releaseStenoKey(2 /* "T-" */);
+}
+
+func onPress2_1() {
+  pressScanCode(26 /* "W" */);
+}
+func onRelease2_1() {
+  releaseScanCode(26 /* "W" */);
+}
+
+func onPress2_2() {
+  pressScanCode(31 /* "2" */);
+}
+func onRelease2_2() {
+  releaseScanCode(31 /* "2" */);
+}
+
+func onPress2_3() {
+  pressScanCode(67 /* "F10" */);
+}
+func onRelease2_3() {
+  releaseScanCode(67 /* "F10" */);
+}
+
+func onPress3() {
+  dispatchToLayer(@onPress3_0, @onPress3_1, @onPress3_2, @onPress3_3, 0);
+}
+func onRelease3() {
+  dispatchToLayer(@onRelease3_0, @onRelease3_1, @onRelease3_2, @onRelease3_3, 0);
+}
+
+func onPress3_0() {
+  pressStenoKey(4 /* "P-" */);
+}
+func onRelease3_0() {
+  releaseStenoKey(4 /* "P-" */);
+}
+
+func onPress3_1() {
+  pressScanCode(8 /* "E" */);
+}
+func onRelease3_1() {
+  releaseScanCode(8 /* "E" */);
+}
+
+func onPress3_2() {
+  pressScanCode(32 /* "3" */);
+}
+func onRelease3_2() {
+  releaseScanCode(32 /* "3" */);
+}
+
+func onPress3_3() {
+  pressScanCode(68 /* "F11" */);
+}
+func onRelease3_3() {
+  releaseScanCode(68 /* "F11" */);
+}
+
+func onPress4() {
+  dispatchToLayer(@onPress4_0, @onPress4_1, @onPress4_2, @onPress4_3, 0);
+}
+func onRelease4() {
+  dispatchToLayer(@onRelease4_0, @onRelease4_1, @onRelease4_2, @onRelease4_3, 0);
+}
+
+func onPress4_0() {
+  pressStenoKey(6 /* "H-" */);
+}
+func onRelease4_0() {
+  releaseStenoKey(6 /* "H-" */);
+}
+
+func onPress4_1() {
+  pressScanCode(21 /* "R" */);
+}
+func onRelease4_1() {
+  releaseScanCode(21 /* "R" */);
+}
+
+func onPress4_2() {
+  pressScanCode(33 /* "4" */);
+}
+func onRelease4_2() {
+  releaseScanCode(33 /* "4" */);
+}
+
+func onPress4_3() {
+  pressScanCode(69 /* "F12" */);
+}
+func onRelease4_3() {
+  releaseScanCode(69 /* "F12" */);
+}
+
+func onPress5() {
+  dispatchToLayer(@onPress5_0, @onPress5_1, @onPress5_2, 0, @onPress5_4);
+}
+func onRelease5() {
+  dispatchToLayer(@onRelease5_0, @onRelease5_1, @onRelease5_2, 0, @onRelease5_4);
+}
+
+func onPress5_0() {
+  pressStenoKey(10 /* "*1" */);
+}
+func onRelease5_0() {
+  releaseStenoKey(10 /* "*1" */);
+}
+
+func onPress5_1() {
+  pressScanCode(23 /* "T" */);
+}
+func onRelease5_1() {
+  releaseScanCode(23 /* "T" */);
+}
+
+func onPress5_2() {
+  pressScanCode(34 /* "5" */);
+}
+func onRelease5_2() {
+  releaseScanCode(34 /* "5" */);
+}
+
+func onPress5_4() {
+  pressScanCode(222 /* "🔆" */);
+}
+func onRelease5_4() {
+  releaseScanCode(222 /* "🔆" */);
+}
+
+func onPress6() {
+  dispatchToLayer(0, @onPress6_1, 0, 0, 0);
+}
+func onRelease6() {
+  dispatchToLayer(0, @onRelease6_1, 0, 0, 0);
+}
+
+func onPress6_1() {
+  deactivateGlobal();
+  deactivate1();
+  activate0();
+  activateGlobal();
+}
+func onRelease6_1() {
+}
+
+func onPress7() {
+  dispatchToLayer(@onPress7_0, 0, 0, 0, 0);
+}
+func onRelease7() {
+  dispatchToLayer(@onRelease7_0, 0, 0, 0, 0);
+}
+
+func onPress7_0() {
+  deactivateGlobal();
+  deactivate0();
+  activate1();
+  activateGlobal();
+}
+func onRelease7_0() {
+}
+
+func onPress8() {
+  dispatchToLayer(@onPress8_0, @onPress8_1, @onPress8_2, 0, @onPress8_4);
+}
+func onRelease8() {
+  dispatchToLayer(@onRelease8_0, @onRelease8_1, @onRelease8_2, 0, @onRelease8_4);
+}
+
+func onPress8_0() {
+  pressStenoKey(11 /* "*2" */);
+}
+func onRelease8_0() {
+  releaseStenoKey(11 /* "*2" */);
+}
+
+func onPress8_1() {
+  pressScanCode(28 /* "Y" */);
+}
+func onRelease8_1() {
+  releaseScanCode(28 /* "Y" */);
+}
+
+func onPress8_2() {
+  pressScanCode(35 /* "6" */);
+}
+func onRelease8_2() {
+  releaseScanCode(35 /* "6" */);
+}
+
+func onPress8_4() {
+  pressScanCode(217 /* "🔊" */);
+}
+func onRelease8_4() {
+  releaseScanCode(217 /* "🔊" */);
+}
+
+func onPress9() {
+  dispatchToLayer(@onPress9_0, @onPress9_1, @onPress9_2, 0, @onPress9_4);
+}
+func onRelease9() {
+  dispatchToLayer(@onRelease9_0, @onRelease9_1, @onRelease9_2, 0, @onRelease9_4);
+}
+
+func onPress9_0() {
+  pressStenoKey(16 /* "-F" */);
+}
+func onRelease9_0() {
+  releaseStenoKey(16 /* "-F" */);
+}
+
+func onPress9_1() {
+  pressScanCode(24 /* "U" */);
+}
+func onRelease9_1() {
+  releaseScanCode(24 /* "U" */);
+}
+
+func onPress9_2() {
+  pressScanCode(36 /* "7" */);
+}
+func onRelease9_2() {
+  releaseScanCode(36 /* "7" */);
+}
+
+func onPress9_4() {
+  pressScanCode(42 /* "⌫" */);
+}
+func onRelease9_4() {
+  releaseScanCode(42 /* "⌫" */);
+}
+
+func onPress10() {
+  dispatchToLayer(@onPress10_0, @onPress10_1, @onPress10_2, 0, @onPress10_4);
+}
+func onRelease10() {
+  dispatchToLayer(@onRelease10_0, @onRelease10_1, @onRelease10_2, 0, @onRelease10_4);
+}
+
+func onPress10_0() {
+  pressStenoKey(18 /* "-P" */);
+}
+func onRelease10_0() {
+  releaseStenoKey(18 /* "-P" */);
+}
+
+func onPress10_1() {
+  pressScanCode(12 /* "I" */);
+}
+func onRelease10_1() {
+  releaseScanCode(12 /* "I" */);
+}
+
+func onPress10_2() {
+  pressScanCode(37 /* "8" */);
+}
+func onRelease10_2() {
+  releaseScanCode(37 /* "8" */);
+}
+
+func onPress10_4() {
+  pressScanCode(82 /* "↑" */);
+}
+func onRelease10_4() {
+  releaseScanCode(82 /* "↑" */);
+}
+
+func onPress11() {
+  dispatchToLayer(@onPress11_0, @onPress11_1, @onPress11_2, 0, @onPress11_4);
+}
+func onRelease11() {
+  dispatchToLayer(@onRelease11_0, @onRelease11_1, @onRelease11_2, 0, @onRelease11_4);
+}
+
+func onPress11_0() {
+  pressStenoKey(20 /* "-L" */);
+}
+func onRelease11_0() {
+  releaseStenoKey(20 /* "-L" */);
+}
+
+func onPress11_1() {
+  pressScanCode(18 /* "O" */);
+}
+func onRelease11_1() {
+  releaseScanCode(18 /* "O" */);
+}
+
+func onPress11_2() {
+  pressScanCode(38 /* "9" */);
+}
+func onRelease11_2() {
+  releaseScanCode(38 /* "9" */);
+}
+
+func onPress11_4() {
+  pressScanCode(76 /* "⌦" */);
+}
+func onRelease11_4() {
+  releaseScanCode(76 /* "⌦" */);
+}
+
+func onPress12() {
+  dispatchToLayer(@onPress12_0, @onPress12_1, @onPress12_2, 0, @onPress12_4);
+}
+func onRelease12() {
+  dispatchToLayer(@onRelease12_0, @onRelease12_1, @onRelease12_2, 0, @onRelease12_4);
+}
+
+func onPress12_0() {
+  pressStenoKey(22 /* "-T" */);
+}
+func onRelease12_0() {
+  releaseStenoKey(22 /* "-T" */);
+}
+
+func onPress12_1() {
+  pressScanCode(19 /* "P" */);
+}
+func onRelease12_1() {
+  releaseScanCode(19 /* "P" */);
+}
+
+func onPress12_2() {
+  pressScanCode(39 /* "0" */);
+}
+func onRelease12_2() {
+  releaseScanCode(39 /* "0" */);
+}
+
+func onPress12_4() {
+  pressScanCode(75 /* "⇞" */);
+}
+func onRelease12_4() {
+  releaseScanCode(75 /* "⇞" */);
+}
+
+func onPress13() {
+  dispatchToLayer(@onPress13_0, @onPress13_1, @onPress13_2, 0, @onPress13_4);
+}
+func onRelease13() {
+  dispatchToLayer(@onRelease13_0, @onRelease13_1, @onRelease13_2, 0, @onRelease13_4);
+}
+
+func onPress13_0() {
+  pressStenoKey(24 /* "-D" */);
+}
+func onRelease13_0() {
+  releaseStenoKey(24 /* "-D" */);
+}
+
+func onPress13_1() {
+  pressScanCode(42 /* "⌫" */);
+}
+func onRelease13_1() {
+  releaseScanCode(42 /* "⌫" */);
+}
+
+func onPress13_2() {
+  pressScanCode(225 /* "⇧" */);
+  pressScanCode(46 /* "=" */);
+}
+func onRelease13_2() {
+  releaseScanCode(46 /* "=" */);
+  releaseScanCode(225 /* "⇧" */);
+}
+
+func onPress13_4() {
+  pressScanCode(74 /* "⇱" */);
+}
+func onRelease13_4() {
+  releaseScanCode(74 /* "⇱" */);
+}
+
+func onPress14() {
+  dispatchToLayer(0, @onPress14_1, 0, 0, 0);
+}
+func onRelease14() {
+  dispatchToLayer(0, @onRelease14_1, 0, 0, 0);
+}
+
+var timer14_1;
+func onPress14_1() {
+  if (!isInPressAll()) {
+    timer14_1 = getTime();
+  }
+  pressScanCode(224 /* "⌃" */);
+}
+func onRelease14_1() {
+  releaseScanCode(224 /* "⌃" */);
+  if (getTime() - timer14_1 <= 200) {
+    pressScanCode(41 /* "⎋" */);
+    releaseScanCode(41 /* "⎋" */);
+
+  }
+}
+
+func onPress15() {
+  dispatchToLayer(@onPress15_0, @onPress15_1, @onPress15_2, @onPress15_3, @onPress15_4);
+}
+func onRelease15() {
+  dispatchToLayer(@onRelease15_0, @onRelease15_1, @onRelease15_2, @onRelease15_3, @onRelease15_4);
+}
+
+func onPress15_0() {
+  pressStenoKey(1 /* "S2" */);
+}
+func onRelease15_0() {
+  releaseStenoKey(1 /* "S2" */);
+}
+
+func onPress15_1() {
+  pressScanCode(4 /* "A" */);
+}
+func onRelease15_1() {
+  releaseScanCode(4 /* "A" */);
+}
+
+func onPress15_2() {
+  pressScanCode(225 /* "⇧" */);
+  pressScanCode(30 /* "1" */);
+}
+func onRelease15_2() {
+  releaseScanCode(30 /* "1" */);
+  releaseScanCode(225 /* "⇧" */);
+}
+
+func onPress15_3() {
+  pressScanCode(62 /* "F5" */);
+}
+func onRelease15_3() {
+  releaseScanCode(62 /* "F5" */);
+}
+
+func onPress15_4() {
+  pressScanCode(227 /* "⌘" */);
+}
+func onRelease15_4() {
+  releaseScanCode(227 /* "⌘" */);
+}
+
+func onPress16() {
+  dispatchToLayer(@onPress16_0, @onPress16_1, @onPress16_2, @onPress16_3, @onPress16_4);
+}
+func onRelease16() {
+  dispatchToLayer(@onRelease16_0, @onRelease16_1, @onRelease16_2, @onRelease16_3, @onRelease16_4);
+}
+
+func onPress16_0() {
+  pressStenoKey(3 /* "K-" */);
+}
+func onRelease16_0() {
+  releaseStenoKey(3 /* "K-" */);
+}
+
+func onPress16_1() {
+  pressScanCode(22 /* "S" */);
+}
+func onRelease16_1() {
+  releaseScanCode(22 /* "S" */);
+}
+
+func onPress16_2() {
+  pressScanCode(225 /* "⇧" */);
+  pressScanCode(31 /* "2" */);
+}
+func onRelease16_2() {
+  releaseScanCode(31 /* "2" */);
+  releaseScanCode(225 /* "⇧" */);
+}
+
+func onPress16_3() {
+  pressScanCode(63 /* "F6" */);
+}
+func onRelease16_3() {
+  releaseScanCode(63 /* "F6" */);
+}
+
+func onPress16_4() {
+  pressScanCode(226 /* "⌥" */);
+}
+func onRelease16_4() {
+  releaseScanCode(226 /* "⌥" */);
+}
+
+func onPress17() {
+  dispatchToLayer(@onPress17_0, @onPress17_1, @onPress17_2, @onPress17_3, @onPress17_4);
+}
+func onRelease17() {
+  dispatchToLayer(@onRelease17_0, @onRelease17_1, @onRelease17_2, @onRelease17_3, @onRelease17_4);
+}
+
+func onPress17_0() {
+  pressStenoKey(5 /* "W-" */);
+}
+func onRelease17_0() {
+  releaseStenoKey(5 /* "W-" */);
+}
+
+func onPress17_1() {
+  pressScanCode(7 /* "D" */);
+}
+func onRelease17_1() {
+  releaseScanCode(7 /* "D" */);
+}
+
+func onPress17_2() {
+  pressScanCode(225 /* "⇧" */);
+  pressScanCode(32 /* "3" */);
+}
+func onRelease17_2() {
+  releaseScanCode(32 /* "3" */);
+  releaseScanCode(225 /* "⇧" */);
+}
+
+func onPress17_3() {
+  pressScanCode(64 /* "F7" */);
+}
+func onRelease17_3() {
+  releaseScanCode(64 /* "F7" */);
+}
+
+func onPress17_4() {
+  pressScanCode(224 /* "⌃" */);
+}
+func onRelease17_4() {
+  releaseScanCode(224 /* "⌃" */);
+}
+
+func onPress18() {
+  dispatchToLayer(@onPress18_0, @onPress18_1, @onPress18_2, @onPress18_3, @onPress18_4);
+}
+func onRelease18() {
+  dispatchToLayer(@onRelease18_0, @onRelease18_1, @onRelease18_2, @onRelease18_3, @onRelease18_4);
+}
+
+func onPress18_0() {
+  pressStenoKey(7 /* "R-" */);
+}
+func onRelease18_0() {
+  releaseStenoKey(7 /* "R-" */);
+}
+
+func onPress18_1() {
+  pressScanCode(9 /* "F" */);
+}
+func onRelease18_1() {
+  releaseScanCode(9 /* "F" */);
+}
+
+func onPress18_2() {
+  pressScanCode(225 /* "⇧" */);
+  pressScanCode(33 /* "4" */);
+}
+func onRelease18_2() {
+  releaseScanCode(33 /* "4" */);
+  releaseScanCode(225 /* "⇧" */);
+}
+
+func onPress18_3() {
+  pressScanCode(65 /* "F8" */);
+}
+func onRelease18_3() {
+  releaseScanCode(65 /* "F8" */);
+}
+
+func onPress18_4() {
+  pressScanCode(225 /* "⇧" */);
+}
+func onRelease18_4() {
+  releaseScanCode(225 /* "⇧" */);
+}
+
+func onPress19() {
+  dispatchToLayer(@onPress19_0, @onPress19_1, @onPress19_2, 0, @onPress19_4);
+}
+func onRelease19() {
+  dispatchToLayer(@onRelease19_0, @onRelease19_1, @onRelease19_2, 0, @onRelease19_4);
+}
+
+func onPress19_0() {
+  pressStenoKey(12 /* "*3" */);
+}
+func onRelease19_0() {
+  releaseStenoKey(12 /* "*3" */);
+}
+
+func onPress19_1() {
+  pressScanCode(10 /* "G" */);
+}
+func onRelease19_1() {
+  releaseScanCode(10 /* "G" */);
+}
+
+func onPress19_2() {
+  pressScanCode(225 /* "⇧" */);
+  pressScanCode(34 /* "5" */);
+}
+func onRelease19_2() {
+  releaseScanCode(34 /* "5" */);
+  releaseScanCode(225 /* "⇧" */);
+}
+
+func onPress19_4() {
+  pressScanCode(223 /* "🔅" */);
+}
+func onRelease19_4() {
+  releaseScanCode(223 /* "🔅" */);
+}
+
+func onPress20() {
+}
+func onRelease20() {
+}
+
+func onPress21() {
+}
+func onRelease21() {
+}
+
+func onPress22() {
+  dispatchToLayer(@onPress22_0, @onPress22_1, @onPress22_2, 0, @onPress22_4);
+}
+func onRelease22() {
+  dispatchToLayer(@onRelease22_0, @onRelease22_1, @onRelease22_2, 0, @onRelease22_4);
+}
+
+func onPress22_0() {
+  pressStenoKey(13 /* "*4" */);
+}
+func onRelease22_0() {
+  releaseStenoKey(13 /* "*4" */);
+}
+
+func onPress22_1() {
+  pressScanCode(11 /* "H" */);
+}
+func onRelease22_1() {
+  releaseScanCode(11 /* "H" */);
+}
+
+func onPress22_2() {
+  pressScanCode(225 /* "⇧" */);
+  pressScanCode(35 /* "6" */);
+}
+func onRelease22_2() {
+  releaseScanCode(35 /* "6" */);
+  releaseScanCode(225 /* "⇧" */);
+}
+
+func onPress22_4() {
+  pressScanCode(218 /* "🔈" */);
+}
+func onRelease22_4() {
+  releaseScanCode(218 /* "🔈" */);
+}
+
+func onPress23() {
+  dispatchToLayer(@onPress23_0, @onPress23_1, @onPress23_2, @onPress23_3, @onPress23_4);
+}
+func onRelease23() {
+  dispatchToLayer(@onRelease23_0, @onRelease23_1, @onRelease23_2, @onRelease23_3, @onRelease23_4);
+}
+
+func onPress23_0() {
+  pressStenoKey(17 /* "-R" */);
+}
+func onRelease23_0() {
+  releaseStenoKey(17 /* "-R" */);
+}
+
+func onPress23_1() {
+  pressScanCode(13 /* "J" */);
+}
+func onRelease23_1() {
+  releaseScanCode(13 /* "J" */);
+}
+
+func onPress23_2() {
+  pressScanCode(225 /* "⇧" */);
+  pressScanCode(36 /* "7" */);
+}
+func onRelease23_2() {
+  releaseScanCode(36 /* "7" */);
+  releaseScanCode(225 /* "⇧" */);
+}
+
+func onPress23_3() {
+  pressScanCode(229 /* "⇧" */);
+}
+func onRelease23_3() {
+  releaseScanCode(229 /* "⇧" */);
+}
+
+func onPress23_4() {
+  pressScanCode(80 /* "←" */);
+}
+func onRelease23_4() {
+  releaseScanCode(80 /* "←" */);
+}
+
+func onPress24() {
+  dispatchToLayer(@onPress24_0, @onPress24_1, @onPress24_2, @onPress24_3, @onPress24_4);
+}
+func onRelease24() {
+  dispatchToLayer(@onRelease24_0, @onRelease24_1, @onRelease24_2, @onRelease24_3, @onRelease24_4);
+}
+
+func onPress24_0() {
+  pressStenoKey(19 /* "-B" */);
+}
+func onRelease24_0() {
+  releaseStenoKey(19 /* "-B" */);
+}
+
+func onPress24_1() {
+  pressScanCode(14 /* "K" */);
+}
+func onRelease24_1() {
+  releaseScanCode(14 /* "K" */);
+}
+
+func onPress24_2() {
+  pressScanCode(225 /* "⇧" */);
+  pressScanCode(37 /* "8" */);
+}
+func onRelease24_2() {
+  releaseScanCode(37 /* "8" */);
+  releaseScanCode(225 /* "⇧" */);
+}
+
+func onPress24_3() {
+  pressScanCode(228 /* "⌃" */);
+}
+func onRelease24_3() {
+  releaseScanCode(228 /* "⌃" */);
+}
+
+func onPress24_4() {
+  pressScanCode(81 /* "↓" */);
+}
+func onRelease24_4() {
+  releaseScanCode(81 /* "↓" */);
+}
+
+func onPress25() {
+  dispatchToLayer(@onPress25_0, @onPress25_1, @onPress25_2, @onPress25_3, @onPress25_4);
+}
+func onRelease25() {
+  dispatchToLayer(@onRelease25_0, @onRelease25_1, @onRelease25_2, @onRelease25_3, @onRelease25_4);
+}
+
+func onPress25_0() {
+  pressStenoKey(21 /* "-G" */);
+}
+func onRelease25_0() {
+  releaseStenoKey(21 /* "-G" */);
+}
+
+func onPress25_1() {
+  pressScanCode(15 /* "L" */);
+}
+func onRelease25_1() {
+  releaseScanCode(15 /* "L" */);
+}
+
+func onPress25_2() {
+  pressScanCode(225 /* "⇧" */);
+  pressScanCode(38 /* "9" */);
+}
+func onRelease25_2() {
+  releaseScanCode(38 /* "9" */);
+  releaseScanCode(225 /* "⇧" */);
+}
+
+func onPress25_3() {
+  pressScanCode(230 /* "⌥" */);
+}
+func onRelease25_3() {
+  releaseScanCode(230 /* "⌥" */);
+}
+
+func onPress25_4() {
+  pressScanCode(79 /* "→" */);
+}
+func onRelease25_4() {
+  releaseScanCode(79 /* "→" */);
+}
+
+func onPress26() {
+  dispatchToLayer(@onPress26_0, @onPress26_1, @onPress26_2, @onPress26_3, @onPress26_4);
+}
+func onRelease26() {
+  dispatchToLayer(@onRelease26_0, @onRelease26_1, @onRelease26_2, @onRelease26_3, @onRelease26_4);
+}
+
+func onPress26_0() {
+  pressStenoKey(23 /* "-S" */);
+}
+func onRelease26_0() {
+  releaseStenoKey(23 /* "-S" */);
+}
+
+func onPress26_1() {
+  pressScanCode(51 /* ";" */);
+}
+func onRelease26_1() {
+  releaseScanCode(51 /* ";" */);
+}
+
+func onPress26_2() {
+  pressScanCode(225 /* "⇧" */);
+  pressScanCode(39 /* "0" */);
+}
+func onRelease26_2() {
+  releaseScanCode(39 /* "0" */);
+  releaseScanCode(225 /* "⇧" */);
+}
+
+func onPress26_3() {
+  pressScanCode(231 /* "⌘" */);
+}
+func onRelease26_3() {
+  releaseScanCode(231 /* "⌘" */);
+}
+
+func onPress26_4() {
+  pressScanCode(78 /* "⇟" */);
+}
+func onRelease26_4() {
+  releaseScanCode(78 /* "⇟" */);
+}
+
+func onPress27() {
+  dispatchToLayer(@onPress27_0, @onPress27_1, @onPress27_2, 0, @onPress27_4);
+}
+func onRelease27() {
+  dispatchToLayer(@onRelease27_0, @onRelease27_1, @onRelease27_2, 0, @onRelease27_4);
+}
+
+func onPress27_0() {
+  pressStenoKey(25 /* "-Z" */);
+}
+func onRelease27_0() {
+  releaseStenoKey(25 /* "-Z" */);
+}
+
+func onPress27_1() {
+  pressScanCode(52 /* "'" */);
+}
+func onRelease27_1() {
+  releaseScanCode(52 /* "'" */);
+}
+
+func onPress27_2() {
+  pressScanCode(46 /* "=" */);
+}
+func onRelease27_2() {
+  releaseScanCode(46 /* "=" */);
+}
+
+func onPress27_4() {
+  pressScanCode(77 /* "⇲" */);
+}
+func onRelease27_4() {
+  releaseScanCode(77 /* "⇲" */);
+}
+
+func onPress28() {
+  dispatchToLayer(0, @onPress28_1, 0, 0, 0);
+}
+func onRelease28() {
+  dispatchToLayer(0, @onRelease28_1, 0, 0, 0);
+}
+
+func onPress28_1() {
+  pressScanCode(225 /* "⇧" */);
+}
+func onRelease28_1() {
+  releaseScanCode(225 /* "⇧" */);
+}
+
+func onPress29() {
+  dispatchToLayer(0, @onPress29_1, @onPress29_2, @onPress29_3, 0);
+}
+func onRelease29() {
+  dispatchToLayer(0, @onRelease29_1, @onRelease29_2, @onRelease29_3, 0);
+}
+
+func onPress29_1() {
+  pressScanCode(29 /* "Z" */);
+}
+func onRelease29_1() {
+  releaseScanCode(29 /* "Z" */);
+}
+
+func onPress29_2() {
+  pressScanCode(49 /* "\" */);
+}
+func onRelease29_2() {
+  releaseScanCode(49 /* "\" */);
+}
+
+func onPress29_3() {
+  pressScanCode(58 /* "F1" */);
+}
+func onRelease29_3() {
+  releaseScanCode(58 /* "F1" */);
+}
+
+func onPress30() {
+  dispatchToLayer(0, @onPress30_1, @onPress30_2, @onPress30_3, 0);
+}
+func onRelease30() {
+  dispatchToLayer(0, @onRelease30_1, @onRelease30_2, @onRelease30_3, 0);
+}
+
+func onPress30_1() {
+  pressScanCode(27 /* "X" */);
+}
+func onRelease30_1() {
+  releaseScanCode(27 /* "X" */);
+}
+
+func onPress30_2() {
+  pressScanCode(225 /* "⇧" */);
+  pressScanCode(49 /* "\" */);
+}
+func onRelease30_2() {
+  releaseScanCode(49 /* "\" */);
+  releaseScanCode(225 /* "⇧" */);
+}
+
+func onPress30_3() {
+  pressScanCode(59 /* "F2" */);
+}
+func onRelease30_3() {
+  releaseScanCode(59 /* "F2" */);
+}
+
+func onPress31() {
+  dispatchToLayer(0, @onPress31_1, @onPress31_2, @onPress31_3, 0);
+}
+func onRelease31() {
+  dispatchToLayer(0, @onRelease31_1, @onRelease31_2, @onRelease31_3, 0);
+}
+
+func onPress31_1() {
+  pressScanCode(6 /* "C" */);
+}
+func onRelease31_1() {
+  releaseScanCode(6 /* "C" */);
+}
+
+func onPress31_2() {
+  pressScanCode(45 /* "-" */);
+}
+func onRelease31_2() {
+  releaseScanCode(45 /* "-" */);
+}
+
+func onPress31_3() {
+  pressScanCode(60 /* "F3" */);
+}
+func onRelease31_3() {
+  releaseScanCode(60 /* "F3" */);
+}
+
+func onPress32() {
+  dispatchToLayer(0, @onPress32_1, @onPress32_2, @onPress32_3, 0);
+}
+func onRelease32() {
+  dispatchToLayer(0, @onRelease32_1, @onRelease32_2, @onRelease32_3, 0);
+}
+
+func onPress32_1() {
+  pressScanCode(25 /* "V" */);
+}
+func onRelease32_1() {
+  releaseScanCode(25 /* "V" */);
+}
+
+func onPress32_2() {
+  pressScanCode(47 /* "[" */);
+}
+func onRelease32_2() {
+  releaseScanCode(47 /* "[" */);
+}
+
+func onPress32_3() {
+  pressScanCode(61 /* "F4" */);
+}
+func onRelease32_3() {
+  releaseScanCode(61 /* "F4" */);
+}
+
+func onPress33() {
+  dispatchToLayer(0, @onPress33_1, @onPress33_2, 0, 0);
+}
+func onRelease33() {
+  dispatchToLayer(0, @onRelease33_1, @onRelease33_2, 0, 0);
+}
+
+func onPress33_1() {
+  pressScanCode(5 /* "B" */);
+}
+func onRelease33_1() {
+  releaseScanCode(5 /* "B" */);
+}
+
+func onPress33_2() {
+  pressScanCode(225 /* "⇧" */);
+  pressScanCode(47 /* "[" */);
+}
+func onRelease33_2() {
+  releaseScanCode(47 /* "[" */);
+  releaseScanCode(225 /* "⇧" */);
+}
+
+func onPress34() {
+  dispatchToLayer(0, @onPress34_1, @onPress34_2, 0, @onPress34_4);
+}
+func onRelease34() {
+  dispatchToLayer(0, @onRelease34_1, @onRelease34_2, 0, @onRelease34_4);
+}
+
+func onPress34_1() {
+  pressScanCode(17 /* "N" */);
+}
+func onRelease34_1() {
+  releaseScanCode(17 /* "N" */);
+}
+
+func onPress34_2() {
+  pressScanCode(225 /* "⇧" */);
+  pressScanCode(48 /* "]" */);
+}
+func onRelease34_2() {
+  releaseScanCode(48 /* "]" */);
+  releaseScanCode(225 /* "⇧" */);
+}
+
+func onPress34_4() {
+  pressScanCode(210 /* "🔇" */);
+}
+func onRelease34_4() {
+  releaseScanCode(210 /* "🔇" */);
+}
+
+func onPress35() {
+  dispatchToLayer(0, @onPress35_1, @onPress35_2, 0, 0);
+}
+func onRelease35() {
+  dispatchToLayer(0, @onRelease35_1, @onRelease35_2, 0, 0);
+}
+
+func onPress35_1() {
+  pressScanCode(16 /* "M" */);
+}
+func onRelease35_1() {
+  releaseScanCode(16 /* "M" */);
+}
+
+func onPress35_2() {
+  pressScanCode(48 /* "]" */);
+}
+func onRelease35_2() {
+  releaseScanCode(48 /* "]" */);
+}
+
+func onPress36() {
+  dispatchToLayer(0, @onPress36_1, @onPress36_2, 0, 0);
+}
+func onRelease36() {
+  dispatchToLayer(0, @onRelease36_1, @onRelease36_2, 0, 0);
+}
+
+func onPress36_1() {
+  pressScanCode(54 /* "," */);
+}
+func onRelease36_1() {
+  releaseScanCode(54 /* "," */);
+}
+
+func onPress36_2() {
+  pressScanCode(225 /* "⇧" */);
+  pressScanCode(45 /* "-" */);
+}
+func onRelease36_2() {
+  releaseScanCode(45 /* "-" */);
+  releaseScanCode(225 /* "⇧" */);
+}
+
+func onPress37() {
+  dispatchToLayer(0, @onPress37_1, 0, 0, 0);
+}
+func onRelease37() {
+  dispatchToLayer(0, @onRelease37_1, 0, 0, 0);
+}
+
+func onPress37_1() {
+  pressScanCode(55 /* "." */);
+}
+func onRelease37_1() {
+  releaseScanCode(55 /* "." */);
+}
+
+func onPress38() {
+  dispatchToLayer(0, @onPress38_1, 0, 0, 0);
+}
+func onRelease38() {
+  dispatchToLayer(0, @onRelease38_1, 0, 0, 0);
+}
+
+func onPress38_1() {
+  pressScanCode(56 /* "/" */);
+}
+func onRelease38_1() {
+  releaseScanCode(56 /* "/" */);
+}
+
+func onPress39() {
+  dispatchToLayer(0, @onPress39_1, 0, 0, 0);
+}
+func onRelease39() {
+  dispatchToLayer(0, @onRelease39_1, 0, 0, 0);
+}
+
+func onPress39_1() {
+  pressScanCode(229 /* "⇧" */);
+}
+func onRelease39_1() {
+  releaseScanCode(229 /* "⇧" */);
+}
+
+func onPress40() {
+  dispatchToLayer(@onPress40_0, @onPress40_1, 0, 0, 0);
+}
+func onRelease40() {
+  dispatchToLayer(@onRelease40_0, @onRelease40_1, 0, 0, 0);
+}
+
+func onPress40_0() {
+  pressStenoKey(26 /* "#1" */);
+}
+func onRelease40_0() {
+  releaseStenoKey(26 /* "#1" */);
+}
+
+func onPress40_1() {
+  pressScanCode(227 /* "⌘" */);
+}
+func onRelease40_1() {
+  releaseScanCode(227 /* "⌘" */);
+}
+
+func onPress41() {
+  dispatchToLayer(@onPress41_0, @onPress41_1, 0, 0, 0);
+}
+func onRelease41() {
+  dispatchToLayer(@onRelease41_0, @onRelease41_1, 0, 0, 0);
+}
+
+func onPress41_0() {
+  pressStenoKey(8 /* "A" */);
+}
+func onRelease41_0() {
+  releaseStenoKey(8 /* "A" */);
+}
+
+func onPress41_1() {
+  pressScanCode(226 /* "⌥" */);
+}
+func onRelease41_1() {
+  releaseScanCode(226 /* "⌥" */);
+}
+
+func onPress42() {
+  dispatchToLayer(@onPress42_0, @onPress42_1, 0, 0, @onPress42_4);
+}
+func onRelease42() {
+  dispatchToLayer(@onRelease42_0, @onRelease42_1, 0, 0, @onRelease42_4);
+}
+
+func onPress42_0() {
+  pressStenoKey(9 /* "O" */);
+}
+func onRelease42_0() {
+  releaseStenoKey(9 /* "O" */);
+}
+
+func onPress42_1() {
+  deactivateGlobal();
+  deactivate1();
+  activate4();
+  activateGlobal();
+}
+func onRelease42_1() {
+}
+
+func onPress42_4() {
+}
+func onRelease42_4() {
+  deactivateGlobal();
+  deactivate4();
+  activate1();
+  activateGlobal();
+  onRelease42_1();
+}
+
+func onPress43() {
+  dispatchToLayer(@onPress43_0, @onPress43_1, 0, 0, 0);
+}
+func onRelease43() {
+  dispatchToLayer(@onRelease43_0, @onRelease43_1, 0, 0, 0);
+}
+
+func onPress43_0() {
+  pressStenoKey(14 /* "E" */);
+}
+func onRelease43_0() {
+  releaseStenoKey(14 /* "E" */);
+}
+
+func onPress43_1() {
+  pressScanCode(44 /* "⎵" */);
+}
+func onRelease43_1() {
+  releaseScanCode(44 /* "⎵" */);
+}
+
+func onPress44() {
+  dispatchToLayer(@onPress44_0, @onPress44_1, @onPress44_2, 0, 0);
+}
+func onRelease44() {
+  dispatchToLayer(@onRelease44_0, @onRelease44_1, @onRelease44_2, 0, 0);
+}
+
+func onPress44_0() {
+  pressStenoKey(15 /* "U" */);
+}
+func onRelease44_0() {
+  releaseStenoKey(15 /* "U" */);
+}
+
+func onPress44_1() {
+  deactivateGlobal();
+  deactivate1();
+  activate2();
+  activateGlobal();
+}
+func onRelease44_1() {
+}
+
+func onPress44_2() {
+}
+func onRelease44_2() {
+  deactivateGlobal();
+  deactivate2();
+  activate1();
+  activateGlobal();
+  onRelease44_1();
+}
+
+func onPress45() {
+  dispatchToLayer(@onPress45_0, @onPress45_1, 0, @onPress45_3, 0);
+}
+func onRelease45() {
+  dispatchToLayer(@onRelease45_0, @onRelease45_1, 0, @onRelease45_3, 0);
+}
+
+func onPress45_0() {
+  pressStenoKey(27 /* "#2" */);
+}
+func onRelease45_0() {
+  releaseStenoKey(27 /* "#2" */);
+}
+
+var timer45_1;
+func onPress45_1() {
+  if (!isInPressAll()) {
+    timer45_1 = getTime();
+  }
+  deactivateGlobal();
+  deactivate1();
+  activate3();
+  activateGlobal();
+}
+func onRelease45_1() {
+  if (getTime() - timer45_1 <= 200) {
+    pressScanCode(40 /* "↵" */);
+    releaseScanCode(40 /* "↵" */);
+
+  }
+}
+
+func onPress45_3() {
+}
+func onRelease45_3() {
+  deactivateGlobal();
+  deactivate3();
+  activate1();
+  activateGlobal();
+  onRelease45_1();
+}
+

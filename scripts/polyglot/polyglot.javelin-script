@@ -1,5 +1,4 @@
-// Generated from polyglot.javelin-layout
-
+// Generated from javelin-layout file
 var layer;
 func setLayer(layerIndex, layerIdEvent) {
   releaseAll();
@@ -8,42 +7,60 @@ func setLayer(layerIndex, layerIdEvent) {
 }
 
 func dispatchToLayer(layer0Func, layer1Func, layer2Func, layer3Func, layer4Func) {
-  if (layer == 0) {
+  var resolvedLayer = resolveLayerIndex();
+  if (resolvedLayer == 0) {
     if (layer0Func) layer0Func();
-  } else if (layer == 1) {
+  } else if (resolvedLayer == 1) {
     if (layer1Func) layer1Func();
-  } else if (layer == 2) {
+  } else if (resolvedLayer == 2) {
     if (layer2Func) layer2Func();
-  } else if (layer == 3) {
+  } else if (resolvedLayer == 3) {
     if (layer3Func) layer3Func();
-  } else if (layer == 4) {
+  } else if (resolvedLayer == 4) {
     if (layer4Func) layer4Func();
   }
 }
 
-func activateGlobal() {
-
+func resolveLayerIndex() var {
+  return layer;
 }
-func deactivateGlobal() {
 
-}
 func activate0() {
-  sendEventUnique("layer: steno");
-}
-
-func deactivate0() {
+  setLayer(0, "layer_id: 87377230");
 
 }
 
 func activate1() {
-  sendEventUnique("layer: qwerty");
-}
-
-func deactivate1() {
+  setLayer(1, "layer_id: 1128808786");
 
 }
 
 func activate2() {
+  setLayer(2, "layer_id: 148942692");
+
+}
+
+func activate3() {
+  setLayer(3, "layer_id: 105007919");
+
+}
+
+func activate4() {
+  setLayer(4, "layer_id: 259868619");
+
+}
+
+func activateDynamic() {
+  dispatchToLayer(@activate0, @activate1, @activate2, @activate3, @activate4);
+}
+func activateGlobal() {
+
+}
+func deactivate0() {
+
+}
+
+func deactivate1() {
 
 }
 
@@ -51,15 +68,7 @@ func deactivate2() {
 
 }
 
-func activate3() {
-
-}
-
 func deactivate3() {
-
-}
-
-func activate4() {
 
 }
 
@@ -67,31 +76,35 @@ func deactivate4() {
 
 }
 
-func activateDynamic() {
-  dispatchToLayer(@activate0, @activate1, 0, 0, 0);
-}
 func deactivateDynamic() {}
-func updateStenoMode() {
-  // Four corner keys are 0, 11, 36, 41.
-  if (checkButtonState("100000000001000000000000000000000000100001")) {
-    if (getParameter("steno_mode") != "embedded") {
-      console("set_steno_mode embedded");
-    } else {
-      console("set_steno_mode gemini");
-    }
-    releaseAll();
+func deactivateGlobal() {
+
+}
+var postPress;
+var postRelease;
+
+func _pressScanCode(scanCode, isModifier) {
+  pressScanCode(scanCode);
+  if (isModifier) return;
+
+  if (postPress) {
+    var localPostPress = postPress;
+    postPress = 0;
+    localPostPress();
   }
 }
 
-var lastEvent;
-func sendEventUnique(event) {
-  if (event == lastEvent) {
-    return;
-  }
-  lastEvent = event;
-  sendEvent(event);
-}
+func _releaseScanCode(scanCode, isModifier) {
+  releaseScanCode(scanCode);
+  if (isModifier) return;
 
+  if (postRelease) {
+    var localPostRelease = postRelease;
+    postRelease = 0;
+    localPostRelease();
+  }
+}
+// RGB Scripts
 const RGB_UPDATE_TIME = 20;
 var lastRgbUpdateTime = 0;
 
@@ -143,6 +156,29 @@ func updateUnderglowRgbHueCycle() {
     sat,
     BRIGHTNESS,
     );
+  }
+}
+
+// sendEventUnique
+var lastEvent;
+func sendEventUnique(event) {
+  if (event == lastEvent) {
+    return;
+  }
+  lastEvent = event;
+  sendEvent(event);
+}
+
+// updateStenoMode
+func updateStenoMode() {
+  // Four corner keys are 0, 11, 36, 41.
+  if (checkButtonState("100000000001000000000000000000000000100001")) {
+    if (getParameter("steno_mode") != "embedded") {
+      console("set_steno_mode embedded");
+    } else {
+      console("set_steno_mode gemini");
+    }
+    releaseAll();
   }
 }
 
@@ -567,7 +603,9 @@ func onRelease12() {
 
 var timer12_1;
 func onPress12_1() {
-  timer12_1 = getTime();
+  if (!isInPressAll()) {
+    timer12_1 = getTime();
+  }
   pressScanCode(224 /* "⌃" */);
 }
 func onRelease12_1() {
@@ -1054,16 +1092,17 @@ func onRelease24() {
 func onPress24_0() {
   deactivateGlobal();
   deactivate0();
-  setLayer(1, "layer_id: 136543802");
-  activateGlobal();
   activate1();
+  activateGlobal();
 }
 func onRelease24_0() {
 }
 
 var timer24_1;
 func onPress24_1() {
-  timer24_1 = getTime();
+  if (!isInPressAll()) {
+    timer24_1 = getTime();
+  }
   pressScanCode(225 /* "⇧" */);
 }
 func onRelease24_1() {
@@ -1071,9 +1110,8 @@ func onRelease24_1() {
   if (getTime() - timer24_1 <= 200) {
     deactivateGlobal();
     deactivate1();
-    setLayer(0, "layer_id: 156387993");
-    activateGlobal();
     activate0();
+    activateGlobal();
 
   }
 }
@@ -1461,7 +1499,9 @@ func onRelease37_0() {
 
 var timer37_1;
 func onPress37_1() {
-  timer37_1 = getTime();
+  if (!isInPressAll()) {
+    timer37_1 = getTime();
+  }
   pressScanCode(226 /* "⌥" */);
 }
 func onRelease37_1() {
@@ -1497,9 +1537,8 @@ func onRelease38_0() {
 func onPress38_1() {
   deactivateGlobal();
   deactivate1();
-  setLayer(4, "layer_id: 259868619");
-  activateGlobal();
   activate4();
+  activateGlobal();
 }
 func onRelease38_1() {
 }
@@ -1516,9 +1555,8 @@ func onPress38_4() {
 func onRelease38_4() {
   deactivateGlobal();
   deactivate4();
-  setLayer(1, "layer_id: 136543802");
-  activateGlobal();
   activate1();
+  activateGlobal();
   onRelease38_1();
 }
 
@@ -1539,9 +1577,8 @@ func onRelease39_0() {
 func onPress39_1() {
   deactivateGlobal();
   deactivate1();
-  setLayer(2, "layer_id: 148942692");
-  activateGlobal();
   activate2();
+  activateGlobal();
 }
 func onRelease39_1() {
 }
@@ -1551,9 +1588,8 @@ func onPress39_2() {
 func onRelease39_2() {
   deactivateGlobal();
   deactivate2();
-  setLayer(1, "layer_id: 136543802");
-  activateGlobal();
   activate1();
+  activateGlobal();
   onRelease39_1();
 }
 
@@ -1603,12 +1639,13 @@ func onRelease41_0() {
 
 var timer41_1;
 func onPress41_1() {
-  timer41_1 = getTime();
+  if (!isInPressAll()) {
+    timer41_1 = getTime();
+  }
   deactivateGlobal();
   deactivate1();
-  setLayer(3, "layer_id: 105007919");
-  activateGlobal();
   activate3();
+  activateGlobal();
 }
 func onRelease41_1() {
   if (getTime() - timer41_1 <= 200) {
@@ -1623,15 +1660,16 @@ func onPress41_3() {
 func onRelease41_3() {
   deactivateGlobal();
   deactivate3();
-  setLayer(1, "layer_id: 136543802");
-  activateGlobal();
   activate1();
+  activateGlobal();
   onRelease41_1();
 }
 
 var timer42;
 func onPress42() {
-  timer42 = getTime();
+  if (!isInPressAll()) {
+    timer42 = getTime();
+  }
 }
 func onRelease42() {
   if (getTime() - timer42 <= 200) {

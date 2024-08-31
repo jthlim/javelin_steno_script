@@ -1,0 +1,217 @@
+//---------------------------------------------------------------------------
+// Default Corne pair script.
+//---------------------------------------------------------------------------
+
+const CONNECTION_NONE = 0;
+const CONNECTION_BLE = 1;
+const CONNECTION_USB = 2;
+const CONNECTION_USB_PAIR = 3;
+
+const PAIR_CONNECTION_NONE = 0;
+const PAIR_CONNECTION_BLE = 1;
+const PAIR_CONNECTION_CABLE = 2;
+
+const SCRIPT_ID_DISPLAY_OVERLAY = 0;
+const SCRIPT_ID_BATTERY_UPDATE = 1;
+const SCRIPT_ID_CONNECTION_UPDATE = 2;
+const SCRIPT_ID_PAIR_CONNECTION_UPDATE = 3;
+const SCRIPT_ID_KEYBOARD_LED_STATUS_UPDATE = 4;
+const SCRIPT_ID_BLE_ADVERTISING_UPDATE = 5;
+const SCRIPT_ID_BLE_SCANNING_UPDATE = 6;
+const SCRIPT_ID_U2F_STATUS_UPDATE = 7;
+
+const TEXT_ALIGNMENT_LEFT = 0;
+const TEXT_ALIGNMENT_MIDDLE = 1;
+const TEXT_ALIGNMENT_RIGHT = 2;
+
+const FONT_ID_NORMAL = 0;
+const FONT_ID_SMALL_DIGITS = 1;
+const FONT_ID_MEDIUM_DIGITS = 2;
+const FONT_ID_LARGE_DIGITS = 3;
+
+//---------------------------------------------------------------------------
+
+const TIMER_ID_RGB_UPDATE = 0;
+
+func init() {
+  setScript(SCRIPT_ID_CONNECTION_UPDATE, @onConnectionUpdate);
+  setScript(SCRIPT_ID_PAIR_CONNECTION_UPDATE, @onPairConnectionUpdate);
+
+  updateRgb();
+}
+
+func onConnectionUpdate() {
+  updateRgb();
+}
+
+func onPairConnectionUpdate() {
+  updateRgb();
+}
+
+func updateRgb() {
+  var activePairConnection = getActivePairConnection();
+  if (activePairConnection == PAIR_CONNECTION_NONE) {
+    updateDisconnectedKeyRgbCycle();
+    startTimer(TIMER_ID_RGB_UPDATE, 32, 1, @updateDisconnectedKeyRgbCycle);
+  } else {
+    clearRgb();
+    stopTimer(TIMER_ID_RGB_UPDATE);
+  }
+}
+
+func clearRgb() {
+  for (var i = 0; i < 46; i = i + 1) {
+    setRgb(i, 0, 0, 0);
+  }
+}
+
+const DISCONNECTED_KEY_ORDER = [[ 07 08 09 0a 0b 0c 0d 0c 0b 0a 09 08 ]];
+func updateDisconnectedKeyRgbCycle() {
+  clearRgb();
+
+  var index = getTime() >> 6;
+  var keyId = DISCONNECTED_KEY_ORDER[index % 12];
+  setHsv(keyId, index << 10, 0xf0, 16);
+}
+
+//---------------------------------------------------------------------------
+
+func onPress0() { }
+func onRelease0() { }
+
+func onPress1() { }
+func onRelease1() { }
+
+func onPress2() { }
+func onRelease2() { }
+
+func onPress3() { }
+func onRelease3() { }
+
+func onPress4() { }
+func onRelease4() { }
+
+func onPress5() { }
+func onRelease5() { }
+
+func onPress6() { }
+func onRelease6() { }
+
+func onPress7() { }
+func onRelease7() { }
+
+func onPress8() { }
+func onRelease8() { }
+
+func onPress9() { }
+func onRelease9() { }
+
+func onPress10() { }
+func onRelease10() { }
+
+func onPress11() { }
+func onRelease11() { }
+
+func onPress12() { }
+func onRelease12() { }
+
+func onPress13() { }
+func onRelease13() { }
+
+func onPress14() { }
+func onRelease14() { }
+
+func onPress15() { }
+func onRelease15() { }
+
+func onPress16() { }
+func onRelease16() { }
+
+func onPress17() { }
+func onRelease17() { }
+
+func onPress18() { }
+func onRelease18() { }
+
+func onPress19() { }
+func onRelease19() { }
+
+func onPress20() { }
+func onRelease20() { }
+
+func onPress21() { }
+func onRelease21() { }
+
+func onPress22() { }
+func onRelease22() { }
+
+func onPress23() { }
+func onRelease23() { }
+
+func onPress24() { }
+func onRelease24() { }
+
+func onPress25() { }
+func onRelease25() { }
+
+func onPress26() { }
+func onRelease26() { }
+
+func onPress27() { }
+func onRelease27() { }
+
+// 3rd row
+func onPress28() { }
+func onRelease28() { }
+
+func onPress29() { }
+func onRelease29() { }
+
+func onPress30() { }
+func onRelease30() { }
+
+func onPress31() { }
+func onRelease31() { }
+
+func onPress32() { }
+func onRelease32() { }
+
+func onPress33() { }
+func onRelease33() { }
+
+func onPress34() { }
+func onRelease34() { }
+
+func onPress35() { }
+func onRelease35() { }
+
+func onPress36() { }
+func onRelease36() { }
+
+func onPress37() { }
+func onRelease37() { }
+
+func onPress38() { }
+func onRelease38() { }
+
+func onPress39() { }
+func onRelease39() { }
+
+// 4th row
+func onPress40() { }
+func onRelease40() { }
+
+func onPress41() { }
+func onRelease41() { }
+
+func onPress42() { }
+func onRelease42() { }
+
+func onPress43() { }
+func onRelease43() { }
+
+func onPress44() { }
+func onRelease44() { }
+
+func onPress45() { }
+func onRelease45() { }
