@@ -1,12 +1,11 @@
-import 'dart:js_interop';
 import 'dart:typed_data';
 
-import 'package:drop_zone/drop_zone.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image/image.dart' show Pixel, decodePng;
-import 'package:web/web.dart' as html;
 
+import 'drop_zone.dart';
+import 'file_helper.dart';
 import 'javelin_script_text_editing_controller.dart';
 
 class HideScrollbarBehavior extends MaterialScrollBehavior {
@@ -64,23 +63,18 @@ class JavelinScriptEditorState extends State<JavelinScriptEditor> {
   static bool isOn(Pixel pixel) =>
       pixel.r < 128 && pixel.g < 128 && pixel.b < 128;
 
-  Future<String> stringForDroppedFile(html.File file) async {
+  Future<String> stringForDroppedFile(File file) async {
     final filename = file.name;
     if (file.type != 'image/png') {
       return '/* Unable to convert: Only PNG files supported. */';
     }
 
-    final reader = html.FileReader();
-    reader.readAsArrayBuffer(file);
-    await reader.onLoadEnd.first;
-
-    final data = reader.result;
-    if (data == null) {
+    final bytes = await file.bytes;
+    if (bytes == null) {
       return '/* Unable to read file data. */';
     }
 
-    final bytes = data as JSArrayBuffer;
-    final image = decodePng(bytes.toDart.asUint8List());
+    final image = decodePng(bytes);
     if (image == null) {
       return '/* Unable to decode PNG. */';
     }
@@ -122,7 +116,7 @@ class JavelinScriptEditorState extends State<JavelinScriptEditor> {
     return buffer.toString();
   }
 
-  void _handleDrop(html.File obj) async {
+  void _handleDrop(File obj) async {
     setState(() => _borderColor = null);
     final code = await stringForDroppedFile(obj);
     final textEditingValue = _textEditingController.value;

@@ -344,6 +344,7 @@ func activateGlobal() {
   if (([[01 01 01 01 00 01 00]][resolveLayerIndex()])) {
     pressAll();
   }
+  setEnableButtonStates(00);
   updateDisplay();
   rgbUpdate();
   rgbUpdateUnderglow();

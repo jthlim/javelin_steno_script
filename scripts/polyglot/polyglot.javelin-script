@@ -54,6 +54,7 @@ func activateDynamic() {
   dispatchToLayer(@activate0, @activate1, @activate2, @activate3, @activate4);
 }
 func activateGlobal() {
+  setEnableButtonStates(([[01 00 00 00 00]][resolveLayerIndex()]));
 
 }
 func deactivate0() {
@@ -184,6 +185,7 @@ func updateStenoMode() {
 
 func init() {
   activate0();
+  activateGlobal();
 }
 
 func onPress0() {

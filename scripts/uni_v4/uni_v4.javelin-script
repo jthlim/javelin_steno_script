@@ -333,6 +333,10 @@ const LED_STATUS_KANA = 4;
 // physical button.
 //---------------------------------------------------------------------------
 
+func init() {
+  setEnableButtonStates(1);
+}
+
 func updateStenoMode() {
   if (checkButtonState("1000000000100000000000100001")) {
     if (getParameter("steno_mode") != "embedded") {

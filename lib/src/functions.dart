@@ -92,6 +92,7 @@ enum InBuiltScriptFunction implements ScriptFunctionDefinition {
   isMouseButtonPressed(1, true, 0x53, true),
   moveMouse(2, false, 0x54, false),
   wheelMouse(1, false, 0x55, false),
+  setEnableButtonStates(1, false, 0x56, false),
   ;
 
   const InBuiltScriptFunction(
