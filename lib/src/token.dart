@@ -87,5 +87,14 @@ class Token {
   String location() => '$line:$column';
 
   @override
-  String toString() => '$type:$line:$column';
+  String toString() {
+    switch (type) {
+      case TokenType.identifier:
+        return '"$stringValue":$line:$column';
+      case TokenType.intValue:
+        return '"$intValue":$line:$column';
+      default:
+        return '$type:$line:$column';
+    }
+  }
 }

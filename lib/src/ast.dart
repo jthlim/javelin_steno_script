@@ -1017,9 +1017,18 @@ class LoadIndexedGlobalValueAstNode extends AstNode {
 
   @override
   void addInstructions(ScriptByteCodeBuilder builder) {
-    indexExpression.addInstructions(builder);
-    builder.addInstruction(
-        LoadIndexedGlobalValueInstruction(globalValue.global.index));
+    if (indexExpression.isConstant()) {
+      builder.addInstruction(
+        LoadGlobalValueInstruction(
+          globalValue.global.index + indexExpression.constantValue(),
+        ),
+      );
+    } else {
+      indexExpression.addInstructions(builder);
+      builder.addInstruction(
+        LoadIndexedGlobalValueInstruction(globalValue.global.index),
+      );
+    }
   }
 
   final LoadGlobalValueArrayAstNode globalValue;
@@ -1257,10 +1266,16 @@ class StoreIndexedGlobalValueAstNode extends AstNode {
   @override
   void addInstructions(ScriptByteCodeBuilder builder) {
     if (builder.reachability.globals.contains(globalValueIndex)) {
-      indexExpression.addInstructions(builder);
-      expression.addInstructions(builder);
-      builder
-          .addInstruction(StoreIndexedGlobalValueInstruction(globalValueIndex));
+      if (indexExpression.isConstant()) {
+        expression.addInstructions(builder);
+        builder.addInstruction(StoreGlobalValueInstruction(
+            globalValueIndex + indexExpression.constantValue()));
+      } else {
+        indexExpression.addInstructions(builder);
+        expression.addInstructions(builder);
+        builder.addInstruction(
+            StoreIndexedGlobalValueInstruction(globalValueIndex));
+      }
     }
   }
 

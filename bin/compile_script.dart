@@ -62,4 +62,6 @@ void main(List<String> arguments) {
   }
   buffer.write('\n');
   print(buffer.toString());
+
+  print("Globals used: ${module.globalsUsedCount}");
 }

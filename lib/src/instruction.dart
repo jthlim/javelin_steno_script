@@ -376,6 +376,9 @@ final class JumpValueInstruction extends ScriptInstruction {
   int get byteCodeLength => 1;
 
   @override
+  bool get implicitNext => false;
+
+  @override
   void addByteCode(ScriptByteCodeBuilder builder) {
     builder.addOpcode(ScriptOpcode.jumpValue);
   }
