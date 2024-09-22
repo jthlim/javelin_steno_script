@@ -628,6 +628,21 @@ class NotEqualsAstNode extends BinaryOperatorAstNode {
   }
 
   @override
+  void addInstructions(ScriptByteCodeBuilder builder) {
+    if (statementA.isConstant() && statementA.constantValue() == 0) {
+      statementB.addInstructions(builder);
+      builder.addInstruction(OpcodeInstruction(ScriptOperatorOpcode.not));
+      builder.addInstruction(OpcodeInstruction(ScriptOperatorOpcode.not));
+    } else if (statementB.isConstant() && statementB.constantValue() == 0) {
+      statementA.addInstructions(builder);
+      builder.addInstruction(OpcodeInstruction(ScriptOperatorOpcode.not));
+      builder.addInstruction(OpcodeInstruction(ScriptOperatorOpcode.not));
+    } else {
+      super.addInstructions(builder);
+    }
+  }
+
+  @override
   ScriptOperatorOpcode get opcode => ScriptOperatorOpcode.notEquals;
 }
 
@@ -750,6 +765,12 @@ class ForStatementAstNode extends AstNode {
 
     initialization?.addInstructions(builder);
     final condition = this.condition;
+    final originalContinueTargets = builder.continueTargets;
+    final originalBreakTargets = builder.breakTargets;
+    final continueTargets = <NopInstruction>[];
+    final breakTargets = <NopInstruction>[];
+    builder.continueTargets = continueTargets;
+    builder.breakTargets = breakTargets;
     if (condition == null) {
       final jumpToStartInstruction = JumpInstruction();
       builder.addInstruction(jumpToStartInstruction.target);
@@ -757,6 +778,10 @@ class ForStatementAstNode extends AstNode {
       body.addInstructions(builder);
       update?.addInstructions(builder);
       builder.addInstruction(jumpToStartInstruction);
+
+      for (final continueTarget in continueTargets) {
+        jumpToStartInstruction.target.insertAfter(continueTarget);
+      }
     } else if (!condition.isConstant() || condition.constantValue() != 0) {
       final jumpToConditionInstruction = JumpInstruction();
       builder.addInstruction(jumpToConditionInstruction.target);
@@ -774,9 +799,17 @@ class ForStatementAstNode extends AstNode {
       builder.addInstruction(jumpToEndInstruction);
       body.addInstructions(builder);
       update?.addInstructions(builder);
+      for (final continueTarget in continueTargets) {
+        builder.addInstruction(continueTarget);
+      }
       builder.addInstruction(jumpToConditionInstruction);
       builder.addInstruction(jumpToEndInstruction.target);
     }
+    for (final endTarget in breakTargets) {
+      builder.addInstruction(endTarget);
+    }
+    builder.continueTargets = originalContinueTargets;
+    builder.breakTargets = originalBreakTargets;
   }
 }
 
@@ -808,9 +841,23 @@ class DoWhileStatementAstNode extends AstNode {
     //   body
     //   condition -> start
 
+    final originalContinueTargets = builder.continueTargets;
+    final originalBreakTargets = builder.breakTargets;
+    final continueTargets = <NopInstruction>[];
+    final breakTargets = <NopInstruction>[];
+    builder.continueTargets = continueTargets;
+    builder.breakTargets = breakTargets;
+
     final startMarker = NopInstruction();
     builder.addInstruction(startMarker);
     body.addInstructions(builder);
+    builder.continueTargets = originalContinueTargets;
+    builder.breakTargets = originalBreakTargets;
+
+    for (final endTarget in continueTargets) {
+      builder.addInstruction(endTarget);
+    }
+
     condition.addInstructions(builder);
 
     final lastInstruction = builder.instructions.last;
@@ -824,6 +871,10 @@ class DoWhileStatementAstNode extends AstNode {
     }
     builder.addInstruction(jumpToEndInstruction);
     startMarker.insertAfter(jumpToEndInstruction.target);
+
+    for (final endTarget in breakTargets) {
+      builder.addInstruction(endTarget);
+    }
   }
 }
 
@@ -832,7 +883,11 @@ class IfStatementAstNode extends AstNode {
     required this.condition,
     required this.whenTrue,
     this.whenFalse,
+    this.isBooleanExpression = false,
   });
+
+  @override
+  bool isBoolean() => isBooleanExpression;
 
   @override
   bool isEmpty() {
@@ -923,9 +978,48 @@ class IfStatementAstNode extends AstNode {
     }
   }
 
+  final bool isBooleanExpression;
   final AstNode condition;
   final AstNode whenTrue;
   final AstNode? whenFalse;
+}
+
+class BreakStatementAstNode extends AstNode {
+  @override
+  bool isConstant() => false;
+
+  @override
+  int constantValue() => throw UnsupportedError('Should not be invoked');
+
+  @override
+  void addInstructions(ScriptByteCodeBuilder builder) {
+    final targets = builder.breakTargets;
+    if (targets == null) {
+      throw FormatException('No target for break statement');
+    }
+    final jumpInstruction = JumpInstruction();
+    builder.addInstruction(jumpInstruction);
+    targets.add(jumpInstruction.target);
+  }
+}
+
+class ContinueStatementAstNode extends AstNode {
+  @override
+  bool isConstant() => false;
+
+  @override
+  int constantValue() => throw UnsupportedError('Should not be invoked');
+
+  @override
+  void addInstructions(ScriptByteCodeBuilder builder) {
+    final targets = builder.continueTargets;
+    if (targets == null) {
+      throw FormatException('No target for continue statement');
+    }
+    final jumpInstruction = JumpInstruction();
+    builder.addInstruction(jumpInstruction);
+    targets.add(jumpInstruction.target);
+  }
 }
 
 class StatementListAstNode extends AstNode {
@@ -990,8 +1084,43 @@ class LoadGlobalValueArrayAstNode extends AstNode {
   final ScriptGlobal global;
 }
 
-class LoadIndexedGlobalValueAstNode extends AstNode {
-  LoadIndexedGlobalValueAstNode(this.globalValue, this.indexExpression);
+mixin IndexedGlobalValueMixin {
+  static int calculateIndexOffset(
+    AstNode indexExpression,
+    int globalValueIndex,
+  ) {
+    if (indexExpression.isConstant()) {
+      // Special cased code generation
+      return 0;
+    }
+
+    if (indexExpression is! TermsAstNode) {
+      return 0;
+    }
+
+    var offset = indexExpression.constantValue();
+    if (offset == 0) {
+      return 0;
+    }
+
+    final index = globalValueIndex + offset;
+    if (index < 0 || index > 255) {
+      return 0;
+    }
+
+    indexExpression.terms.removeWhere((e) => e.statement.isConstant());
+    return offset;
+  }
+}
+
+class LoadIndexedGlobalValueAstNode extends AstNode
+    with IndexedGlobalValueMixin {
+  LoadIndexedGlobalValueAstNode(this.globalValue, this.indexExpression) {
+    globalIndexOffset = IndexedGlobalValueMixin.calculateIndexOffset(
+      indexExpression,
+      globalValue.global.index,
+    );
+  }
 
   @override
   bool isConstant() => false;
@@ -1026,11 +1155,13 @@ class LoadIndexedGlobalValueAstNode extends AstNode {
     } else {
       indexExpression.addInstructions(builder);
       builder.addInstruction(
-        LoadIndexedGlobalValueInstruction(globalValue.global.index),
+        LoadIndexedGlobalValueInstruction(
+            globalValue.global.index + globalIndexOffset),
       );
     }
   }
 
+  int globalIndexOffset = 0;
   final LoadGlobalValueArrayAstNode globalValue;
   final AstNode indexExpression;
 }
@@ -1114,7 +1245,7 @@ class CallFunctionAstNode extends AstNode {
   void addInstructions(ScriptByteCodeBuilder builder) {
     final definition = builder.module.functions[name];
     if (definition == null) {
-      throw FormatException('No such function $name');
+      throw FormatException('No such function $name ${token.location()}');
     }
     if (definition.numberOfParameters != parameters.length) {
       throw FormatException(
@@ -1236,12 +1367,18 @@ class StoreValueAstNode extends AstNode {
   final AstNode expression;
 }
 
-class StoreIndexedGlobalValueAstNode extends AstNode {
+class StoreIndexedGlobalValueAstNode extends AstNode
+    with IndexedGlobalValueMixin {
   StoreIndexedGlobalValueAstNode({
     required this.globalValueIndex,
     required this.indexExpression,
     required this.expression,
-  });
+  }) {
+    globalIndexOffset = IndexedGlobalValueMixin.calculateIndexOffset(
+      indexExpression,
+      globalValueIndex,
+    );
+  }
 
   @override
   bool isConstant() => false;
@@ -1273,12 +1410,13 @@ class StoreIndexedGlobalValueAstNode extends AstNode {
       } else {
         indexExpression.addInstructions(builder);
         expression.addInstructions(builder);
-        builder.addInstruction(
-            StoreIndexedGlobalValueInstruction(globalValueIndex));
+        builder.addInstruction(StoreIndexedGlobalValueInstruction(
+            globalValueIndex + globalIndexOffset));
       }
     }
   }
 
+  int globalIndexOffset = 0;
   final int globalValueIndex;
   final AstNode indexExpression;
   final AstNode expression;

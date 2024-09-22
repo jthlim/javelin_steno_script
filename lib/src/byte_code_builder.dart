@@ -23,6 +23,8 @@ class ScriptByteCodeBuilder {
   var stringHashTableOffset = 0;
   final data = <AstNode, int>{};
   final ScriptReachability reachability;
+  List<NopInstruction>? continueTargets;
+  List<NopInstruction>? breakTargets;
 
   Uint8List createByteCode(int buttonCount) {
     _mark(buttonCount);

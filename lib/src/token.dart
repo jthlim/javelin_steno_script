@@ -8,6 +8,8 @@ enum TokenType {
   ifKeyword,
   returnKeyword,
   varKeyword,
+  breakKeyword,
+  continueKeyword,
   questionMark,
   fallback,
   colon,

@@ -434,15 +434,19 @@ class Parser {
   }
 
   AstNode _parseSubscript() {
-    final result = _parseFallback();
+    var result = _parseFallback();
+    if (result is LoadGlobalValueArrayAstNode &&
+        _currentToken.type == TokenType.openSquareBracket) {
+      _nextToken();
+      final indexExpression = _parseExpression();
+      _assertToken(TokenType.closeSquareBracket);
+      result = LoadIndexedGlobalValueAstNode(result, indexExpression);
+    }
     switch (_currentToken.type) {
       case TokenType.openSquareBracket:
         _nextToken();
         final indexExpression = _parseExpression();
         _assertToken(TokenType.closeSquareBracket);
-        if (result is LoadGlobalValueArrayAstNode) {
-          return LoadIndexedGlobalValueAstNode(result, indexExpression);
-        }
         return ByteIndexAstNode(result, indexExpression);
       case TokenType.openHalfWordList:
         _nextToken();
@@ -644,6 +648,7 @@ class Parser {
           condition: result,
           whenTrue: rhs.isBoolean() ? rhs : NotAstNode(NotAstNode(rhs)),
           whenFalse: IntValueAstNode(0),
+          isBooleanExpression: true,
         );
       }
     }
@@ -662,6 +667,7 @@ class Parser {
           condition: NotAstNode(result),
           whenTrue: rhs.isBoolean() ? rhs : NotAstNode(NotAstNode(rhs)),
           whenFalse: IntValueAstNode(1),
+          isBooleanExpression: true,
         );
       }
     }
@@ -965,6 +971,20 @@ class Parser {
     return DoWhileStatementAstNode(condition: condition, body: body);
   }
 
+  AstNode _parseContinueStatement() {
+    _assertToken(TokenType.continueKeyword);
+    _assertToken(TokenType.semiColon);
+
+    return ContinueStatementAstNode();
+  }
+
+  AstNode _parseBreakStatement() {
+    _assertToken(TokenType.breakKeyword);
+    _assertToken(TokenType.semiColon);
+
+    return BreakStatementAstNode();
+  }
+
   AstNode _parseStatement() {
     switch (_currentToken.type) {
       case TokenType.constKeyword:
@@ -988,6 +1008,10 @@ class Parser {
         return _parseDoWhileStatement();
       case TokenType.at:
         return _parseLambdaCall();
+      case TokenType.continueKeyword:
+        return _parseContinueStatement();
+      case TokenType.breakKeyword:
+        return _parseBreakStatement();
       default:
         throw FormatException('Expected statement, found $_currentToken');
     }

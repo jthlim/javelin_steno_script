@@ -355,7 +355,9 @@ class Tokenizer {
           final identifier = _input.substring(startOffset, _offset);
 
           const identifierToTokenContentMap = {
+            'break': TokenType.breakKeyword,
             'const': TokenType.constKeyword,
+            'continue': TokenType.continueKeyword,
             'do': TokenType.doKeyword,
             'else': TokenType.elseKeyword,
             'for': TokenType.forKeyword,
