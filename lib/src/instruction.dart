@@ -136,7 +136,7 @@ sealed class ScriptInstruction extends LinkedListEntry<ScriptInstruction> {
   @override
   bool operator ==(Object other) => toString() == other.toString();
 
-  ScriptInstruction get nextNonNopInstruction {
+  ScriptInstruction get firstNonNopInstruction {
     var instruction = this;
     while (instruction is NopInstruction) {
       instruction = instruction.next!;

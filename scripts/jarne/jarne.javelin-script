@@ -339,17 +339,13 @@ var hueSpread = 4;
 var hueShift = 0;
 var brightness = 3;
 var saturation = 5;
-var lastQwertyActionTimes[2];
 
 var keyColorData[42];
 
 const TIMER_ID_RGB_UPDATE = 0;
-const TIMER_ID_FUZZY_LAYER = 1;
-const TIMER_ID_SCREEN_SAVER = 2;
-const TIMER_ID_PAIRING_HOLD = 3;
-const TIMER_ID_CAPS_RELEASE = 4;
-const TIMER_ID_FUZZY_LAYER_STARTED = 5;
-const TIMER_ID_FUZZY_LAYER_PRESS_DELAY = 6;
+const TIMER_ID_SCREEN_SAVER = 1;
+const TIMER_ID_PAIRING_HOLD = 2;
+const TIMER_ID_CAPS_RELEASE = 3;
 
 const DYNAMIC_STENO_DISPLAY_WPM = 0;
 const DYNAMIC_STENO_DISPLAY_PAPER_TAPE = 1;
@@ -372,15 +368,15 @@ const KEY_SHIFT = 0x100;
 
 // Defined globally since drawBleSummary() also needs it.
 const SETTINGS_IMAGE = [[
-20 20 00 00 00 00 00 c0 03 00 00 e0 07 00 00 e0
-07 00 c0 e0 07 03 e0 f3 cf 07 f0 ff ff 0f f0 ff
-ff 0f e0 ff ff 07 e0 ff ff 07 c0 ff ff 03 c0 7f
-fe 03 e0 1f f8 07 fc 0f f0 3f fe 0f f0 7f fe 07
-e0 7f fe 07 e0 7f fe 0f f0 7f fc 0f f0 3f e0 1f
-f8 07 c0 7f fe 03 c0 ff ff 03 e0 ff ff 07 e0 ff
-ff 07 f0 ff ff 0f f0 ff ff 0f e0 f3 cf 07 c0 e0
-07 03 00 e0 07 00 00 e0 07 00 00 c0 03 00 00 00
-00 00
+  20 20 00 00 00 00 00 c0 03 00 00 e0 07 00 00 e0
+  07 00 c0 e0 07 03 e0 f3 cf 07 f0 ff ff 0f f0 ff
+  ff 0f e0 ff ff 07 e0 ff ff 07 c0 ff ff 03 c0 7f
+  fe 03 e0 1f f8 07 fc 0f f0 3f fe 0f f0 7f fe 07
+  e0 7f fe 07 e0 7f fe 0f f0 7f fc 0f f0 3f e0 1f
+  f8 07 c0 7f fe 03 c0 ff ff 03 e0 ff ff 07 e0 ff
+  ff 07 f0 ff ff 0f f0 ff ff 0f e0 f3 cf 07 c0 e0
+  07 03 00 e0 07 00 00 e0 07 00 00 c0 03 00 00 00
+  00 00
 ]];
 
 var layer;
@@ -390,25 +386,14 @@ func setLayer(layerIndex, layerIdEvent) {
   sendEvent(layerIdEvent);
 }
 
-func dispatchToLayer(layer0Func, layer1Func, layer2Func, layer3Func, layer4Func, layer5Func, layer6Func, layer7Func) {
-  var resolvedLayer = resolveLayerIndex();
-  if (resolvedLayer == 0) {
-    if (layer0Func) layer0Func();
-  } else if (resolvedLayer == 1) {
-    if (layer1Func) layer1Func();
-  } else if (resolvedLayer == 2) {
-    if (layer2Func) layer2Func();
-  } else if (resolvedLayer == 3) {
-    if (layer3Func) layer3Func();
-  } else if (resolvedLayer == 4) {
-    if (layer4Func) layer4Func();
-  } else if (resolvedLayer == 5) {
-    if (layer5Func) layer5Func();
-  } else if (resolvedLayer == 6) {
-    if (layer6Func) layer6Func();
-  } else if (resolvedLayer == 7) {
-    if (layer7Func) layer7Func();
-  }
+func setLayerNoRelease(layerIndex, layerIdEvent) {
+  layer = layerIndex;
+  sendEvent(layerIdEvent);
+}
+
+func dispatchToLayer(functions) {
+  var f = functions[[[resolveLayerIndex()]]];
+  if (f) f();
 }
 
 func resolveLayerIndex() var {
@@ -419,50 +404,101 @@ func resolveLayerIndex() var {
 }
 
 func activate0() {
+  clearPendingModTap();
   setLayer(0, "layer_id: 87377230");
   wordCaps = 0;
 
 }
 
+func activate0NoRelease() {
+  setLayerNoRelease(0, "layer_id: 87377230");
+  wordCaps = 0;
+
+}
+
 func activate1() {
+  clearPendingModTap();
   setLayer(1, "layer_id: 1128808786");
 
 }
 
+func activate1NoRelease() {
+  setLayerNoRelease(1, "layer_id: 1128808786");
+
+}
+
 func activate2() {
+  clearPendingModTap();
   setLayer(2, "layer_id: 262857896");
 
 }
 
+func activate2NoRelease() {
+  setLayerNoRelease(2, "layer_id: 262857896");
+
+}
+
 func activate3() {
+  clearPendingModTap();
   setLayer(3, "layer_id: 41429312");
 
 }
 
+func activate3NoRelease() {
+  setLayerNoRelease(3, "layer_id: 41429312");
+
+}
+
 func activate4() {
+  clearPendingModTap();
   setLayer(4, "layer_id: 212846523");
   if (isButtonPressed(37)) {
     onPress37();
   }
 }
 
+func activate4NoRelease() {
+  setLayerNoRelease(4, "layer_id: 212846523");
+  if (isButtonPressed(37)) {
+    onPress37();
+  }
+}
+
 func activate5() {
+  clearPendingModTap();
   setLayer(5, "layer_id: 125635709");
 
 }
 
+func activate5NoRelease() {
+  setLayerNoRelease(5, "layer_id: 125635709");
+
+}
+
 func activate6() {
+  clearPendingModTap();
   setLayer(6, "layer_id: 58064650");
 
 }
 
+func activate6NoRelease() {
+  setLayerNoRelease(6, "layer_id: 58064650");
+
+}
+
 func activate7() {
+  clearPendingModTap();
   setLayer(7, "layer_id: 61572736");
 
 }
 
+func activate7NoRelease() {
+  setLayerNoRelease(7, "layer_id: 61572736");
+
+}
+
 func activateDynamic() {
-  dispatchToLayer(@activate0, @activate1, @activate2, @activate3, @activate4, @activate5, @activate6, @activate7);
+  dispatchToLayer([[[@activate0, @activate1, @activate2, @activate3, @activate4, @activate5, @activate6, @activate7]]]);
 }
 func activateGlobal() {
   if (([[00 01 01 01 01 00 01 00]][resolveLayerIndex()])) {
@@ -479,6 +515,7 @@ func deactivate0() {
 }
 
 func deactivate1() {
+  clearResolvedModTap();
 
 }
 
@@ -487,10 +524,12 @@ func deactivate2() {
 }
 
 func deactivate3() {
+  clearResolvedModTap();
 
 }
 
 func deactivate4() {
+  clearResolvedModTap();
 
 }
 
@@ -508,7 +547,7 @@ func deactivate7() {
 }
 
 func deactivateDynamic() {
-  dispatchToLayer(0, 0, 0, 0, 0, @deactivate5, 0, 0);
+  dispatchToLayer([[[0, @deactivate1, 0, @deactivate3, @deactivate4, @deactivate5, 0, 0]]]);
 }
 func deactivateGlobal() {
 
@@ -540,8 +579,6 @@ func _releaseScanCode(scanCode, isModifier) {
 // Button Overrides
 const LAYER_PRESS_TO_KEY_PRESS_THRESHOLD = 100;
 const KEY_PRESS_TO_LAYER_RELEASE_THRESHOLD = 50;
-
-var deferredButtonIndex;
 
 func isModifierKey(key) var {
   return SC_L_CTRL <= key && key <= SC_R_META;
@@ -586,19 +623,6 @@ func pressScanCodeButton(buttonIndex, modifiers, scanCode, isModifier) {
     }
   }
 
-  if (isTimerActive(TIMER_ID_FUZZY_LAYER_STARTED)) {
-    stopTimer(TIMER_ID_FUZZY_LAYER_STARTED);
-    deferredButtonIndex = buttonIndex;
-    startTimer(TIMER_ID_FUZZY_LAYER_PRESS_DELAY, KEY_PRESS_TO_LAYER_RELEASE_THRESHOLD, 0, @{
-      callPress(deferredButtonIndex);
-    });
-    return;
-  } else if (isTimerActive(TIMER_ID_FUZZY_LAYER_PRESS_DELAY)) {
-    if (buttonIndex == deferredButtonIndex) return;
-    stopTimer(TIMER_ID_FUZZY_LAYER_PRESS_DELAY);
-    callPress(deferredButtonIndex);
-  }
-
   if (onPressScanCodeCallback) {
     var localCallback = onPressScanCodeCallback;
     onPressScanCodeCallback = 0;
@@ -632,10 +656,6 @@ func pressScanCodeButton(buttonIndex, modifiers, scanCode, isModifier) {
 }
 
 func releaseScanCodeButton(scanCode) {
-  if (isTimerActive(TIMER_ID_FUZZY_LAYER_PRESS_DELAY)) {
-    stopTimer(TIMER_ID_FUZZY_LAYER_PRESS_DELAY);
-    callPress(deferredButtonIndex);
-  }
   releaseScanCode(scanCode);
 
   if (wordCaps) {
@@ -658,35 +678,16 @@ func pressStenoKeyButton(scanCode) {
 func globalPress(buttonIndex) {
   lastButtonIndex = buttonIndex;
   updateScreenSaverTimer();
-  dispatchToLayer(@noop, @rgbButtonPressRandomColor, @rgbButtonPressRandomColor, @rgbButtonPressRandomColor, @rgbButtonPressRandomColor, @rgbButtonPressRandomColor, @rgbButtonPressRandomColor, @noop);
+  dispatchToLayer([[[@noop, @rgbButtonPressRandomColor, @rgbButtonPressRandomColor, @rgbButtonPressRandomColor, @rgbButtonPressRandomColor, @rgbButtonPressRandomColor, @rgbButtonPressRandomColor, @noop]]]);
 }
 
 func globalRelease() {
   updateScreenSaverTimer();
 }
 
-func startFuzzyLayer() {
-  startTimer(TIMER_ID_FUZZY_LAYER_STARTED, LAYER_PRESS_TO_KEY_PRESS_THRESHOLD, 0, @{});
-}
-
-var doFuzzyLayerAction;
-func stopFuzzyLayerPreSetLayer() {
-  stopTimer(TIMER_ID_FUZZY_LAYER_STARTED);
-  if (isTimerActive(TIMER_ID_FUZZY_LAYER_PRESS_DELAY)) {
-    stopTimer(TIMER_ID_FUZZY_LAYER_PRESS_DELAY);
-    doFuzzyLayerAction = 1;
-  }
-}
-
-func stopFuzzyLayerPostSetLayer() {
-  if (!doFuzzyLayerAction) return;
-  doFuzzyLayerAction = 0;
-  callPress(deferredButtonIndex);
-}
-
 // Display Scripts
 func updateDisplay() {
-  dispatchToLayer(@drawDisplayDynamicSteno, @drawDisplayAbc, @drawDisplaySymbol, @drawDisplayFunction, @drawDisplayNavigation, @drawBleSummary, @drawDisplayNumpad, @drawDisplaySecurityKey);
+  dispatchToLayer([[[@drawDisplayDynamicSteno, @drawDisplayAbc, @drawDisplaySymbol, @drawDisplayFunction, @drawDisplayNavigation, @drawBleSummary, @drawDisplayNumpad, @drawDisplaySecurityKey]]]);
 }
 
 func blankDisplay() {
@@ -708,40 +709,40 @@ func drawStrokes() {
 
 func drawDisplay0(layerImage) {
   const ICON_POSITIONS = [[
-  08 00 00 00 00 00 00 00
-  00 00 10 00 00 00 00 00
-  00 00 10 00 08 12 00 00
-  00 00 10 00 00 12 10 12
+    08 00 00 00 00 00 00 00
+    00 00 10 00 00 00 00 00
+    00 00 10 00 08 12 00 00
+    00 00 10 00 00 12 10 12
   ]];
 
   const SHIFT_IMAGE = [[
-  10 10
-  00 01 80 01 c0 01 e0 01 f0 7f f8 7f fc 7f fe 7f
-  fe 7f fc 7f f8 7f f0 7f e0 01 c0 01 80 01 00 01
+    10 10
+    00 01 80 01 c0 01 e0 01 f0 7f f8 7f fc 7f fe 7f
+    fe 7f fc 7f f8 7f f0 7f e0 01 c0 01 80 01 00 01
   ]];
 
   const CONTROL_IMAGE = [[
-  10 10
-  00 00 00 00 40 00 60 00 30 00 18 00 0c 00 06 00
-  06 00 0c 00 18 00 30 00 60 00 40 00 00 00 00 00
+    10 10
+    00 00 00 00 40 00 60 00 30 00 18 00 0c 00 06 00
+    06 00 0c 00 18 00 30 00 60 00 40 00 00 00 00 00
   ]];
 
   const ALT_IMAGE = [[
-  10 10
-  00 00 00 30 00 30 00 30 00 30 00 38 00 1e 80 07
-  e0 01 78 30 1c 30 0c 30 0c 30 0c 30 0c 30 00 00
+    10 10
+    00 00 00 30 00 30 00 30 00 30 00 38 00 1e 80 07
+    e0 01 78 30 1c 30 0c 30 0c 30 0c 30 0c 30 00 00
   ]];
 
   const COMMAND_IMAGE = [[
-  10 10
-  00 00 3c 3c 7e 7e 66 66 66 66 fe 7f fc 3f 60 06
-  60 06 fc 3f fe 7f 66 66 66 66 7e 7e 3c 3c 00 00
+    10 10
+    00 00 3c 3c 7e 7e 66 66 66 66 fe 7f fc 3f 60 06
+    60 06 fc 3f fe 7f 66 66 66 66 7e 7e 3c 3c 00 00
   ]];
 
   const CAPS_LOCK_IMAGE = [[
-  10 10
-  00 01 80 01 c0 01 e0 01 f0 67 f8 67 fc 67 fe 67
-  fe 67 fc 67 f8 67 f0 67 e0 01 c0 01 80 01 00 01
+    10 10
+    00 01 80 01 c0 01 e0 01 f0 67 f8 67 fc 67 fe 67
+    fe 67 fc 67 f8 67 f0 67 e0 01 c0 01 80 01 00 01
   ]];
 
   setAutoDraw(0, AUTO_DRAW_NONE);
@@ -783,15 +784,15 @@ func drawDisplay0(layerImage) {
 
 func drawDisplaySteno() {
   const STENO_IMAGE = [[
-  20 20 ff ff 3f 00 ff ff ff 00 ff ff ff 03 ff ff
-  ff 07 ff ff ff 0f ff ff ff 1f ff f9 f3 3f ff f0
-  e1 3f ff f0 e1 7f ff e1 f0 7f ff e3 f8 ff ff 47
-  fc ff ff 07 fc ff ff 0f fe ff 0f 00 00 fe 0f 00
-  00 fe 0f 00 00 fe ff 0f fe ff ff 07 fc ff ff 47
-  fc ff ff e3 f8 ff ff e1 f0 7f ff f0 e1 7f ff f0
-  e1 3f ff f9 f3 3f ff ff ff 1f ff ff ff 0f ff ff
-  ff 07 ff ff ff 03 ff ff ff 00 ff ff 3f 00 00 00
-  00 00
+    20 20 ff ff 3f 00 ff ff ff 00 ff ff ff 03 ff ff
+    ff 07 ff ff ff 0f ff ff ff 1f ff f9 f3 3f ff f0
+    e1 3f ff f0 e1 7f ff e1 f0 7f ff e3 f8 ff ff 47
+    fc ff ff 07 fc ff ff 0f fe ff 0f 00 00 fe 0f 00
+    00 fe 0f 00 00 fe ff 0f fe ff ff 07 fc ff ff 47
+    fc ff ff e3 f8 ff ff e1 f0 7f ff f0 e1 7f ff f0
+    e1 3f ff f9 f3 3f ff ff ff 1f ff ff ff 0f ff ff
+    ff 07 ff ff ff 03 ff ff ff 00 ff ff 3f 00 00 00
+    00 00
   ]];
 
   drawDisplay0(STENO_IMAGE);
@@ -813,15 +814,15 @@ func drawDisplaySteno() {
 
 func drawDisplayAbc() {
   const ABC_IMAGE = [[
-  20 20 00 00 00 00 00 00 08 00 00 00 0c 00 00 00
-  0f 00 00 c0 0f 00 00 f0 09 00 00 bc 00 00 80 8f
-  00 00 80 bf 00 00 00 fc 08 00 00 f0 0f 00 00 c0
-  0f 00 00 00 0e 00 00 00 08 00 80 00 08 00 80 ff
-  0f 00 80 ff 0f 00 00 30 0c 00 00 10 08 00 00 30
-  0c 00 00 f0 0f 00 00 e0 07 00 00 00 00 00 00 e0
-  07 00 00 f0 0f 00 00 30 0c 00 00 10 08 00 00 30
-  0c 00 00 70 0e 00 00 60 06 00 00 00 00 00 00 00
-  00 00
+    20 20 00 00 00 00 00 00 08 00 00 00 0c 00 00 00
+    0f 00 00 c0 0f 00 00 f0 09 00 00 bc 00 00 80 8f
+    00 00 80 bf 00 00 00 fc 08 00 00 f0 0f 00 00 c0
+    0f 00 00 00 0e 00 00 00 08 00 80 00 08 00 80 ff
+    0f 00 80 ff 0f 00 00 30 0c 00 00 10 08 00 00 30
+    0c 00 00 f0 0f 00 00 e0 07 00 00 00 00 00 00 e0
+    07 00 00 f0 0f 00 00 30 0c 00 00 10 08 00 00 30
+    0c 00 00 70 0e 00 00 60 06 00 00 00 00 00 00 00
+    00 00
   ]];
 
   drawDisplay0(ABC_IMAGE);
@@ -830,15 +831,15 @@ func drawDisplayAbc() {
 
 func drawDisplayFunction() {
   const FUNCTION_IMAGE = [[
-  20 20
-  f0 ff ff 0f f8 ff ff 1f 0c 00 00 30 06 00 00 60
-  03 00 00 c0 03 00 06 c0 03 00 06 c0 03 c0 ff c7
-  03 e0 ff c7 03 60 06 c0 03 60 06 c0 03 00 00 c0
-  03 00 fe c7 03 00 fe c7 03 00 0c c0 03 00 06 c0
-  03 00 0e c0 03 00 fc c7 03 00 f8 c7 03 00 00 c0
-  03 00 00 c0 03 00 00 c0 03 00 00 c0 03 00 00 c0
-  03 00 00 c0 03 00 00 c0 03 00 00 c0 03 00 00 c0
-  06 00 00 60 0c 00 00 30 f8 ff ff 1f f0 ff ff 0f
+    20 20
+    f0 ff ff 0f f8 ff ff 1f 0c 00 00 30 06 00 00 60
+    03 00 00 c0 03 00 06 c0 03 00 06 c0 03 c0 ff c7
+    03 e0 ff c7 03 60 06 c0 03 60 06 c0 03 00 00 c0
+    03 00 fe c7 03 00 fe c7 03 00 0c c0 03 00 06 c0
+    03 00 0e c0 03 00 fc c7 03 00 f8 c7 03 00 00 c0
+    03 00 00 c0 03 00 00 c0 03 00 00 c0 03 00 00 c0
+    03 00 00 c0 03 00 00 c0 03 00 00 c0 03 00 00 c0
+    06 00 00 60 0c 00 00 30 f8 ff ff 1f f0 ff ff 0f
   ]];
 
   drawDisplay0(FUNCTION_IMAGE);
@@ -847,15 +848,15 @@ func drawDisplayFunction() {
 
 func drawDisplaySymbol() {
   const SYMBOL_IMAGE = [[
-  20 20 00 00 00 00 00 00 00 00 18 00 00 00 18 00
-  00 00 1c 00 00 00 fe 3f ff 1b fe 3f ff 1b fe 3f
-  ff 1b 00 00 00 00 00 00 fc 0f 00 00 fe 1f 1c 38
-  ff 3f 1e 3c 07 38 1e 3e f3 33 06 3f f3 37 86 37
-  f3 37 c6 33 07 36 fe 31 ff 3b fe 30 fe 3b 3c 30
-  fc 19 00 00 00 00 1c 0c 00 03 1e 1c 18 3f 1e 3c
-  f8 3f c6 38 ff 3f c6 30 ff 03 e6 30 1f 3f fe 39
-  f8 3f fe 3f ff 3f bc 1f ff 03 00 0e 1f 03 00 00
-  18 00
+    20 20 00 00 00 00 00 00 00 00 18 00 00 00 18 00
+    00 00 1c 00 00 00 fe 3f ff 1b fe 3f ff 1b fe 3f
+    ff 1b 00 00 00 00 00 00 fc 0f 00 00 fe 1f 1c 38
+    ff 3f 1e 3c 07 38 1e 3e f3 33 06 3f f3 37 86 37
+    f3 37 c6 33 07 36 fe 31 ff 3b fe 30 fe 3b 3c 30
+    fc 19 00 00 00 00 1c 0c 00 03 1e 1c 18 3f 1e 3c
+    f8 3f c6 38 ff 3f c6 30 ff 03 e6 30 1f 3f fe 39
+    f8 3f fe 3f ff 3f bc 1f ff 03 00 0e 1f 03 00 00
+    18 00
   ]];
 
   drawDisplay0(SYMBOL_IMAGE);
@@ -864,15 +865,15 @@ func drawDisplaySymbol() {
 
 func drawDisplayNavigation() {
   const NAVIGATION_IMAGE = [[
-  20 20 00 00 00 00 00 80 01 00 00 c0 03 00 00 e0
-  07 00 00 f0 0f 00 00 f8 1f 00 00 fc 3f 00 00 e0
-  07 00 00 e0 07 00 00 e0 07 00 40 e0 07 02 60 e0
-  07 06 70 00 00 0e f8 0f f0 1f fc 0f f0 3f fe 0f
-  f0 7f fe 0f f0 7f fc 0f f0 3f f8 0f f0 1f 70 00
-  00 0e 60 e0 07 06 40 e0 07 02 00 e0 07 00 00 e0
-  07 00 00 e0 07 00 00 fc 3f 00 00 f8 1f 00 00 f0
-  0f 00 00 e0 07 00 00 c0 03 00 00 80 01 00 00 00
-  00 00
+    20 20 00 00 00 00 00 80 01 00 00 c0 03 00 00 e0
+    07 00 00 f0 0f 00 00 f8 1f 00 00 fc 3f 00 00 e0
+    07 00 00 e0 07 00 00 e0 07 00 40 e0 07 02 60 e0
+    07 06 70 00 00 0e f8 0f f0 1f fc 0f f0 3f fe 0f
+    f0 7f fe 0f f0 7f fc 0f f0 3f f8 0f f0 1f 70 00
+    00 0e 60 e0 07 06 40 e0 07 02 00 e0 07 00 00 e0
+    07 00 00 e0 07 00 00 fc 3f 00 00 f8 1f 00 00 f0
+    0f 00 00 e0 07 00 00 c0 03 00 00 80 01 00 00 00
+    00 00
   ]];
 
   drawDisplay0(NAVIGATION_IMAGE);
@@ -886,15 +887,15 @@ func drawDisplaySettings() {
 
 func drawDisplayNumpad() {
   const NUMPAD_IMAGE = [[
-  20 20 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-  00 00 00 00 00 00 00 00 00 00 7e 7e 7e 7e 7e 7e
-  7e 7e 7e 7e 7e 7e 7e 7e 7e 7e 7e 7e 7e 7e 7e 7e
-  7e 7e 00 00 00 7e 00 00 00 7e 7e 7e 7e 7e 7e 7e
-  7e 7e 7e 7e 7e 7e 7e 7e 7e 7e 7e 7e 7e 7e 7e 7e
-  7e 7e 00 00 00 00 00 00 00 00 7e 7e 7e 7e 7e 7e
-  7e 7e 7e 7e 7e 7e 7e 7e 7e 7e 7e 7e 7e 7e 7e 7e
-  7e 7e 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-  00 00
+    20 20 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    00 00 00 00 00 00 00 00 00 00 7e 7e 7e 7e 7e 7e
+    7e 7e 7e 7e 7e 7e 7e 7e 7e 7e 7e 7e 7e 7e 7e 7e
+    7e 7e 00 00 00 7e 00 00 00 7e 7e 7e 7e 7e 7e 7e
+    7e 7e 7e 7e 7e 7e 7e 7e 7e 7e 7e 7e 7e 7e 7e 7e
+    7e 7e 00 00 00 00 00 00 00 00 7e 7e 7e 7e 7e 7e
+    7e 7e 7e 7e 7e 7e 7e 7e 7e 7e 7e 7e 7e 7e 7e 7e
+    7e 7e 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    00 00
   ]];
 
   drawDisplay0(NUMPAD_IMAGE);
@@ -903,15 +904,15 @@ func drawDisplayNumpad() {
 
 func drawDisplaySecurityKey() {
   const SECURITY_KEY_IMAGE = [[
-  20 20 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-  00 00 00 00 00 00 00 00 00 00 c0 ff ff 00 e0 ff
-  ff 01 60 00 80 03 70 00 00 07 30 00 00 06 38 00
-  00 0c 18 00 18 1c 18 00 7e 18 0c 00 66 38 0c ff
-  c3 30 0c ff c3 30 0c 1b 66 38 18 1b 7e 18 18 01
-  18 1c 38 00 00 0c 30 00 00 06 70 00 00 07 60 00
-  80 03 e0 ff ff 01 c0 ff ff 00 00 00 00 00 00 00
-  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-  00 00
+    20 20 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    00 00 00 00 00 00 00 00 00 00 c0 ff ff 00 e0 ff
+    ff 01 60 00 80 03 70 00 00 07 30 00 00 06 38 00
+    00 0c 18 00 18 1c 18 00 7e 18 0c 00 66 38 0c ff
+    c3 30 0c ff c3 30 0c 1b 66 38 18 1b 7e 18 18 01
+    18 1c 38 00 00 0c 30 00 00 06 70 00 00 07 60 00
+    80 03 e0 ff ff 01 c0 ff ff 00 00 00 00 00 00 00
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    00 00
   ]];
 
   drawDisplay0(SECURITY_KEY_IMAGE);
@@ -934,79 +935,79 @@ func drawDisplayOverlay() {
 
   const PAIR_CONNECTED_STATUS_IMAGE_OFFSETS = [[ 00 02 1c ]];
   const PAIR_CONNECTED_STATUS_IMAGES = [[
-  // None
-  00 00
+    // None
+    00 00
 
-  // BLE
-  0c 0c 00 00 98 00 98 01 98 03 98 07 98 01 98 01
-  9e 01 9c 01 98 01 90 01 00 00
+    // BLE
+    0c 0c 00 00 98 00 98 01 98 03 98 07 98 01 98 01
+    9e 01 9c 01 98 01 90 01 00 00
 
-  // Cable
-  0c 0c 00 00 60 00 f0 00 f8 01 fc 03 f0 00 f0 00
-  fc 03 f8 01 f0 00 60 00 00 00
+    // Cable
+    0c 0c 00 00 60 00 f0 00 f8 01 fc 03 f0 00 f0 00
+    fc 03 f8 01 f0 00 60 00 00 00
   ]];
 
   const USB_STATUS_IMAGE = [[
-  09 0c 30 00 78 00 b0 00 06 0d ff 0f 86 0c 58 00
-  3c 00 18 00
+    09 0c 30 00 78 00 b0 00 06 0d ff 0f 86 0c 58 00
+    3c 00 18 00
   ]];
 
   const BLUETOOTH_STATUS_IMAGE = [[
-  06 0c 08 01 90 00 ff 0f 62 04 94 02 08 01
+    06 0c 08 01 90 00 ff 0f 62 04 94 02 08 01
   ]];
 
   const BATTERY_LEVEL_STATUS_IMAGES = [[
-  // battery0
-  0c 0c f8 01 08 01 08 01 08 01 08 01 08 01 08 01
-  08 01 08 01 08 01 f8 01 f0 00
+    // battery0
+    0c 0c f8 01 08 01 08 01 08 01 08 01 08 01 08 01
+    08 01 08 01 08 01 f8 01 f0 00
 
-  // battery1
-  0c 0c f8 01 f8 01 08 01 08 01 08 01 08 01 08 01
-  08 01 08 01 08 01 f8 01 f0 00
+    // battery1
+    0c 0c f8 01 f8 01 08 01 08 01 08 01 08 01 08 01
+    08 01 08 01 08 01 f8 01 f0 00
 
-  // battery2
-  0c 0c f8 01 f8 01 f8 01 08 01 08 01 08 01 08 01
-  08 01 08 01 08 01 f8 01 f0 00
+    // battery2
+    0c 0c f8 01 f8 01 f8 01 08 01 08 01 08 01 08 01
+    08 01 08 01 08 01 f8 01 f0 00
 
-  // battery3
-  0c 0c f8 01 f8 01 f8 01 f8 01 08 01 08 01 08 01
-  08 01 08 01 08 01 f8 01 f0 00
+    // battery3
+    0c 0c f8 01 f8 01 f8 01 f8 01 08 01 08 01 08 01
+    08 01 08 01 08 01 f8 01 f0 00
 
-  // battery4
-  0c 0c f8 01 f8 01 f8 01 f8 01 f8 01 08 01 08 01
-  08 01 08 01 08 01 f8 01 f0 00
+    // battery4
+    0c 0c f8 01 f8 01 f8 01 f8 01 f8 01 08 01 08 01
+    08 01 08 01 08 01 f8 01 f0 00
 
-  // battery5
-  0c 0c f8 01 f8 01 f8 01 f8 01 f8 01 f8 01 08 01
-  08 01 08 01 08 01 f8 01 f0 00
+    // battery5
+    0c 0c f8 01 f8 01 f8 01 f8 01 f8 01 f8 01 08 01
+    08 01 08 01 08 01 f8 01 f0 00
 
-  // battery6
-  0c 0c f8 01 f8 01 f8 01 f8 01 f8 01 f8 01 f8 01
-  08 01 08 01 08 01 f8 01 f0 00
+    // battery6
+    0c 0c f8 01 f8 01 f8 01 f8 01 f8 01 f8 01 f8 01
+    08 01 08 01 08 01 f8 01 f0 00
 
-  // battery7
-  0c 0c f8 01 f8 01 f8 01 f8 01 f8 01 f8 01 f8 01
-  f8 01 08 01 08 01 f8 01 f0 00
+    // battery7
+    0c 0c f8 01 f8 01 f8 01 f8 01 f8 01 f8 01 f8 01
+    f8 01 08 01 08 01 f8 01 f0 00
 
-  // battery8
-  0c 0c f8 01 f8 01 f8 01 f8 01 f8 01 f8 01 f8 01
-  f8 01 f8 01 08 01 f8 01 f0 00
+    // battery8
+    0c 0c f8 01 f8 01 f8 01 f8 01 f8 01 f8 01 f8 01
+    f8 01 f8 01 08 01 f8 01 f0 00
 
-  // battery9
-  0c 0c f8 01 f8 01 f8 01 f8 01 f8 01 f8 01 f8 01
-  f8 01 f8 01 f8 01 f8 01 f0 00
+    // battery9
+    0c 0c f8 01 f8 01 f8 01 f8 01 f8 01 f8 01 f8 01
+    f8 01 f8 01 f8 01 f8 01 f0 00
   ]];
 
   const CHARGING_STATUS_IMAGE = [[
-  0c 0c f8 01 08 01 08 01 68 01 70 04 78 03 ec 01
-  e2 00 68 01 08 01 f8 01 f0 00
+    0c 0c f8 01 08 01 08 01 68 01 70 04 78 03 ec 01
+    e2 00 68 01 08 01 f8 01 f0 00
   ]];
 
   const BLE_PROFILE_DOTS = [[
-  02 10 c0 00 c0 00
-  02 10 b0 01 b0 01
-  02 10 d8 06 d8 06
-  02 10 b6 0d b6 0d
+    02 10 c0 00 c0 00
+    02 10 b0 01 b0 01
+    02 10 d8 06 d8 06
+    02 10 b6 0d b6 0d
   ]];
 
   // Clear the region.
@@ -1127,25 +1128,25 @@ const BRIGHTNESS_VALUES = [[ 00 08 10 20 40 60 80 c0 ff ]];
 
 func rgbUpdateKeyHueCycle(hShift, sat, spreadMultiplier, value) {
   const HUE_CYCLE_RGB_ORDER = [[
-  00
-  0c 01
-  18 0d 02
-  19 0e 03
-  1a 0f 04
-  1b 10 05
-  24 1c 11
-  25 1d
-  26
+    00
+    0c 01
+    18 0d 02
+    19 0e 03
+    1a 0f 04
+    1b 10 05
+    24 1c 11
+    25 1d
+    26
 
-  27
-  28 1e
-  29 1f 12
-  20 13 06
-  21 14 07
-  22 15 08
-  23 16 09
-  17 0a
-  0b
+    27
+    28 1e
+    29 1f 12
+    20 13 06
+    21 14 07
+    22 15 08
+    23 16 09
+    17 0a
+    0b
   ]];
 
   for (var i = 0; i < 42; i = i + 1) {
@@ -1160,8 +1161,8 @@ func rgbUpdateKeyHueCycle(hShift, sat, spreadMultiplier, value) {
 
 func rgbUpdateUnderglowHueCycle(hShift, sat, spreadMultiplier, value) {
   const COLOR_OFFSETS = [[
-  02 0b 0d  1d 1e 28
-  06 0f 14  16 1b 24
+    02 0b 0d  1d 1e 28
+    06 0f 14  16 1b 24
   ]];
 
   for (var i = 0; i < 12; i = i + 1) {
@@ -1292,7 +1293,7 @@ func rgbUpdate() {
     rgbUpdateKeyBreatheCycle();
     setUnderglowRgb(8, 8, 8);
   } else {
-    dispatchToLayer(@rgbUpdateHueCycle, @rgbUpdateRandomColors, @rgbUpdateRandomColors, @rgbUpdateRandomColors, @rgbUpdateRandomColors, @rgbUpdateRandomColors, @rgbUpdateRandomColors, @rgbUpdateKeyU2fAlertCycle);
+    dispatchToLayer([[[@rgbUpdateHueCycle, @rgbUpdateRandomColors, @rgbUpdateRandomColors, @rgbUpdateRandomColors, @rgbUpdateRandomColors, @rgbUpdateRandomColors, @rgbUpdateRandomColors, @rgbUpdateKeyU2fAlertCycle]]]);
   }
 }
 
@@ -1324,7 +1325,7 @@ func rgbUpdateUnderglow() {
     return;
   }
 
-  dispatchToLayer(@noop, @rgbUpdateUnderglowWhite, @rgbUpdateUnderglowWhite, @rgbUpdateUnderglowWhite, @rgbUpdateUnderglowWhite, @rgbUpdateUnderglowWhite, @rgbUpdateUnderglowWhite, @rgbUpdateUnderglowWhite);
+  dispatchToLayer([[[@noop, @rgbUpdateUnderglowWhite, @rgbUpdateUnderglowWhite, @rgbUpdateUnderglowWhite, @rgbUpdateUnderglowWhite, @rgbUpdateUnderglowWhite, @rgbUpdateUnderglowWhite, @rgbUpdateUnderglowWhite]]]);
 }
 
 func rgbUpdateUnderglowWhite() {
@@ -1469,80 +1470,80 @@ func tapCapsLock() {
 
 // drawBar
 const BRIGHTNESS_IMAGE = [[
-10 10 80 01 86 61 8e 71 1c 38 d8 1b e0 07 70 0e
-37 ec 37 ec 70 0e e0 07 d8 1b 1c 38 8e 71 86 61
-80 01
+  10 10 80 01 86 61 8e 71 1c 38 d8 1b e0 07 70 0e
+  37 ec 37 ec 70 0e e0 07 d8 1b 1c 38 8e 71 86 61
+  80 01
 ]];
 
 const SATURATION_IMAGE = [[
-10 10 e0 07 f8 1f 3c 3c 0e 70 06 60 07 e0 03 c0
-03 c0 ff ff ff ff ff ff fe 7f fe 7f fc 3f f8 1f
-e0 07
+  10 10 e0 07 f8 1f 3c 3c 0e 70 06 60 07 e0 03 c0
+  03 c0 ff ff ff ff ff ff fe 7f fe 7f fc 3f f8 1f
+  e0 07
 ]];
 
 const BAR_IMAGES = [[
-// BAR_000_IMAGE
-08 40 fc ff ff ff ff ff ff 3f 02 00 00 00 00 00
-00 40 01 00 00 00 00 00 00 80 01 00 00 00 00 00
-00 80 01 00 00 00 00 00 00 80 01 00 00 00 00 00
-00 80 02 00 00 00 00 00 00 40 fc ff ff ff ff ff
-ff 3f
+  // BAR_000_IMAGE
+  08 40 fc ff ff ff ff ff ff 3f 02 00 00 00 00 00
+  00 40 01 00 00 00 00 00 00 80 01 00 00 00 00 00
+  00 80 01 00 00 00 00 00 00 80 01 00 00 00 00 00
+  00 80 02 00 00 00 00 00 00 40 fc ff ff ff ff ff
+  ff 3f
 
-// BAR_125_IMAGE
-08 40 fc ff ff ff ff ff ff 3f 02 00 00 00 00 00
-00 7f 01 00 00 00 00 00 00 ff 01 00 00 00 00 00
-00 ff 01 00 00 00 00 00 00 ff 01 00 00 00 00 00
-00 ff 02 00 00 00 00 00 00 7f fc ff ff ff ff ff
-ff 3f
+  // BAR_125_IMAGE
+  08 40 fc ff ff ff ff ff ff 3f 02 00 00 00 00 00
+  00 7f 01 00 00 00 00 00 00 ff 01 00 00 00 00 00
+  00 ff 01 00 00 00 00 00 00 ff 01 00 00 00 00 00
+  00 ff 02 00 00 00 00 00 00 7f fc ff ff ff ff ff
+  ff 3f
 
-// BAR_250_IMAGE
-08 40 fc ff ff ff ff ff ff 3f 02 00 00 00 00 00
-ff 7f 01 00 00 00 00 00 ff ff 01 00 00 00 00 00
-ff ff 01 00 00 00 00 00 ff ff 01 00 00 00 00 00
-ff ff 02 00 00 00 00 00 ff 7f fc ff ff ff ff ff
-ff 3f
+  // BAR_250_IMAGE
+  08 40 fc ff ff ff ff ff ff 3f 02 00 00 00 00 00
+  ff 7f 01 00 00 00 00 00 ff ff 01 00 00 00 00 00
+  ff ff 01 00 00 00 00 00 ff ff 01 00 00 00 00 00
+  ff ff 02 00 00 00 00 00 ff 7f fc ff ff ff ff ff
+  ff 3f
 
-// BAR_375_IMAGE
-08 40 fc ff ff ff ff ff ff 3f 02 00 00 00 00 ff
-ff 7f 01 00 00 00 00 ff ff ff 01 00 00 00 00 ff
-ff ff 01 00 00 00 00 ff ff ff 01 00 00 00 00 ff
-ff ff 02 00 00 00 00 ff ff 7f fc ff ff ff ff ff
-ff 3f
+  // BAR_375_IMAGE
+  08 40 fc ff ff ff ff ff ff 3f 02 00 00 00 00 ff
+  ff 7f 01 00 00 00 00 ff ff ff 01 00 00 00 00 ff
+  ff ff 01 00 00 00 00 ff ff ff 01 00 00 00 00 ff
+  ff ff 02 00 00 00 00 ff ff 7f fc ff ff ff ff ff
+  ff 3f
 
-// BAR_500_IMAGE
-08 40 fc ff ff ff ff ff ff 3f 02 00 00 00 ff ff
-ff 7f 01 00 00 00 ff ff ff ff 01 00 00 00 ff ff
-ff ff 01 00 00 00 ff ff ff ff 01 00 00 00 ff ff
-ff ff 02 00 00 00 ff ff ff 7f fc ff ff ff ff ff
-ff 3f
+  // BAR_500_IMAGE
+  08 40 fc ff ff ff ff ff ff 3f 02 00 00 00 ff ff
+  ff 7f 01 00 00 00 ff ff ff ff 01 00 00 00 ff ff
+  ff ff 01 00 00 00 ff ff ff ff 01 00 00 00 ff ff
+  ff ff 02 00 00 00 ff ff ff 7f fc ff ff ff ff ff
+  ff 3f
 
-// BAR_625_IMAGE
-08 40 fc ff ff ff ff ff ff 3f 02 00 00 ff ff ff
-ff 7f 01 00 00 ff ff ff ff ff 01 00 00 ff ff ff
-ff ff 01 00 00 ff ff ff ff ff 01 00 00 ff ff ff
-ff ff 02 00 00 ff ff ff ff 7f fc ff ff ff ff ff
-ff 3f
+  // BAR_625_IMAGE
+  08 40 fc ff ff ff ff ff ff 3f 02 00 00 ff ff ff
+  ff 7f 01 00 00 ff ff ff ff ff 01 00 00 ff ff ff
+  ff ff 01 00 00 ff ff ff ff ff 01 00 00 ff ff ff
+  ff ff 02 00 00 ff ff ff ff 7f fc ff ff ff ff ff
+  ff 3f
 
-// BAR_750_IMAGE
-08 40 fc ff ff ff ff ff ff 3f 02 00 ff ff ff ff
-ff 7f 01 00 ff ff ff ff ff ff 01 00 ff ff ff ff
-ff ff 01 00 ff ff ff ff ff ff 01 00 ff ff ff ff
-ff ff 02 00 ff ff ff ff ff 7f fc ff ff ff ff ff
-ff 3f
+  // BAR_750_IMAGE
+  08 40 fc ff ff ff ff ff ff 3f 02 00 ff ff ff ff
+  ff 7f 01 00 ff ff ff ff ff ff 01 00 ff ff ff ff
+  ff ff 01 00 ff ff ff ff ff ff 01 00 ff ff ff ff
+  ff ff 02 00 ff ff ff ff ff 7f fc ff ff ff ff ff
+  ff 3f
 
-// BAR_875_IMAGE
-08 40 fc ff ff ff ff ff ff 3f 02 ff ff ff ff ff
-ff 7f 01 ff ff ff ff ff ff ff 01 ff ff ff ff ff
-ff ff 01 ff ff ff ff ff ff ff 01 ff ff ff ff ff
-ff ff 02 ff ff ff ff ff ff 7f fc ff ff ff ff ff
-ff 3f
+  // BAR_875_IMAGE
+  08 40 fc ff ff ff ff ff ff 3f 02 ff ff ff ff ff
+  ff 7f 01 ff ff ff ff ff ff ff 01 ff ff ff ff ff
+  ff ff 01 ff ff ff ff ff ff ff 01 ff ff ff ff ff
+  ff ff 02 ff ff ff ff ff ff 7f fc ff ff ff ff ff
+  ff 3f
 
-// BAR_1000_IMAGE
-08 40 fc ff ff ff ff ff ff 3f fe ff ff ff ff ff
-ff 7f ff ff ff ff ff ff ff ff ff ff ff ff ff ff
-ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
-ff ff fe ff ff ff ff ff ff 7f fc ff ff ff ff ff
-ff 3f
+  // BAR_1000_IMAGE
+  08 40 fc ff ff ff ff ff ff 3f fe ff ff ff ff ff
+  ff 7f ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+  ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+  ff ff fe ff ff ff ff ff ff 7f fc ff ff ff ff ff
+  ff 3f
 ]];
 
 func drawBar(image, value) {
@@ -1560,51 +1561,51 @@ func drawSettings() {
 
 func drawBleSummary() {
   const BLE_ICONS = [[
-  // Laptop
-  10 10 fc 67 fe 6f 06 6c 06 6c 06 6c 06 6c 06 6c
-  06 6c 06 6c 06 6c 06 6c 06 6c 06 6c 06 6c fe 6f
-  fc 67
+    // Laptop
+    10 10 fc 67 fe 6f 06 6c 06 6c 06 6c 06 6c 06 6c
+    06 6c 06 6c 06 6c 06 6c 06 6c 06 6c 06 6c fe 6f
+    fc 67
 
-  // Desktop
-  10 10 fe 07 ff 0f 03 0e 03 0e 03 8e 03 8e 03 fe
-  03 fe 03 fe 03 fe 03 8e 03 8e 03 0e 03 0e ff 0f
-  fe 07
+    // Desktop
+    10 10 fe 07 ff 0f 03 0e 03 0e 03 8e 03 8e 03 fe
+    03 fe 03 fe 03 fe 03 8e 03 8e 03 0e 03 0e ff 0f
+    fe 07
 
-  // Phone
-  10 10 00 00 00 00 fe 7f ff ff 03 c0 03 c0 07 c0
-  07 c0 07 c0 07 c0 03 c0 03 c0 ff ff fe 7f 00 00
-  00 00
+    // Phone
+    10 10 00 00 00 00 fe 7f ff ff 03 c0 03 c0 07 c0
+    07 c0 07 c0 07 c0 03 c0 03 c0 ff ff fe 7f 00 00
+    00 00
 
-  // Tablet
-  10 10 00 00 00 00 fe 7f ff ff 07 f0 07 f0 07 f0
-  07 90 07 90 07 f0 07 f0 07 f0 ff ff fe 7f 00 00
-  00 00
+    // Tablet
+    10 10 00 00 00 00 fe 7f ff ff 07 f0 07 f0 07 f0
+    07 90 07 90 07 f0 07 f0 07 f0 ff ff fe 7f 00 00
+    00 00
   ]];
 
   const SLEEPING_ICON = [[
-  20 10 00 00 00 00 10 04 10 06 10 05 90 04 50 04
-  30 04 10 04 00 00 10 04 10 06 10 05 90 04 50 04
-  30 04 10 04 00 00 10 04 10 06 10 05 90 04 50 04
-  30 04 10 04 00 00 00 04 00 00 00 04 00 00 00 04
-  00 00
+    20 10 00 00 00 00 10 04 10 06 10 05 90 04 50 04
+    30 04 10 04 00 00 10 04 10 06 10 05 90 04 50 04
+    30 04 10 04 00 00 10 04 10 06 10 05 90 04 50 04
+    30 04 10 04 00 00 00 04 00 00 00 04 00 00 00 04
+    00 00
   ]];
 
   const CONNECTED_ICON = [[
-  10 10 30 00 38 00 9c 01 cc 01 ce 00 66 0c 66 0e
-  66 66 66 66 66 0e 66 0c ce 00 cc 01 9c 01 38 00
-  30 00
+    10 10 30 00 38 00 9c 01 cc 01 ce 00 66 0c 66 0e
+    66 66 66 66 66 0e 66 0c ce 00 cc 01 9c 01 38 00
+    30 00
   ]];
 
   const DISCONNECTED_ICON = [[
-  10 10 30 00 38 00 9c 01 cc 01 ce 70 66 7c 06 1f
-  c6 47 f0 61 7c 0c 1f 0c c7 00 c0 01 9c 01 38 00
-  30 00
+    10 10 30 00 38 00 9c 01 cc 01 ce 70 66 7c 06 1f
+    c6 47 f0 61 7c 0c 1f 0c c7 00 c0 01 9c 01 38 00
+    30 00
   ]];
 
   const UNPAIRED_ICON = [[
-  10 10 00 00 00 00 80 01 80 01 80 01 80 01 80 01
-  80 01 80 01 80 01 80 01 80 01 80 01 80 01 00 00
-  00 00
+    10 10 00 00 00 00 80 01 80 01 80 01 80 01 80 01
+    80 01 80 01 80 01 80 01 80 01 80 01 80 01 00 00
+    00 00
   ]];
 
   isBleSummaryActive = 1;
@@ -1681,12 +1682,6 @@ func startPairing() {
   startBlePairing();
 }
 
-// tapSpace
-func tapSpace() {
-  pressScanCode(44 /* space */);
-  releaseScanCode(44 /* space */);
-}
-
 // updateBoardPower
 func updateBoardPower() {
   const RGB_UPDATE_TIME = 10;
@@ -1719,11 +1714,1650 @@ func updateBoardPower() {
   rgbUpdateUnderglow();
 }
 
-// updateQwertyActionTimes
-func updateQwertyActionTimes() {
-  lastQwertyActionTimes[0] = lastQwertyActionTimes[1];
-  lastQwertyActionTimes[1] = getTime();
+func _action_switchToNumpadLayer() {
+  deactivateGlobal();
+  deactivate1();
+  activate6();
+  activateGlobal();
+
 }
+
+const MODTAP_HANDLER_PRESS_TAP = 0;
+const MODTAP_HANDLER_RELEASE_TAP = 1;
+const MODTAP_HANDLER_PRESS_HOLD = 2;
+const MODTAP_HANDLER_RELEASE_HOLD = 3;
+
+const MODTAP_FLAG_TAP = 1;
+const MODTAP_FLAG_HOLD = 2;
+const MODTAP_FLAG_TAP_AND_HOLD = 3;
+
+const MODTAP_FLAG_RELEASED = 4;
+const MODTAP_FLAG_STATE = 24;
+const MODTAP_FLAG_LAYER_CHANGE = 32;
+const MODTAP_STATE_UNRESOLVED = 0;
+const MODTAP_STATE_RESOLVED_HOLD = 8;
+const MODTAP_STATE_RESOLVED_TAP = 16;
+
+const MODTAP_DEFAULT_MODTAP_HOLD_TIME = 200;
+const MODTAP_DEFAULT_LAYER_HOLD_TIME = 180;
+
+const TIMER_ID_MODTAP = 99;
+
+// struct ModTapData {
+  //   handler
+  //   group
+  //   flags
+  //   layerFlagList
+  //   holdTriggerTime
+  // }
+const MODTAP_DATA_OFFSET_HANDLER = 0;
+const MODTAP_DATA_OFFSET_GROUP = 1;
+const MODTAP_DATA_OFFSET_FLAGS = 2;
+const MODTAP_DATA_OFFSET_LAYER_FLAGS_LIST = 3;
+const MODTAP_DATA_OFFSET_HOLD_TRIGGER_TIME = 4;
+const MODTAP_DATA_LENGTH = 5;
+
+const MODTAP_ENTRY_COUNT = 12;
+
+var modTapDataCount;
+var modTapData[MODTAP_DATA_LENGTH * MODTAP_ENTRY_COUNT];
+
+var modTapLayerPossibility[8];
+
+// Group is used to identify which keys can work together for mods and taps.
+// It is a bit mask to allow keys to belong to more than one group.
+// For this configuration,
+// Pressing a tap-only key from a group will cause other unresolved hold keys to resolve to tap.
+func addModTapEntry(handler, group, flags, layerFlagsList, holdTime) {
+  var base = modTapDataCount * MODTAP_DATA_LENGTH;
+  modTapDataCount = modTapDataCount + 1;
+  modTapData[base + MODTAP_DATA_OFFSET_HANDLER] = handler;
+  modTapData[base + MODTAP_DATA_OFFSET_GROUP] = group;
+  modTapData[base + MODTAP_DATA_OFFSET_FLAGS] = flags;
+  modTapData[base + MODTAP_DATA_OFFSET_LAYER_FLAGS_LIST] = layerFlagsList;
+  modTapData[base + MODTAP_DATA_OFFSET_HOLD_TRIGGER_TIME] = getTime() + holdTime;
+}
+
+func findModTapIndex(handler) var {
+  for (var i = 0; i < modTapDataCount; i = i + 1) {
+    if (modTapData[i * MODTAP_DATA_LENGTH + MODTAP_DATA_OFFSET_HANDLER] == handler &&
+    (modTapData[i * MODTAP_DATA_LENGTH + MODTAP_DATA_OFFSET_FLAGS] & MODTAP_FLAG_RELEASED) == 0) {
+      return i;
+    }
+  }
+  // Not found.
+  return -1;
+}
+
+func clearPendingModTap() {
+  while (modTapDataCount) {
+    var state = modTapData[MODTAP_DATA_OFFSET_FLAGS] & MODTAP_FLAG_STATE;
+    var handler = modTapData[MODTAP_DATA_OFFSET_HANDLER];
+
+    // Prevent infinite recursion if the handler ends up calling clearPendingModTap.
+    removeModTapIndex(0);
+
+    if (state == MODTAP_STATE_RESOLVED_TAP) {
+      handler(MODTAP_HANDLER_RELEASE_TAP);
+    } else if (state == MODTAP_STATE_RESOLVED_HOLD) {
+      handler(MODTAP_HANDLER_RELEASE_HOLD);
+    } else if (state == MODTAP_STATE_UNRESOLVED) {
+      handler(MODTAP_HANDLER_PRESS_TAP);
+      handler(MODTAP_HANDLER_RELEASE_TAP);
+    }
+  }
+}
+
+func clearResolvedModTap() {
+  for (var i = 0; i < modTapDataCount;) {
+    var base = i * MODTAP_DATA_LENGTH;
+    var flags = modTapData[base + MODTAP_DATA_OFFSET_FLAGS];
+    var state = flags & MODTAP_FLAG_STATE;
+    if (state != MODTAP_STATE_UNRESOLVED) {
+      var handler = modTapData[base + MODTAP_DATA_OFFSET_HANDLER];
+      if (state == MODTAP_STATE_RESOLVED_TAP) {
+        removeModTapIndex(i);
+        handler(MODTAP_HANDLER_RELEASE_TAP);
+        continue;
+      } else if (state == MODTAP_STATE_RESOLVED_HOLD && (flags & MODTAP_FLAG_LAYER_CHANGE) == 0) {
+        removeModTapIndex(i);
+        handler(MODTAP_HANDLER_RELEASE_HOLD);
+        continue;
+      }
+    }
+    i = i + 1;
+  }
+}
+
+func removeModTapIndex(i) {
+  // Safety -- should never happen.
+  if (modTapDataCount == 0) return;
+
+  modTapDataCount = modTapDataCount - 1;
+  var end = modTapDataCount * MODTAP_DATA_LENGTH;
+  for (i = i * MODTAP_DATA_LENGTH; i < end; i = i + 1) {
+    modTapData[i] = modTapData[i + MODTAP_DATA_LENGTH];
+  }
+}
+
+func areAllModTapEntriesFromGroup(group) var {
+  for (var i = 0; i < modTapDataCount; i = i + 1) {
+    if ((modTapData[i * MODTAP_DATA_LENGTH + MODTAP_DATA_OFFSET_GROUP] & group) == 0) {
+      return 0;
+    }
+  }
+  return 1;
+}
+
+func areAllModTapEntriesResolved() var {
+  for (var i = 0; i < modTapDataCount; i = i + 1) {
+    if ((modTapData[i * MODTAP_DATA_LENGTH + MODTAP_DATA_OFFSET_FLAGS] & MODTAP_FLAG_STATE) == MODTAP_STATE_UNRESOLVED) {
+      return 0;
+    }
+  }
+  return 1;
+}
+
+func handleModTapPress(handler, group, layerFlagsList, holdTime) {
+  // Shouldn't happen, but for safety.
+  if (modTapDataCount >= MODTAP_ENTRY_COUNT) {
+    return;
+  }
+
+  var flags = layerFlagsList[resolveLayerIndex()];
+  for (var i = 0; i < 8; i = i + 1) {
+    if (modTapLayerPossibility[i]) {
+      flags = flags | layerFlagsList[i];
+    }
+  }
+
+  if (isInPressAll() && (flags & MODTAP_FLAG_LAYER_CHANGE) == 0) return;
+  if (flags == MODTAP_FLAG_TAP) {
+    // If group is same as any unresolved mod, then resolve them to tap.
+    // If it has already been resolved to hold, release and mark as ignore.
+    // This also takes care of the case where there are no entries.
+    if (areAllModTapEntriesFromGroup(group)) {
+      for (var i = 0; i < modTapDataCount;) {
+        var base = i * MODTAP_DATA_LENGTH;
+        var entryHandler = modTapData[base + MODTAP_DATA_OFFSET_HANDLER];
+        var entryFlags = modTapData[base + MODTAP_DATA_OFFSET_FLAGS];
+        var state = entryFlags & MODTAP_FLAG_STATE;
+        if (state == MODTAP_STATE_RESOLVED_HOLD) {
+          removeModTapIndex(i);
+          entryHandler(MODTAP_HANDLER_RELEASE_HOLD);
+          continue;
+        } else if (state == MODTAP_STATE_UNRESOLVED) {
+          modTapData[base + MODTAP_DATA_OFFSET_FLAGS] = entryFlags | MODTAP_STATE_RESOLVED_TAP;
+          entryHandler(MODTAP_HANDLER_PRESS_TAP);
+        }
+        i = i + 1;
+      }
+    }
+
+    // If everything has been resolved, then do the tap immediately
+    if (areAllModTapEntriesResolved()) {
+      handler(MODTAP_HANDLER_PRESS_TAP);
+      flags = flags | MODTAP_STATE_RESOLVED_TAP;
+    }
+  } else if (flags == MODTAP_FLAG_HOLD) {
+    handler(MODTAP_HANDLER_PRESS_HOLD);
+    flags = flags | MODTAP_STATE_RESOLVED_HOLD;
+  } else {
+    // If another group has been resolved to hold, then tap immediately.
+    for (var i = 0; i < modTapDataCount; i = i + 1) {
+      var base = i * MODTAP_DATA_LENGTH;
+      if (modTapData[base + MODTAP_DATA_OFFSET_GROUP] != 0 &&
+      (modTapData[base + MODTAP_DATA_OFFSET_GROUP] & group) == 0 &&
+      (modTapData[base + MODTAP_DATA_OFFSET_FLAGS] & MODTAP_FLAG_STATE) == MODTAP_STATE_RESOLVED_HOLD) {
+        handler(MODTAP_HANDLER_PRESS_TAP);
+        flags = flags | MODTAP_STATE_RESOLVED_TAP;
+        break;
+      }
+    }
+  }
+
+  addModTapEntry(handler, group, flags, layerFlagsList, holdTime);
+  updateModTapTimer();
+}
+
+func handleModTapRelease(handler) {
+  var i = findModTapIndex(handler);
+
+  // If handler is not in list, do nothing.
+  if (i == -1) {
+    return;
+  }
+
+  var base = i * MODTAP_DATA_LENGTH;
+  var group = modTapData[base + MODTAP_DATA_OFFSET_GROUP];
+  var flags = modTapData[base + MODTAP_DATA_OFFSET_FLAGS];
+  var state = flags & MODTAP_FLAG_STATE;
+  if (state != MODTAP_STATE_UNRESOLVED) {
+    removeModTapIndex(i);
+    if (state == MODTAP_STATE_RESOLVED_TAP) {
+      handler(MODTAP_HANDLER_RELEASE_TAP);
+    } else if (state == MODTAP_STATE_RESOLVED_HOLD) {
+      handler(MODTAP_HANDLER_RELEASE_HOLD);
+    }
+    return;
+  }
+  // Mark the handler as released.
+  modTapData[base + MODTAP_DATA_OFFSET_FLAGS] = flags | MODTAP_FLAG_RELEASED;
+
+  for (i = 0; i < modTapDataCount;) {
+    base = i * MODTAP_DATA_LENGTH;
+    flags = modTapData[base + MODTAP_DATA_OFFSET_FLAGS];
+    state = flags & MODTAP_FLAG_STATE;
+    var entryHandler = modTapData[base + MODTAP_DATA_OFFSET_HANDLER];
+    if (flags & MODTAP_FLAG_RELEASED) {
+      removeModTapIndex(i);
+      if (state == MODTAP_STATE_UNRESOLVED) {
+        entryHandler(MODTAP_HANDLER_PRESS_TAP);
+        entryHandler(MODTAP_HANDLER_RELEASE_TAP);
+      } else if (state == MODTAP_STATE_RESOLVED_TAP) {
+        entryHandler(MODTAP_HANDLER_RELEASE_TAP);
+      } else if (state == MODTAP_STATE_RESOLVED_HOLD) {
+        entryHandler(MODTAP_HANDLER_RELEASE_HOLD);
+      }
+      continue;
+    }
+
+    if((modTapData[base + MODTAP_DATA_OFFSET_GROUP] & group) == 0) {
+      updateModTapTimer();
+      return;
+    }
+
+    if (state == MODTAP_STATE_RESOLVED_HOLD) {
+      removeModTapIndex(i);
+      entryHandler(MODTAP_HANDLER_RELEASE_HOLD);
+      continue;
+    } else if (state == MODTAP_STATE_UNRESOLVED) {
+      modTapData[base + MODTAP_DATA_OFFSET_FLAGS] = flags | MODTAP_STATE_RESOLVED_TAP;
+      entryHandler(MODTAP_HANDLER_PRESS_TAP);
+    }
+    i = i + 1;
+  }
+}
+
+func findFirstUnresolvedModTapEntry() var {
+  var layerIndex = resolveLayerIndex();
+  for (var i = 0; i < modTapDataCount; i = i + 1) {
+    var base = i * MODTAP_DATA_LENGTH;
+    var layerFlags = modTapData[base + MODTAP_DATA_OFFSET_LAYER_FLAGS_LIST][layerIndex];
+    var flags = modTapData[base + MODTAP_DATA_OFFSET_FLAGS];
+
+    // If not resolved, not tap only and not released.
+    if ((layerFlags & MODTAP_FLAG_TAP_AND_HOLD) == MODTAP_FLAG_TAP_AND_HOLD && (flags & (MODTAP_FLAG_STATE | MODTAP_FLAG_RELEASED)) == 0) {
+      return i;
+    }
+  }
+  return -1;
+}
+
+func updateModTapTimer() {
+  var i = findFirstUnresolvedModTapEntry();
+  if (i == -1)  {
+    stopTimer(TIMER_ID_MODTAP);
+  } else {
+    var delay = modTapData[i * MODTAP_DATA_LENGTH + MODTAP_DATA_OFFSET_HOLD_TRIGGER_TIME] - getTime();
+    if (delay < 0) {
+      updateModTap();
+    } else {
+      startTimer(TIMER_ID_MODTAP, delay, 0, @updateModTap);
+    }
+  }
+}
+
+// After first unresolved non-tap only entry has timed out
+func updateModTap() {
+  var i = findFirstUnresolvedModTapEntry();
+  if (i == -1) return;
+
+  var base = i * MODTAP_DATA_LENGTH;
+  if (getTime() - modTapData[base + MODTAP_DATA_OFFSET_HOLD_TRIGGER_TIME] < 0) {
+    return;
+  }
+
+  var group = modTapData[base + MODTAP_DATA_OFFSET_GROUP];
+
+  while (i < modTapDataCount) {
+    // Resolve same group to hold, resolve different group to tap.
+    base = i * MODTAP_DATA_LENGTH;
+    var handler = modTapData[base + MODTAP_DATA_OFFSET_HANDLER];
+    var flags = modTapData[base + MODTAP_DATA_OFFSET_FLAGS];
+    if ((flags & MODTAP_FLAG_STATE) != MODTAP_STATE_UNRESOLVED) {
+      i = i + 1;
+    } else if (modTapData[base + MODTAP_DATA_OFFSET_GROUP] & group) {
+      var resolvedFlags = modTapData[base + MODTAP_DATA_OFFSET_LAYER_FLAGS_LIST][resolveLayerIndex()];
+      if (resolvedFlags & MODTAP_FLAG_HOLD) {
+        modTapData[base + MODTAP_DATA_OFFSET_FLAGS] = flags | MODTAP_STATE_RESOLVED_HOLD;
+        handler(MODTAP_HANDLER_PRESS_HOLD);
+        // Restart, because handler can call something that updates the list.
+        i = 0;
+      } else if (resolvedFlags & MODTAP_FLAG_TAP) {
+        modTapData[base + MODTAP_DATA_OFFSET_FLAGS] = flags | MODTAP_STATE_RESOLVED_TAP;
+        if (flags & MODTAP_FLAG_RELEASED) {
+          removeModTapIndex(i);
+          handler(MODTAP_HANDLER_PRESS_TAP);
+          handler(MODTAP_HANDLER_RELEASE_TAP);
+        } else {
+          handler(MODTAP_HANDLER_PRESS_TAP);
+        }
+        i = 0;
+      } else {
+        removeModTapIndex(i);
+      }
+    } else {
+      modTapData[base + MODTAP_DATA_OFFSET_FLAGS] = flags | MODTAP_STATE_RESOLVED_TAP;
+      if (flags & MODTAP_FLAG_RELEASED) {
+        removeModTapIndex(i);
+        handler(MODTAP_HANDLER_PRESS_TAP);
+        handler(MODTAP_HANDLER_RELEASE_TAP);
+      } else {
+        handler(MODTAP_HANDLER_PRESS_TAP);
+      }
+      i = 0;
+    }
+  }
+}
+
+func modTapHandler0(action) {
+  var resolvedLayerIndex = resolveLayerIndex();
+  if (resolvedLayerIndex == 1) {
+    if (action == MODTAP_HANDLER_PRESS_TAP) {
+      pressScanCodeButton(0, 0, 43 /* "⇥" */, 0);
+      return;
+
+    }
+    if (action == MODTAP_HANDLER_RELEASE_TAP) {
+      releaseScanCodeButton(43 /* "⇥" */);
+      return;
+
+    }
+    return;
+  }
+}
+
+const modTapLayerFlagsList0 = [[00 01 00 00 00 00 00 00]];
+
+func modTapHandler1(action) {
+  var resolvedLayerIndex = resolveLayerIndex();
+  if (resolvedLayerIndex == 1) {
+    if (action == MODTAP_HANDLER_PRESS_TAP) {
+      pressScanCodeButton(1, 0, 20 /* "Q" */, 0);
+      return;
+
+    }
+    if (action == MODTAP_HANDLER_RELEASE_TAP) {
+      releaseScanCodeButton(20 /* "Q" */);
+      return;
+
+    }
+    return;
+  }
+  if (resolvedLayerIndex == 3) {
+    if (action == MODTAP_HANDLER_PRESS_TAP) {
+      pressScanCodeButton(1, 0, 66 /* "F9" */, 0);
+      return;
+
+    }
+    if (action == MODTAP_HANDLER_RELEASE_TAP) {
+      releaseScanCodeButton(66 /* "F9" */);
+      return;
+
+    }
+    return;
+  }
+}
+
+const modTapLayerFlagsList1 = [[00 01 00 01 00 00 00 00]];
+
+func modTapHandler2(action) {
+  var resolvedLayerIndex = resolveLayerIndex();
+  if (resolvedLayerIndex == 1) {
+    if (action == MODTAP_HANDLER_PRESS_TAP) {
+      pressScanCodeButton(2, 0, 26 /* "W" */, 0);
+      return;
+
+    }
+    if (action == MODTAP_HANDLER_RELEASE_TAP) {
+      releaseScanCodeButton(26 /* "W" */);
+      return;
+
+    }
+    return;
+  }
+  if (resolvedLayerIndex == 3) {
+    if (action == MODTAP_HANDLER_PRESS_TAP) {
+      pressScanCodeButton(2, 0, 67 /* "F10" */, 0);
+      return;
+
+    }
+    if (action == MODTAP_HANDLER_RELEASE_TAP) {
+      releaseScanCodeButton(67 /* "F10" */);
+      return;
+
+    }
+    return;
+  }
+}
+
+const modTapLayerFlagsList2 = [[00 01 00 01 00 00 00 00]];
+
+func modTapHandler3(action) {
+  var resolvedLayerIndex = resolveLayerIndex();
+  if (resolvedLayerIndex == 1) {
+    if (action == MODTAP_HANDLER_PRESS_TAP) {
+      pressScanCodeButton(3, 0, 8 /* "E" */, 0);
+      return;
+
+    }
+    if (action == MODTAP_HANDLER_RELEASE_TAP) {
+      releaseScanCodeButton(8 /* "E" */);
+      return;
+
+    }
+    return;
+  }
+  if (resolvedLayerIndex == 3) {
+    if (action == MODTAP_HANDLER_PRESS_TAP) {
+      pressScanCodeButton(3, 0, 68 /* "F11" */, 0);
+      return;
+
+    }
+    if (action == MODTAP_HANDLER_RELEASE_TAP) {
+      releaseScanCodeButton(68 /* "F11" */);
+      return;
+
+    }
+    return;
+  }
+}
+
+const modTapLayerFlagsList3 = [[00 01 00 01 00 00 00 00]];
+
+func modTapHandler4(action) {
+  var resolvedLayerIndex = resolveLayerIndex();
+  if (resolvedLayerIndex == 1) {
+    if (action == MODTAP_HANDLER_PRESS_TAP) {
+      pressScanCodeButton(4, 0, 21 /* "R" */, 0);
+      return;
+
+    }
+    if (action == MODTAP_HANDLER_RELEASE_TAP) {
+      releaseScanCodeButton(21 /* "R" */);
+      return;
+
+    }
+    return;
+  }
+  if (resolvedLayerIndex == 3) {
+    if (action == MODTAP_HANDLER_PRESS_TAP) {
+      pressScanCodeButton(4, 0, 69 /* "F12" */, 0);
+      return;
+
+    }
+    if (action == MODTAP_HANDLER_RELEASE_TAP) {
+      releaseScanCodeButton(69 /* "F12" */);
+      return;
+
+    }
+    return;
+  }
+}
+
+const modTapLayerFlagsList4 = [[00 01 00 01 00 00 00 00]];
+
+func modTapHandler5(action) {
+  var resolvedLayerIndex = resolveLayerIndex();
+  if (resolvedLayerIndex == 1) {
+    if (action == MODTAP_HANDLER_PRESS_TAP) {
+      pressScanCodeButton(5, 0, 23 /* "T" */, 0);
+      return;
+
+    }
+    if (action == MODTAP_HANDLER_RELEASE_TAP) {
+      releaseScanCodeButton(23 /* "T" */);
+      return;
+
+    }
+    return;
+  }
+  if (resolvedLayerIndex == 4) {
+    if (action == MODTAP_HANDLER_PRESS_TAP) {
+      pressScanCodeButton(5, 0, 222 /* "🔆" */, 0);
+      return;
+
+    }
+    if (action == MODTAP_HANDLER_RELEASE_TAP) {
+      releaseScanCodeButton(222 /* "🔆" */);
+      return;
+
+    }
+    return;
+  }
+}
+
+const modTapLayerFlagsList5 = [[00 01 00 00 01 00 00 00]];
+
+func modTapHandler6(action) {
+  var resolvedLayerIndex = resolveLayerIndex();
+  if (resolvedLayerIndex == 1) {
+    if (action == MODTAP_HANDLER_PRESS_TAP) {
+      pressScanCodeButton(6, 0, 28 /* "Y" */, 0);
+      return;
+
+    }
+    if (action == MODTAP_HANDLER_RELEASE_TAP) {
+      releaseScanCodeButton(28 /* "Y" */);
+      return;
+
+    }
+    return;
+  }
+  if (resolvedLayerIndex == 4) {
+    if (action == MODTAP_HANDLER_PRESS_TAP) {
+      pressScanCodeButton(6, 0, 217 /* "🔊" */, 0);
+      return;
+
+    }
+    if (action == MODTAP_HANDLER_RELEASE_TAP) {
+      releaseScanCodeButton(217 /* "🔊" */);
+      return;
+
+    }
+    return;
+  }
+}
+
+const modTapLayerFlagsList6 = [[00 01 00 00 01 00 00 00]];
+
+func modTapHandler7(action) {
+  var resolvedLayerIndex = resolveLayerIndex();
+  if (resolvedLayerIndex == 1) {
+    if (action == MODTAP_HANDLER_PRESS_TAP) {
+      pressScanCodeButton(7, 0, 24 /* "U" */, 0);
+      return;
+
+    }
+    if (action == MODTAP_HANDLER_RELEASE_TAP) {
+      releaseScanCodeButton(24 /* "U" */);
+      return;
+
+    }
+    return;
+  }
+  if (resolvedLayerIndex == 4) {
+    if (action == MODTAP_HANDLER_PRESS_TAP) {
+      pressScanCodeButton(7, 0, 42 /* "⌫" */, 0);
+      return;
+
+    }
+    if (action == MODTAP_HANDLER_RELEASE_TAP) {
+      releaseScanCodeButton(42 /* "⌫" */);
+      return;
+
+    }
+    return;
+  }
+}
+
+const modTapLayerFlagsList7 = [[00 01 00 00 01 00 00 00]];
+
+func modTapHandler8(action) {
+  var resolvedLayerIndex = resolveLayerIndex();
+  if (resolvedLayerIndex == 1) {
+    if (action == MODTAP_HANDLER_PRESS_TAP) {
+      pressScanCodeButton(8, 0, 12 /* "I" */, 0);
+      return;
+
+    }
+    if (action == MODTAP_HANDLER_RELEASE_TAP) {
+      releaseScanCodeButton(12 /* "I" */);
+      return;
+
+    }
+    return;
+  }
+  if (resolvedLayerIndex == 4) {
+    if (action == MODTAP_HANDLER_PRESS_TAP) {
+      pressScanCodeButton(8, 0, 82 /* "↑" */, 0);
+      return;
+
+    }
+    if (action == MODTAP_HANDLER_RELEASE_TAP) {
+      releaseScanCodeButton(82 /* "↑" */);
+      return;
+
+    }
+    return;
+  }
+}
+
+const modTapLayerFlagsList8 = [[00 01 00 00 01 00 00 00]];
+
+func modTapHandler9(action) {
+  var resolvedLayerIndex = resolveLayerIndex();
+  if (resolvedLayerIndex == 1) {
+    if (action == MODTAP_HANDLER_PRESS_TAP) {
+      pressScanCodeButton(9, 0, 18 /* "O" */, 0);
+      return;
+
+    }
+    if (action == MODTAP_HANDLER_RELEASE_TAP) {
+      releaseScanCodeButton(18 /* "O" */);
+      return;
+
+    }
+    return;
+  }
+  if (resolvedLayerIndex == 4) {
+    if (action == MODTAP_HANDLER_PRESS_TAP) {
+      pressScanCodeButton(9, 0, 76 /* "⌦" */, 0);
+      return;
+
+    }
+    if (action == MODTAP_HANDLER_RELEASE_TAP) {
+      releaseScanCodeButton(76 /* "⌦" */);
+      return;
+
+    }
+    return;
+  }
+}
+
+const modTapLayerFlagsList9 = [[00 01 00 00 01 00 00 00]];
+
+func modTapHandler10(action) {
+  var resolvedLayerIndex = resolveLayerIndex();
+  if (resolvedLayerIndex == 1) {
+    if (action == MODTAP_HANDLER_PRESS_TAP) {
+      pressScanCodeButton(10, 0, 19 /* "P" */, 0);
+      return;
+
+    }
+    if (action == MODTAP_HANDLER_RELEASE_TAP) {
+      releaseScanCodeButton(19 /* "P" */);
+      return;
+
+    }
+    return;
+  }
+  if (resolvedLayerIndex == 4) {
+    if (action == MODTAP_HANDLER_PRESS_TAP) {
+      pressScanCodeButton(10, 0, 75 /* "⇞" */, 0);
+      return;
+
+    }
+    if (action == MODTAP_HANDLER_RELEASE_TAP) {
+      releaseScanCodeButton(75 /* "⇞" */);
+      return;
+
+    }
+    return;
+  }
+}
+
+const modTapLayerFlagsList10 = [[00 01 00 00 01 00 00 00]];
+
+func modTapHandler11(action) {
+  var resolvedLayerIndex = resolveLayerIndex();
+  if (resolvedLayerIndex == 1) {
+    if (action == MODTAP_HANDLER_PRESS_TAP) {
+      pressScanCodeButton(11, 0, 42 /* "⌫" */, 0);
+      return;
+
+    }
+    if (action == MODTAP_HANDLER_RELEASE_TAP) {
+      releaseScanCodeButton(42 /* "⌫" */);
+      return;
+
+    }
+    return;
+  }
+  if (resolvedLayerIndex == 4) {
+    if (action == MODTAP_HANDLER_PRESS_TAP) {
+      pressScanCodeButton(11, 0, 74 /* "⇱" */, 0);
+      return;
+
+    }
+    if (action == MODTAP_HANDLER_RELEASE_TAP) {
+      releaseScanCodeButton(74 /* "⇱" */);
+      return;
+
+    }
+    return;
+  }
+}
+
+const modTapLayerFlagsList11 = [[00 01 00 00 01 00 00 00]];
+
+func modTapHandler12(action) {
+  var resolvedLayerIndex = resolveLayerIndex();
+  if (resolvedLayerIndex == 1) {
+    if (action == MODTAP_HANDLER_PRESS_HOLD) {
+      pressScanCodeButton(12, 0, 224 /* "⌃" */, 0);
+
+      return;
+
+    }
+    if (action == MODTAP_HANDLER_RELEASE_HOLD) {
+      releaseScanCodeButton(224 /* "⌃" */);
+
+      return;
+
+    }
+    if (action == MODTAP_HANDLER_PRESS_TAP) {
+      pressScanCodeButton(12, 0, 41 /* "⎋" */, 0);
+      return;
+
+    }
+    if (action == MODTAP_HANDLER_RELEASE_TAP) {
+      releaseScanCodeButton(41 /* "⎋" */);
+      return;
+
+    }
+    return;
+  }
+}
+
+const modTapLayerFlagsList12 = [[00 03 00 00 00 00 00 00]];
+
+func modTapHandler13(action) {
+  var resolvedLayerIndex = resolveLayerIndex();
+  if (resolvedLayerIndex == 1) {
+    if (action == MODTAP_HANDLER_PRESS_TAP) {
+      pressScanCodeButton(13, 0, 4 /* "A" */, 0);
+      return;
+
+    }
+    if (action == MODTAP_HANDLER_RELEASE_TAP) {
+      releaseScanCodeButton(4 /* "A" */);
+      return;
+
+    }
+    return;
+  }
+  if (resolvedLayerIndex == 3) {
+    if (action == MODTAP_HANDLER_PRESS_TAP) {
+      pressScanCodeButton(13, 0, 62 /* "F5" */, 0);
+      return;
+
+    }
+    if (action == MODTAP_HANDLER_RELEASE_TAP) {
+      releaseScanCodeButton(62 /* "F5" */);
+      return;
+
+    }
+    return;
+  }
+  if (resolvedLayerIndex == 4) {
+    if (action == MODTAP_HANDLER_PRESS_TAP) {
+      pressScanCodeButton(13, 0, 227 /* "⌘" */, 0);
+      return;
+
+    }
+    if (action == MODTAP_HANDLER_RELEASE_TAP) {
+      releaseScanCodeButton(227 /* "⌘" */);
+      return;
+
+    }
+    return;
+  }
+}
+
+const modTapLayerFlagsList13 = [[00 01 00 01 01 00 00 00]];
+
+func modTapHandler14(action) {
+  var resolvedLayerIndex = resolveLayerIndex();
+  if (resolvedLayerIndex == 1) {
+    if (action == MODTAP_HANDLER_PRESS_TAP) {
+      pressScanCodeButton(14, 0, 22 /* "S" */, 0);
+      return;
+
+    }
+    if (action == MODTAP_HANDLER_RELEASE_TAP) {
+      releaseScanCodeButton(22 /* "S" */);
+      return;
+
+    }
+    return;
+  }
+  if (resolvedLayerIndex == 3) {
+    if (action == MODTAP_HANDLER_PRESS_TAP) {
+      pressScanCodeButton(14, 0, 63 /* "F6" */, 0);
+      return;
+
+    }
+    if (action == MODTAP_HANDLER_RELEASE_TAP) {
+      releaseScanCodeButton(63 /* "F6" */);
+      return;
+
+    }
+    return;
+  }
+  if (resolvedLayerIndex == 4) {
+    if (action == MODTAP_HANDLER_PRESS_TAP) {
+      pressScanCodeButton(14, 0, 226 /* "⌥" */, 0);
+      return;
+
+    }
+    if (action == MODTAP_HANDLER_RELEASE_TAP) {
+      releaseScanCodeButton(226 /* "⌥" */);
+      return;
+
+    }
+    return;
+  }
+}
+
+const modTapLayerFlagsList14 = [[00 01 00 01 01 00 00 00]];
+
+func modTapHandler15(action) {
+  var resolvedLayerIndex = resolveLayerIndex();
+  if (resolvedLayerIndex == 1) {
+    if (action == MODTAP_HANDLER_PRESS_TAP) {
+      pressScanCodeButton(15, 0, 7 /* "D" */, 0);
+      return;
+
+    }
+    if (action == MODTAP_HANDLER_RELEASE_TAP) {
+      releaseScanCodeButton(7 /* "D" */);
+      return;
+
+    }
+    return;
+  }
+  if (resolvedLayerIndex == 3) {
+    if (action == MODTAP_HANDLER_PRESS_TAP) {
+      pressScanCodeButton(15, 0, 64 /* "F7" */, 0);
+      return;
+
+    }
+    if (action == MODTAP_HANDLER_RELEASE_TAP) {
+      releaseScanCodeButton(64 /* "F7" */);
+      return;
+
+    }
+    return;
+  }
+  if (resolvedLayerIndex == 4) {
+    if (action == MODTAP_HANDLER_PRESS_TAP) {
+      pressScanCodeButton(15, 0, 224 /* "⌃" */, 0);
+      return;
+
+    }
+    if (action == MODTAP_HANDLER_RELEASE_TAP) {
+      releaseScanCodeButton(224 /* "⌃" */);
+      return;
+
+    }
+    return;
+  }
+}
+
+const modTapLayerFlagsList15 = [[00 01 00 01 01 00 00 00]];
+
+func modTapHandler16(action) {
+  var resolvedLayerIndex = resolveLayerIndex();
+  if (resolvedLayerIndex == 1) {
+    if (action == MODTAP_HANDLER_PRESS_TAP) {
+      pressScanCodeButton(16, 0, 9 /* "F" */, 0);
+      return;
+
+    }
+    if (action == MODTAP_HANDLER_RELEASE_TAP) {
+      releaseScanCodeButton(9 /* "F" */);
+      return;
+
+    }
+    return;
+  }
+  if (resolvedLayerIndex == 3) {
+    if (action == MODTAP_HANDLER_PRESS_TAP) {
+      pressScanCodeButton(16, 0, 65 /* "F8" */, 0);
+      return;
+
+    }
+    if (action == MODTAP_HANDLER_RELEASE_TAP) {
+      releaseScanCodeButton(65 /* "F8" */);
+      return;
+
+    }
+    return;
+  }
+  if (resolvedLayerIndex == 4) {
+    if (action == MODTAP_HANDLER_PRESS_TAP) {
+      pressScanCodeButton(16, 0, 225 /* "⇧" */, 0);
+      return;
+
+    }
+    if (action == MODTAP_HANDLER_RELEASE_TAP) {
+      releaseScanCodeButton(225 /* "⇧" */);
+      return;
+
+    }
+    return;
+  }
+}
+
+const modTapLayerFlagsList16 = [[00 01 00 01 01 00 00 00]];
+
+func modTapHandler17(action) {
+  var resolvedLayerIndex = resolveLayerIndex();
+  if (resolvedLayerIndex == 1) {
+    if (action == MODTAP_HANDLER_PRESS_TAP) {
+      pressScanCodeButton(17, 0, 10 /* "G" */, 0);
+      return;
+
+    }
+    if (action == MODTAP_HANDLER_RELEASE_TAP) {
+      releaseScanCodeButton(10 /* "G" */);
+      return;
+
+    }
+    return;
+  }
+  if (resolvedLayerIndex == 4) {
+    if (action == MODTAP_HANDLER_PRESS_TAP) {
+      pressScanCodeButton(17, 0, 223 /* "🔅" */, 0);
+      return;
+
+    }
+    if (action == MODTAP_HANDLER_RELEASE_TAP) {
+      releaseScanCodeButton(223 /* "🔅" */);
+      return;
+
+    }
+    return;
+  }
+}
+
+const modTapLayerFlagsList17 = [[00 01 00 00 01 00 00 00]];
+
+func modTapHandler18(action) {
+  var resolvedLayerIndex = resolveLayerIndex();
+  if (resolvedLayerIndex == 1) {
+    if (action == MODTAP_HANDLER_PRESS_TAP) {
+      pressScanCodeButton(18, 0, 11 /* "H" */, 0);
+      return;
+
+    }
+    if (action == MODTAP_HANDLER_RELEASE_TAP) {
+      releaseScanCodeButton(11 /* "H" */);
+      return;
+
+    }
+    return;
+  }
+  if (resolvedLayerIndex == 4) {
+    if (action == MODTAP_HANDLER_PRESS_TAP) {
+      pressScanCodeButton(18, 0, 218 /* "🔈" */, 0);
+      return;
+
+    }
+    if (action == MODTAP_HANDLER_RELEASE_TAP) {
+      releaseScanCodeButton(218 /* "🔈" */);
+      return;
+
+    }
+    return;
+  }
+}
+
+const modTapLayerFlagsList18 = [[00 01 00 00 01 00 00 00]];
+
+func modTapHandler19(action) {
+  var resolvedLayerIndex = resolveLayerIndex();
+  if (resolvedLayerIndex == 1) {
+    if (action == MODTAP_HANDLER_PRESS_TAP) {
+      pressScanCodeButton(19, 0, 13 /* "J" */, 0);
+      return;
+
+    }
+    if (action == MODTAP_HANDLER_RELEASE_TAP) {
+      releaseScanCodeButton(13 /* "J" */);
+      return;
+
+    }
+    return;
+  }
+  if (resolvedLayerIndex == 3) {
+    if (action == MODTAP_HANDLER_PRESS_TAP) {
+      pressScanCodeButton(19, 0, 229 /* "⇧" */, 0);
+      return;
+
+    }
+    if (action == MODTAP_HANDLER_RELEASE_TAP) {
+      releaseScanCodeButton(229 /* "⇧" */);
+      return;
+
+    }
+    return;
+  }
+  if (resolvedLayerIndex == 4) {
+    if (action == MODTAP_HANDLER_PRESS_TAP) {
+      pressScanCodeButton(19, 0, 80 /* "←" */, 0);
+      return;
+
+    }
+    if (action == MODTAP_HANDLER_RELEASE_TAP) {
+      releaseScanCodeButton(80 /* "←" */);
+      return;
+
+    }
+    return;
+  }
+}
+
+const modTapLayerFlagsList19 = [[00 01 00 01 01 00 00 00]];
+
+func modTapHandler20(action) {
+  var resolvedLayerIndex = resolveLayerIndex();
+  if (resolvedLayerIndex == 1) {
+    if (action == MODTAP_HANDLER_PRESS_TAP) {
+      pressScanCodeButton(20, 0, 14 /* "K" */, 0);
+      return;
+
+    }
+    if (action == MODTAP_HANDLER_RELEASE_TAP) {
+      releaseScanCodeButton(14 /* "K" */);
+      return;
+
+    }
+    return;
+  }
+  if (resolvedLayerIndex == 3) {
+    if (action == MODTAP_HANDLER_PRESS_TAP) {
+      pressScanCodeButton(20, 0, 230 /* "⌥" */, 0);
+      return;
+
+    }
+    if (action == MODTAP_HANDLER_RELEASE_TAP) {
+      releaseScanCodeButton(230 /* "⌥" */);
+      return;
+
+    }
+    return;
+  }
+  if (resolvedLayerIndex == 4) {
+    if (action == MODTAP_HANDLER_PRESS_TAP) {
+      pressScanCodeButton(20, 0, 81 /* "↓" */, 0);
+      return;
+
+    }
+    if (action == MODTAP_HANDLER_RELEASE_TAP) {
+      releaseScanCodeButton(81 /* "↓" */);
+      return;
+
+    }
+    return;
+  }
+}
+
+const modTapLayerFlagsList20 = [[00 01 00 01 01 00 00 00]];
+
+func modTapHandler21(action) {
+  var resolvedLayerIndex = resolveLayerIndex();
+  if (resolvedLayerIndex == 1) {
+    if (action == MODTAP_HANDLER_PRESS_TAP) {
+      pressScanCodeButton(21, 0, 15 /* "L" */, 0);
+      return;
+
+    }
+    if (action == MODTAP_HANDLER_RELEASE_TAP) {
+      releaseScanCodeButton(15 /* "L" */);
+      return;
+
+    }
+    return;
+  }
+  if (resolvedLayerIndex == 3) {
+    if (action == MODTAP_HANDLER_PRESS_TAP) {
+      pressScanCodeButton(21, 0, 230 /* "⌥" */, 0);
+      return;
+
+    }
+    if (action == MODTAP_HANDLER_RELEASE_TAP) {
+      releaseScanCodeButton(230 /* "⌥" */);
+      return;
+
+    }
+    return;
+  }
+  if (resolvedLayerIndex == 4) {
+    if (action == MODTAP_HANDLER_PRESS_TAP) {
+      pressScanCodeButton(21, 0, 79 /* "→" */, 0);
+      return;
+
+    }
+    if (action == MODTAP_HANDLER_RELEASE_TAP) {
+      releaseScanCodeButton(79 /* "→" */);
+      return;
+
+    }
+    return;
+  }
+}
+
+const modTapLayerFlagsList21 = [[00 01 00 01 01 00 00 00]];
+
+func modTapHandler22(action) {
+  var resolvedLayerIndex = resolveLayerIndex();
+  if (resolvedLayerIndex == 1) {
+    if (action == MODTAP_HANDLER_PRESS_TAP) {
+      pressScanCodeButton(22, 0, 51 /* ";" */, 0);
+      return;
+
+    }
+    if (action == MODTAP_HANDLER_RELEASE_TAP) {
+      releaseScanCodeButton(51 /* ";" */);
+      return;
+
+    }
+    return;
+  }
+  if (resolvedLayerIndex == 3) {
+    if (action == MODTAP_HANDLER_PRESS_TAP) {
+      pressScanCodeButton(22, 0, 231 /* "⌘" */, 0);
+      return;
+
+    }
+    if (action == MODTAP_HANDLER_RELEASE_TAP) {
+      releaseScanCodeButton(231 /* "⌘" */);
+      return;
+
+    }
+    return;
+  }
+  if (resolvedLayerIndex == 4) {
+    if (action == MODTAP_HANDLER_PRESS_TAP) {
+      pressScanCodeButton(22, 0, 78 /* "⇟" */, 0);
+      return;
+
+    }
+    if (action == MODTAP_HANDLER_RELEASE_TAP) {
+      releaseScanCodeButton(78 /* "⇟" */);
+      return;
+
+    }
+    return;
+  }
+}
+
+const modTapLayerFlagsList22 = [[00 01 00 01 01 00 00 00]];
+
+func modTapHandler23(action) {
+  var resolvedLayerIndex = resolveLayerIndex();
+  if (resolvedLayerIndex == 1) {
+    if (action == MODTAP_HANDLER_PRESS_TAP) {
+      pressScanCodeButton(23, 0, 52 /* "'" */, 0);
+      return;
+
+    }
+    if (action == MODTAP_HANDLER_RELEASE_TAP) {
+      releaseScanCodeButton(52 /* "'" */);
+      return;
+
+    }
+    return;
+  }
+  if (resolvedLayerIndex == 4) {
+    if (action == MODTAP_HANDLER_PRESS_TAP) {
+      pressScanCodeButton(23, 0, 77 /* "⇲" */, 0);
+      return;
+
+    }
+    if (action == MODTAP_HANDLER_RELEASE_TAP) {
+      releaseScanCodeButton(77 /* "⇲" */);
+      return;
+
+    }
+    return;
+  }
+}
+
+const modTapLayerFlagsList23 = [[00 01 00 00 01 00 00 00]];
+
+func modTapHandler24(action) {
+  var resolvedLayerIndex = resolveLayerIndex();
+  if (resolvedLayerIndex == 1) {
+    if (action == MODTAP_HANDLER_PRESS_HOLD) {
+      pressScanCodeButton(24, 0, 225 /* "⇧" */, 0);
+
+      return;
+
+    }
+    if (action == MODTAP_HANDLER_RELEASE_HOLD) {
+      releaseScanCodeButton(225 /* "⇧" */);
+
+      return;
+
+    }
+    return;
+  }
+}
+
+const modTapLayerFlagsList24 = [[00 02 00 00 00 00 00 00]];
+
+func modTapHandler25(action) {
+  var resolvedLayerIndex = resolveLayerIndex();
+  if (resolvedLayerIndex == 1) {
+    if (action == MODTAP_HANDLER_PRESS_TAP) {
+      pressScanCodeButton(25, 0, 29 /* "Z" */, 0);
+      return;
+
+    }
+    if (action == MODTAP_HANDLER_RELEASE_TAP) {
+      releaseScanCodeButton(29 /* "Z" */);
+      return;
+
+    }
+    return;
+  }
+  if (resolvedLayerIndex == 3) {
+    if (action == MODTAP_HANDLER_PRESS_TAP) {
+      pressScanCodeButton(25, 0, 58 /* "F1" */, 0);
+      return;
+
+    }
+    if (action == MODTAP_HANDLER_RELEASE_TAP) {
+      releaseScanCodeButton(58 /* "F1" */);
+      return;
+
+    }
+    return;
+  }
+}
+
+const modTapLayerFlagsList25 = [[00 01 00 01 00 00 00 00]];
+
+func modTapHandler26(action) {
+  var resolvedLayerIndex = resolveLayerIndex();
+  if (resolvedLayerIndex == 1) {
+    if (action == MODTAP_HANDLER_PRESS_TAP) {
+      pressScanCodeButton(26, 0, 27 /* "X" */, 0);
+      return;
+
+    }
+    if (action == MODTAP_HANDLER_RELEASE_TAP) {
+      releaseScanCodeButton(27 /* "X" */);
+      return;
+
+    }
+    return;
+  }
+  if (resolvedLayerIndex == 3) {
+    if (action == MODTAP_HANDLER_PRESS_TAP) {
+      pressScanCodeButton(26, 0, 59 /* "F2" */, 0);
+      return;
+
+    }
+    if (action == MODTAP_HANDLER_RELEASE_TAP) {
+      releaseScanCodeButton(59 /* "F2" */);
+      return;
+
+    }
+    return;
+  }
+}
+
+const modTapLayerFlagsList26 = [[00 01 00 01 00 00 00 00]];
+
+func modTapHandler27(action) {
+  var resolvedLayerIndex = resolveLayerIndex();
+  if (resolvedLayerIndex == 1) {
+    if (action == MODTAP_HANDLER_PRESS_TAP) {
+      pressScanCodeButton(27, 0, 6 /* "C" */, 0);
+      return;
+
+    }
+    if (action == MODTAP_HANDLER_RELEASE_TAP) {
+      releaseScanCodeButton(6 /* "C" */);
+      return;
+
+    }
+    return;
+  }
+  if (resolvedLayerIndex == 3) {
+    if (action == MODTAP_HANDLER_PRESS_TAP) {
+      pressScanCodeButton(27, 0, 60 /* "F3" */, 0);
+      return;
+
+    }
+    if (action == MODTAP_HANDLER_RELEASE_TAP) {
+      releaseScanCodeButton(60 /* "F3" */);
+      return;
+
+    }
+    return;
+  }
+}
+
+const modTapLayerFlagsList27 = [[00 01 00 01 00 00 00 00]];
+
+func modTapHandler28(action) {
+  var resolvedLayerIndex = resolveLayerIndex();
+  if (resolvedLayerIndex == 1) {
+    if (action == MODTAP_HANDLER_PRESS_TAP) {
+      pressScanCodeButton(28, 0, 25 /* "V" */, 0);
+      return;
+
+    }
+    if (action == MODTAP_HANDLER_RELEASE_TAP) {
+      releaseScanCodeButton(25 /* "V" */);
+      return;
+
+    }
+    return;
+  }
+  if (resolvedLayerIndex == 3) {
+    if (action == MODTAP_HANDLER_PRESS_TAP) {
+      pressScanCodeButton(28, 0, 61 /* "F4" */, 0);
+      return;
+
+    }
+    if (action == MODTAP_HANDLER_RELEASE_TAP) {
+      releaseScanCodeButton(61 /* "F4" */);
+      return;
+
+    }
+    return;
+  }
+}
+
+const modTapLayerFlagsList28 = [[00 01 00 01 00 00 00 00]];
+
+func modTapHandler29(action) {
+  var resolvedLayerIndex = resolveLayerIndex();
+  if (resolvedLayerIndex == 1) {
+    if (action == MODTAP_HANDLER_PRESS_TAP) {
+      pressScanCodeButton(29, 0, 5 /* "B" */, 0);
+      return;
+
+    }
+    if (action == MODTAP_HANDLER_RELEASE_TAP) {
+      releaseScanCodeButton(5 /* "B" */);
+      return;
+
+    }
+    return;
+  }
+}
+
+const modTapLayerFlagsList29 = [[00 01 00 00 00 00 00 00]];
+
+func modTapHandler30(action) {
+  var resolvedLayerIndex = resolveLayerIndex();
+  if (resolvedLayerIndex == 1) {
+    if (action == MODTAP_HANDLER_PRESS_TAP) {
+      pressScanCodeButton(30, 0, 17 /* "N" */, 0);
+      return;
+
+    }
+    if (action == MODTAP_HANDLER_RELEASE_TAP) {
+      releaseScanCodeButton(17 /* "N" */);
+      return;
+
+    }
+    return;
+  }
+  if (resolvedLayerIndex == 4) {
+    if (action == MODTAP_HANDLER_PRESS_TAP) {
+      pressScanCodeButton(30, 0, 210 /* "🔇" */, 0);
+      return;
+
+    }
+    if (action == MODTAP_HANDLER_RELEASE_TAP) {
+      releaseScanCodeButton(210 /* "🔇" */);
+      return;
+
+    }
+    return;
+  }
+}
+
+const modTapLayerFlagsList30 = [[00 01 00 00 01 00 00 00]];
+
+func modTapHandler31(action) {
+  var resolvedLayerIndex = resolveLayerIndex();
+  if (resolvedLayerIndex == 1) {
+    if (action == MODTAP_HANDLER_PRESS_TAP) {
+      pressScanCodeButton(31, 0, 16 /* "M" */, 0);
+      return;
+
+    }
+    if (action == MODTAP_HANDLER_RELEASE_TAP) {
+      releaseScanCodeButton(16 /* "M" */);
+      return;
+
+    }
+    return;
+  }
+}
+
+const modTapLayerFlagsList31 = [[00 01 00 00 00 00 00 00]];
+
+func modTapHandler32(action) {
+  var resolvedLayerIndex = resolveLayerIndex();
+  if (resolvedLayerIndex == 1) {
+    if (action == MODTAP_HANDLER_PRESS_TAP) {
+      pressScanCodeButton(32, 0, 54 /* "," */, 0);
+      return;
+
+    }
+    if (action == MODTAP_HANDLER_RELEASE_TAP) {
+      releaseScanCodeButton(54 /* "," */);
+      return;
+
+    }
+    return;
+  }
+}
+
+const modTapLayerFlagsList32 = [[00 01 00 00 00 00 00 00]];
+
+func modTapHandler33(action) {
+  var resolvedLayerIndex = resolveLayerIndex();
+  if (resolvedLayerIndex == 1) {
+    if (action == MODTAP_HANDLER_PRESS_TAP) {
+      pressScanCodeButton(33, 0, 55 /* "." */, 0);
+      return;
+
+    }
+    if (action == MODTAP_HANDLER_RELEASE_TAP) {
+      releaseScanCodeButton(55 /* "." */);
+      return;
+
+    }
+    return;
+  }
+}
+
+const modTapLayerFlagsList33 = [[00 01 00 00 00 00 00 00]];
+
+func modTapHandler34(action) {
+  var resolvedLayerIndex = resolveLayerIndex();
+  if (resolvedLayerIndex == 1) {
+    if (action == MODTAP_HANDLER_PRESS_TAP) {
+      pressScanCodeButton(34, 0, 56 /* "/" */, 0);
+      return;
+
+    }
+    if (action == MODTAP_HANDLER_RELEASE_TAP) {
+      releaseScanCodeButton(56 /* "/" */);
+      return;
+
+    }
+    return;
+  }
+}
+
+const modTapLayerFlagsList34 = [[00 01 00 00 00 00 00 00]];
+
+func modTapHandler35(action) {
+  var resolvedLayerIndex = resolveLayerIndex();
+  if (resolvedLayerIndex == 1) {
+    if (action == MODTAP_HANDLER_PRESS_HOLD) {
+      pressScanCodeButton(35, 0, 229 /* "⇧" */, 0);
+
+      return;
+
+    }
+    if (action == MODTAP_HANDLER_RELEASE_HOLD) {
+      releaseScanCodeButton(229 /* "⇧" */);
+
+      return;
+
+    }
+    return;
+  }
+}
+
+const modTapLayerFlagsList35 = [[00 02 00 00 00 00 00 00]];
+
+func modTapHandler36(action) {
+  var resolvedLayerIndex = resolveLayerIndex();
+  if (resolvedLayerIndex == 1) {
+    if (action == MODTAP_HANDLER_PRESS_HOLD) {
+      pressScanCodeButton(36, 0, 227 /* "⌘" */, 0);
+
+      return;
+
+    }
+    if (action == MODTAP_HANDLER_RELEASE_HOLD) {
+      releaseScanCodeButton(227 /* "⌘" */);
+
+      return;
+
+    }
+    return;
+  }
+}
+
+const modTapLayerFlagsList36 = [[00 02 00 00 00 00 00 00]];
+
+func modTapHandler37(action) {
+  var resolvedLayerIndex = resolveLayerIndex();
+  if (resolvedLayerIndex == 1) {
+    if (action == MODTAP_HANDLER_PRESS_HOLD) {
+      pressScanCodeButton(37, 0, 226 /* "⌥" */, 0);
+
+      return;
+
+    }
+    if (action == MODTAP_HANDLER_RELEASE_HOLD) {
+      releaseScanCodeButton(226 /* "⌥" */);
+
+      return;
+
+    }
+    return;
+  }
+}
+
+const modTapLayerFlagsList37 = [[00 02 00 00 00 00 00 00]];
+
+func modTapHandler38(action) {
+  var resolvedLayerIndex = resolveLayerIndex();
+  if (resolvedLayerIndex == 1) {
+    if (action == MODTAP_HANDLER_PRESS_HOLD) {
+      deactivateGlobal();
+      deactivate1();
+      activate4NoRelease();
+      activateGlobal();
+      modTapLayerPossibility[1] = 1;
+      return;
+
+    }
+    if (action == MODTAP_HANDLER_PRESS_TAP) {
+      pressScanCodeButton(38, 0, 44 /* "⎵" */, 0);
+      return;
+
+    }
+    if (action == MODTAP_HANDLER_RELEASE_TAP) {
+      releaseScanCodeButton(44 /* "⎵" */);
+      return;
+
+    }
+    return;
+  }
+}
+
+const modTapLayerFlagsList38 = [[00 23 00 00 00 00 00 00]];
+
+func modTapHandler39(action) {
+  var resolvedLayerIndex = resolveLayerIndex();
+  if (resolvedLayerIndex == 1) {
+    if (action == MODTAP_HANDLER_PRESS_TAP) {
+      pressScanCodeButton(39, 0, 44 /* "⎵" */, 0);
+      return;
+
+    }
+    if (action == MODTAP_HANDLER_RELEASE_TAP) {
+      releaseScanCodeButton(44 /* "⎵" */);
+      return;
+
+    }
+    return;
+  }
+  if (resolvedLayerIndex == 4) {
+    if (action == MODTAP_HANDLER_PRESS_TAP) {
+      pressScanCodeButton(39, 0, 44 /* "⎵" */, 0);
+      return;
+
+    }
+    if (action == MODTAP_HANDLER_RELEASE_TAP) {
+      releaseScanCodeButton(44 /* "⎵" */);
+      return;
+
+    }
+    return;
+  }
+}
+
+const modTapLayerFlagsList39 = [[00 01 00 00 01 00 00 00]];
+
+func modTapHandler41(action) {
+  var resolvedLayerIndex = resolveLayerIndex();
+  if (resolvedLayerIndex == 1) {
+    if (action == MODTAP_HANDLER_PRESS_HOLD) {
+      deactivateGlobal();
+      deactivate1();
+      activate3NoRelease();
+      activateGlobal();
+      modTapLayerPossibility[1] = 1;
+      return;
+
+    }
+    if (action == MODTAP_HANDLER_PRESS_TAP) {
+      pressScanCodeButton(41, 0, 40 /* "↵" */, 0);
+      return;
+
+    }
+    if (action == MODTAP_HANDLER_RELEASE_TAP) {
+      releaseScanCodeButton(40 /* "↵" */);
+      return;
+
+    }
+    return;
+  }
+  if (resolvedLayerIndex == 4) {
+    if (action == MODTAP_HANDLER_PRESS_TAP) {
+      pressScanCodeButton(41, 0, 40 /* "↵" */, 0);
+      return;
+
+    }
+    if (action == MODTAP_HANDLER_RELEASE_TAP) {
+      releaseScanCodeButton(40 /* "↵" */);
+      return;
+
+    }
+    return;
+  }
+}
+
+const modTapLayerFlagsList41 = [[00 23 00 00 01 00 00 00]];
 
 func init() {
   rgbInitRandomColors();
@@ -1772,12 +3406,13 @@ func init() {
 func onPress0() {
   globalPress(0);
 
-  dispatchToLayer(@onPress0_0, @onPress0_1, @onPress0_2, 0, 0, @onPress0_5, 0, 0);
+  dispatchToLayer([[[@onPress0_0, @onPress0_1, @onPress0_2, 0, 0, @onPress0_5, 0, 0]]]);
 }
 func onRelease0() {
   globalRelease();
 
-  dispatchToLayer(@onRelease0_0, @onRelease0_1, @onRelease0_2, 0, 0, @onRelease0_5, 0, 0);
+  handleModTapRelease(@modTapHandler0);
+  dispatchToLayer([[[@onRelease0_0, @onRelease0_1, @onRelease0_2, 0, 0, @onRelease0_5, 0, 0]]]);
 }
 
 func onPress0_0() {
@@ -1788,11 +3423,9 @@ func onRelease0_0() {
 }
 
 func onPress0_1() {
-  updateQwertyActionTimes();
-  pressScanCodeButton(0, 0, 43 /* "⇥" */, 0);
+  handleModTapPress(@modTapHandler0, 1, modTapLayerFlagsList0, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
 }
 func onRelease0_1() {
-  releaseScanCodeButton(43 /* "⇥" */);
 }
 
 func onPress0_2() {
@@ -1814,12 +3447,13 @@ func onRelease0_5() {
 func onPress1() {
   globalPress(1);
 
-  dispatchToLayer(@onPress1_0, @onPress1_1, @onPress1_2, @onPress1_3, 0, @onPress1_5, 0, 0);
+  dispatchToLayer([[[@onPress1_0, @onPress1_1, @onPress1_2, @onPress1_3, 0, @onPress1_5, 0, 0]]]);
 }
 func onRelease1() {
   globalRelease();
 
-  dispatchToLayer(@onRelease1_0, @onRelease1_1, @onRelease1_2, @onRelease1_3, 0, @onRelease1_5, 0, 0);
+  handleModTapRelease(@modTapHandler1);
+  dispatchToLayer([[[@onRelease1_0, @onRelease1_1, @onRelease1_2, @onRelease1_3, 0, @onRelease1_5, 0, 0]]]);
 }
 
 func onPress1_0() {
@@ -1830,11 +3464,9 @@ func onRelease1_0() {
 }
 
 func onPress1_1() {
-  updateQwertyActionTimes();
-  pressScanCodeButton(1, 0, 20 /* "Q" */, 0);
+  handleModTapPress(@modTapHandler1, 1, modTapLayerFlagsList1, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
 }
 func onRelease1_1() {
-  releaseScanCodeButton(20 /* "Q" */);
 }
 
 func onPress1_2() {
@@ -1845,10 +3477,9 @@ func onRelease1_2() {
 }
 
 func onPress1_3() {
-  pressScanCodeButton(1, 0, 66 /* "F9" */, 0);
+  handleModTapPress(@modTapHandler1, 1, modTapLayerFlagsList1, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
 }
 func onRelease1_3() {
-  releaseScanCodeButton(66 /* "F9" */);
 }
 
 func onPress1_5() {
@@ -1874,12 +3505,13 @@ func onRelease1_5() {
 func onPress2() {
   globalPress(2);
 
-  dispatchToLayer(@onPress2_0, @onPress2_1, @onPress2_2, @onPress2_3, 0, @onPress2_5, 0, 0);
+  dispatchToLayer([[[@onPress2_0, @onPress2_1, @onPress2_2, @onPress2_3, 0, @onPress2_5, 0, 0]]]);
 }
 func onRelease2() {
   globalRelease();
 
-  dispatchToLayer(@onRelease2_0, @onRelease2_1, @onRelease2_2, @onRelease2_3, 0, @onRelease2_5, 0, 0);
+  handleModTapRelease(@modTapHandler2);
+  dispatchToLayer([[[@onRelease2_0, @onRelease2_1, @onRelease2_2, @onRelease2_3, 0, @onRelease2_5, 0, 0]]]);
 }
 
 func onPress2_0() {
@@ -1890,11 +3522,9 @@ func onRelease2_0() {
 }
 
 func onPress2_1() {
-  updateQwertyActionTimes();
-  pressScanCodeButton(2, 0, 26 /* "W" */, 0);
+  handleModTapPress(@modTapHandler2, 1, modTapLayerFlagsList2, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
 }
 func onRelease2_1() {
-  releaseScanCodeButton(26 /* "W" */);
 }
 
 func onPress2_2() {
@@ -1905,10 +3535,9 @@ func onRelease2_2() {
 }
 
 func onPress2_3() {
-  pressScanCodeButton(2, 0, 67 /* "F10" */, 0);
+  handleModTapPress(@modTapHandler2, 1, modTapLayerFlagsList2, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
 }
 func onRelease2_3() {
-  releaseScanCodeButton(67 /* "F10" */);
 }
 
 func onPress2_5() {
@@ -1934,12 +3563,13 @@ func onRelease2_5() {
 func onPress3() {
   globalPress(3);
 
-  dispatchToLayer(@onPress3_0, @onPress3_1, @onPress3_2, @onPress3_3, 0, @onPress3_5, 0, 0);
+  dispatchToLayer([[[@onPress3_0, @onPress3_1, @onPress3_2, @onPress3_3, 0, @onPress3_5, 0, 0]]]);
 }
 func onRelease3() {
   globalRelease();
 
-  dispatchToLayer(@onRelease3_0, @onRelease3_1, @onRelease3_2, @onRelease3_3, 0, @onRelease3_5, 0, 0);
+  handleModTapRelease(@modTapHandler3);
+  dispatchToLayer([[[@onRelease3_0, @onRelease3_1, @onRelease3_2, @onRelease3_3, 0, @onRelease3_5, 0, 0]]]);
 }
 
 func onPress3_0() {
@@ -1950,11 +3580,9 @@ func onRelease3_0() {
 }
 
 func onPress3_1() {
-  updateQwertyActionTimes();
-  pressScanCodeButton(3, 0, 8 /* "E" */, 0);
+  handleModTapPress(@modTapHandler3, 1, modTapLayerFlagsList3, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
 }
 func onRelease3_1() {
-  releaseScanCodeButton(8 /* "E" */);
 }
 
 func onPress3_2() {
@@ -1965,10 +3593,9 @@ func onRelease3_2() {
 }
 
 func onPress3_3() {
-  pressScanCodeButton(3, 0, 68 /* "F11" */, 0);
+  handleModTapPress(@modTapHandler3, 1, modTapLayerFlagsList3, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
 }
 func onRelease3_3() {
-  releaseScanCodeButton(68 /* "F11" */);
 }
 
 func onPress3_5() {
@@ -1994,12 +3621,13 @@ func onRelease3_5() {
 func onPress4() {
   globalPress(4);
 
-  dispatchToLayer(@onPress4_0, @onPress4_1, @onPress4_2, @onPress4_3, 0, @onPress4_5, 0, 0);
+  dispatchToLayer([[[@onPress4_0, @onPress4_1, @onPress4_2, @onPress4_3, 0, @onPress4_5, 0, 0]]]);
 }
 func onRelease4() {
   globalRelease();
 
-  dispatchToLayer(@onRelease4_0, @onRelease4_1, @onRelease4_2, @onRelease4_3, 0, @onRelease4_5, 0, 0);
+  handleModTapRelease(@modTapHandler4);
+  dispatchToLayer([[[@onRelease4_0, @onRelease4_1, @onRelease4_2, @onRelease4_3, 0, @onRelease4_5, 0, 0]]]);
 }
 
 func onPress4_0() {
@@ -2010,11 +3638,9 @@ func onRelease4_0() {
 }
 
 func onPress4_1() {
-  updateQwertyActionTimes();
-  pressScanCodeButton(4, 0, 21 /* "R" */, 0);
+  handleModTapPress(@modTapHandler4, 1, modTapLayerFlagsList4, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
 }
 func onRelease4_1() {
-  releaseScanCodeButton(21 /* "R" */);
 }
 
 func onPress4_2() {
@@ -2025,10 +3651,9 @@ func onRelease4_2() {
 }
 
 func onPress4_3() {
-  pressScanCodeButton(4, 0, 69 /* "F12" */, 0);
+  handleModTapPress(@modTapHandler4, 1, modTapLayerFlagsList4, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
 }
 func onRelease4_3() {
-  releaseScanCodeButton(69 /* "F12" */);
 }
 
 func onPress4_5() {
@@ -2054,12 +3679,13 @@ func onRelease4_5() {
 func onPress5() {
   globalPress(5);
 
-  dispatchToLayer(@onPress5_0, @onPress5_1, @onPress5_2, 0, @onPress5_4, @onPress5_5, 0, 0);
+  dispatchToLayer([[[@onPress5_0, @onPress5_1, @onPress5_2, 0, @onPress5_4, @onPress5_5, 0, 0]]]);
 }
 func onRelease5() {
   globalRelease();
 
-  dispatchToLayer(@onRelease5_0, @onRelease5_1, @onRelease5_2, 0, @onRelease5_4, @onRelease5_5, 0, 0);
+  handleModTapRelease(@modTapHandler5);
+  dispatchToLayer([[[@onRelease5_0, @onRelease5_1, @onRelease5_2, 0, @onRelease5_4, @onRelease5_5, 0, 0]]]);
 }
 
 func onPress5_0() {
@@ -2070,11 +3696,9 @@ func onRelease5_0() {
 }
 
 func onPress5_1() {
-  updateQwertyActionTimes();
-  pressScanCodeButton(5, 0, 23 /* "T" */, 0);
+  handleModTapPress(@modTapHandler5, 1, modTapLayerFlagsList5, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
 }
 func onRelease5_1() {
-  releaseScanCodeButton(23 /* "T" */);
 }
 
 func onPress5_2() {
@@ -2085,10 +3709,9 @@ func onRelease5_2() {
 }
 
 func onPress5_4() {
-  pressScanCodeButton(5, 0, 222 /* "🔆" */, 0);
+  handleModTapPress(@modTapHandler5, 1, modTapLayerFlagsList5, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
 }
 func onRelease5_4() {
-  releaseScanCodeButton(222 /* "🔆" */);
 }
 
 func onPress5_5() {
@@ -2103,12 +3726,13 @@ func onRelease5_5() {
 func onPress6() {
   globalPress(6);
 
-  dispatchToLayer(@onPress6_0, @onPress6_1, @onPress6_2, 0, @onPress6_4, 0, 0, 0);
+  dispatchToLayer([[[@onPress6_0, @onPress6_1, @onPress6_2, 0, @onPress6_4, 0, 0, 0]]]);
 }
 func onRelease6() {
   globalRelease();
 
-  dispatchToLayer(@onRelease6_0, @onRelease6_1, @onRelease6_2, 0, @onRelease6_4, 0, 0, 0);
+  handleModTapRelease(@modTapHandler6);
+  dispatchToLayer([[[@onRelease6_0, @onRelease6_1, @onRelease6_2, 0, @onRelease6_4, 0, 0, 0]]]);
 }
 
 func onPress6_0() {
@@ -2119,11 +3743,9 @@ func onRelease6_0() {
 }
 
 func onPress6_1() {
-  updateQwertyActionTimes();
-  pressScanCodeButton(6, 0, 28 /* "Y" */, 0);
+  handleModTapPress(@modTapHandler6, 2, modTapLayerFlagsList6, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
 }
 func onRelease6_1() {
-  releaseScanCodeButton(28 /* "Y" */);
 }
 
 func onPress6_2() {
@@ -2134,21 +3756,21 @@ func onRelease6_2() {
 }
 
 func onPress6_4() {
-  pressScanCodeButton(6, 0, 217 /* "🔊" */, 0);
+  handleModTapPress(@modTapHandler6, 2, modTapLayerFlagsList6, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
 }
 func onRelease6_4() {
-  releaseScanCodeButton(217 /* "🔊" */);
 }
 
 func onPress7() {
   globalPress(7);
 
-  dispatchToLayer(@onPress7_0, @onPress7_1, @onPress7_2, 0, @onPress7_4, 0, @onPress7_6, 0);
+  dispatchToLayer([[[@onPress7_0, @onPress7_1, @onPress7_2, 0, @onPress7_4, 0, @onPress7_6, 0]]]);
 }
 func onRelease7() {
   globalRelease();
 
-  dispatchToLayer(@onRelease7_0, @onRelease7_1, @onRelease7_2, 0, @onRelease7_4, 0, @onRelease7_6, 0);
+  handleModTapRelease(@modTapHandler7);
+  dispatchToLayer([[[@onRelease7_0, @onRelease7_1, @onRelease7_2, 0, @onRelease7_4, 0, @onRelease7_6, 0]]]);
 }
 
 func onPress7_0() {
@@ -2159,11 +3781,9 @@ func onRelease7_0() {
 }
 
 func onPress7_1() {
-  updateQwertyActionTimes();
-  pressScanCodeButton(7, 0, 24 /* "U" */, 0);
+  handleModTapPress(@modTapHandler7, 2, modTapLayerFlagsList7, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
 }
 func onRelease7_1() {
-  releaseScanCodeButton(24 /* "U" */);
 }
 
 func onPress7_2() {
@@ -2174,10 +3794,9 @@ func onRelease7_2() {
 }
 
 func onPress7_4() {
-  pressScanCodeButton(7, 0, 42 /* "⌫" */, 0);
+  handleModTapPress(@modTapHandler7, 2, modTapLayerFlagsList7, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
 }
 func onRelease7_4() {
-  releaseScanCodeButton(42 /* "⌫" */);
 }
 
 func onPress7_6() {
@@ -2190,12 +3809,13 @@ func onRelease7_6() {
 func onPress8() {
   globalPress(8);
 
-  dispatchToLayer(@onPress8_0, @onPress8_1, @onPress8_2, 0, @onPress8_4, @onPress8_5, @onPress8_6, 0);
+  dispatchToLayer([[[@onPress8_0, @onPress8_1, @onPress8_2, 0, @onPress8_4, @onPress8_5, @onPress8_6, 0]]]);
 }
 func onRelease8() {
   globalRelease();
 
-  dispatchToLayer(@onRelease8_0, @onRelease8_1, @onRelease8_2, 0, @onRelease8_4, @onRelease8_5, @onRelease8_6, 0);
+  handleModTapRelease(@modTapHandler8);
+  dispatchToLayer([[[@onRelease8_0, @onRelease8_1, @onRelease8_2, 0, @onRelease8_4, @onRelease8_5, @onRelease8_6, 0]]]);
 }
 
 func onPress8_0() {
@@ -2206,11 +3826,9 @@ func onRelease8_0() {
 }
 
 func onPress8_1() {
-  updateQwertyActionTimes();
-  pressScanCodeButton(8, 0, 12 /* "I" */, 0);
+  handleModTapPress(@modTapHandler8, 2, modTapLayerFlagsList8, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
 }
 func onRelease8_1() {
-  releaseScanCodeButton(12 /* "I" */);
 }
 
 func onPress8_2() {
@@ -2221,10 +3839,9 @@ func onRelease8_2() {
 }
 
 func onPress8_4() {
-  pressScanCodeButton(8, 0, 82 /* "↑" */, 0);
+  handleModTapPress(@modTapHandler8, 2, modTapLayerFlagsList8, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
 }
 func onRelease8_4() {
-  releaseScanCodeButton(82 /* "↑" */);
 }
 
 func onPress8_5() {
@@ -2249,12 +3866,13 @@ func onRelease8_6() {
 func onPress9() {
   globalPress(9);
 
-  dispatchToLayer(@onPress9_0, @onPress9_1, @onPress9_2, 0, @onPress9_4, @onPress9_5, @onPress9_6, 0);
+  dispatchToLayer([[[@onPress9_0, @onPress9_1, @onPress9_2, 0, @onPress9_4, @onPress9_5, @onPress9_6, 0]]]);
 }
 func onRelease9() {
   globalRelease();
 
-  dispatchToLayer(@onRelease9_0, @onRelease9_1, @onRelease9_2, 0, @onRelease9_4, @onRelease9_5, @onRelease9_6, 0);
+  handleModTapRelease(@modTapHandler9);
+  dispatchToLayer([[[@onRelease9_0, @onRelease9_1, @onRelease9_2, 0, @onRelease9_4, @onRelease9_5, @onRelease9_6, 0]]]);
 }
 
 func onPress9_0() {
@@ -2265,11 +3883,9 @@ func onRelease9_0() {
 }
 
 func onPress9_1() {
-  updateQwertyActionTimes();
-  pressScanCodeButton(9, 0, 18 /* "O" */, 0);
+  handleModTapPress(@modTapHandler9, 2, modTapLayerFlagsList9, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
 }
 func onRelease9_1() {
-  releaseScanCodeButton(18 /* "O" */);
 }
 
 func onPress9_2() {
@@ -2280,10 +3896,9 @@ func onRelease9_2() {
 }
 
 func onPress9_4() {
-  pressScanCodeButton(9, 0, 76 /* "⌦" */, 0);
+  handleModTapPress(@modTapHandler9, 2, modTapLayerFlagsList9, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
 }
 func onRelease9_4() {
-  releaseScanCodeButton(76 /* "⌦" */);
 }
 
 func onPress9_5() {
@@ -2308,12 +3923,13 @@ func onRelease9_6() {
 func onPress10() {
   globalPress(10);
 
-  dispatchToLayer(@onPress10_0, @onPress10_1, @onPress10_2, 0, @onPress10_4, 0, @onPress10_6, 0);
+  dispatchToLayer([[[@onPress10_0, @onPress10_1, @onPress10_2, 0, @onPress10_4, 0, @onPress10_6, 0]]]);
 }
 func onRelease10() {
   globalRelease();
 
-  dispatchToLayer(@onRelease10_0, @onRelease10_1, @onRelease10_2, 0, @onRelease10_4, 0, @onRelease10_6, 0);
+  handleModTapRelease(@modTapHandler10);
+  dispatchToLayer([[[@onRelease10_0, @onRelease10_1, @onRelease10_2, 0, @onRelease10_4, 0, @onRelease10_6, 0]]]);
 }
 
 func onPress10_0() {
@@ -2324,11 +3940,9 @@ func onRelease10_0() {
 }
 
 func onPress10_1() {
-  updateQwertyActionTimes();
-  pressScanCodeButton(10, 0, 19 /* "P" */, 0);
+  handleModTapPress(@modTapHandler10, 2, modTapLayerFlagsList10, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
 }
 func onRelease10_1() {
-  releaseScanCodeButton(19 /* "P" */);
 }
 
 func onPress10_2() {
@@ -2339,10 +3953,9 @@ func onRelease10_2() {
 }
 
 func onPress10_4() {
-  pressScanCodeButton(10, 0, 75 /* "⇞" */, 0);
+  handleModTapPress(@modTapHandler10, 2, modTapLayerFlagsList10, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
 }
 func onRelease10_4() {
-  releaseScanCodeButton(75 /* "⇞" */);
 }
 
 func onPress10_6() {
@@ -2355,12 +3968,13 @@ func onRelease10_6() {
 func onPress11() {
   globalPress(11);
 
-  dispatchToLayer(@onPress11_0, @onPress11_1, @onPress11_2, 0, @onPress11_4, @onPress11_5, @onPress11_6, 0);
+  dispatchToLayer([[[@onPress11_0, @onPress11_1, @onPress11_2, 0, @onPress11_4, @onPress11_5, @onPress11_6, 0]]]);
 }
 func onRelease11() {
   globalRelease();
 
-  dispatchToLayer(@onRelease11_0, @onRelease11_1, @onRelease11_2, 0, @onRelease11_4, @onRelease11_5, @onRelease11_6, 0);
+  handleModTapRelease(@modTapHandler11);
+  dispatchToLayer([[[@onRelease11_0, @onRelease11_1, @onRelease11_2, 0, @onRelease11_4, @onRelease11_5, @onRelease11_6, 0]]]);
 }
 
 func onPress11_0() {
@@ -2371,11 +3985,9 @@ func onRelease11_0() {
 }
 
 func onPress11_1() {
-  updateQwertyActionTimes();
-  pressScanCodeButton(11, 0, 42 /* "⌫" */, 0);
+  handleModTapPress(@modTapHandler11, 2, modTapLayerFlagsList11, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
 }
 func onRelease11_1() {
-  releaseScanCodeButton(42 /* "⌫" */);
 }
 
 func onPress11_2() {
@@ -2388,10 +4000,9 @@ func onRelease11_2() {
 }
 
 func onPress11_4() {
-  pressScanCodeButton(11, 0, 74 /* "⇱" */, 0);
+  handleModTapPress(@modTapHandler11, 2, modTapLayerFlagsList11, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
 }
 func onRelease11_4() {
-  releaseScanCodeButton(74 /* "⇱" */);
 }
 
 func onPress11_5() {
@@ -2412,12 +4023,13 @@ func onRelease11_6() {
 func onPress12() {
   globalPress(12);
 
-  dispatchToLayer(@onPress12_0, @onPress12_1, @onPress12_2, 0, 0, 0, 0, @onPress12_7);
+  dispatchToLayer([[[@onPress12_0, @onPress12_1, @onPress12_2, 0, 0, 0, 0, @onPress12_7]]]);
 }
 func onRelease12() {
   globalRelease();
 
-  dispatchToLayer(@onRelease12_0, @onRelease12_1, @onRelease12_2, 0, 0, 0, 0, @onRelease12_7);
+  handleModTapRelease(@modTapHandler12);
+  dispatchToLayer([[[@onRelease12_0, @onRelease12_1, @onRelease12_2, 0, 0, 0, 0, @onRelease12_7]]]);
   // Temp-QWERTY
 
   // Returning here prevents the next sequence, SetLayer, from occurring.
@@ -2461,21 +4073,10 @@ func onRelease12_0() {
   }
 }
 
-var timer12_1;
 func onPress12_1() {
-  updateQwertyActionTimes();
-  if (!isInPressAll()) {
-    timer12_1 = getTime();
-  }
-  pressScanCodeButton(12, 0, 224 /* "⌃" */, 0);
+  handleModTapPress(@modTapHandler12, 4, modTapLayerFlagsList12, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
 }
 func onRelease12_1() {
-  releaseScanCodeButton(224 /* "⌃" */);
-  if (getTime() - timer12_1 <= 200) {
-    pressScanCodeButton(12, 0, 41 /* "⎋" */, 1);
-    releaseScanCodeButton(41 /* "⎋" */);
-
-  }
 }
 
 func onPress12_2() {
@@ -2500,12 +4101,13 @@ func onRelease12_7() {
 func onPress13() {
   globalPress(13);
 
-  dispatchToLayer(@onPress13_0, @onPress13_1, @onPress13_2, @onPress13_3, @onPress13_4, @onPress13_5, @onPress13_6, 0);
+  dispatchToLayer([[[@onPress13_0, @onPress13_1, @onPress13_2, @onPress13_3, @onPress13_4, @onPress13_5, @onPress13_6, 0]]]);
 }
 func onRelease13() {
   globalRelease();
 
-  dispatchToLayer(@onRelease13_0, @onRelease13_1, @onRelease13_2, @onRelease13_3, @onRelease13_4, @onRelease13_5, @onRelease13_6, 0);
+  handleModTapRelease(@modTapHandler13);
+  dispatchToLayer([[[@onRelease13_0, @onRelease13_1, @onRelease13_2, @onRelease13_3, @onRelease13_4, @onRelease13_5, @onRelease13_6, 0]]]);
 }
 
 func onPress13_0() {
@@ -2516,11 +4118,9 @@ func onRelease13_0() {
 }
 
 func onPress13_1() {
-  updateQwertyActionTimes();
-  pressScanCodeButton(13, 0, 4 /* "A" */, 0);
+  handleModTapPress(@modTapHandler13, 1, modTapLayerFlagsList13, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
 }
 func onRelease13_1() {
-  releaseScanCodeButton(4 /* "A" */);
 }
 
 func onPress13_2() {
@@ -2533,17 +4133,15 @@ func onRelease13_2() {
 }
 
 func onPress13_3() {
-  pressScanCodeButton(13, 0, 62 /* "F5" */, 0);
+  handleModTapPress(@modTapHandler13, 1, modTapLayerFlagsList13, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
 }
 func onRelease13_3() {
-  releaseScanCodeButton(62 /* "F5" */);
 }
 
 func onPress13_4() {
-  pressScanCodeButton(13, 0, 227 /* "⌘" */, 0);
+  handleModTapPress(@modTapHandler13, 1, modTapLayerFlagsList13, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
 }
 func onRelease13_4() {
-  releaseScanCodeButton(227 /* "⌘" */);
 }
 
 func onPress13_5() {
@@ -2565,12 +4163,13 @@ func onRelease13_6() {
 func onPress14() {
   globalPress(14);
 
-  dispatchToLayer(@onPress14_0, @onPress14_1, @onPress14_2, @onPress14_3, @onPress14_4, @onPress14_5, @onPress14_6, 0);
+  dispatchToLayer([[[@onPress14_0, @onPress14_1, @onPress14_2, @onPress14_3, @onPress14_4, @onPress14_5, @onPress14_6, 0]]]);
 }
 func onRelease14() {
   globalRelease();
 
-  dispatchToLayer(@onRelease14_0, @onRelease14_1, @onRelease14_2, @onRelease14_3, @onRelease14_4, @onRelease14_5, @onRelease14_6, 0);
+  handleModTapRelease(@modTapHandler14);
+  dispatchToLayer([[[@onRelease14_0, @onRelease14_1, @onRelease14_2, @onRelease14_3, @onRelease14_4, @onRelease14_5, @onRelease14_6, 0]]]);
 }
 
 func onPress14_0() {
@@ -2581,11 +4180,9 @@ func onRelease14_0() {
 }
 
 func onPress14_1() {
-  updateQwertyActionTimes();
-  pressScanCodeButton(14, 0, 22 /* "S" */, 0);
+  handleModTapPress(@modTapHandler14, 1, modTapLayerFlagsList14, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
 }
 func onRelease14_1() {
-  releaseScanCodeButton(22 /* "S" */);
 }
 
 func onPress14_2() {
@@ -2598,17 +4195,15 @@ func onRelease14_2() {
 }
 
 func onPress14_3() {
-  pressScanCodeButton(14, 0, 63 /* "F6" */, 0);
+  handleModTapPress(@modTapHandler14, 1, modTapLayerFlagsList14, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
 }
 func onRelease14_3() {
-  releaseScanCodeButton(63 /* "F6" */);
 }
 
 func onPress14_4() {
-  pressScanCodeButton(14, 0, 226 /* "⌥" */, 0);
+  handleModTapPress(@modTapHandler14, 1, modTapLayerFlagsList14, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
 }
 func onRelease14_4() {
-  releaseScanCodeButton(226 /* "⌥" */);
 }
 
 func onPress14_5() {
@@ -2630,12 +4225,13 @@ func onRelease14_6() {
 func onPress15() {
   globalPress(15);
 
-  dispatchToLayer(@onPress15_0, @onPress15_1, @onPress15_2, @onPress15_3, @onPress15_4, @onPress15_5, @onPress15_6, 0);
+  dispatchToLayer([[[@onPress15_0, @onPress15_1, @onPress15_2, @onPress15_3, @onPress15_4, @onPress15_5, @onPress15_6, 0]]]);
 }
 func onRelease15() {
   globalRelease();
 
-  dispatchToLayer(@onRelease15_0, @onRelease15_1, @onRelease15_2, @onRelease15_3, @onRelease15_4, @onRelease15_5, @onRelease15_6, 0);
+  handleModTapRelease(@modTapHandler15);
+  dispatchToLayer([[[@onRelease15_0, @onRelease15_1, @onRelease15_2, @onRelease15_3, @onRelease15_4, @onRelease15_5, @onRelease15_6, 0]]]);
 }
 
 func onPress15_0() {
@@ -2646,11 +4242,9 @@ func onRelease15_0() {
 }
 
 func onPress15_1() {
-  updateQwertyActionTimes();
-  pressScanCodeButton(15, 0, 7 /* "D" */, 0);
+  handleModTapPress(@modTapHandler15, 1, modTapLayerFlagsList15, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
 }
 func onRelease15_1() {
-  releaseScanCodeButton(7 /* "D" */);
 }
 
 func onPress15_2() {
@@ -2663,17 +4257,15 @@ func onRelease15_2() {
 }
 
 func onPress15_3() {
-  pressScanCodeButton(15, 0, 64 /* "F7" */, 0);
+  handleModTapPress(@modTapHandler15, 1, modTapLayerFlagsList15, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
 }
 func onRelease15_3() {
-  releaseScanCodeButton(64 /* "F7" */);
 }
 
 func onPress15_4() {
-  pressScanCodeButton(15, 0, 224 /* "⌃" */, 0);
+  handleModTapPress(@modTapHandler15, 1, modTapLayerFlagsList15, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
 }
 func onRelease15_4() {
-  releaseScanCodeButton(224 /* "⌃" */);
 }
 
 func onPress15_5() {
@@ -2695,12 +4287,13 @@ func onRelease15_6() {
 func onPress16() {
   globalPress(16);
 
-  dispatchToLayer(@onPress16_0, @onPress16_1, @onPress16_2, @onPress16_3, @onPress16_4, @onPress16_5, @onPress16_6, 0);
+  dispatchToLayer([[[@onPress16_0, @onPress16_1, @onPress16_2, @onPress16_3, @onPress16_4, @onPress16_5, @onPress16_6, 0]]]);
 }
 func onRelease16() {
   globalRelease();
 
-  dispatchToLayer(@onRelease16_0, @onRelease16_1, @onRelease16_2, @onRelease16_3, @onRelease16_4, @onRelease16_5, @onRelease16_6, 0);
+  handleModTapRelease(@modTapHandler16);
+  dispatchToLayer([[[@onRelease16_0, @onRelease16_1, @onRelease16_2, @onRelease16_3, @onRelease16_4, @onRelease16_5, @onRelease16_6, 0]]]);
 }
 
 func onPress16_0() {
@@ -2711,11 +4304,9 @@ func onRelease16_0() {
 }
 
 func onPress16_1() {
-  updateQwertyActionTimes();
-  pressScanCodeButton(16, 0, 9 /* "F" */, 0);
+  handleModTapPress(@modTapHandler16, 1, modTapLayerFlagsList16, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
 }
 func onRelease16_1() {
-  releaseScanCodeButton(9 /* "F" */);
 }
 
 func onPress16_2() {
@@ -2728,17 +4319,15 @@ func onRelease16_2() {
 }
 
 func onPress16_3() {
-  pressScanCodeButton(16, 0, 65 /* "F8" */, 0);
+  handleModTapPress(@modTapHandler16, 1, modTapLayerFlagsList16, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
 }
 func onRelease16_3() {
-  releaseScanCodeButton(65 /* "F8" */);
 }
 
 func onPress16_4() {
-  pressScanCodeButton(16, 0, 225 /* "⇧" */, 0);
+  handleModTapPress(@modTapHandler16, 1, modTapLayerFlagsList16, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
 }
 func onRelease16_4() {
-  releaseScanCodeButton(225 /* "⇧" */);
 }
 
 func onPress16_5() {
@@ -2760,12 +4349,13 @@ func onRelease16_6() {
 func onPress17() {
   globalPress(17);
 
-  dispatchToLayer(@onPress17_0, @onPress17_1, @onPress17_2, 0, @onPress17_4, 0, 0, 0);
+  dispatchToLayer([[[@onPress17_0, @onPress17_1, @onPress17_2, 0, @onPress17_4, 0, 0, 0]]]);
 }
 func onRelease17() {
   globalRelease();
 
-  dispatchToLayer(@onRelease17_0, @onRelease17_1, @onRelease17_2, 0, @onRelease17_4, 0, 0, 0);
+  handleModTapRelease(@modTapHandler17);
+  dispatchToLayer([[[@onRelease17_0, @onRelease17_1, @onRelease17_2, 0, @onRelease17_4, 0, 0, 0]]]);
 }
 
 func onPress17_0() {
@@ -2776,11 +4366,9 @@ func onRelease17_0() {
 }
 
 func onPress17_1() {
-  updateQwertyActionTimes();
-  pressScanCodeButton(17, 0, 10 /* "G" */, 0);
+  handleModTapPress(@modTapHandler17, 1, modTapLayerFlagsList17, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
 }
 func onRelease17_1() {
-  releaseScanCodeButton(10 /* "G" */);
 }
 
 func onPress17_2() {
@@ -2793,21 +4381,21 @@ func onRelease17_2() {
 }
 
 func onPress17_4() {
-  pressScanCodeButton(17, 0, 223 /* "🔅" */, 0);
+  handleModTapPress(@modTapHandler17, 1, modTapLayerFlagsList17, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
 }
 func onRelease17_4() {
-  releaseScanCodeButton(223 /* "🔅" */);
 }
 
 func onPress18() {
   globalPress(18);
 
-  dispatchToLayer(@onPress18_0, @onPress18_1, @onPress18_2, 0, @onPress18_4, 0, 0, 0);
+  dispatchToLayer([[[@onPress18_0, @onPress18_1, @onPress18_2, 0, @onPress18_4, 0, 0, 0]]]);
 }
 func onRelease18() {
   globalRelease();
 
-  dispatchToLayer(@onRelease18_0, @onRelease18_1, @onRelease18_2, 0, @onRelease18_4, 0, 0, 0);
+  handleModTapRelease(@modTapHandler18);
+  dispatchToLayer([[[@onRelease18_0, @onRelease18_1, @onRelease18_2, 0, @onRelease18_4, 0, 0, 0]]]);
 }
 
 func onPress18_0() {
@@ -2818,11 +4406,9 @@ func onRelease18_0() {
 }
 
 func onPress18_1() {
-  updateQwertyActionTimes();
-  pressScanCodeButton(18, 0, 11 /* "H" */, 0);
+  handleModTapPress(@modTapHandler18, 2, modTapLayerFlagsList18, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
 }
 func onRelease18_1() {
-  releaseScanCodeButton(11 /* "H" */);
 }
 
 func onPress18_2() {
@@ -2835,21 +4421,21 @@ func onRelease18_2() {
 }
 
 func onPress18_4() {
-  pressScanCodeButton(18, 0, 218 /* "🔈" */, 0);
+  handleModTapPress(@modTapHandler18, 2, modTapLayerFlagsList18, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
 }
 func onRelease18_4() {
-  releaseScanCodeButton(218 /* "🔈" */);
 }
 
 func onPress19() {
   globalPress(19);
 
-  dispatchToLayer(@onPress19_0, @onPress19_1, @onPress19_2, @onPress19_3, @onPress19_4, 0, @onPress19_6, 0);
+  dispatchToLayer([[[@onPress19_0, @onPress19_1, @onPress19_2, @onPress19_3, @onPress19_4, 0, @onPress19_6, 0]]]);
 }
 func onRelease19() {
   globalRelease();
 
-  dispatchToLayer(@onRelease19_0, @onRelease19_1, @onRelease19_2, @onRelease19_3, @onRelease19_4, 0, @onRelease19_6, 0);
+  handleModTapRelease(@modTapHandler19);
+  dispatchToLayer([[[@onRelease19_0, @onRelease19_1, @onRelease19_2, @onRelease19_3, @onRelease19_4, 0, @onRelease19_6, 0]]]);
 }
 
 func onPress19_0() {
@@ -2860,11 +4446,9 @@ func onRelease19_0() {
 }
 
 func onPress19_1() {
-  updateQwertyActionTimes();
-  pressScanCodeButton(19, 0, 13 /* "J" */, 0);
+  handleModTapPress(@modTapHandler19, 2, modTapLayerFlagsList19, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
 }
 func onRelease19_1() {
-  releaseScanCodeButton(13 /* "J" */);
 }
 
 func onPress19_2() {
@@ -2877,17 +4461,15 @@ func onRelease19_2() {
 }
 
 func onPress19_3() {
-  pressScanCodeButton(19, 0, 225 /* "⇧" */, 0);
+  handleModTapPress(@modTapHandler19, 2, modTapLayerFlagsList19, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
 }
 func onRelease19_3() {
-  releaseScanCodeButton(225 /* "⇧" */);
 }
 
 func onPress19_4() {
-  pressScanCodeButton(19, 0, 80 /* "←" */, 0);
+  handleModTapPress(@modTapHandler19, 2, modTapLayerFlagsList19, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
 }
 func onRelease19_4() {
-  releaseScanCodeButton(80 /* "←" */);
 }
 
 func onPress19_6() {
@@ -2900,12 +4482,13 @@ func onRelease19_6() {
 func onPress20() {
   globalPress(20);
 
-  dispatchToLayer(@onPress20_0, @onPress20_1, @onPress20_2, @onPress20_3, @onPress20_4, @onPress20_5, @onPress20_6, 0);
+  dispatchToLayer([[[@onPress20_0, @onPress20_1, @onPress20_2, @onPress20_3, @onPress20_4, @onPress20_5, @onPress20_6, 0]]]);
 }
 func onRelease20() {
   globalRelease();
 
-  dispatchToLayer(@onRelease20_0, @onRelease20_1, @onRelease20_2, @onRelease20_3, @onRelease20_4, @onRelease20_5, @onRelease20_6, 0);
+  handleModTapRelease(@modTapHandler20);
+  dispatchToLayer([[[@onRelease20_0, @onRelease20_1, @onRelease20_2, @onRelease20_3, @onRelease20_4, @onRelease20_5, @onRelease20_6, 0]]]);
 }
 
 func onPress20_0() {
@@ -2916,11 +4499,9 @@ func onRelease20_0() {
 }
 
 func onPress20_1() {
-  updateQwertyActionTimes();
-  pressScanCodeButton(20, 0, 14 /* "K" */, 0);
+  handleModTapPress(@modTapHandler20, 2, modTapLayerFlagsList20, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
 }
 func onRelease20_1() {
-  releaseScanCodeButton(14 /* "K" */);
 }
 
 func onPress20_2() {
@@ -2933,17 +4514,15 @@ func onRelease20_2() {
 }
 
 func onPress20_3() {
-  pressScanCodeButton(20, 0, 224 /* "⌃" */, 0);
+  handleModTapPress(@modTapHandler20, 2, modTapLayerFlagsList20, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
 }
 func onRelease20_3() {
-  releaseScanCodeButton(224 /* "⌃" */);
 }
 
 func onPress20_4() {
-  pressScanCodeButton(20, 0, 81 /* "↓" */, 0);
+  handleModTapPress(@modTapHandler20, 2, modTapLayerFlagsList20, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
 }
 func onRelease20_4() {
-  releaseScanCodeButton(81 /* "↓" */);
 }
 
 func onPress20_5() {
@@ -2968,12 +4547,13 @@ func onRelease20_6() {
 func onPress21() {
   globalPress(21);
 
-  dispatchToLayer(@onPress21_0, @onPress21_1, @onPress21_2, @onPress21_3, @onPress21_4, @onPress21_5, @onPress21_6, 0);
+  dispatchToLayer([[[@onPress21_0, @onPress21_1, @onPress21_2, @onPress21_3, @onPress21_4, @onPress21_5, @onPress21_6, 0]]]);
 }
 func onRelease21() {
   globalRelease();
 
-  dispatchToLayer(@onRelease21_0, @onRelease21_1, @onRelease21_2, @onRelease21_3, @onRelease21_4, @onRelease21_5, @onRelease21_6, 0);
+  handleModTapRelease(@modTapHandler21);
+  dispatchToLayer([[[@onRelease21_0, @onRelease21_1, @onRelease21_2, @onRelease21_3, @onRelease21_4, @onRelease21_5, @onRelease21_6, 0]]]);
 }
 
 func onPress21_0() {
@@ -2984,11 +4564,9 @@ func onRelease21_0() {
 }
 
 func onPress21_1() {
-  updateQwertyActionTimes();
-  pressScanCodeButton(21, 0, 15 /* "L" */, 0);
+  handleModTapPress(@modTapHandler21, 2, modTapLayerFlagsList21, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
 }
 func onRelease21_1() {
-  releaseScanCodeButton(15 /* "L" */);
 }
 
 func onPress21_2() {
@@ -3001,17 +4579,15 @@ func onRelease21_2() {
 }
 
 func onPress21_3() {
-  pressScanCodeButton(21, 0, 226 /* "⌥" */, 0);
+  handleModTapPress(@modTapHandler21, 2, modTapLayerFlagsList21, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
 }
 func onRelease21_3() {
-  releaseScanCodeButton(226 /* "⌥" */);
 }
 
 func onPress21_4() {
-  pressScanCodeButton(21, 0, 79 /* "→" */, 0);
+  handleModTapPress(@modTapHandler21, 2, modTapLayerFlagsList21, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
 }
 func onRelease21_4() {
-  releaseScanCodeButton(79 /* "→" */);
 }
 
 func onPress21_5() {
@@ -3036,12 +4612,13 @@ func onRelease21_6() {
 func onPress22() {
   globalPress(22);
 
-  dispatchToLayer(@onPress22_0, @onPress22_1, @onPress22_2, @onPress22_3, @onPress22_4, 0, @onPress22_6, 0);
+  dispatchToLayer([[[@onPress22_0, @onPress22_1, @onPress22_2, @onPress22_3, @onPress22_4, 0, @onPress22_6, 0]]]);
 }
 func onRelease22() {
   globalRelease();
 
-  dispatchToLayer(@onRelease22_0, @onRelease22_1, @onRelease22_2, @onRelease22_3, @onRelease22_4, 0, @onRelease22_6, 0);
+  handleModTapRelease(@modTapHandler22);
+  dispatchToLayer([[[@onRelease22_0, @onRelease22_1, @onRelease22_2, @onRelease22_3, @onRelease22_4, 0, @onRelease22_6, 0]]]);
 }
 
 func onPress22_0() {
@@ -3052,11 +4629,9 @@ func onRelease22_0() {
 }
 
 func onPress22_1() {
-  updateQwertyActionTimes();
-  pressScanCodeButton(22, 0, 51 /* ";" */, 0);
+  handleModTapPress(@modTapHandler22, 2, modTapLayerFlagsList22, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
 }
 func onRelease22_1() {
-  releaseScanCodeButton(51 /* ";" */);
 }
 
 func onPress22_2() {
@@ -3069,17 +4644,15 @@ func onRelease22_2() {
 }
 
 func onPress22_3() {
-  pressScanCodeButton(22, 0, 227 /* "⌘" */, 0);
+  handleModTapPress(@modTapHandler22, 2, modTapLayerFlagsList22, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
 }
 func onRelease22_3() {
-  releaseScanCodeButton(227 /* "⌘" */);
 }
 
 func onPress22_4() {
-  pressScanCodeButton(22, 0, 78 /* "⇟" */, 0);
+  handleModTapPress(@modTapHandler22, 2, modTapLayerFlagsList22, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
 }
 func onRelease22_4() {
-  releaseScanCodeButton(78 /* "⇟" */);
 }
 
 func onPress22_6() {
@@ -3092,12 +4665,13 @@ func onRelease22_6() {
 func onPress23() {
   globalPress(23);
 
-  dispatchToLayer(@onPress23_0, @onPress23_1, @onPress23_2, 0, @onPress23_4, 0, @onPress23_6, 0);
+  dispatchToLayer([[[@onPress23_0, @onPress23_1, @onPress23_2, 0, @onPress23_4, 0, @onPress23_6, 0]]]);
 }
 func onRelease23() {
   globalRelease();
 
-  dispatchToLayer(@onRelease23_0, @onRelease23_1, @onRelease23_2, 0, @onRelease23_4, 0, @onRelease23_6, 0);
+  handleModTapRelease(@modTapHandler23);
+  dispatchToLayer([[[@onRelease23_0, @onRelease23_1, @onRelease23_2, 0, @onRelease23_4, 0, @onRelease23_6, 0]]]);
 }
 
 func onPress23_0() {
@@ -3108,11 +4682,9 @@ func onRelease23_0() {
 }
 
 func onPress23_1() {
-  updateQwertyActionTimes();
-  pressScanCodeButton(23, 0, 52 /* "'" */, 0);
+  handleModTapPress(@modTapHandler23, 2, modTapLayerFlagsList23, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
 }
 func onRelease23_1() {
-  releaseScanCodeButton(52 /* "'" */);
 }
 
 func onPress23_2() {
@@ -3123,10 +4695,9 @@ func onRelease23_2() {
 }
 
 func onPress23_4() {
-  pressScanCodeButton(23, 0, 77 /* "⇲" */, 0);
+  handleModTapPress(@modTapHandler23, 2, modTapLayerFlagsList23, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
 }
 func onRelease23_4() {
-  releaseScanCodeButton(77 /* "⇲" */);
 }
 
 func onPress23_6() {
@@ -3139,12 +4710,13 @@ func onRelease23_6() {
 func onPress24() {
   globalPress(24);
 
-  dispatchToLayer(@onPress24_0, @onPress24_1, 0, 0, 0, 0, 0, @onPress24_7);
+  dispatchToLayer([[[@onPress24_0, @onPress24_1, 0, 0, 0, 0, 0, @onPress24_7]]]);
 }
 func onRelease24() {
   globalRelease();
 
-  dispatchToLayer(@onRelease24_0, @onRelease24_1, 0, 0, 0, 0, 0, @onRelease24_7);
+  handleModTapRelease(@modTapHandler24);
+  dispatchToLayer([[[@onRelease24_0, @onRelease24_1, 0, 0, 0, 0, 0, @onRelease24_7]]]);
   // Temp-QWERTY
 
   // Returning here prevents the next sequence, SetLayer, from occurring.
@@ -3190,18 +4762,17 @@ var releaseCount24_1;
 var timer24_1;
 
 func onPress24_1() {
-  updateQwertyActionTimes();
+
   if (!isInPressAll()) {
     timer24_1 = getTime();
   }
-  pressScanCodeButton(24, 0, 225 /* "⇧" */, 0);
   pressCount24_1 = getPressCount();
   releaseCount24_1 = getReleaseCount();
+  handleModTapPress(@modTapHandler24, 4, modTapLayerFlagsList24, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
   checkWordCapsAndCapsLock();
 
 }
 func onRelease24_1() {
-  releaseScanCodeButton(225 /* "⇧" */);
 
   if (getTime() - timer24_1 <= 200 && pressCount24_1 == getPressCount() && releaseCount24_1 + 1 == getReleaseCount()) {
     @{
@@ -3232,20 +4803,19 @@ func onRelease24_7() {
 func onPress25() {
   globalPress(25);
 
-  dispatchToLayer(0, @onPress25_1, @onPress25_2, @onPress25_3, 0, @onPress25_5, 0, 0);
+  dispatchToLayer([[[0, @onPress25_1, @onPress25_2, @onPress25_3, 0, @onPress25_5, 0, 0]]]);
 }
 func onRelease25() {
   globalRelease();
 
-  dispatchToLayer(0, @onRelease25_1, @onRelease25_2, @onRelease25_3, 0, @onRelease25_5, 0, 0);
+  handleModTapRelease(@modTapHandler25);
+  dispatchToLayer([[[0, @onRelease25_1, @onRelease25_2, @onRelease25_3, 0, @onRelease25_5, 0, 0]]]);
 }
 
 func onPress25_1() {
-  updateQwertyActionTimes();
-  pressScanCodeButton(25, 0, 29 /* "Z" */, 0);
+  handleModTapPress(@modTapHandler25, 1, modTapLayerFlagsList25, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
 }
 func onRelease25_1() {
-  releaseScanCodeButton(29 /* "Z" */);
 }
 
 func onPress25_2() {
@@ -3256,10 +4826,9 @@ func onRelease25_2() {
 }
 
 func onPress25_3() {
-  pressScanCodeButton(25, 0, 58 /* "F1" */, 0);
+  handleModTapPress(@modTapHandler25, 1, modTapLayerFlagsList25, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
 }
 func onRelease25_3() {
-  releaseScanCodeButton(58 /* "F1" */);
 }
 
 func onPress25_5() {
@@ -3274,20 +4843,19 @@ func onRelease25_5() {
 func onPress26() {
   globalPress(26);
 
-  dispatchToLayer(0, @onPress26_1, @onPress26_2, @onPress26_3, 0, @onPress26_5, 0, 0);
+  dispatchToLayer([[[0, @onPress26_1, @onPress26_2, @onPress26_3, 0, @onPress26_5, 0, 0]]]);
 }
 func onRelease26() {
   globalRelease();
 
-  dispatchToLayer(0, @onRelease26_1, @onRelease26_2, @onRelease26_3, 0, @onRelease26_5, 0, 0);
+  handleModTapRelease(@modTapHandler26);
+  dispatchToLayer([[[0, @onRelease26_1, @onRelease26_2, @onRelease26_3, 0, @onRelease26_5, 0, 0]]]);
 }
 
 func onPress26_1() {
-  updateQwertyActionTimes();
-  pressScanCodeButton(26, 0, 27 /* "X" */, 0);
+  handleModTapPress(@modTapHandler26, 1, modTapLayerFlagsList26, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
 }
 func onRelease26_1() {
-  releaseScanCodeButton(27 /* "X" */);
 }
 
 func onPress26_2() {
@@ -3300,10 +4868,9 @@ func onRelease26_2() {
 }
 
 func onPress26_3() {
-  pressScanCodeButton(26, 0, 59 /* "F2" */, 0);
+  handleModTapPress(@modTapHandler26, 1, modTapLayerFlagsList26, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
 }
 func onRelease26_3() {
-  releaseScanCodeButton(59 /* "F2" */);
 }
 
 func onPress26_5() {
@@ -3318,20 +4885,19 @@ func onRelease26_5() {
 func onPress27() {
   globalPress(27);
 
-  dispatchToLayer(0, @onPress27_1, @onPress27_2, @onPress27_3, 0, @onPress27_5, 0, 0);
+  dispatchToLayer([[[0, @onPress27_1, @onPress27_2, @onPress27_3, 0, @onPress27_5, 0, 0]]]);
 }
 func onRelease27() {
   globalRelease();
 
-  dispatchToLayer(0, @onRelease27_1, @onRelease27_2, @onRelease27_3, 0, @onRelease27_5, 0, 0);
+  handleModTapRelease(@modTapHandler27);
+  dispatchToLayer([[[0, @onRelease27_1, @onRelease27_2, @onRelease27_3, 0, @onRelease27_5, 0, 0]]]);
 }
 
 func onPress27_1() {
-  updateQwertyActionTimes();
-  pressScanCodeButton(27, 0, 6 /* "C" */, 0);
+  handleModTapPress(@modTapHandler27, 1, modTapLayerFlagsList27, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
 }
 func onRelease27_1() {
-  releaseScanCodeButton(6 /* "C" */);
 }
 
 func onPress27_2() {
@@ -3342,10 +4908,9 @@ func onRelease27_2() {
 }
 
 func onPress27_3() {
-  pressScanCodeButton(27, 0, 60 /* "F3" */, 0);
+  handleModTapPress(@modTapHandler27, 1, modTapLayerFlagsList27, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
 }
 func onRelease27_3() {
-  releaseScanCodeButton(60 /* "F3" */);
 }
 
 func onPress27_5() {
@@ -3360,20 +4925,19 @@ func onRelease27_5() {
 func onPress28() {
   globalPress(28);
 
-  dispatchToLayer(0, @onPress28_1, @onPress28_2, @onPress28_3, 0, 0, 0, 0);
+  dispatchToLayer([[[0, @onPress28_1, @onPress28_2, @onPress28_3, 0, 0, 0, 0]]]);
 }
 func onRelease28() {
   globalRelease();
 
-  dispatchToLayer(0, @onRelease28_1, @onRelease28_2, @onRelease28_3, 0, 0, 0, 0);
+  handleModTapRelease(@modTapHandler28);
+  dispatchToLayer([[[0, @onRelease28_1, @onRelease28_2, @onRelease28_3, 0, 0, 0, 0]]]);
 }
 
 func onPress28_1() {
-  updateQwertyActionTimes();
-  pressScanCodeButton(28, 0, 25 /* "V" */, 0);
+  handleModTapPress(@modTapHandler28, 1, modTapLayerFlagsList28, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
 }
 func onRelease28_1() {
-  releaseScanCodeButton(25 /* "V" */);
 }
 
 func onPress28_2() {
@@ -3384,29 +4948,27 @@ func onRelease28_2() {
 }
 
 func onPress28_3() {
-  pressScanCodeButton(28, 0, 61 /* "F4" */, 0);
+  handleModTapPress(@modTapHandler28, 1, modTapLayerFlagsList28, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
 }
 func onRelease28_3() {
-  releaseScanCodeButton(61 /* "F4" */);
 }
 
 func onPress29() {
   globalPress(29);
 
-  dispatchToLayer(0, @onPress29_1, @onPress29_2, 0, 0, 0, 0, 0);
+  dispatchToLayer([[[0, @onPress29_1, @onPress29_2, 0, 0, 0, 0, 0]]]);
 }
 func onRelease29() {
   globalRelease();
 
-  dispatchToLayer(0, @onRelease29_1, @onRelease29_2, 0, 0, 0, 0, 0);
+  handleModTapRelease(@modTapHandler29);
+  dispatchToLayer([[[0, @onRelease29_1, @onRelease29_2, 0, 0, 0, 0, 0]]]);
 }
 
 func onPress29_1() {
-  updateQwertyActionTimes();
-  pressScanCodeButton(29, 0, 5 /* "B" */, 0);
+  handleModTapPress(@modTapHandler29, 1, modTapLayerFlagsList29, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
 }
 func onRelease29_1() {
-  releaseScanCodeButton(5 /* "B" */);
 }
 
 func onPress29_2() {
@@ -3421,20 +4983,19 @@ func onRelease29_2() {
 func onPress30() {
   globalPress(30);
 
-  dispatchToLayer(0, @onPress30_1, @onPress30_2, 0, @onPress30_4, 0, 0, 0);
+  dispatchToLayer([[[0, @onPress30_1, @onPress30_2, 0, @onPress30_4, 0, 0, 0]]]);
 }
 func onRelease30() {
   globalRelease();
 
-  dispatchToLayer(0, @onRelease30_1, @onRelease30_2, 0, @onRelease30_4, 0, 0, 0);
+  handleModTapRelease(@modTapHandler30);
+  dispatchToLayer([[[0, @onRelease30_1, @onRelease30_2, 0, @onRelease30_4, 0, 0, 0]]]);
 }
 
 func onPress30_1() {
-  updateQwertyActionTimes();
-  pressScanCodeButton(30, 0, 17 /* "N" */, 0);
+  handleModTapPress(@modTapHandler30, 2, modTapLayerFlagsList30, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
 }
 func onRelease30_1() {
-  releaseScanCodeButton(17 /* "N" */);
 }
 
 func onPress30_2() {
@@ -3447,29 +5008,27 @@ func onRelease30_2() {
 }
 
 func onPress30_4() {
-  pressScanCodeButton(30, 0, 210 /* "🔇" */, 0);
+  handleModTapPress(@modTapHandler30, 2, modTapLayerFlagsList30, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
 }
 func onRelease30_4() {
-  releaseScanCodeButton(210 /* "🔇" */);
 }
 
 func onPress31() {
   globalPress(31);
 
-  dispatchToLayer(0, @onPress31_1, @onPress31_2, 0, 0, 0, @onPress31_6, 0);
+  dispatchToLayer([[[0, @onPress31_1, @onPress31_2, 0, 0, 0, @onPress31_6, 0]]]);
 }
 func onRelease31() {
   globalRelease();
 
-  dispatchToLayer(0, @onRelease31_1, @onRelease31_2, 0, 0, 0, @onRelease31_6, 0);
+  handleModTapRelease(@modTapHandler31);
+  dispatchToLayer([[[0, @onRelease31_1, @onRelease31_2, 0, 0, 0, @onRelease31_6, 0]]]);
 }
 
 func onPress31_1() {
-  updateQwertyActionTimes();
-  pressScanCodeButton(31, 0, 16 /* "M" */, 0);
+  handleModTapPress(@modTapHandler31, 2, modTapLayerFlagsList31, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
 }
 func onRelease31_1() {
-  releaseScanCodeButton(16 /* "M" */);
 }
 
 func onPress31_2() {
@@ -3489,20 +5048,19 @@ func onRelease31_6() {
 func onPress32() {
   globalPress(32);
 
-  dispatchToLayer(0, @onPress32_1, @onPress32_2, 0, 0, 0, @onPress32_6, 0);
+  dispatchToLayer([[[0, @onPress32_1, @onPress32_2, 0, 0, 0, @onPress32_6, 0]]]);
 }
 func onRelease32() {
   globalRelease();
 
-  dispatchToLayer(0, @onRelease32_1, @onRelease32_2, 0, 0, 0, @onRelease32_6, 0);
+  handleModTapRelease(@modTapHandler32);
+  dispatchToLayer([[[0, @onRelease32_1, @onRelease32_2, 0, 0, 0, @onRelease32_6, 0]]]);
 }
 
 func onPress32_1() {
-  updateQwertyActionTimes();
-  pressScanCodeButton(32, 0, 54 /* "," */, 0);
+  handleModTapPress(@modTapHandler32, 2, modTapLayerFlagsList32, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
 }
 func onRelease32_1() {
-  releaseScanCodeButton(54 /* "," */);
 }
 
 func onPress32_2() {
@@ -3524,20 +5082,19 @@ func onRelease32_6() {
 func onPress33() {
   globalPress(33);
 
-  dispatchToLayer(0, @onPress33_1, @onPress33_2, 0, 0, 0, @onPress33_6, 0);
+  dispatchToLayer([[[0, @onPress33_1, @onPress33_2, 0, 0, 0, @onPress33_6, 0]]]);
 }
 func onRelease33() {
   globalRelease();
 
-  dispatchToLayer(0, @onRelease33_1, @onRelease33_2, 0, 0, 0, @onRelease33_6, 0);
+  handleModTapRelease(@modTapHandler33);
+  dispatchToLayer([[[0, @onRelease33_1, @onRelease33_2, 0, 0, 0, @onRelease33_6, 0]]]);
 }
 
 func onPress33_1() {
-  updateQwertyActionTimes();
-  pressScanCodeButton(33, 0, 55 /* "." */, 0);
+  handleModTapPress(@modTapHandler33, 2, modTapLayerFlagsList33, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
 }
 func onRelease33_1() {
-  releaseScanCodeButton(55 /* "." */);
 }
 
 func onPress33_2() {
@@ -3557,20 +5114,19 @@ func onRelease33_6() {
 func onPress34() {
   globalPress(34);
 
-  dispatchToLayer(0, @onPress34_1, @onPress34_2, 0, 0, 0, @onPress34_6, 0);
+  dispatchToLayer([[[0, @onPress34_1, @onPress34_2, 0, 0, 0, @onPress34_6, 0]]]);
 }
 func onRelease34() {
   globalRelease();
 
-  dispatchToLayer(0, @onRelease34_1, @onRelease34_2, 0, 0, 0, @onRelease34_6, 0);
+  handleModTapRelease(@modTapHandler34);
+  dispatchToLayer([[[0, @onRelease34_1, @onRelease34_2, 0, 0, 0, @onRelease34_6, 0]]]);
 }
 
 func onPress34_1() {
-  updateQwertyActionTimes();
-  pressScanCodeButton(34, 0, 56 /* "/" */, 0);
+  handleModTapPress(@modTapHandler34, 2, modTapLayerFlagsList34, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
 }
 func onRelease34_1() {
-  releaseScanCodeButton(56 /* "/" */);
 }
 
 func onPress34_2() {
@@ -3590,21 +5146,21 @@ func onRelease34_6() {
 func onPress35() {
   globalPress(35);
 
-  dispatchToLayer(0, @onPress35_1, @onPress35_2, 0, 0, @onPress35_5, @onPress35_6, @onPress35_7);
+  dispatchToLayer([[[0, @onPress35_1, @onPress35_2, 0, 0, @onPress35_5, @onPress35_6, @onPress35_7]]]);
 }
 func onRelease35() {
   globalRelease();
 
-  dispatchToLayer(0, @onRelease35_1, @onRelease35_2, 0, 0, @onRelease35_5, @onRelease35_6, @onRelease35_7);
+  handleModTapRelease(@modTapHandler35);
+  dispatchToLayer([[[0, @onRelease35_1, @onRelease35_2, 0, 0, @onRelease35_5, @onRelease35_6, @onRelease35_7]]]);
 }
 
 func onPress35_1() {
-  updateQwertyActionTimes();
-  pressScanCodeButton(35, 0, 229 /* "⇧" */, 0);
+
+  handleModTapPress(@modTapHandler35, 4, modTapLayerFlagsList35, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
   checkWordCapsAndCapsLock();
 }
 func onRelease35_1() {
-  releaseScanCodeButton(229 /* "⇧" */);
 
 }
 
@@ -3647,12 +5203,13 @@ func onRelease35_7() {
 func onPress36() {
   globalPress(36);
 
-  dispatchToLayer(@onPress36_0, @onPress36_1, @onPress36_2, 0, 0, 0, 0, @onPress36_7);
+  dispatchToLayer([[[@onPress36_0, @onPress36_1, @onPress36_2, 0, 0, 0, 0, @onPress36_7]]]);
 }
 func onRelease36() {
   globalRelease();
 
-  dispatchToLayer(@onRelease36_0, @onRelease36_1, @onRelease36_2, 0, 0, 0, 0, @onRelease36_7);
+  handleModTapRelease(@modTapHandler36);
+  dispatchToLayer([[[@onRelease36_0, @onRelease36_1, @onRelease36_2, 0, 0, 0, 0, @onRelease36_7]]]);
   // Temp-QWERTY
 
   // Returning here prevents the next sequence, SetLayer, from occurring.
@@ -3688,11 +5245,9 @@ func onRelease36_0() {
 }
 
 func onPress36_1() {
-  updateQwertyActionTimes();
-  pressScanCodeButton(36, 0, 227 /* "⌘" */, 0);
+  handleModTapPress(@modTapHandler36, 4, modTapLayerFlagsList36, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
 }
 func onRelease36_1() {
-  releaseScanCodeButton(227 /* "⌘" */);
 }
 
 func onPress36_2() {
@@ -3712,12 +5267,13 @@ func onRelease36_7() {
 func onPress37() {
   globalPress(37);
 
-  dispatchToLayer(@onPress37_0, @onPress37_1, @onPress37_2, 0, @onPress37_4, 0, @onPress37_6, @onPress37_7);
+  dispatchToLayer([[[@onPress37_0, @onPress37_1, @onPress37_2, 0, @onPress37_4, 0, @onPress37_6, @onPress37_7]]]);
 }
 func onRelease37() {
   globalRelease();
 
-  dispatchToLayer(@onRelease37_0, @onRelease37_1, @onRelease37_2, 0, @onRelease37_4, 0, @onRelease37_6, @onRelease37_7);
+  handleModTapRelease(@modTapHandler37);
+  dispatchToLayer([[[@onRelease37_0, @onRelease37_1, @onRelease37_2, 0, @onRelease37_4, 0, @onRelease37_6, @onRelease37_7]]]);
 }
 
 func onPress37_0() {
@@ -3728,12 +5284,14 @@ func onRelease37_0() {
 }
 
 func onPress37_1() {
-  updateQwertyActionTimes();
-  pressScanCodeButton(37, 0, 226 /* "⌥" */, 0);
+  if (isButtonPressed(38)) {
+    _action_switchToNumpadLayer();
+    return;
+  }
+  handleModTapPress(@modTapHandler37, 4, modTapLayerFlagsList37, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
   checkWordCapsAndCapsLock();
 }
 func onRelease37_1() {
-  releaseScanCodeButton(226 /* "⌥" */);
 
 }
 
@@ -3773,12 +5331,13 @@ func onRelease37_7() {
 func onPress38() {
   globalPress(38);
 
-  dispatchToLayer(@onPress38_0, @onPress38_1, @onPress38_2, 0, @onPress38_4, 0, @onPress38_6, 0);
+  dispatchToLayer([[[@onPress38_0, @onPress38_1, @onPress38_2, 0, @onPress38_4, 0, @onPress38_6, 0]]]);
 }
 func onRelease38() {
   globalRelease();
 
-  dispatchToLayer(@onRelease38_0, @onRelease38_1, @onRelease38_2, 0, @onRelease38_4, 0, @onRelease38_6, 0);
+  handleModTapRelease(@modTapHandler38);
+  dispatchToLayer([[[@onRelease38_0, @onRelease38_1, @onRelease38_2, 0, @onRelease38_4, 0, @onRelease38_6, 0]]]);
 }
 
 func onPress38_0() {
@@ -3788,84 +5347,19 @@ func onRelease38_0() {
   releaseStenoKey(9 /* "O" */);
 }
 
-var timer38_1;
-var forceQwertySpace38;
-
 func onPress38_1() {
-  updateQwertyActionTimes();
-  startTimer(104, 200, 0, @{
-    if (layer != 1) return;
-
-    if (!isButtonPressed(38)) return;
-
-    //
-    // This logic is used to set the layer when held
-    if (!forceQwertySpace38) return;
-    if (onPressScanCodeCallback == @tapSpace) {
-      onPressScanCodeCallback = 0;
-    }
-
-    deactivateGlobal();
-    deactivate1();
-    activate4();
-    activateGlobal();
-
-  });
-  if (!isInPressAll()) {
-    timer38_1 = getTime();
+  if (isButtonPressed(37)) {
+    _action_switchToNumpadLayer();
+    return;
   }
-  @{
-    //
-    // This key has a bunch of extra logic to it to make it behave
-    // reliably like a space bar during fast typing.
-    //
-    // * If pressed within 100ms of pressing another key, then it will
-    //   be treated as a spacebar unless held for 150ms (Hold Trigger).
-    //
-    // * If pressed without any other key, it will immediately switch to
-    //   the navigation layer, after which fuzzy layer logic will take
-    //   over to prevent
-
-    // Suppress Layer Change if anything else was pressed in the last 200ms and it isn't temporary qwerty
-    forceQwertySpace38 = !wasSteno24 && !isButtonPressed(37) && (getTime() - lastQwertyActionTimes[0] < 100);
-    if (forceQwertySpace38) {
-      // In this case, if another key is pressed, tap space.
-      // In the hold trigger, this is removed.
-      onPressScanCodeCallback = @tapSpace;
-
-      // Prevent SetLayer
-      return;
-    }
-
-    deactivateGlobal();
-    deactivate1();
-    activate4();
-    activateGlobal();
-    //
-    startFuzzyLayer();
-
-  }();
+  modTapLayerPossibility[4] = 1;
+  handleModTapPress(@modTapHandler38, 4, modTapLayerFlagsList38, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
 
 }
 func onRelease38_1() {
-  stopTimer(104);
+  modTapLayerPossibility[1] = 0;
+  modTapLayerPossibility[4] = 0;
 
-  if (getTime() - timer38_1 <= 200) {
-    @{
-      //
-      // Prevent space being tapped after it's already been sent.
-      if (forceQwertySpace38 && onPressScanCodeCallback == 0) {
-        return;
-      }
-      if (onPressScanCodeCallback == @tapSpace) {
-        onPressScanCodeCallback = 0;
-      }
-      pressScanCodeButton(38, 0, 44 /* "⎵" */, 1);
-      releaseScanCodeButton(44 /* "⎵" */);
-
-    }();
-
-  }
 }
 
 var timer38_2;
@@ -3887,16 +5381,11 @@ func onRelease38_2() {
 func onPress38_4() {
 }
 func onRelease38_4() {
-  //
-  stopFuzzyLayerPreSetLayer();
   deactivateGlobal();
   deactivate4();
-  activate1();
+  activate1NoRelease();
   activateGlobal();
   onRelease38_1();
-  //
-  stopFuzzyLayerPostSetLayer();
-
 }
 
 func onPress38_6() {
@@ -3912,12 +5401,13 @@ func onRelease38_6() {
 func onPress39() {
   globalPress(39);
 
-  dispatchToLayer(@onPress39_0, @onPress39_1, 0, 0, @onPress39_4, 0, @onPress39_6, 0);
+  dispatchToLayer([[[@onPress39_0, @onPress39_1, 0, 0, @onPress39_4, 0, @onPress39_6, 0]]]);
 }
 func onRelease39() {
   globalRelease();
 
-  dispatchToLayer(@onRelease39_0, @onRelease39_1, 0, 0, @onRelease39_4, 0, @onRelease39_6, 0);
+  handleModTapRelease(@modTapHandler39);
+  dispatchToLayer([[[@onRelease39_0, @onRelease39_1, 0, 0, @onRelease39_4, 0, @onRelease39_6, 0]]]);
 }
 
 func onPress39_0() {
@@ -3928,18 +5418,15 @@ func onRelease39_0() {
 }
 
 func onPress39_1() {
-  updateQwertyActionTimes();
-  pressScanCodeButton(39, 0, 44 /* "⎵" */, 0);
+  handleModTapPress(@modTapHandler39, 8, modTapLayerFlagsList39, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
 }
 func onRelease39_1() {
-  releaseScanCodeButton(44 /* "⎵" */);
 }
 
 func onPress39_4() {
-  pressScanCodeButton(39, 0, 44 /* "⎵" */, 0);
+  handleModTapPress(@modTapHandler39, 8, modTapLayerFlagsList39, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
 }
 func onRelease39_4() {
-  releaseScanCodeButton(44 /* "⎵" */);
 }
 
 func onPress39_6() {
@@ -3952,12 +5439,12 @@ func onRelease39_6() {
 func onPress40() {
   globalPress(40);
 
-  dispatchToLayer(@onPress40_0, @onPress40_1, @onPress40_2, @onPress40_3, 0, @onPress40_5, @onPress40_6, @onPress40_7);
+  dispatchToLayer([[[@onPress40_0, @onPress40_1, @onPress40_2, @onPress40_3, 0, @onPress40_5, @onPress40_6, @onPress40_7]]]);
 }
 func onRelease40() {
   globalRelease();
 
-  dispatchToLayer(@onRelease40_0, @onRelease40_1, @onRelease40_2, @onRelease40_3, 0, @onRelease40_5, @onRelease40_6, @onRelease40_7);
+  dispatchToLayer([[[@onRelease40_0, @onRelease40_1, @onRelease40_2, @onRelease40_3, 0, @onRelease40_5, @onRelease40_6, @onRelease40_7]]]);
 }
 
 func onPress40_0() {
@@ -3968,7 +5455,6 @@ func onRelease40_0() {
 }
 
 func onPress40_1() {
-  updateQwertyActionTimes();
   deactivateGlobal();
   deactivate1();
   activate2();
@@ -4029,12 +5515,13 @@ func onRelease40_7() {
 func onPress41() {
   globalPress(41);
 
-  dispatchToLayer(@onPress41_0, @onPress41_1, @onPress41_2, @onPress41_3, @onPress41_4, @onPress41_5, @onPress41_6, 0);
+  dispatchToLayer([[[@onPress41_0, @onPress41_1, @onPress41_2, @onPress41_3, @onPress41_4, @onPress41_5, @onPress41_6, 0]]]);
 }
 func onRelease41() {
   globalRelease();
 
-  dispatchToLayer(@onRelease41_0, @onRelease41_1, @onRelease41_2, @onRelease41_3, @onRelease41_4, @onRelease41_5, @onRelease41_6, 0);
+  handleModTapRelease(@modTapHandler41);
+  dispatchToLayer([[[@onRelease41_0, @onRelease41_1, @onRelease41_2, @onRelease41_3, @onRelease41_4, @onRelease41_5, @onRelease41_6, 0]]]);
 }
 
 func onPress41_0() {
@@ -4044,44 +5531,13 @@ func onRelease41_0() {
   releaseStenoKey(27 /* "#2" */);
 }
 
-var timer41_1;
-var forceQwertyEnter41;
 func onPress41_1() {
-  updateQwertyActionTimes();
-  if (!isInPressAll()) {
-    timer41_1 = getTime();
-  }
-  @{
-    //
-    // Suppress Layer Change if anything else was pressed in the last 150ms and it isn't temporary qwerty
-    forceQwertyEnter41 = !wasSteno24 && !isButtonPressed(40) && (getTime() - lastQwertyActionTimes[0] < 150);
-    if (forceQwertyEnter41) {
-      pressScanCode(40 /* Enter */);
-      return;
-    }
-
-    deactivateGlobal();
-    deactivate1();
-    activate3();
-    activateGlobal();
-    //
-    startFuzzyLayer();
-
-  }();
-
+  modTapLayerPossibility[3] = 1;
+  handleModTapPress(@modTapHandler41, 16, modTapLayerFlagsList41, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
 }
 func onRelease41_1() {
-  //
-  if (forceQwertyEnter41) {
-    releaseScanCode(40 /* Enter */);
-    return;
-  }
-
-  if (getTime() - timer41_1 <= 200) {
-    pressScanCodeButton(41, 0, 40 /* "↵" */, 1);
-    releaseScanCodeButton(40 /* "↵" */);
-
-  }
+  modTapLayerPossibility[1] = 0;
+  modTapLayerPossibility[3] = 0;
 }
 
 func onPress41_2() {
@@ -4096,23 +5552,17 @@ func onRelease41_2() {
 func onPress41_3() {
 }
 func onRelease41_3() {
-  //
-  stopFuzzyLayerPreSetLayer();
   deactivateGlobal();
   deactivate3();
-  activate1();
+  activate1NoRelease();
   activateGlobal();
   onRelease41_1();
-  //
-  stopFuzzyLayerPostSetLayer();
-
 }
 
 func onPress41_4() {
-  pressScanCodeButton(41, 0, 40 /* "↵" */, 0);
+  handleModTapPress(@modTapHandler41, 16, modTapLayerFlagsList41, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
 }
 func onRelease41_4() {
-  releaseScanCodeButton(40 /* "↵" */);
 }
 
 func onPress41_5() {

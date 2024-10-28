@@ -30,14 +30,13 @@ void main(List<String> arguments) {
 
   print('Opcodes');
   print('-------');
-  var lastInstruction = '';
+  ScriptInstruction? lastInstruction;
   for (final instruction in builder.instructions) {
-    final thisInstruction = instruction.toString();
-    if (thisInstruction != lastInstruction || instruction is! NopInstruction) {
-      print(thisInstruction);
+    if (instruction is! NopInstruction || lastInstruction is! NopInstruction) {
+      print(instruction.toString());
     }
 
-    lastInstruction = thisInstruction;
+    lastInstruction = instruction;
   }
 
   if (builder.stringTable.isNotEmpty) {

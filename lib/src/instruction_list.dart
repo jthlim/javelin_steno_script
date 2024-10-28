@@ -22,17 +22,26 @@ class InstructionList extends Iterable<ScriptInstruction> {
     optimizeRightFactor();
     optimizeJumpTarget();
     optimizeRightFactor();
+    optimizeJumpTarget();
     optimizeCallReturn();
     optimizeDeadCode();
     optimizeJumpToNext();
     optimizeConditionalJumpOverJump();
     optimizeNot();
     optimizeConditionalJumpToNext();
+    optimizeConsecutiveRet();
+    optimizeStoreLoad();
   }
 
   void optimizeRightFactor() {
     if (instructions.isEmpty) {
       return;
+    }
+
+    // To avoid jumps being equivalent, do do a layout
+    var offset = 0;
+    for (final instruction in instructions) {
+      offset += instruction.layoutFinalPass(offset);
     }
 
     ScriptInstruction? instruction = instructions.first;
@@ -132,7 +141,7 @@ class InstructionList extends Iterable<ScriptInstruction> {
     ScriptInstruction? instruction = instructions.first;
     while (instruction != null) {
       if (instruction is JumpInstructionBase) {
-        final target = instruction.target.nextNonNopInstruction;
+        final target = instruction.target.firstNonNopInstruction;
         ScriptInstruction? replacement;
         if (target is ReturnInstruction) {
           if (instruction is JumpInstruction) {
@@ -171,7 +180,7 @@ class InstructionList extends Iterable<ScriptInstruction> {
 
           instruction = jumpInstruction;
         } else if (nextInstruction is NopInstruction) {
-          final nextNonNop = nextInstruction.nextNonNopInstruction;
+          final nextNonNop = nextInstruction.firstNonNopInstruction;
           if (nextNonNop is ReturnInstruction) {
             final jumpInstruction =
                 JumpFunctionInstruction(instruction.functionName);
@@ -190,7 +199,7 @@ class InstructionList extends Iterable<ScriptInstruction> {
 
           instruction = jumpInstruction;
         } else if (nextInstruction is NopInstruction) {
-          final nextNonNop = nextInstruction.nextNonNopInstruction;
+          final nextNonNop = nextInstruction.firstNonNopInstruction;
           if (nextNonNop is ReturnInstruction) {
             final jumpInstruction = JumpValueInstruction();
 
@@ -423,6 +432,81 @@ class InstructionList extends Iterable<ScriptInstruction> {
       }
     } else {
       throw Exception('Internal error: Unexpected jump type $first');
+    }
+  }
+
+  void optimizeConsecutiveRet() {
+    if (instructions.isEmpty) {
+      return;
+    }
+
+    ScriptInstruction? instruction = instructions.first;
+    while (instruction != null) {
+      final nextInstruction = instruction.next;
+      if (instruction is! ReturnInstruction) {
+        instruction = nextInstruction;
+        continue;
+      }
+
+      if (nextInstruction?.firstNonNopInstruction is! ReturnInstruction) {
+        instruction = nextInstruction;
+        continue;
+      }
+
+      instruction.unlink();
+      instruction = nextInstruction;
+    }
+  }
+
+  static bool hasLoadIndex(ScriptInstruction? instruction, int index) {
+    for (;;) {
+      if (instruction == null) {
+        return false;
+      }
+      if (instruction is FunctionStartInstruction) {
+        return false;
+      }
+      if (instruction is LoadLocalValueInstruction &&
+          instruction.index == index) {
+        return true;
+      }
+      instruction = instruction.next;
+    }
+  }
+
+  void optimizeStoreLoad() {
+    if (instructions.isEmpty) {
+      return;
+    }
+
+    ScriptInstruction? instruction = instructions.first;
+    while (instruction != null) {
+      final nextInstruction = instruction.next;
+      if (instruction is! StoreLocalValueInstruction) {
+        instruction = nextInstruction;
+        continue;
+      }
+
+      if (nextInstruction is! LoadLocalValueInstruction) {
+        instruction = nextInstruction;
+        continue;
+      }
+
+      if (instruction.index != nextInstruction.index) {
+        instruction = nextInstruction;
+        continue;
+      }
+
+      // Check if there are any more loads
+      final nextNextInstruction = nextInstruction.next;
+      if (hasLoadIndex(nextNextInstruction, instruction.index)) {
+        instruction = nextInstruction;
+        continue;
+      }
+
+      instruction.unlink();
+      nextInstruction.unlink();
+      instruction = nextNextInstruction;
     }
   }
 }
