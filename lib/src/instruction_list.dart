@@ -458,7 +458,7 @@ class InstructionList extends Iterable<ScriptInstruction> {
     }
   }
 
-  static bool hasLoadIndex(ScriptInstruction? instruction, int index) {
+  static bool hasLoadLocalIndex(ScriptInstruction? instruction, int index) {
     for (;;) {
       if (instruction == null) {
         return false;
@@ -499,7 +499,7 @@ class InstructionList extends Iterable<ScriptInstruction> {
 
       // Check if there are any more loads
       final nextNextInstruction = nextInstruction.next;
-      if (hasLoadIndex(nextNextInstruction, instruction.index)) {
+      if (hasLoadLocalIndex(nextNextInstruction, instruction.index)) {
         instruction = nextInstruction;
         continue;
       }
