@@ -338,15 +338,22 @@ final class CallInBuiltFunctionInstruction extends ScriptInstruction {
       '(${function.functionName})';
 }
 
-final class CallFunctionInstruction extends ScriptInstruction {
-  CallFunctionInstruction(this.functionName);
+sealed class FunctionNameScriptInstruction extends ScriptInstruction {
+  FunctionNameScriptInstruction(this.functionName) : targetName = functionName;
+
+  final String functionName;
+  String targetName;
+}
+
+final class CallFunctionInstruction extends FunctionNameScriptInstruction {
+  CallFunctionInstruction(super.functionName);
 
   @override
   int get byteCodeLength => 3;
 
   @override
   void addByteCode(ScriptByteCodeBuilder builder) {
-    final function = builder.functions[functionName]!;
+    final function = builder.functions[targetName]!;
     final offset = function.offset;
 
     builder.addOpcode(ScriptOpcode.callFunction);
@@ -354,10 +361,10 @@ final class CallFunctionInstruction extends ScriptInstruction {
     builder.addByte(offset >> 8);
   }
 
-  final String functionName;
-
   @override
-  String toString() => '  call $functionName';
+  String toString() => functionName == targetName
+      ? '  call $functionName'
+      : '  call $targetName ($functionName)';
 }
 
 final class CallValueInstruction extends ScriptInstruction {
@@ -389,8 +396,9 @@ final class JumpValueInstruction extends ScriptInstruction {
   String toString() => '  jump_value';
 }
 
-final class PushFunctionAddressInstruction extends ScriptInstruction {
-  PushFunctionAddressInstruction(this.functionName);
+final class PushFunctionAddressInstruction
+    extends FunctionNameScriptInstruction {
+  PushFunctionAddressInstruction(super.functionName);
 
   @override
   int get byteCodeLength => 3;
@@ -405,21 +413,19 @@ final class PushFunctionAddressInstruction extends ScriptInstruction {
     builder.addByte(offset >> 8);
   }
 
-  final String functionName;
-
   @override
   String toString() => '  push @$functionName';
 }
 
-sealed class JumpFunctionInstructionBase extends ScriptInstruction {
-  JumpFunctionInstructionBase(this.functionName);
+sealed class JumpFunctionInstructionBase extends FunctionNameScriptInstruction {
+  JumpFunctionInstructionBase(super.functionName);
 
   @override
   int get byteCodeLength => 3;
 
   @override
   void addByteCode(ScriptByteCodeBuilder builder) {
-    final function = builder.functions[functionName]!;
+    final function = builder.functions[targetName]!;
     final offset = function.offset;
 
     builder.addOpcode(opcode);
@@ -428,8 +434,6 @@ sealed class JumpFunctionInstructionBase extends ScriptInstruction {
   }
 
   ScriptOpcode get opcode;
-
-  final String functionName;
 }
 
 final class JumpFunctionInstruction extends JumpFunctionInstructionBase {
@@ -442,7 +446,9 @@ final class JumpFunctionInstruction extends JumpFunctionInstructionBase {
   ScriptOpcode get opcode => ScriptOpcode.jumpLong;
 
   @override
-  String toString() => '  jmp $functionName';
+  String toString() => functionName == targetName
+      ? '  jmp $functionName'
+      : '  jmp $targetName ($functionName)';
 }
 
 final class JumpIfZeroFunctionInstruction extends JumpFunctionInstructionBase {
@@ -452,7 +458,9 @@ final class JumpIfZeroFunctionInstruction extends JumpFunctionInstructionBase {
   ScriptOpcode get opcode => ScriptOpcode.jumpIfZeroLong;
 
   @override
-  String toString() => '  jz $functionName';
+  String toString() => functionName == targetName
+      ? '  jz $functionName'
+      : '  jz $targetName ($functionName)';
 }
 
 final class JumpIfNotZeroFunctionInstruction
@@ -463,7 +471,9 @@ final class JumpIfNotZeroFunctionInstruction
   ScriptOpcode get opcode => ScriptOpcode.jumpIfNotZeroLong;
 
   @override
-  String toString() => '  jnz $functionName';
+  String toString() => functionName == targetName
+      ? '  jnz $functionName'
+      : '  jnz $targetName ($functionName)';
 }
 
 sealed class JumpInstructionBase extends ScriptInstruction {
@@ -612,12 +622,13 @@ final class PushStringValueInstruction extends ScriptInstruction {
   final String value;
 }
 
-final class SetHalfWordFunctionDataValueInstruction extends ScriptInstruction {
+final class SetHalfWordFunctionDataValueInstruction
+    extends FunctionNameScriptInstruction {
   SetHalfWordFunctionDataValueInstruction({
     required this.value,
     required this.valueOffset,
-    required this.functionName,
-  });
+    required String functionName,
+  }) : super(functionName);
 
   @override
   int get byteCodeLength => 0;
@@ -634,11 +645,12 @@ final class SetHalfWordFunctionDataValueInstruction extends ScriptInstruction {
   }
 
   @override
-  String toString() => '  ((set_data offset $valueOffset -> $functionName))';
+  String toString() => functionName == targetName
+      ? '  ((set_data offset $valueOffset -> $functionName))'
+      : '  ((set_data offset $valueOffset -> $targetName ($functionName)))';
 
   final Uint8List value;
   final int valueOffset;
-  final String functionName;
 }
 
 final class PushDataValueInstruction extends ScriptInstruction {
@@ -803,9 +815,12 @@ final class ReturnIfNotZeroInstruction extends ScriptInstruction {
 }
 
 final class FunctionStartInstruction extends ScriptInstruction {
-  FunctionStartInstruction(this.function);
+  FunctionStartInstruction(this.function, this.isLocked);
 
   final ScriptFunctionDefinition function;
+
+  // Locked functions cannot have their body completely optimized out.
+  final bool isLocked;
 
   @override
   bool get hasReference => true;

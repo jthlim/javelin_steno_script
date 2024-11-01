@@ -34,6 +34,7 @@ class InstructionList extends Iterable<ScriptInstruction> {
     optimizeConditionalJumpToNext();
     optimizeConsecutiveRet();
     optimizeStoreLoad();
+    optimizeCallFunction();
   }
 
   void optimizeRightFactor() {
@@ -424,6 +425,16 @@ class InstructionList extends Iterable<ScriptInstruction> {
         instruction.unlink();
         instruction = previous;
         continue;
+      } else if (next is ReturnIfNotZeroInstruction) {
+        next.replaceWith(ReturnIfZeroInstruction());
+        instruction.unlink();
+        instruction = previous;
+        continue;
+      } else if (next is ReturnIfZeroInstruction) {
+        next.replaceWith(ReturnIfNotZeroInstruction());
+        instruction.unlink();
+        instruction = previous;
+        continue;
       }
       instruction = next;
     }
@@ -554,6 +565,52 @@ class InstructionList extends Iterable<ScriptInstruction> {
       instruction.unlink();
       nextInstruction.unlink();
       instruction = nextNextInstruction;
+    }
+  }
+
+  void optimizeCallFunction() {
+    if (instructions.isEmpty) {
+      return;
+    }
+
+    // First build function name -> target Name map.
+    final functionTargets = <String, String>{};
+
+    for (ScriptInstruction? instruction = instructions.first;
+        instruction != null;
+        instruction = instruction.next) {
+      if (instruction is FunctionStartInstruction) {
+        final firstInstruction = instruction.next;
+        if (firstInstruction is JumpFunctionInstruction) {
+          functionTargets[instruction.function.functionName] =
+              firstInstruction.targetName;
+        }
+      }
+    }
+
+    for (ScriptInstruction? instruction = instructions.first;
+        instruction != null;
+        instruction = instruction.next) {
+      if (instruction is FunctionNameScriptInstruction) {
+        for (;;) {
+          final targetFunctionName = functionTargets[instruction.targetName];
+          if (targetFunctionName == null) break;
+
+          instruction.targetName = targetFunctionName;
+        }
+      }
+    }
+
+    // Clean up functions that are redirected.
+    for (ScriptInstruction? instruction = instructions.first;
+        instruction != null;
+        instruction = instruction.next) {
+      if (instruction is FunctionStartInstruction) {
+        if (!instruction.isLocked &&
+            functionTargets.containsKey(instruction.function.functionName)) {
+          instruction.next?.unlink();
+        }
+      }
     }
   }
 }

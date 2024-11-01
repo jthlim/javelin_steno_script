@@ -28,6 +28,7 @@ class ScriptFunction implements ScriptFunctionDefinition {
   var locals = ScriptLocals();
   late final StatementListAstNode statements;
   var hasMarked = false;
+  var isLocked = false;
 
   final localsStack = <ScriptLocals>[];
 

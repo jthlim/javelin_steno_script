@@ -58,7 +58,8 @@ class ScriptByteCodeBuilder {
         throw Exception('Internal error - inconsistent function name');
       }
       // Set up placeholder instruction.
-      final functionStart = FunctionStartInstruction(function);
+      final functionStart =
+          FunctionStartInstruction(function, function.isLocked);
       functions[function.functionName] = functionStart;
       addInstruction(functionStart);
 
@@ -173,6 +174,7 @@ class ScriptByteCodeBuilder {
   void _markFunction(String name) {
     final function = module.functions[name] as ScriptFunction?;
     function?.mark(reachability);
+    function?.isLocked = true;
 
     reachability.functions.add(name);
   }
