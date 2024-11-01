@@ -25,7 +25,7 @@ void main(List<String> arguments) {
     Parser(input: source, filename: filename, module: module).parse();
   }
 
-  final builder = ScriptByteCodeBuilder(module);
+  final builder = ScriptByteCodeBuilder(module, latestScriptByteCodeVersion);
   final byteCode = builder.createByteCode(buttonCount);
 
   print('Opcodes');

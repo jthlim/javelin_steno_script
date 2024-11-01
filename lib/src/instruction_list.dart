@@ -16,13 +16,16 @@ class InstructionList extends Iterable<ScriptInstruction> {
   @override
   Iterator<ScriptInstruction> get iterator => instructions.iterator;
 
-  void optimize() {
+  void optimize({required int byteCodeVersion}) {
     optimizeNot();
     optimizeTrueFalseJumps();
     optimizeRightFactor();
-    optimizeJumpTarget();
+    if (byteCodeVersion >= 4) {
+      optimizeJumpOverRet();
+    }
+    optimizeJumpTarget(byteCodeVersion);
     optimizeRightFactor();
-    optimizeJumpTarget();
+    optimizeJumpTarget(byteCodeVersion);
     optimizeCallReturn();
     optimizeDeadCode();
     optimizeJumpToNext();
@@ -133,7 +136,45 @@ class InstructionList extends Iterable<ScriptInstruction> {
     }
   }
 
-  void optimizeJumpTarget() {
+  // Replaces jump over rets with a single retz or retnz instruction:
+  //
+  //     jnz skip
+  //     ret
+  //   skip:
+  //
+  // with:
+  //
+  //     retz
+  void optimizeJumpOverRet() {
+    if (instructions.isEmpty) {
+      return;
+    }
+
+    ScriptInstruction? instruction = instructions.first;
+    while (instruction != null) {
+      final next = instruction.next;
+      if (next is! ReturnInstruction) {
+        instruction = next;
+        continue;
+      }
+      if (instruction is JumpIfZeroInstruction) {
+        final afterJump = instruction.target.next;
+        instruction.replaceWith(ReturnIfNotZeroInstruction());
+        next.unlink();
+        instruction = afterJump;
+      } else if (instruction is JumpIfNotZeroInstruction) {
+        final afterJump = instruction.target.next;
+        instruction.replaceWith(ReturnIfZeroInstruction());
+        next.unlink();
+        instruction = afterJump;
+      } else {
+        instruction = next;
+      }
+    }
+  }
+
+  // Replace jump to ret, jump to jump, and jump to function
+  void optimizeJumpTarget(int byteCodeVersion) {
     if (instructions.isEmpty) {
       return;
     }
@@ -146,6 +187,12 @@ class InstructionList extends Iterable<ScriptInstruction> {
         if (target is ReturnInstruction) {
           if (instruction is JumpInstruction) {
             replacement = ReturnInstruction();
+          } else if (byteCodeVersion >= 4) {
+            if (instruction is JumpIfZeroInstruction) {
+              replacement = ReturnIfZeroInstruction();
+            } else if (instruction is JumpIfNotZeroInstruction) {
+              replacement = ReturnIfNotZeroInstruction();
+            }
           }
         } else if (target is JumpInstructionBase) {
           replacement = replaceJumpPair(instruction, target);

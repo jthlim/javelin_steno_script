@@ -3,4 +3,7 @@ export 'src/module.dart';
 export 'src/parser.dart';
 export 'src/string_data.dart';
 
-const scriptByteCodeRevision = 3;
+const latestScriptByteCodeVersion = 4;
+bool isScriptByteCodeVersionSupported(int version) {
+  return version == 3 || version == 4;
+}

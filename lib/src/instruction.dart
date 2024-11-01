@@ -39,6 +39,8 @@ enum ScriptOpcode {
   enterFunction(0x94),
   callValue(0x95),
   jumpValue(0x96),
+  retIfZero(0x97),
+  retIfNotZero(0x98),
   jumpShortBegin(0xa0),
   jumpShortEnd(0xbe),
   jumpLong(0xbf),
@@ -772,6 +774,32 @@ final class ReturnInstruction extends ScriptInstruction {
 
   @override
   String toString() => '  ret';
+}
+
+final class ReturnIfZeroInstruction extends ScriptInstruction {
+  @override
+  int get byteCodeLength => 1;
+
+  @override
+  void addByteCode(ScriptByteCodeBuilder builder) {
+    builder.addOpcode(ScriptOpcode.retIfZero);
+  }
+
+  @override
+  String toString() => '  retz';
+}
+
+final class ReturnIfNotZeroInstruction extends ScriptInstruction {
+  @override
+  int get byteCodeLength => 1;
+
+  @override
+  void addByteCode(ScriptByteCodeBuilder builder) {
+    builder.addOpcode(ScriptOpcode.retIfNotZero);
+  }
+
+  @override
+  String toString() => '  retnz';
 }
 
 final class FunctionStartInstruction extends ScriptInstruction {

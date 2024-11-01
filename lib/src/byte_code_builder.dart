@@ -9,10 +9,11 @@ import 'instruction_list.dart';
 import 'package:crclib/catalog.dart';
 
 class ScriptByteCodeBuilder {
-  ScriptByteCodeBuilder(this.module)
+  ScriptByteCodeBuilder(this.module, this.byteCodeVersion)
       : reachability = ScriptReachability(module);
 
   final ScriptModule module;
+  final int byteCodeVersion;
 
   final _bytesBuilder = BytesBuilder();
   final instructions = InstructionList();
@@ -73,7 +74,7 @@ class ScriptByteCodeBuilder {
       }
     }
 
-    instructions.optimize();
+    instructions.optimize(byteCodeVersion: byteCodeVersion);
   }
 
   void _measureByteCode(int buttonCount) {
@@ -116,7 +117,7 @@ class ScriptByteCodeBuilder {
   }
 
   void _createByteCode(int buttonCount) {
-    _bytesBuilder.add('JSS3'.codeUnits);
+    _bytesBuilder.add('JSS$byteCodeVersion'.codeUnits);
 
     add16BitValue(stringHashTableOffset);
 

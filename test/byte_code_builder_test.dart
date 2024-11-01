@@ -22,7 +22,7 @@ tick (0xe):
 String _compileScript(String script) {
   final module = ScriptModule();
   Parser(input: script, filename: '', module: module).parse();
-  final builder = ScriptByteCodeBuilder(module);
+  final builder = ScriptByteCodeBuilder(module, latestScriptByteCodeVersion);
   builder.createByteCode(0);
 
   final buffer = StringBuffer();

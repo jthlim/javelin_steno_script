@@ -10,6 +10,7 @@ class ScriptCompileResult {
   factory ScriptCompileResult(
     int scriptButtonCount,
     int maximumScriptByteCodeSize,
+    int scriptByteCodeVersion,
     String scriptHeader,
     String script,
   ) {
@@ -23,7 +24,7 @@ class ScriptCompileResult {
         Parser(input: scriptHeader, filename: '', module: module).parse();
       }
       Parser(input: script, filename: '', module: module).parse();
-      final builder = ScriptByteCodeBuilder(module);
+      final builder = ScriptByteCodeBuilder(module, scriptByteCodeVersion);
       final byteCode = builder.createByteCode(scriptButtonCount);
 
       if (byteCode.length > maximumScriptByteCodeSize) {
