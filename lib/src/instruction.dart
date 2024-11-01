@@ -405,7 +405,7 @@ final class PushFunctionAddressInstruction
 
   @override
   void addByteCode(ScriptByteCodeBuilder builder) {
-    final function = builder.functions[functionName]!;
+    final function = builder.functions[targetName]!;
     final offset = function.offset;
 
     builder.addOpcode(ScriptOpcode.pushBytes2S);
@@ -635,7 +635,7 @@ final class SetHalfWordFunctionDataValueInstruction
 
   @override
   void addByteCode(ScriptByteCodeBuilder builder) {
-    final offset = builder.functions[functionName]?.offset;
+    final offset = builder.functions[targetName]?.offset;
     if (offset == null) {
       throw Exception('Internal error: failed lookup on data');
     }
