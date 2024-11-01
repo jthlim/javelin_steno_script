@@ -29,6 +29,8 @@ const FONT_ID_SMALL_DIGITS = 1;
 const FONT_ID_MEDIUM_DIGITS = 2;
 const FONT_ID_LARGE_DIGITS = 3;
 
+const TIMER_ID_TIMEOUT_CHECK = 0;
+
 //---------------------------------------------------------------------------
 
 // Constants
@@ -115,8 +117,17 @@ const CHARGING_STATUS_IMAGE = [[
 func init() {
   setScript(SCRIPT_ID_DISPLAY_OVERLAY, @drawDisplayOverlay);
   setScript(SCRIPT_ID_BATTERY_UPDATE, @redrawDisplayOverlay);
-  setScript(SCRIPT_ID_CONNECTION_UPDATE, @redrawDisplayOverlay);
-  setScript(SCRIPT_ID_PAIR_CONNECTION_UPDATE, @redrawDisplayOverlay);
+  setScript(SCRIPT_ID_CONNECTION_UPDATE, @onConnectionUpdate);
+  setScript(SCRIPT_ID_PAIR_CONNECTION_UPDATE, @onConnectionUpdate);
+}
+
+func onConnectionUpdate() {
+  if (getActivePairConnection() != PAIR_CONNECTION_NONE || isPairPowered()) {
+    stopTimer(TIMER_ID_TIMEOUT_CHECK);
+  } else {
+    startTimer(TIMER_ID_TIMEOUT_CHECK, 1000, 1, @{});
+  }
+  redrawDisplayOverlay();
 }
 
 func drawDisplayOverlay() {

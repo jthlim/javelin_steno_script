@@ -414,7 +414,9 @@ final class PushFunctionAddressInstruction
   }
 
   @override
-  String toString() => '  push @$functionName';
+  String toString() => functionName == targetName
+      ? '  push @$functionName'
+      : '  push @$targetName ($functionName)';
 }
 
 sealed class JumpFunctionInstructionBase extends FunctionNameScriptInstruction {
@@ -625,9 +627,9 @@ final class PushStringValueInstruction extends ScriptInstruction {
 final class SetHalfWordFunctionDataValueInstruction
     extends FunctionNameScriptInstruction {
   SetHalfWordFunctionDataValueInstruction({
+    required String functionName,
     required this.value,
     required this.valueOffset,
-    required String functionName,
   }) : super(functionName);
 
   @override

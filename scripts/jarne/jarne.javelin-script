@@ -1726,8 +1726,10 @@ const MODTAP_ACTIVATION_LAYER_CHANGE = 4;
 const MODTAP_FLAG_RELEASED = 4;
 const MODTAP_FLAG_STATE = 3;
 const MODTAP_STATE_UNRESOLVED = 0;
-const MODTAP_STATE_RESOLVED_HOLD = 1;
-const MODTAP_STATE_RESOLVED_TAP = 2;
+
+// These values are designed to overlap with HANDLER_RELEASE_TAP and HANDLER_RELEASE_HOLD
+const MODTAP_STATE_RESOLVED_TAP = 1;
+const MODTAP_STATE_RESOLVED_HOLD = 3;
 
 const MODTAP_DEFAULT_MODTAP_HOLD_TIME = 200;
 const MODTAP_DEFAULT_LAYER_HOLD_TIME = 180;
@@ -1773,13 +1775,11 @@ func clearPendingModTap() {
     // Prevent infinite recursion if the handler ends up calling clearPendingModTap.
     removeModTapIndex(0);
 
-    if (state == MODTAP_STATE_RESOLVED_TAP) {
-      handler(MODTAP_HANDLER_RELEASE_TAP);
-    } else if (state == MODTAP_STATE_RESOLVED_HOLD) {
-      handler(MODTAP_HANDLER_RELEASE_HOLD);
-    } else if (state == MODTAP_STATE_UNRESOLVED) {
+    if (state == MODTAP_STATE_UNRESOLVED) {
       handler(MODTAP_HANDLER_PRESS_TAP);
       handler(MODTAP_HANDLER_RELEASE_TAP);
+    } else {
+      handler(state);
     }
   }
 }
@@ -1791,15 +1791,9 @@ func clearResolvedModTap() {
     var state = flags & MODTAP_FLAG_STATE;
     if (state != MODTAP_STATE_UNRESOLVED) {
       var handler = modTapData[base + MODTAP_DATA_OFFSET_HANDLER];
-      if (state == MODTAP_STATE_RESOLVED_TAP) {
-        removeModTapIndex(i);
-        handler(MODTAP_HANDLER_RELEASE_TAP);
-        continue;
-      } else if (state == MODTAP_STATE_RESOLVED_HOLD) {
-        removeModTapIndex(i);
-        handler(MODTAP_HANDLER_RELEASE_HOLD);
-        continue;
-      }
+      removeModTapIndex(i);
+      handler(state);
+      continue;
     }
     i = i + 1;
   }
@@ -1934,11 +1928,7 @@ func handleModTapRelease(handler) {
   var state = flags & MODTAP_FLAG_STATE;
   if (state != MODTAP_STATE_UNRESOLVED) {
     removeModTapIndex(i);
-    if (state == MODTAP_STATE_RESOLVED_TAP) {
-      handler(MODTAP_HANDLER_RELEASE_TAP);
-    } else if (state == MODTAP_STATE_RESOLVED_HOLD) {
-      handler(MODTAP_HANDLER_RELEASE_HOLD);
-    }
+    handler(state);
     return;
   }
   // Mark the handler as released.
@@ -1954,10 +1944,8 @@ func handleModTapRelease(handler) {
       if (state == MODTAP_STATE_UNRESOLVED) {
         entryHandler(MODTAP_HANDLER_PRESS_TAP);
         entryHandler(MODTAP_HANDLER_RELEASE_TAP);
-      } else if (state == MODTAP_STATE_RESOLVED_TAP) {
-        entryHandler(MODTAP_HANDLER_RELEASE_TAP);
-      } else if (state == MODTAP_STATE_RESOLVED_HOLD) {
-        entryHandler(MODTAP_HANDLER_RELEASE_HOLD);
+      } else {
+        entryHandler(state);
       }
       continue;
     }
@@ -5025,7 +5013,7 @@ func onRelease35() {
   globalRelease();
 
   handleModTapRelease(@modTapHandler35);
-  dispatchToLayer([[[0, @onRelease35_1, @onRelease35_2, 0, 0, 0, @onRelease35_6, 0]]]);
+  dispatchToLayer([[[0, 0, @onRelease35_2, 0, 0, 0, @onRelease35_6, 0]]]);
 }
 
 func onPress35_1() {
@@ -5146,7 +5134,7 @@ func onRelease37() {
   globalRelease();
 
   handleModTapRelease(@modTapHandler37);
-  dispatchToLayer([[[@onRelease37_0, @onRelease37_1, @onRelease37_2, 0, 0, 0, @onRelease37_6, 0]]]);
+  dispatchToLayer([[[@onRelease37_0, 0, @onRelease37_2, 0, 0, 0, @onRelease37_6, 0]]]);
 }
 
 func onPress37_0() {
