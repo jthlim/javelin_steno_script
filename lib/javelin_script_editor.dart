@@ -45,10 +45,7 @@ class JavelinScriptEditorState extends State<JavelinScriptEditor> {
     super.initState();
     _textEditingController.value = TextEditingValue(
       text: widget.script,
-      selection: TextSelection(
-        baseOffset: 0,
-        extentOffset: 0,
-      ),
+      selection: const TextSelection(baseOffset: 0, extentOffset: 0),
     );
   }
 

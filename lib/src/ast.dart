@@ -995,7 +995,7 @@ class BreakStatementAstNode extends AstNode {
   void addInstructions(ScriptByteCodeBuilder builder) {
     final targets = builder.breakTargets;
     if (targets == null) {
-      throw FormatException('No target for break statement');
+      throw const FormatException('No target for break statement');
     }
     final jumpInstruction = JumpInstruction();
     builder.addInstruction(jumpInstruction);
@@ -1014,7 +1014,7 @@ class ContinueStatementAstNode extends AstNode {
   void addInstructions(ScriptByteCodeBuilder builder) {
     final targets = builder.continueTargets;
     if (targets == null) {
-      throw FormatException('No target for continue statement');
+      throw const FormatException('No target for continue statement');
     }
     final jumpInstruction = JumpInstruction();
     builder.addInstruction(jumpInstruction);
@@ -1078,7 +1078,7 @@ class LoadGlobalValueArrayAstNode extends AstNode {
 
   @override
   void addInstructions(ScriptByteCodeBuilder builder) {
-    throw Exception("Global value array ${global.name} must be indexed");
+    throw Exception('Global value array ${global.name} must be indexed');
   }
 
   final ScriptGlobal global;

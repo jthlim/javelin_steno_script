@@ -221,7 +221,7 @@ func noop() {}
 var speed = 1;
 var hueSpread = 4;
 var hueShift = 0;
-var brightness = 3;
+var brightness = 4;
 var saturation = 5;
 
 var keyColorData[42];
@@ -459,8 +459,7 @@ func isWordCapsContinuingKey(key, modifiers) var {
     return 1;
   }
   key = key | 4;
-  if (key == SC_R_SHIFT || key == SC_R_ALT) return 1;
-  return 0;
+  return key == SC_R_SHIFT || key == SC_R_ALT;
 }
 
 var wordPressActivatedShift = 0;
@@ -982,7 +981,7 @@ func releaseMagicKey() {
 const SPEED_VALUES      = [[ 00 04 08 0c 10 18 20 30 40 ]];
 const HUE_SPREAD_VALUES = [[ 00 10 20 28 30 38 40 48 50 ]];
 const SATURATION_VALUES = [[ 00 20 40 50 60 68 70 78 80 ]];
-const BRIGHTNESS_VALUES = [[ 00 08 10 20 40 60 80 c0 ff ]];
+const BRIGHTNESS_VALUES = [[ 00 08 10 18 20 28 30 38 40 ]];
 
 func rgbUpdateKeyHueCycle(hShift, sat, spreadMultiplier, value) {
   const HUE_CYCLE_RGB_ORDER = [[
@@ -1101,12 +1100,12 @@ func rgbUpdateKeyBreatheCycle() {
   // Sine wave between 4-20 brightness, with staggering of r, g, b values
   // to reduce harsh steps.
   var w = (0xc00 + (SINE_TABLE[(animationTime() >> 5) & 0xff] - 0x80) * (2 * 8));
-  rgbUpdateAllConstantColor((w + 0x53) >> 8, w >> 8, (w + 0xa6) >> 8);
+  rgbUpdateKeyConstantColor((w + 0x53) >> 8, w >> 8, (w + 0xa6) >> 8);
 }
 
 const DISCONNECTED_KEY_ORDER = [[ 00 01 02 03 04 05 04 03 02 01 ]];
 func rgbUpdateKeyConnectingCycle() {
-  for (var i = 0; i < 54; i = i + 1) {
+  for (var i = 0; i < 42; i = i + 1) {
     setRgb(i, 0, 0, 0);
   }
 
@@ -1149,7 +1148,6 @@ func rgbUpdate() {
     rgbUpdateKeyConnectingCycle();
   } else if (isHostSleeping()) {
     rgbUpdateKeyBreatheCycle();
-    setUnderglowRgb(8, 8, 8);
   } else {
     dispatchToLayer([[[@rgbUpdateRandomColors, @rgbUpdateRandomColors, @rgbUpdateRandomColors, @rgbUpdateRandomColors, @rgbUpdateRandomColors, @rgbUpdateRandomColors, @rgbUpdateKeyU2fAlertCycle]]]);
   }
@@ -1174,20 +1172,17 @@ func setUnderglowRgb(r, g, b) {
 }
 
 func rgbUpdateUnderglow() {
-  if (isWaitingForUserPresence() || isBleAdvertising()) {
+  if (isBleAdvertising()) {
     setUnderglowRgb(0, 0, 0);
-    return;
-  }
-  if (isHostSleeping()) {
+  } else if (isHostSleeping()) {
     setUnderglowRgb(8, 8, 8);
-    return;
+  } else {
+    dispatchToLayer([[[@rgbUpdateUnderglowWhite, @rgbUpdateUnderglowWhite, @rgbUpdateUnderglowWhite, @rgbUpdateUnderglowWhite, @rgbUpdateUnderglowWhite, @rgbUpdateUnderglowWhite, @rgbUpdateUnderglowOff]]]);
   }
-
-  dispatchToLayer([[[@rgbUpdateUnderglowWhite, @rgbUpdateUnderglowWhite, @rgbUpdateUnderglowWhite, @rgbUpdateUnderglowWhite, @rgbUpdateUnderglowWhite, @rgbUpdateUnderglowWhite, @rgbUpdateUnderglowWhite]]]);
 }
 
 func rgbUpdateUnderglowWhite() {
-  setUnderglowRgb(128, 128, 128);
+  setUnderglowRgb(64, 64, 64);
 }
 
 func rgbButtonPressRandomColor() {
@@ -1200,27 +1195,31 @@ func rgbButtonPressRandomColor() {
 }
 
 func rgbUpdateRed() {
-  setKeyRgb(255, 0, 0);
+  setKeyRgb(128, 0, 0);
 }
 
 func rgbUpdateUnderglowRed() {
-  setUnderglowRgb(255, 0, 0);
+  setUnderglowRgb(128, 0, 0);
 }
 
 func rgbUpdateGreen() {
-  setKeyRgb(0, 255, 0);
+  setKeyRgb(0, 128, 0);
 }
 
 func rgbUpdateUnderglowGreen() {
-  setUnderglowRgb(0, 255, 0);
+  setUnderglowRgb(0, 128, 0);
 }
 
 func rgbUpdateBlue() {
-  setKeyRgb(0, 0, 255);
+  setKeyRgb(0, 0, 128);
 }
 
 func rgbUpdateUnderglowBlue() {
-  setUnderglowRgb(0, 0, 255);
+  setUnderglowRgb(0, 0, 128);
+}
+
+func rgbUpdateUnderglowOff() {
+  setUnderglowRgb(0, 0, 0);
 }
 
 // Screen Saver Scripts
@@ -1696,6 +1695,8 @@ func areAllModTapEntriesResolved() var {
 }
 
 func hasResolvedHoldInOtherGroup(group) var {
+  if (group == 0) return 0;
+
   for (var i = 0; i < modTapDataCount; i = i + 1) {
     var base = i * MODTAP_DATA_LENGTH;
     if ((modTapData[base + MODTAP_DATA_OFFSET_GROUP] & group) == 0 &&
@@ -1708,11 +1709,6 @@ func hasResolvedHoldInOtherGroup(group) var {
 
 // Tap press/release and hold release can never trigger a change in the modTapData list.
 func handleModTapPress(handler, group, layerActivations, holdTime) {
-  // Shouldn't happen, but for safety.
-  if (modTapDataCount >= MODTAP_ENTRY_COUNT) {
-    return;
-  }
-
   var activation = layerActivations[resolveLayerIndex()];
   if (!areAllModTapEntriesResolved()) {
     for (var i = 0; i < 7; i = i + 1) {
@@ -1722,7 +1718,25 @@ func handleModTapPress(handler, group, layerActivations, holdTime) {
     }
   }
 
-  if (isInPressAll() && (activation & MODTAP_ACTIVATION_LAYER_CHANGE) == 0) return;
+  if (isInPressAll()) {
+    if (activation != MODTAP_ACTIVATION_HOLD && (activation & MODTAP_ACTIVATION_LAYER_CHANGE) == 0) return;
+    var i = findModTapIndex(handler);
+    var base = i * MODTAP_DATA_LENGTH;
+    if (base >= 0) {
+      var state = modTapData[base + MODTAP_DATA_OFFSET_FLAGS] & MODTAP_FLAG_STATE;
+      modTapData[base + MODTAP_DATA_OFFSET_FLAGS] = MODTAP_STATE_UNRESOLVED;
+      if (state != MODTAP_STATE_UNRESOLVED) {
+        handler(state);
+        updateModTapTimer();
+      }
+      return;
+    }
+  }
+
+  // Shouldn't happen, but for safety.
+  if (modTapDataCount >= MODTAP_ENTRY_COUNT) {
+    return;
+  }
 
   if (activation == MODTAP_ACTIVATION_TAP) {
     // If group is same as any unresolved mod, then resolve them to tap.
@@ -1784,27 +1798,28 @@ func handleModTapPress(handler, group, layerActivations, holdTime) {
 func handleModTapRelease(handler) {
   var i = findModTapIndex(handler);
 
-  // If handler is not in list, do nothing.
-  if (i == -1) {
-    return;
-  }
+  var group = 0;
 
-  var base = i * MODTAP_DATA_LENGTH;
-  var group = modTapData[base + MODTAP_DATA_OFFSET_GROUP];
-  var flags = modTapData[base + MODTAP_DATA_OFFSET_FLAGS];
-  var state = flags & MODTAP_FLAG_STATE;
-  if (state != MODTAP_STATE_UNRESOLVED) {
-    removeModTapIndex(i);
-    handler(state);
-    return;
+  // If handler is not in list, do nothing.
+  if (i != -1) {
+    var base = i * MODTAP_DATA_LENGTH;
+    group = modTapData[base + MODTAP_DATA_OFFSET_GROUP];
+    var flags = modTapData[base + MODTAP_DATA_OFFSET_FLAGS];
+
+    // Mark the handler as released.
+    modTapData[base + MODTAP_DATA_OFFSET_FLAGS] = flags | MODTAP_FLAG_RELEASED;
+
+    var state = flags & MODTAP_FLAG_STATE;
+    if (state != MODTAP_STATE_UNRESOLVED) {
+      removeModTapIndex(i);
+      handler(state);
+    }
   }
-  // Mark the handler as released.
-  modTapData[base + MODTAP_DATA_OFFSET_FLAGS] = flags | MODTAP_FLAG_RELEASED;
 
   for (i = 0; i < modTapDataCount;) {
-    base = i * MODTAP_DATA_LENGTH;
-    flags = modTapData[base + MODTAP_DATA_OFFSET_FLAGS];
-    state = flags & MODTAP_FLAG_STATE;
+    var base = i * MODTAP_DATA_LENGTH;
+    var flags = modTapData[base + MODTAP_DATA_OFFSET_FLAGS];
+    var state = flags & MODTAP_FLAG_STATE;
     var entryHandler = modTapData[base + MODTAP_DATA_OFFSET_HANDLER];
     if (flags & MODTAP_FLAG_RELEASED) {
       removeModTapIndex(i);
@@ -1817,25 +1832,20 @@ func handleModTapRelease(handler) {
       continue;
     }
 
-    if (state != MODTAP_STATE_UNRESOLVED) {
-      i = i + 1;
-      continue;
+    if (state == MODTAP_STATE_UNRESOLVED) {
+      var activation = modTapData[base + MODTAP_DATA_OFFSET_LAYER_ACTIVATIONS][resolveLayerIndex()] & MODTAP_ACTIVATION_TAP_AND_HOLD;
+      if(activation == MODTAP_ACTIVATION_TAP_AND_HOLD && (modTapData[base + MODTAP_DATA_OFFSET_GROUP] & group) == 0) {
+        updateModTapTimer();
+        return;
+      } else if (activation & MODTAP_ACTIVATION_TAP) {
+        modTapData[base + MODTAP_DATA_OFFSET_FLAGS] = flags | MODTAP_STATE_RESOLVED_TAP;
+        entryHandler(MODTAP_HANDLER_PRESS_TAP);
+      } else if (activation & MODTAP_ACTIVATION_HOLD) {
+        modTapData[base + MODTAP_DATA_OFFSET_FLAGS] = flags | MODTAP_STATE_RESOLVED_HOLD;
+        entryHandler(MODTAP_HANDLER_PRESS_HOLD);
+        continue;
+      }
     }
-
-    if((modTapData[base + MODTAP_DATA_OFFSET_GROUP] & group) == 0) {
-      updateModTapTimer();
-      return;
-    }
-
-    if (state == MODTAP_STATE_RESOLVED_HOLD) {
-      removeModTapIndex(i);
-      entryHandler(MODTAP_HANDLER_RELEASE_HOLD);
-      continue;
-    } else if (state == MODTAP_STATE_UNRESOLVED) {
-      modTapData[base + MODTAP_DATA_OFFSET_FLAGS] = flags | MODTAP_STATE_RESOLVED_TAP;
-      entryHandler(MODTAP_HANDLER_PRESS_TAP);
-    }
-
     i = i + 1;
   }
 }
@@ -1844,11 +1854,11 @@ func findFirstUnresolvedModTapEntry() var {
   var layerIndex = resolveLayerIndex();
   for (var i = 0; i < modTapDataCount; i = i + 1) {
     var base = i * MODTAP_DATA_LENGTH;
-    var activation = modTapData[base + MODTAP_DATA_OFFSET_LAYER_ACTIVATIONS][layerIndex];
     var flags = modTapData[base + MODTAP_DATA_OFFSET_FLAGS];
+    var activation = modTapData[base + MODTAP_DATA_OFFSET_LAYER_ACTIVATIONS][layerIndex] & MODTAP_ACTIVATION_TAP_AND_HOLD;
 
     // If not resolved, not tap only and not released.
-    if ((activation & MODTAP_ACTIVATION_TAP_AND_HOLD) == MODTAP_ACTIVATION_TAP_AND_HOLD && (flags & (MODTAP_FLAG_STATE | MODTAP_FLAG_RELEASED)) == 0) {
+    if (activation == MODTAP_ACTIVATION_TAP_AND_HOLD && (flags & (MODTAP_FLAG_STATE | MODTAP_FLAG_RELEASED)) == 0) {
       return i;
     }
   }
@@ -1857,81 +1867,65 @@ func findFirstUnresolvedModTapEntry() var {
 
 func updateModTapTimer() {
   var i = findFirstUnresolvedModTapEntry();
-  if (i == -1)  {
+  var base = i * MODTAP_DATA_LENGTH;
+  if (base < 0)  {
     stopTimer(TIMER_ID_MODTAP);
     return;
   }
 
-  var base = i * MODTAP_DATA_LENGTH;
   var delay = modTapData[base + MODTAP_DATA_OFFSET_HOLD_TRIGGER_TIME] - getTime();
-  if (delay < 0) {
-    resolveModTap(modTapData[base + MODTAP_DATA_OFFSET_GROUP]);
+  if (delay <= 0) {
+    resolveModTap(modTapData[base + MODTAP_DATA_OFFSET_GROUP], modTapData[base + MODTAP_DATA_OFFSET_HANDLER]);
   } else {
     startTimer(TIMER_ID_MODTAP, delay, 0, @updateModTap);
   }
 }
 
-func resolveModTap(group) {
+// Returns true if entry was removed.
+func triggerModTap(i, flags, resolved) var {
+  var base = i * MODTAP_DATA_LENGTH;
+  var handler = modTapData[base + MODTAP_DATA_OFFSET_HANDLER];
+  if (flags & MODTAP_FLAG_RELEASED) {
+    removeModTapIndex(i);
+    handler(resolved - 1);  // Constants chosen so that this maps to press of the resolved type.
+    handler(resolved);      // Constants chosen so that this maps to release of the resolved type.
+    return 1;
+  } else {
+    modTapData[base + MODTAP_DATA_OFFSET_FLAGS] = flags | resolved;
+    handler(resolved - 1);
+    return 0;
+  }
+}
+
+func resolveModTap(group, handler) {
   var i = 0;
   while (i < modTapDataCount) {
     // Resolve same group to hold, resolve different group to tap.
     var base = i * MODTAP_DATA_LENGTH;
     var flags = modTapData[base + MODTAP_DATA_OFFSET_FLAGS];
-    if ((flags & MODTAP_FLAG_STATE) != MODTAP_STATE_UNRESOLVED) {
-      i = i + 1;
-      continue;
-    }
+    if ((flags & MODTAP_FLAG_STATE) == MODTAP_STATE_UNRESOLVED) {
+      var activation = modTapData[base + MODTAP_DATA_OFFSET_LAYER_ACTIVATIONS][resolveLayerIndex()] & MODTAP_ACTIVATION_TAP_AND_HOLD;
+      var entryGroup = modTapData[base + MODTAP_DATA_OFFSET_GROUP];
 
-    var handler = modTapData[base + MODTAP_DATA_OFFSET_HANDLER];
-    var activation = modTapData[base + MODTAP_DATA_OFFSET_LAYER_ACTIVATIONS][resolveLayerIndex()] & MODTAP_ACTIVATION_TAP_AND_HOLD;
-    if (modTapData[base + MODTAP_DATA_OFFSET_GROUP] & group) {
-      if (activation & MODTAP_ACTIVATION_HOLD) {
-        modTapData[base + MODTAP_DATA_OFFSET_FLAGS] = flags | MODTAP_STATE_RESOLVED_HOLD;
-        handler(MODTAP_HANDLER_PRESS_HOLD);
+      if (activation == MODTAP_ACTIVATION_TAP_AND_HOLD && entryGroup == 0 && handler != modTapData[base + MODTAP_DATA_OFFSET_HANDLER]) {
+        updateModTapTimer();
+        return;
+      }
+
+      if ((entryGroup & group) == 0 && (activation & MODTAP_ACTIVATION_TAP)) {
+        if (triggerModTap(i, flags, MODTAP_STATE_RESOLVED_TAP)) continue;
+      } else if (activation & MODTAP_ACTIVATION_HOLD) {
+        triggerModTap(i, flags, MODTAP_STATE_RESOLVED_HOLD);
         // Restart, because handler can call something that updates the list.
         i = 0;
         continue;
       } else if (activation & MODTAP_ACTIVATION_TAP) {
-        modTapData[base + MODTAP_DATA_OFFSET_FLAGS] = flags | MODTAP_STATE_RESOLVED_TAP;
-        if (flags & MODTAP_FLAG_RELEASED) {
-          removeModTapIndex(i);
-          handler(MODTAP_HANDLER_PRESS_TAP);
-          handler(MODTAP_HANDLER_RELEASE_TAP);
-          continue;
-        } else {
-          handler(MODTAP_HANDLER_PRESS_TAP);
-        }
+        if (triggerModTap(i, flags, MODTAP_STATE_RESOLVED_TAP)) continue;
       } else {
         removeModTapIndex(i);
         continue;
       }
-    } else {
-      // Not the same group.
-      if (activation & MODTAP_ACTIVATION_TAP) {
-        modTapData[base + MODTAP_DATA_OFFSET_FLAGS] = flags | MODTAP_STATE_RESOLVED_TAP;
-        if (flags & MODTAP_FLAG_RELEASED) {
-          removeModTapIndex(i);
-          handler(MODTAP_HANDLER_PRESS_TAP);
-          handler(MODTAP_HANDLER_RELEASE_TAP);
-          continue;
-        } else {
-          handler(MODTAP_HANDLER_PRESS_TAP);
-        }
-      } else if (activation & MODTAP_ACTIVATION_HOLD) {
-        modTapData[base + MODTAP_DATA_OFFSET_FLAGS] = flags | MODTAP_STATE_RESOLVED_HOLD;
-        if (flags & MODTAP_FLAG_RELEASED) {
-          removeModTapIndex(i);
-          handler(MODTAP_HANDLER_PRESS_HOLD);
-          handler(MODTAP_HANDLER_RELEASE_HOLD);
-        } else {
-          handler(MODTAP_HANDLER_PRESS_HOLD);
-        }
-        // Restart, because handler can call something that updates the list.
-        i = 0;
-        continue;
-      }
     }
-
     i = i + 1;
   }
 }
@@ -1939,14 +1933,14 @@ func resolveModTap(group) {
 // After first unresolved non-tap only entry has timed out
 func updateModTap() {
   var i = findFirstUnresolvedModTapEntry();
-  if (i == -1) return;
-
   var base = i * MODTAP_DATA_LENGTH;
+  if (base < 0) return;
+
   if (getTime() - modTapData[base + MODTAP_DATA_OFFSET_HOLD_TRIGGER_TIME] < 0) {
     return;
   }
 
-  resolveModTap(modTapData[base + MODTAP_DATA_OFFSET_GROUP]);
+  resolveModTap(modTapData[base + MODTAP_DATA_OFFSET_GROUP], modTapData[base + MODTAP_DATA_OFFSET_HANDLER]);
 }
 
 func modTapHandler0(action) {
@@ -2326,19 +2320,21 @@ func modTapHandler13(action) {
     return;
   }
   if (resolvedLayerIndex == 3) {
-    if (action == MODTAP_HANDLER_PRESS_TAP) {
+    if (action == MODTAP_HANDLER_PRESS_HOLD) {
       pressScanCodeButton(13, 0, 227 /* "⌘" */, 0);
+
       return;
     }
-    if (action == MODTAP_HANDLER_RELEASE_TAP) {
+    if (action == MODTAP_HANDLER_RELEASE_HOLD) {
       releaseScanCodeButton(227 /* "⌘" */);
+
       return;
     }
     return;
   }
 }
 
-const modTapLayerActivations13 = [[01 00 01 01 00 00 00]];
+const modTapLayerActivations13 = [[01 00 01 02 00 00 00]];
 
 func modTapHandler14(action) {
   var resolvedLayerIndex = resolveLayerIndex();
@@ -2365,19 +2361,21 @@ func modTapHandler14(action) {
     return;
   }
   if (resolvedLayerIndex == 3) {
-    if (action == MODTAP_HANDLER_PRESS_TAP) {
+    if (action == MODTAP_HANDLER_PRESS_HOLD) {
       pressScanCodeButton(14, 0, 226 /* "⌥" */, 0);
+
       return;
     }
-    if (action == MODTAP_HANDLER_RELEASE_TAP) {
+    if (action == MODTAP_HANDLER_RELEASE_HOLD) {
       releaseScanCodeButton(226 /* "⌥" */);
+
       return;
     }
     return;
   }
 }
 
-const modTapLayerActivations14 = [[01 00 01 01 00 00 00]];
+const modTapLayerActivations14 = [[01 00 01 02 00 00 00]];
 
 func modTapHandler15(action) {
   var resolvedLayerIndex = resolveLayerIndex();
@@ -2404,19 +2402,21 @@ func modTapHandler15(action) {
     return;
   }
   if (resolvedLayerIndex == 3) {
-    if (action == MODTAP_HANDLER_PRESS_TAP) {
+    if (action == MODTAP_HANDLER_PRESS_HOLD) {
       pressScanCodeButton(15, 0, 224 /* "⌃" */, 0);
+
       return;
     }
-    if (action == MODTAP_HANDLER_RELEASE_TAP) {
+    if (action == MODTAP_HANDLER_RELEASE_HOLD) {
       releaseScanCodeButton(224 /* "⌃" */);
+
       return;
     }
     return;
   }
 }
 
-const modTapLayerActivations15 = [[01 00 01 01 00 00 00]];
+const modTapLayerActivations15 = [[01 00 01 02 00 00 00]];
 
 func modTapHandler16(action) {
   var resolvedLayerIndex = resolveLayerIndex();
@@ -2443,19 +2443,21 @@ func modTapHandler16(action) {
     return;
   }
   if (resolvedLayerIndex == 3) {
-    if (action == MODTAP_HANDLER_PRESS_TAP) {
+    if (action == MODTAP_HANDLER_PRESS_HOLD) {
       pressScanCodeButton(16, 0, 225 /* "⇧" */, 0);
+
       return;
     }
-    if (action == MODTAP_HANDLER_RELEASE_TAP) {
+    if (action == MODTAP_HANDLER_RELEASE_HOLD) {
       releaseScanCodeButton(225 /* "⇧" */);
+
       return;
     }
     return;
   }
 }
 
-const modTapLayerActivations16 = [[01 00 01 01 00 00 00]];
+const modTapLayerActivations16 = [[01 00 01 02 00 00 00]];
 
 func modTapHandler17(action) {
   var resolvedLayerIndex = resolveLayerIndex();
@@ -2527,12 +2529,14 @@ func modTapHandler19(action) {
     return;
   }
   if (resolvedLayerIndex == 2) {
-    if (action == MODTAP_HANDLER_PRESS_TAP) {
+    if (action == MODTAP_HANDLER_PRESS_HOLD) {
       pressScanCodeButton(19, 0, 229 /* "⇧" */, 0);
+
       return;
     }
-    if (action == MODTAP_HANDLER_RELEASE_TAP) {
+    if (action == MODTAP_HANDLER_RELEASE_HOLD) {
       releaseScanCodeButton(229 /* "⇧" */);
+
       return;
     }
     return;
@@ -2550,7 +2554,7 @@ func modTapHandler19(action) {
   }
 }
 
-const modTapLayerActivations19 = [[01 00 01 01 00 00 00]];
+const modTapLayerActivations19 = [[01 00 02 01 00 00 00]];
 
 func modTapHandler20(action) {
   var resolvedLayerIndex = resolveLayerIndex();
@@ -2566,12 +2570,14 @@ func modTapHandler20(action) {
     return;
   }
   if (resolvedLayerIndex == 2) {
-    if (action == MODTAP_HANDLER_PRESS_TAP) {
-      pressScanCodeButton(20, 0, 230 /* "⌥" */, 0);
+    if (action == MODTAP_HANDLER_PRESS_HOLD) {
+      pressScanCodeButton(20, 0, 228 /* "⌃" */, 0);
+
       return;
     }
-    if (action == MODTAP_HANDLER_RELEASE_TAP) {
-      releaseScanCodeButton(230 /* "⌥" */);
+    if (action == MODTAP_HANDLER_RELEASE_HOLD) {
+      releaseScanCodeButton(228 /* "⌃" */);
+
       return;
     }
     return;
@@ -2589,7 +2595,7 @@ func modTapHandler20(action) {
   }
 }
 
-const modTapLayerActivations20 = [[01 00 01 01 00 00 00]];
+const modTapLayerActivations20 = [[01 00 02 01 00 00 00]];
 
 func modTapHandler21(action) {
   var resolvedLayerIndex = resolveLayerIndex();
@@ -2605,12 +2611,14 @@ func modTapHandler21(action) {
     return;
   }
   if (resolvedLayerIndex == 2) {
-    if (action == MODTAP_HANDLER_PRESS_TAP) {
+    if (action == MODTAP_HANDLER_PRESS_HOLD) {
       pressScanCodeButton(21, 0, 230 /* "⌥" */, 0);
+
       return;
     }
-    if (action == MODTAP_HANDLER_RELEASE_TAP) {
+    if (action == MODTAP_HANDLER_RELEASE_HOLD) {
       releaseScanCodeButton(230 /* "⌥" */);
+
       return;
     }
     return;
@@ -2628,7 +2636,7 @@ func modTapHandler21(action) {
   }
 }
 
-const modTapLayerActivations21 = [[01 00 01 01 00 00 00]];
+const modTapLayerActivations21 = [[01 00 02 01 00 00 00]];
 
 func modTapHandler22(action) {
   var resolvedLayerIndex = resolveLayerIndex();
@@ -2644,12 +2652,14 @@ func modTapHandler22(action) {
     return;
   }
   if (resolvedLayerIndex == 2) {
-    if (action == MODTAP_HANDLER_PRESS_TAP) {
+    if (action == MODTAP_HANDLER_PRESS_HOLD) {
       pressScanCodeButton(22, 0, 231 /* "⌘" */, 0);
+
       return;
     }
-    if (action == MODTAP_HANDLER_RELEASE_TAP) {
+    if (action == MODTAP_HANDLER_RELEASE_HOLD) {
       releaseScanCodeButton(231 /* "⌘" */);
+
       return;
     }
     return;
@@ -2667,7 +2677,7 @@ func modTapHandler22(action) {
   }
 }
 
-const modTapLayerActivations22 = [[01 00 01 01 00 00 00]];
+const modTapLayerActivations22 = [[01 00 02 01 00 00 00]];
 
 func modTapHandler23(action) {
   var resolvedLayerIndex = resolveLayerIndex();
@@ -3127,7 +3137,25 @@ func init() {
   updateBoardPower();
   updateScreenSaverTimer();
 
+  const SCRIPT_ID_USER1 = 11;
+  setScript(SCRIPT_ID_USER1, @user1ScriptSetLayer);
   activate0();
+  activateGlobal();
+}
+
+func user1ScriptSetLayer(layerId) {
+  var layerActivate = 0;
+  if (layerId == 1128808786) layerActivate = @activate0;
+  if (layerId == 262857896) layerActivate = @activate1;
+  if (layerId == 41429312) layerActivate = @activate2;
+  if (layerId == 212846523) layerActivate = @activate3;
+  if (layerId == 125635709) layerActivate = @activate4;
+  if (layerId == 58064650) layerActivate = @activate5;
+  if (layerId == 61572736) layerActivate = @activate6;
+  if (layerActivate == 0) return;
+  deactivateGlobal();
+  deactivateDynamic();
+  layerActivate();
   activateGlobal();
 }
 

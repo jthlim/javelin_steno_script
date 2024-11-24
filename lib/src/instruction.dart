@@ -104,13 +104,11 @@ enum ScriptOperatorOpcode {
 }
 
 sealed class ScriptInstruction extends LinkedListEntry<ScriptInstruction> {
-  int get byteCodeLength;
-
   bool get isBooleanResult => false;
-
   bool get implicitNext => true;
-
   bool get hasReference => previous?.implicitNext ?? false;
+
+  int get byteCodeLength;
 
   int layoutFirstPass(int offset) {
     _firstPassOffset = offset;
@@ -338,21 +336,25 @@ final class CallInBuiltFunctionInstruction extends ScriptInstruction {
       '(${function.functionName})';
 }
 
-sealed class FunctionNameScriptInstruction extends ScriptInstruction {
-  FunctionNameScriptInstruction(this.functionName) : targetName = functionName;
+sealed class FunctionReferenceScriptInstruction extends ScriptInstruction {
+  FunctionReferenceScriptInstruction(this.functionName)
+      : targetName = functionName;
 
   final String functionName;
-  String targetName;
+  String? targetName;
 }
 
-final class CallFunctionInstruction extends FunctionNameScriptInstruction {
+final class CallFunctionInstruction extends FunctionReferenceScriptInstruction {
   CallFunctionInstruction(super.functionName);
 
   @override
-  int get byteCodeLength => 3;
+  int get byteCodeLength => targetName == null ? 0 : 3;
 
   @override
   void addByteCode(ScriptByteCodeBuilder builder) {
+    final targetName = this.targetName;
+    if (targetName == null) return;
+
     final function = builder.functions[targetName]!;
     final offset = function.offset;
 
@@ -397,14 +399,21 @@ final class JumpValueInstruction extends ScriptInstruction {
 }
 
 final class PushFunctionAddressInstruction
-    extends FunctionNameScriptInstruction {
+    extends FunctionReferenceScriptInstruction {
   PushFunctionAddressInstruction(super.functionName);
 
   @override
-  int get byteCodeLength => 3;
+  int get byteCodeLength => targetName == null ? 1 : 3;
 
   @override
   void addByteCode(ScriptByteCodeBuilder builder) {
+    final targetName = this.targetName;
+    if (targetName == null) {
+      // Push 0.
+      builder.addOpcode(ScriptOpcode.pushConstantBegin);
+      return;
+    }
+
     final function = builder.functions[targetName]!;
     final offset = function.offset;
 
@@ -419,14 +428,22 @@ final class PushFunctionAddressInstruction
       : '  push @$targetName ($functionName)';
 }
 
-sealed class JumpFunctionInstructionBase extends FunctionNameScriptInstruction {
+sealed class JumpFunctionInstructionBase
+    extends FunctionReferenceScriptInstruction {
   JumpFunctionInstructionBase(super.functionName);
 
   @override
-  int get byteCodeLength => 3;
+  int get byteCodeLength => targetName == null ? 1 : 3;
 
   @override
   void addByteCode(ScriptByteCodeBuilder builder) {
+    final targetName = this.targetName;
+
+    if (targetName == null) {
+      builder.addOpcode(returnOpcode);
+      return;
+    }
+
     final function = builder.functions[targetName]!;
     final offset = function.offset;
 
@@ -436,6 +453,7 @@ sealed class JumpFunctionInstructionBase extends FunctionNameScriptInstruction {
   }
 
   ScriptOpcode get opcode;
+  ScriptOpcode get returnOpcode;
 }
 
 final class JumpFunctionInstruction extends JumpFunctionInstructionBase {
@@ -446,6 +464,9 @@ final class JumpFunctionInstruction extends JumpFunctionInstructionBase {
 
   @override
   ScriptOpcode get opcode => ScriptOpcode.jumpLong;
+
+  @override
+  ScriptOpcode get returnOpcode => ScriptOpcode.ret;
 
   @override
   String toString() => functionName == targetName
@@ -460,6 +481,9 @@ final class JumpIfZeroFunctionInstruction extends JumpFunctionInstructionBase {
   ScriptOpcode get opcode => ScriptOpcode.jumpIfZeroLong;
 
   @override
+  ScriptOpcode get returnOpcode => ScriptOpcode.retIfZero;
+
+  @override
   String toString() => functionName == targetName
       ? '  jz $functionName'
       : '  jz $targetName ($functionName)';
@@ -471,6 +495,9 @@ final class JumpIfNotZeroFunctionInstruction
 
   @override
   ScriptOpcode get opcode => ScriptOpcode.jumpIfNotZeroLong;
+
+  @override
+  ScriptOpcode get returnOpcode => ScriptOpcode.retIfNotZero;
 
   @override
   String toString() => functionName == targetName
@@ -503,7 +530,7 @@ sealed class JumpInstructionBase extends ScriptInstruction {
     offset = finalOffset;
     int layoutDelta = target._firstPassOffset - _firstPassOffset;
     if (layoutDelta == 3) {
-      return isConditional() ? 1 : 0;
+      return isConditional ? 1 : 0;
     }
     if (4 <= layoutDelta && layoutDelta < 35) {
       return 1;
@@ -516,7 +543,7 @@ sealed class JumpInstructionBase extends ScriptInstruction {
     int delta = target.offset - offset;
     int layoutDelta = target._firstPassOffset - _firstPassOffset;
     if (layoutDelta == 3) {
-      if (isConditional()) {
+      if (isConditional) {
         builder.addByte(ScriptOpcode.pop.value);
         --delta;
       }
@@ -553,7 +580,7 @@ sealed class JumpInstructionBase extends ScriptInstruction {
 
   ScriptOpcode get shortOpcode;
   ScriptOpcode get longOpcode;
-  bool isConditional() => false;
+  bool get isConditional => false;
 
   late final NopInstruction target;
 }
@@ -583,7 +610,7 @@ final class JumpIfZeroInstruction extends JumpInstructionBase {
   String toString() => '  jz 0x${target.offset.toRadixString(16)}';
 
   @override
-  bool isConditional() => true;
+  bool get isConditional => true;
 }
 
 final class JumpIfNotZeroInstruction extends JumpInstructionBase {
@@ -597,7 +624,7 @@ final class JumpIfNotZeroInstruction extends JumpInstructionBase {
   String toString() => '  jnz 0x${target.offset.toRadixString(16)}';
 
   @override
-  bool isConditional() => true;
+  bool get isConditional => true;
 }
 
 final class PushStringValueInstruction extends ScriptInstruction {
@@ -625,7 +652,7 @@ final class PushStringValueInstruction extends ScriptInstruction {
 }
 
 final class SetHalfWordFunctionDataValueInstruction
-    extends FunctionNameScriptInstruction {
+    extends FunctionReferenceScriptInstruction {
   SetHalfWordFunctionDataValueInstruction({
     required String functionName,
     required this.value,
@@ -637,9 +664,16 @@ final class SetHalfWordFunctionDataValueInstruction
 
   @override
   void addByteCode(ScriptByteCodeBuilder builder) {
-    final offset = builder.functions[targetName]?.offset;
-    if (offset == null) {
-      throw Exception('Internal error: failed lookup on data');
+    final targetName = this.targetName;
+    final int? offset;
+
+    if (targetName == null) {
+      offset = 0;
+    } else {
+      offset = builder.functions[targetName]?.offset;
+      if (offset == null) {
+        throw Exception('Internal error: failed lookup on data');
+      }
     }
 
     value[valueOffset] = offset & 0xff;
@@ -750,6 +784,14 @@ final class NopInstruction extends ScriptInstruction {
 
   final ScriptInstruction? reference;
 
+  bool isTarget(ScriptInstruction? target) {
+    while (target is NopInstruction) {
+      if (identical(this, target)) return true;
+      target = target.next;
+    }
+    return false;
+  }
+
   @override
   String toString() => ' 0x${offset.toRadixString(16)}:';
 }
@@ -816,8 +858,8 @@ final class ReturnIfNotZeroInstruction extends ScriptInstruction {
   String toString() => '  retnz';
 }
 
-final class FunctionStartInstruction extends ScriptInstruction {
-  FunctionStartInstruction(this.function, this.isLocked);
+final class StartFunctionInstruction extends ScriptInstruction {
+  StartFunctionInstruction(this.function, this.isLocked);
 
   final ScriptFunctionDefinition function;
 
@@ -854,5 +896,28 @@ final class FunctionStartInstruction extends ScriptInstruction {
           '${function.functionName} (0x${offset.toRadixString(16)}):'
           '\n  enterFunction ${function.numberOfParameters} ${function.numberOfLocals - function.numberOfParameters}';
     }
+  }
+}
+
+final class DataInstruction extends ScriptInstruction {
+  DataInstruction(this.data);
+
+  final Uint8List data;
+
+  @override
+  bool get implicitNext => false;
+
+  @override
+  int get byteCodeLength => data.length;
+
+  @override
+  void addByteCode(ScriptByteCodeBuilder builder) {
+    builder.add(data);
+  }
+
+  @override
+  String toString() {
+    final bytesText = data.map((e) => e.toRadixString(16).padLeft(2, '0'));
+    return '  data [[${bytesText.join(' ')}]]';
   }
 }

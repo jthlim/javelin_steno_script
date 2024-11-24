@@ -82,7 +82,7 @@ void main() {
             type: TokenType.identifier,
             line: 1,
             column: 23,
-            stringValue: "myValue",
+            stringValue: 'myValue',
           ),
           const Token(
             type: TokenType.intValue,

@@ -20,9 +20,6 @@ class InstructionList extends Iterable<ScriptInstruction> {
     optimizeNot();
     optimizeTrueFalseJumps();
     optimizeRightFactor();
-    if (byteCodeVersion >= 4) {
-      optimizeJumpOverRet();
-    }
     optimizeJumpTarget(byteCodeVersion);
     optimizeRightFactor();
     optimizeJumpTarget(byteCodeVersion);
@@ -34,7 +31,11 @@ class InstructionList extends Iterable<ScriptInstruction> {
     optimizeConditionalJumpToNext();
     optimizeConsecutiveRet();
     optimizeStoreLoad();
-    optimizeCallFunction();
+    optimizeFunctionReference();
+    if (byteCodeVersion >= 4) {
+      optimizeJumpOverRet();
+    }
+    optimizeDeadFunctions();
   }
 
   void optimizeRightFactor() {
@@ -313,7 +314,7 @@ class InstructionList extends Iterable<ScriptInstruction> {
       }
 
       final next = instruction.target.next;
-      if (instruction.isConditional()) {
+      if (instruction.isConditional) {
         instruction.insertAfter(PopValueInstruction());
         instruction.unlink();
       }
@@ -338,38 +339,55 @@ class InstructionList extends Iterable<ScriptInstruction> {
 
     ScriptInstruction? instruction = instructions.first;
     while (instruction != null) {
-      if (instruction is! JumpInstructionBase || !instruction.isConditional()) {
+      if (instruction is! JumpInstructionBase || !instruction.isConditional) {
         instruction = instruction.next;
         continue;
       }
 
       final next = instruction.next;
-      if (next is! JumpInstruction) {
+      if (next is JumpInstruction) {
+        if (!instruction.target.isTarget(next.next)) {
+          instruction = instruction.next;
+          continue;
+        }
+
+        final label2 = next.target;
+        late final JumpInstructionBase replacementInstruction;
+        if (instruction is JumpIfZeroInstruction) {
+          replacementInstruction = JumpIfNotZeroInstruction();
+        } else if (instruction is JumpIfNotZeroInstruction) {
+          replacementInstruction = JumpIfZeroInstruction();
+        }
+        label2.insertAfter(replacementInstruction.target);
+        instruction.insertAfter(replacementInstruction);
+
+        instruction.unlink();
+        next.unlink();
+
+        instruction = replacementInstruction;
+      } else if (next is JumpFunctionInstruction) {
+        if (!instruction.target.isTarget(next.next)) {
+          instruction = instruction.next;
+          continue;
+        }
+
+        late final JumpFunctionInstructionBase replacementInstruction;
+        if (instruction is JumpIfZeroInstruction) {
+          replacementInstruction =
+              JumpIfNotZeroFunctionInstruction(next.functionName);
+        } else if (instruction is JumpIfNotZeroInstruction) {
+          replacementInstruction =
+              JumpIfZeroFunctionInstruction(next.functionName);
+        }
+        instruction.insertAfter(replacementInstruction);
+
+        instruction.unlink();
+        next.unlink();
+
+        instruction = replacementInstruction;
+      } else {
         instruction = instruction.next;
-        continue;
       }
-
-      if (!identical(instruction.target, next.next)) {
-        instruction = instruction.next;
-        continue;
-      }
-
-      final label2 = next.target;
-      late final JumpInstructionBase replacementInstruction;
-      if (instruction is JumpIfZeroInstruction) {
-        replacementInstruction = JumpIfNotZeroInstruction();
-      } else if (instruction is JumpIfNotZeroInstruction) {
-        replacementInstruction = JumpIfZeroInstruction();
-      }
-      label2.insertAfter(replacementInstruction.target);
-      instruction.insertAfter(replacementInstruction);
-
-      final nextInstructionToProcess = instruction.target.next;
-
-      instruction.unlink();
-      next.unlink();
-
-      instruction = nextInstructionToProcess;
     }
   }
 
@@ -417,10 +435,23 @@ class InstructionList extends Iterable<ScriptInstruction> {
         instruction.unlink();
         instruction = previous;
         continue;
+      } else if (next is JumpIfZeroFunctionInstruction) {
+        final replacement = JumpIfNotZeroFunctionInstruction(next.functionName);
+        next.replaceWith(replacement);
+        instruction.unlink();
+        instruction = previous;
+        continue;
       } else if (next is JumpIfNotZeroInstruction) {
         final replacement = JumpIfZeroInstruction();
         final previous = instruction.previous!;
         next.target.insertAfter(replacement.target);
+        next.replaceWith(replacement);
+        instruction.unlink();
+        instruction = previous;
+        continue;
+      } else if (next is JumpIfNotZeroFunctionInstruction) {
+        final replacement = JumpIfZeroFunctionInstruction(next.functionName);
+        final previous = instruction.previous!;
         next.replaceWith(replacement);
         instruction.unlink();
         instruction = previous;
@@ -521,7 +552,7 @@ class InstructionList extends Iterable<ScriptInstruction> {
       if (instruction == null) {
         return false;
       }
-      if (instruction is FunctionStartInstruction) {
+      if (instruction is StartFunctionInstruction) {
         return false;
       }
       if (instruction is LoadLocalValueInstruction &&
@@ -568,22 +599,24 @@ class InstructionList extends Iterable<ScriptInstruction> {
     }
   }
 
-  void optimizeCallFunction() {
+  void optimizeFunctionReference() {
     if (instructions.isEmpty) {
       return;
     }
 
     // First build function name -> target Name map.
-    final functionTargets = <String, String>{};
+    final functionTargets = <String, String?>{};
 
     for (ScriptInstruction? instruction = instructions.first;
         instruction != null;
         instruction = instruction.next) {
-      if (instruction is FunctionStartInstruction) {
+      if (instruction is StartFunctionInstruction) {
         final firstInstruction = instruction.next;
         if (firstInstruction is JumpFunctionInstruction) {
           functionTargets[instruction.function.functionName] =
               firstInstruction.targetName;
+        } else if (firstInstruction is ReturnInstruction) {
+          functionTargets[instruction.function.functionName] = null;
         }
       }
     }
@@ -591,25 +624,77 @@ class InstructionList extends Iterable<ScriptInstruction> {
     for (ScriptInstruction? instruction = instructions.first;
         instruction != null;
         instruction = instruction.next) {
-      if (instruction is FunctionNameScriptInstruction) {
+      if (instruction is FunctionReferenceScriptInstruction) {
         for (;;) {
-          final targetFunctionName = functionTargets[instruction.targetName];
-          if (targetFunctionName == null) break;
+          if (!functionTargets.containsKey(instruction.targetName)) {
+            break;
+          }
 
-          instruction.targetName = targetFunctionName;
+          instruction.targetName = functionTargets[instruction.targetName];
         }
       }
     }
+  }
 
-    // Clean up functions that are redirected.
+  void recurseMarkStartFunctions(
+    Map<String, StartFunctionInstruction> startFunctionInstructions,
+    Set<StartFunctionInstruction> requiredFunctions,
+    String? name,
+  ) {
+    if (name == null) return;
+
+    final startInstruction = startFunctionInstructions[name];
+    if (startInstruction == null) return;
+
+    if (requiredFunctions.contains(startInstruction)) return;
+
+    requiredFunctions.add(startInstruction);
+
+    for (ScriptInstruction? instruction = startInstruction;
+        instruction != null;
+        instruction = instruction.next) {
+      if (instruction is FunctionReferenceScriptInstruction) {
+        recurseMarkStartFunctions(
+          startFunctionInstructions,
+          requiredFunctions,
+          instruction.targetName,
+        );
+      }
+    }
+  }
+
+  void optimizeDeadFunctions() {
+    // First build function name -> target Name map.
+    final startFunctionInstructions = <String, StartFunctionInstruction>{};
+    final requiredFunctions = <StartFunctionInstruction>{};
+
     for (ScriptInstruction? instruction = instructions.first;
         instruction != null;
         instruction = instruction.next) {
-      if (instruction is FunctionStartInstruction) {
-        if (!instruction.isLocked &&
-            functionTargets.containsKey(instruction.function.functionName)) {
-          instruction.next?.unlink();
-        }
+      if (instruction is StartFunctionInstruction) {
+        startFunctionInstructions[instruction.function.functionName] =
+            instruction;
+      }
+    }
+
+    recurseMarkStartFunctions(
+      startFunctionInstructions,
+      requiredFunctions,
+      '\$byteCodeRoot',
+    );
+
+    for (ScriptInstruction? instruction = instructions.first;
+        instruction != null;
+        instruction = instruction?.next) {
+      while (instruction is StartFunctionInstruction) {
+        if (requiredFunctions.contains(instruction)) break;
+
+        do {
+          final next = instruction!.next;
+          instruction.unlink();
+          instruction = next;
+        } while (
+            instruction != null && instruction is! StartFunctionInstruction);
       }
     }
   }

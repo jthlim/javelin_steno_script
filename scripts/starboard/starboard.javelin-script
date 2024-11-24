@@ -1,4 +1,20 @@
 // Generated from javelin-layout file
+var layer;
+func setLayer(layerIndex, layerIdEvent) {
+  releaseAll();
+  layer = layerIndex;
+  sendEvent(layerIdEvent);
+}
+
+func dispatchToLayer(functions) {
+  var f = functions[[[resolveLayerIndex()]]];
+  f();
+}
+
+func resolveLayerIndex() var {
+  return 0;
+}
+
 func activate0() {
 
 }
@@ -75,79 +91,156 @@ func onRelease0() {
 }
 
 func onPress1() {
-  pressStenoKey(0 /* "S1" */);
+  onPress1_0();
 }
 func onRelease1() {
+  onRelease1_0();
+}
+
+func onPress1_0() {
+  pressStenoKey(0 /* "S1" */);
+}
+func onRelease1_0() {
   releaseStenoKey(0 /* "S1" */);
 }
 
 func onPress2() {
-  pressStenoKey(2 /* "T-" */);
+  onPress2_0();
 }
 func onRelease2() {
+  onRelease2_0();
+}
+
+func onPress2_0() {
+  pressStenoKey(2 /* "T-" */);
+}
+func onRelease2_0() {
   releaseStenoKey(2 /* "T-" */);
 }
 
 func onPress3() {
-  pressStenoKey(4 /* "P-" */);
+  onPress3_0();
 }
 func onRelease3() {
+  onRelease3_0();
+}
+
+func onPress3_0() {
+  pressStenoKey(4 /* "P-" */);
+}
+func onRelease3_0() {
   releaseStenoKey(4 /* "P-" */);
 }
 
 func onPress4() {
-  pressStenoKey(6 /* "H-" */);
+  onPress4_0();
 }
 func onRelease4() {
+  onRelease4_0();
+}
+
+func onPress4_0() {
+  pressStenoKey(6 /* "H-" */);
+}
+func onRelease4_0() {
   releaseStenoKey(6 /* "H-" */);
 }
 
 func onPress5() {
-  pressStenoKey(26 /* "#1" */);
+  onPress5_0();
 }
 func onRelease5() {
+  onRelease5_0();
+}
+
+func onPress5_0() {
+  pressStenoKey(26 /* "#1" */);
+}
+func onRelease5_0() {
   releaseStenoKey(26 /* "#1" */);
 }
 
 func onPress6() {
-  pressStenoKey(10 /* "*1" */);
+  onPress6_0();
 }
 func onRelease6() {
+  onRelease6_0();
+}
+
+func onPress6_0() {
+  pressStenoKey(10 /* "*1" */);
+}
+func onRelease6_0() {
   releaseStenoKey(10 /* "*1" */);
 }
 
 func onPress7() {
-  pressStenoKey(16 /* "-F" */);
+  onPress7_0();
 }
 func onRelease7() {
+  onRelease7_0();
+}
+
+func onPress7_0() {
+  pressStenoKey(16 /* "-F" */);
+}
+func onRelease7_0() {
   releaseStenoKey(16 /* "-F" */);
 }
 
 func onPress8() {
-  pressStenoKey(18 /* "-P" */);
+  onPress8_0();
 }
 func onRelease8() {
+  onRelease8_0();
+}
+
+func onPress8_0() {
+  pressStenoKey(18 /* "-P" */);
+}
+func onRelease8_0() {
   releaseStenoKey(18 /* "-P" */);
 }
 
 func onPress9() {
-  pressStenoKey(20 /* "-L" */);
+  onPress9_0();
 }
 func onRelease9() {
+  onRelease9_0();
+}
+
+func onPress9_0() {
+  pressStenoKey(20 /* "-L" */);
+}
+func onRelease9_0() {
   releaseStenoKey(20 /* "-L" */);
 }
 
 func onPress10() {
-  pressStenoKey(22 /* "-T" */);
+  onPress10_0();
 }
 func onRelease10() {
+  onRelease10_0();
+}
+
+func onPress10_0() {
+  pressStenoKey(22 /* "-T" */);
+}
+func onRelease10_0() {
   releaseStenoKey(22 /* "-T" */);
 }
 
 func onPress11() {
-  pressStenoKey(24 /* "-D" */);
+  onPress11_0();
 }
 func onRelease11() {
+  onRelease11_0();
+}
+
+func onPress11_0() {
+  pressStenoKey(24 /* "-D" */);
+}
+func onRelease11_0() {
   releaseStenoKey(24 /* "-D" */);
 }
 
@@ -157,97 +250,194 @@ func onRelease12() {
 }
 
 func onPress13() {
-  pressStenoKey(1 /* "S2" */);
+  onPress13_0();
 }
 func onRelease13() {
+  onRelease13_0();
+}
+
+func onPress13_0() {
+  pressStenoKey(1 /* "S2" */);
+}
+func onRelease13_0() {
   releaseStenoKey(1 /* "S2" */);
 }
 
 func onPress14() {
-  pressStenoKey(3 /* "K-" */);
+  onPress14_0();
 }
 func onRelease14() {
+  onRelease14_0();
+}
+
+func onPress14_0() {
+  pressStenoKey(3 /* "K-" */);
+}
+func onRelease14_0() {
   releaseStenoKey(3 /* "K-" */);
 }
 
 func onPress15() {
-  pressStenoKey(5 /* "W-" */);
+  onPress15_0();
 }
 func onRelease15() {
+  onRelease15_0();
+}
+
+func onPress15_0() {
+  pressStenoKey(5 /* "W-" */);
+}
+func onRelease15_0() {
   releaseStenoKey(5 /* "W-" */);
 }
 
 func onPress16() {
-  pressStenoKey(7 /* "R-" */);
+  onPress16_0();
 }
 func onRelease16() {
+  onRelease16_0();
+}
+
+func onPress16_0() {
+  pressStenoKey(7 /* "R-" */);
+}
+func onRelease16_0() {
   releaseStenoKey(7 /* "R-" */);
 }
 
 func onPress17() {
-  pressStenoKey(17 /* "-R" */);
+  onPress17_0();
 }
 func onRelease17() {
+  onRelease17_0();
+}
+
+func onPress17_0() {
+  pressStenoKey(17 /* "-R" */);
+}
+func onRelease17_0() {
   releaseStenoKey(17 /* "-R" */);
 }
 
 func onPress18() {
-  pressStenoKey(19 /* "-B" */);
+  onPress18_0();
 }
 func onRelease18() {
+  onRelease18_0();
+}
+
+func onPress18_0() {
+  pressStenoKey(19 /* "-B" */);
+}
+func onRelease18_0() {
   releaseStenoKey(19 /* "-B" */);
 }
 
 func onPress19() {
-  pressStenoKey(21 /* "-G" */);
+  onPress19_0();
 }
 func onRelease19() {
+  onRelease19_0();
+}
+
+func onPress19_0() {
+  pressStenoKey(21 /* "-G" */);
+}
+func onRelease19_0() {
   releaseStenoKey(21 /* "-G" */);
 }
 
 func onPress20() {
-  pressStenoKey(23 /* "-S" */);
+  onPress20_0();
 }
 func onRelease20() {
+  onRelease20_0();
+}
+
+func onPress20_0() {
+  pressStenoKey(23 /* "-S" */);
+}
+func onRelease20_0() {
   releaseStenoKey(23 /* "-S" */);
 }
 
 func onPress21() {
-  pressStenoKey(25 /* "-Z" */);
+  onPress21_0();
 }
 func onRelease21() {
+  onRelease21_0();
+}
+
+func onPress21_0() {
+  pressStenoKey(25 /* "-Z" */);
+}
+func onRelease21_0() {
   releaseStenoKey(25 /* "-Z" */);
 }
 
 func onPress22() {
-  pressStenoKey(8 /* "A" */);
+  onPress22_0();
 }
 func onRelease22() {
+  onRelease22_0();
+}
+
+func onPress22_0() {
+  pressStenoKey(8 /* "A" */);
+}
+func onRelease22_0() {
   releaseStenoKey(8 /* "A" */);
 }
 
 func onPress23() {
-  pressStenoKey(9 /* "O" */);
+  onPress23_0();
 }
 func onRelease23() {
+  onRelease23_0();
+}
+
+func onPress23_0() {
+  pressStenoKey(9 /* "O" */);
+}
+func onRelease23_0() {
   releaseStenoKey(9 /* "O" */);
 }
 
 func onPress24() {
-  pressStenoKey(14 /* "E" */);
+  onPress24_0();
 }
 func onRelease24() {
+  onRelease24_0();
+}
+
+func onPress24_0() {
+  pressStenoKey(14 /* "E" */);
+}
+func onRelease24_0() {
   releaseStenoKey(14 /* "E" */);
 }
 
 func onPress25() {
-  pressStenoKey(15 /* "U" */);
+  onPress25_0();
 }
 func onRelease25() {
+  onRelease25_0();
+}
+
+func onPress25_0() {
+  pressStenoKey(15 /* "U" */);
+}
+func onRelease25_0() {
   releaseStenoKey(15 /* "U" */);
 }
 
 func onPress26() {
+  onPress26_0();
+}
+func onRelease26() {
+}
+
+func onPress26_0() {
   // Toggle Steno
   // Toggle the steno mode between embedded and Gemini PR when USR is pressed.
   // LED RGB is updated in Global StenoModeUpdate callback.
@@ -258,12 +448,18 @@ func onPress26() {
   }
   releaseAll();
 }
-func onRelease26() {
+func onRelease26_0() {
 }
 
 func onPress27() {
-  console("launch_bootloader");
+  onPress27_0();
 }
 func onRelease27() {
+}
+
+func onPress27_0() {
+  console("launch_bootloader");
+}
+func onRelease27_0() {
 }
 

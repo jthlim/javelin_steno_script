@@ -1,6 +1,7 @@
 name: javelin_steno_script
 description: A sample command-line application.
 version: 1.0.0
+publish_to: none
 # homepage: https://www.example.com
 
 environment:

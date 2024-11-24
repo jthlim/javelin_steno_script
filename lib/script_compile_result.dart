@@ -24,8 +24,13 @@ class ScriptCompileResult {
         Parser(input: scriptHeader, filename: '', module: module).parse();
       }
       Parser(input: script, filename: '', module: module).parse();
-      final builder = ScriptByteCodeBuilder(module, scriptByteCodeVersion);
-      final byteCode = builder.createByteCode(scriptButtonCount);
+      final builder = ScriptByteCodeBuilder(
+        module: module,
+        byteCodeVersion: scriptByteCodeVersion,
+        requiredFunctions:
+            ScriptByteCodeBuilder.createScriptFunctionList(scriptButtonCount),
+      );
+      final byteCode = builder.createByteCode();
 
       if (byteCode.length > maximumScriptByteCodeSize) {
         return ScriptCompileResult.failed(
@@ -35,14 +40,18 @@ class ScriptCompileResult {
         );
       }
 
-      return ScriptCompileResult.ok(byteCode.length, byteCode, script);
+      return ScriptCompileResult.ok(byteCode.length, byteCode, script, builder);
     } on Exception catch (e) {
       return ScriptCompileResult.failed(e.toString());
     }
   }
 
-  ScriptCompileResult.ok(this.size, Uint8List this.data, String this.script)
-      : success = true,
+  ScriptCompileResult.ok(
+    this.size,
+    Uint8List this.data,
+    String this.script,
+    ScriptByteCodeBuilder this.builder,
+  )   : success = true,
         message = 'OK, $size bytes';
   ScriptCompileResult.failed(this.message)
       : success = false,
@@ -53,6 +62,7 @@ class ScriptCompileResult {
   int size;
   Uint8List? data;
   String? script;
+  ScriptByteCodeBuilder? builder;
 
   int get crc => Crc32().convert(data ?? []).toBigInt().toInt();
 }

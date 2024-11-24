@@ -3,7 +3,6 @@
 import 'dart:io';
 
 import 'package:javelin_steno_script/javelin_steno_script.dart';
-import 'package:javelin_steno_script/src/instruction.dart';
 
 void main(List<String> arguments) {
   if (arguments.length < 2) {
@@ -25,42 +24,12 @@ void main(List<String> arguments) {
     Parser(input: source, filename: filename, module: module).parse();
   }
 
-  final builder = ScriptByteCodeBuilder(module, latestScriptByteCodeVersion);
-  final byteCode = builder.createByteCode(buttonCount);
-
-  print('Opcodes');
-  print('-------');
-  ScriptInstruction? lastInstruction;
-  for (final instruction in builder.instructions) {
-    if (instruction is! NopInstruction || lastInstruction is! NopInstruction) {
-      print(instruction.toString());
-    }
-
-    lastInstruction = instruction;
-  }
-
-  if (builder.stringTable.isNotEmpty) {
-    print('\n\nString table');
-    print('------------');
-    builder.stringTable.forEach((key, value) {
-      print(
-        '${value.toRadixString(16).padLeft(4, '0')}: '
-        '${formatStringData(key)}',
-      );
-    });
-  }
-
-  print('\n\nBytecode');
-  print('--------');
-  final buffer = StringBuffer();
-  for (var i = 0; i < byteCode.length; ++i) {
-    if (i % 16 == 0) {
-      buffer.write('\n${i.toRadixString(16).padLeft(4, '0')}: ');
-    }
-    buffer.write(' 0x${byteCode[i].toRadixString(16).padLeft(2, '0')},');
-  }
-  buffer.write('\n');
-  print(buffer.toString());
-
-  print("Globals used: ${module.globalsUsedCount}");
+  final builder = ScriptByteCodeBuilder(
+    module: module,
+    byteCodeVersion: latestScriptByteCodeVersion,
+    requiredFunctions:
+        ScriptByteCodeBuilder.createScriptFunctionList(buttonCount),
+  );
+  final byteCode = builder.createByteCode();
+  print(builder.disassemble(byteCode));
 }
