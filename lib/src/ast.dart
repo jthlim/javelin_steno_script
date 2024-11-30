@@ -107,11 +107,13 @@ class HalfWordListAstNode extends AstNode {
     var offset = 0;
     for (final e in values) {
       if (!e.isConstant() && e is PushFunctionAddress) {
-        builder.addInstruction(SetHalfWordFunctionDataValueInstruction(
-          value: bytes,
-          valueOffset: offset,
-          functionName: e.name,
-        ));
+        builder.addInstruction(
+          SetHalfWordFunctionDataValueInstruction(
+            value: bytes,
+            valueOffset: offset,
+            functionName: e.name,
+          ),
+        );
       }
       offset += 2;
     }
@@ -344,7 +346,7 @@ class TermsAstNode extends AstNode {
       if (!term.statement.isConstant()) {
         continue;
       }
-      int value = term.statement.constantValue();
+      final value = term.statement.constantValue();
       switch (term.mode) {
         case TermMode.add:
           result += value;
@@ -387,18 +389,21 @@ class TermsAstNode extends AstNode {
             if (constantsSum == 0) {
               term.statement.addInstructions(builder);
               builder.addInstruction(
-                  OpcodeInstruction(ScriptOperatorOpcode.negative));
+                OpcodeInstruction(ScriptOperatorOpcode.negative),
+              );
             } else {
               builder.addInstruction(PushIntValueInstruction(constantsSum));
               constantsSum = 0;
               term.statement.addInstructions(builder);
               builder.addInstruction(
-                  OpcodeInstruction(ScriptOperatorOpcode.subtract));
+                OpcodeInstruction(ScriptOperatorOpcode.subtract),
+              );
             }
           } else {
             term.statement.addInstructions(builder);
             builder.addInstruction(
-                OpcodeInstruction(ScriptOperatorOpcode.subtract));
+              OpcodeInstruction(ScriptOperatorOpcode.subtract),
+            );
           }
       }
     }
@@ -1156,7 +1161,8 @@ class LoadIndexedGlobalValueAstNode extends AstNode
       indexExpression.addInstructions(builder);
       builder.addInstruction(
         LoadIndexedGlobalValueInstruction(
-            globalValue.global.index + globalIndexOffset),
+          globalValue.global.index + globalIndexOffset,
+        ),
       );
     }
   }
@@ -1255,7 +1261,8 @@ class CallFunctionAstNode extends AstNode {
     }
     if (usesValue && !definition.hasReturnValue) {
       throw FormatException(
-          '$name (${token.location()}) does not return a value');
+        '$name (${token.location()}) does not return a value',
+      );
     }
 
     if (definition is InBuiltScriptFunction) {
@@ -1405,13 +1412,19 @@ class StoreIndexedGlobalValueAstNode extends AstNode
     if (builder.reachability.globals.contains(globalValueIndex)) {
       if (indexExpression.isConstant()) {
         expression.addInstructions(builder);
-        builder.addInstruction(StoreGlobalValueInstruction(
-            globalValueIndex + indexExpression.constantValue()));
+        builder.addInstruction(
+          StoreGlobalValueInstruction(
+            globalValueIndex + indexExpression.constantValue(),
+          ),
+        );
       } else {
         indexExpression.addInstructions(builder);
         expression.addInstructions(builder);
-        builder.addInstruction(StoreIndexedGlobalValueInstruction(
-            globalValueIndex + globalIndexOffset));
+        builder.addInstruction(
+          StoreIndexedGlobalValueInstruction(
+            globalValueIndex + globalIndexOffset,
+          ),
+        );
       }
     }
   }

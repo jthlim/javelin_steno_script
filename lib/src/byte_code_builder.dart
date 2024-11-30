@@ -65,15 +65,18 @@ class ScriptByteCodeBuilder {
   void _createInstructionList() {
     // Add header and root element. This name is used by InstructionList.
     addInstruction(
-        StartFunctionInstruction(ScriptFunction('\$byteCodeRoot'), true));
+      StartFunctionInstruction(ScriptFunction('\$byteCodeRoot'), true),
+    );
     _headerBytes = Uint8List(6 + 2 * requiredFunctions.length);
     _headerBytes.setRange(0, 4, 'JSS$byteCodeVersion'.codeUnits);
     for (var i = 0; i < requiredFunctions.length; ++i) {
-      addInstruction(SetHalfWordFunctionDataValueInstruction(
-        functionName: requiredFunctions[i],
-        value: _headerBytes,
-        valueOffset: 6 + i * 2,
-      ));
+      addInstruction(
+        SetHalfWordFunctionDataValueInstruction(
+          functionName: requiredFunctions[i],
+          value: _headerBytes,
+          valueOffset: 6 + i * 2,
+        ),
+      );
     }
     addInstruction(DataInstruction(_headerBytes));
 
@@ -126,7 +129,7 @@ class ScriptByteCodeBuilder {
       stringTable[string] = offset;
 
       // Strings either start with 'S' (string) or 'D' (data).
-      int marker = string.codeUnitAt(0);
+      final marker = string.codeUnitAt(0);
 
       if (marker == 0x53 /* 'S' */) {
         offset += utf8.encode(string.substring(1)).length + 1;

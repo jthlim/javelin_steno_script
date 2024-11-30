@@ -32,6 +32,7 @@ class InstructionList extends Iterable<ScriptInstruction> {
     optimizeConsecutiveRet();
     optimizeStoreLoad();
     optimizeFunctionReference();
+    optimizeEqualsAndNotEquals();
     if (byteCodeVersion >= 4) {
       optimizeJumpOverRet();
     }
@@ -83,7 +84,7 @@ class InstructionList extends Iterable<ScriptInstruction> {
       if (instruction is PushIntValueInstruction) {
         final value = instruction.value;
         if (value == 0 || value == 1) {
-          ScriptInstruction? jumpInstruction =
+          final jumpInstruction =
               findFixedJumpTarget(instruction.next, value != 0);
           if (jumpInstruction != null) {
             instruction.replaceWith(jumpInstruction);
@@ -391,6 +392,106 @@ class InstructionList extends Iterable<ScriptInstruction> {
     }
   }
 
+  void replaceWithSubtract(ScriptInstruction instruction) {
+    final previous = instruction.previous;
+    if (previous is PushIntValueInstruction) {
+      if (previous.value == 1) {
+        previous.unlink();
+        instruction
+            .replaceWith(OpcodeInstruction(ScriptOperatorOpcode.decrement));
+        return;
+      } else if (previous.value == -1) {
+        previous.unlink();
+        instruction
+            .replaceWith(OpcodeInstruction(ScriptOperatorOpcode.increment));
+        return;
+      }
+    }
+    instruction.replaceWith(OpcodeInstruction(ScriptOperatorOpcode.subtract));
+  }
+
+  // Replaces equals and not equals with subtract when possible.
+  //
+  // Subtract is a faster operation than equals and not equals, and opens
+  // up increment/decrement opportunities, which also reduces the number of
+  // instructions.
+  void optimizeEqualsAndNotEquals() {
+    if (instructions.isEmpty) {
+      return;
+    }
+
+    ScriptInstruction? instruction = instructions.first;
+    while (instruction != null) {
+      if (instruction is! OpcodeInstruction) {
+        instruction = instruction.next;
+        continue;
+      }
+
+      switch (instruction.opcode) {
+        case ScriptOperatorOpcode.notEquals:
+          final next = instruction.next;
+          if ((next is JumpInstructionBase && next.isConditional) ||
+              (next is JumpFunctionInstructionBase && next.isConditional) ||
+              next is ReturnIfZeroInstruction ||
+              next is ReturnIfNotZeroInstruction) {
+            replaceWithSubtract(instruction);
+            instruction = next;
+            continue;
+          }
+          break;
+
+        case ScriptOperatorOpcode.equals:
+          final next = instruction.next;
+          if (next is JumpInstructionBase && next.isConditional) {
+            final JumpInstructionBase replacement;
+            if (next is JumpIfNotZeroInstruction) {
+              replacement = JumpIfZeroInstruction();
+            } else if (next is JumpIfZeroInstruction) {
+              replacement = JumpIfNotZeroInstruction();
+            } else {
+              throw Exception('Internal error: Unexpected jump type $next');
+            }
+            replaceWithSubtract(instruction);
+            next.target.insertAfter(replacement.target);
+            next.replaceWith(replacement);
+            instruction = replacement;
+            continue;
+          } else if (next is JumpFunctionInstructionBase &&
+              next.isConditional) {
+            final JumpFunctionInstructionBase replacement;
+            if (next is JumpIfNotZeroFunctionInstruction) {
+              replacement = JumpIfZeroFunctionInstruction(next.functionName);
+            } else if (next is JumpIfZeroInstruction) {
+              replacement = JumpIfNotZeroFunctionInstruction(next.functionName);
+            } else {
+              throw Exception('Internal error: Unexpected jump type $next');
+            }
+            replaceWithSubtract(instruction);
+            next.replaceWith(replacement);
+            instruction = replacement;
+            continue;
+          } else if (next is ReturnIfZeroInstruction) {
+            replaceWithSubtract(instruction);
+            final replacement = ReturnIfNotZeroInstruction();
+            next.replaceWith(replacement);
+            instruction = replacement;
+            continue;
+          } else if (next is ReturnIfNotZeroInstruction) {
+            replaceWithSubtract(instruction);
+            final replacement = ReturnIfZeroInstruction();
+            next.replaceWith(replacement);
+            instruction = replacement;
+            continue;
+          }
+          break;
+
+        default:
+          break;
+      }
+      instruction = instruction.next;
+    }
+  }
+
   void optimizeNot() {
     if (instructions.isEmpty) {
       return;
@@ -472,7 +573,9 @@ class InstructionList extends Iterable<ScriptInstruction> {
   }
 
   static ScriptInstruction? replaceJumpToFunction(
-      JumpInstructionBase first, JumpFunctionInstruction second) {
+    JumpInstructionBase first,
+    JumpFunctionInstruction second,
+  ) {
     if (first is JumpInstruction) {
       return JumpFunctionInstruction(second.functionName);
     } else if (first is JumpIfZeroInstruction) {
@@ -485,7 +588,9 @@ class InstructionList extends Iterable<ScriptInstruction> {
   }
 
   static JumpInstructionBase? replaceJumpPair(
-      JumpInstructionBase first, JumpInstructionBase second) {
+    JumpInstructionBase first,
+    JumpInstructionBase second,
+  ) {
     if (first is JumpInstruction) {
       if (second is JumpInstruction) {
         final result = JumpInstruction();

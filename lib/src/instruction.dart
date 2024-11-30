@@ -454,6 +454,7 @@ sealed class JumpFunctionInstructionBase
 
   ScriptOpcode get opcode;
   ScriptOpcode get returnOpcode;
+  bool get isConditional;
 }
 
 final class JumpFunctionInstruction extends JumpFunctionInstructionBase {
@@ -467,6 +468,9 @@ final class JumpFunctionInstruction extends JumpFunctionInstructionBase {
 
   @override
   ScriptOpcode get returnOpcode => ScriptOpcode.ret;
+
+  @override
+  bool get isConditional => false;
 
   @override
   String toString() => functionName == targetName
@@ -484,6 +488,9 @@ final class JumpIfZeroFunctionInstruction extends JumpFunctionInstructionBase {
   ScriptOpcode get returnOpcode => ScriptOpcode.retIfZero;
 
   @override
+  bool get isConditional => true;
+
+  @override
   String toString() => functionName == targetName
       ? '  jz $functionName'
       : '  jz $targetName ($functionName)';
@@ -498,6 +505,9 @@ final class JumpIfNotZeroFunctionInstruction
 
   @override
   ScriptOpcode get returnOpcode => ScriptOpcode.retIfNotZero;
+
+  @override
+  bool get isConditional => true;
 
   @override
   String toString() => functionName == targetName
@@ -528,7 +538,7 @@ sealed class JumpInstructionBase extends ScriptInstruction {
   @override
   int layoutFinalPass(int finalOffset) {
     offset = finalOffset;
-    int layoutDelta = target._firstPassOffset - _firstPassOffset;
+    final layoutDelta = target._firstPassOffset - _firstPassOffset;
     if (layoutDelta == 3) {
       return isConditional ? 1 : 0;
     }
@@ -540,8 +550,8 @@ sealed class JumpInstructionBase extends ScriptInstruction {
 
   @override
   void addByteCode(ScriptByteCodeBuilder builder) {
-    int delta = target.offset - offset;
-    int layoutDelta = target._firstPassOffset - _firstPassOffset;
+    var delta = target.offset - offset;
+    final layoutDelta = target._firstPassOffset - _firstPassOffset;
     if (layoutDelta == 3) {
       if (isConditional) {
         builder.addByte(ScriptOpcode.pop.value);
@@ -565,7 +575,7 @@ sealed class JumpInstructionBase extends ScriptInstruction {
   }
 
   bool isJumpToNext() {
-    ScriptInstruction? n = next;
+    var n = next;
     while (n != null) {
       if (identical(n, target)) {
         return true;
@@ -638,7 +648,8 @@ final class PushStringValueInstruction extends ScriptInstruction {
     final offset = builder.stringTable[value];
     if (offset == null) {
       throw Exception(
-          'Internal error: failed lookup on string value "${formatStringData(value)}"');
+        'Internal error: failed lookup on string value "${formatStringData(value)}"',
+      );
     }
     builder.addOpcode(ScriptOpcode.pushBytes2S);
     builder.addByte(offset);

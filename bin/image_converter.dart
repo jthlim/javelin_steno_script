@@ -22,8 +22,8 @@ void main(List<String> arguments) {
     final white = ColorUint32.rgb(255, 255, 255);
 
     for (var x = 0; x < width; ++x) {
-      for (int yy = 0; yy < height; yy += 8) {
-        int data = 0;
+      for (var yy = 0; yy < height; yy += 8) {
+        var data = 0;
         for (var y = 0; y < 8; ++y) {
           if (yy + y >= height) {
             break;

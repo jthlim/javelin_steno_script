@@ -101,7 +101,8 @@ class Parser {
   void _assertUniqueName(String name) {
     if (_module.constants.containsKey(name)) {
       throw Exception(
-          '$name already defined as a constant near $_currentToken');
+        '$name already defined as a constant near $_currentToken',
+      );
     }
     if (_module.globals.containsKey(name)) {
       throw Exception('$name already defined as a global near $_currentToken');
@@ -116,7 +117,8 @@ class Parser {
     }
     if (_function?.locals.constants.containsKey(name) ?? false) {
       throw Exception(
-          '$name already defined as a local constant $_currentToken');
+        '$name already defined as a local constant $_currentToken',
+      );
     }
   }
 
@@ -781,7 +783,7 @@ class Parser {
       if (global.arraySize != null) {
         if (indexExpression == null) {
           throw FormatException(
-            '$name is an array and requirs an index near $_currentToken',
+            '$name is an array and requires an index near $_currentToken',
           );
         }
         return StoreIndexedGlobalValueAstNode(

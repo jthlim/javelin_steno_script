@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 
 class SyntaxHighlightingRule {
-  SyntaxHighlightingRule(this.pattern, this.lightMode, this.darkMode,
-      [this.nestedRules]);
+  SyntaxHighlightingRule(
+    this.pattern,
+    this.lightMode,
+    this.darkMode, [
+    this.nestedRules,
+  ]);
 
   final RegExp pattern;
   final TextStyle lightMode;
@@ -43,8 +47,10 @@ class SyntaxHighlightingRule {
 
     // Keywords
     SyntaxHighlightingRule(
-      RegExp(r'\b(?:func|for|const|var|return|if|else|while|do)\b',
-          unicode: true),
+      RegExp(
+        r'\b(?:func|for|const|var|return|if|else|while|do)\b',
+        unicode: true,
+      ),
       const TextStyle(color: Color(0xFFAD1457)), // pink800
       const TextStyle(color: Color(0xFFF48FB1)), // pink200
     ),

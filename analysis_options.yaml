@@ -2,6 +2,13 @@ include: package:lints/recommended.yaml
 
 linter:
   rules:
+    always_declare_return_types: true
+    avoid_type_to_string: true
+    no_self_assignments: true
+    omit_local_variable_types: true
     prefer_const_constructors: true
+    prefer_const_declarations: true
     prefer_single_quotes: true
+    require_trailing_commas: true
+    unnecessary_statements: true
 

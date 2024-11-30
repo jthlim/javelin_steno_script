@@ -43,7 +43,10 @@ class Tokenizer {
             ++_offset;
             ++_column;
             yield Token(
-                type: TokenType.notEquals, line: _line, column: _column);
+              type: TokenType.notEquals,
+              line: _line,
+              column: _column,
+            );
           } else {
             yield Token(type: TokenType.not, line: _line, column: _column);
           }
@@ -411,7 +414,7 @@ class Tokenizer {
       }
 
       if (_offset >= _length) {
-        throw FormatException('Unexepected end of input $locator');
+        throw FormatException('Unexpected end of input $locator');
       }
 
       final v = _input.codeUnitAt(_offset++);
@@ -516,7 +519,8 @@ class Tokenizer {
         _column++;
         if (c != 0x5d) {
           throw FormatException(
-              'Expected ]] to end data section in file $locator');
+            'Expected ]] to end data section in file $locator',
+          );
         }
         return buffer.toString();
       }
@@ -527,7 +531,8 @@ class Tokenizer {
           _column++;
           if (c != 0x5d) {
             throw FormatException(
-                'Expected ]] to end data section in file $locator');
+              'Expected ]] to end data section in file $locator',
+            );
           }
           return buffer.toString();
 
