@@ -235,9 +235,12 @@ class Parser {
     // Check locals
     final localVariable = _function?.locals.variables[name];
     if (localVariable != null) {
+      if (localVariable.arraySize != null) {
+        return LoadLocalValueArrayAstNode(localVariable);
+      }
       return LoadValueAstNode(
         isGlobal: false,
-        index: localVariable,
+        index: localVariable.index,
       );
     }
 
@@ -437,13 +440,20 @@ class Parser {
 
   AstNode _parseSubscript() {
     var result = _parseFallback();
-    if (result is LoadGlobalValueArrayAstNode &&
-        _currentToken.type == TokenType.openSquareBracket) {
-      _nextToken();
-      final indexExpression = _parseExpression();
-      _assertToken(TokenType.closeSquareBracket);
-      result = LoadIndexedGlobalValueAstNode(result, indexExpression);
+    if (_currentToken.type == TokenType.openSquareBracket) {
+      if (result is LoadGlobalValueArrayAstNode) {
+        _nextToken();
+        final indexExpression = _parseExpression();
+        _assertToken(TokenType.closeSquareBracket);
+        result = LoadIndexedGlobalValueAstNode(result, indexExpression);
+      } else if (result is LoadLocalValueArrayAstNode) {
+        _nextToken();
+        final indexExpression = _parseExpression();
+        _assertToken(TokenType.closeSquareBracket);
+        result = LoadIndexedLocalValueAstNode(result, indexExpression);
+      }
     }
+
     switch (_currentToken.type) {
       case TokenType.openSquareBracket:
         _nextToken();
@@ -724,8 +734,26 @@ class Parser {
     final nameToken = _currentToken;
     _assertToken(TokenType.identifier);
     final name = nameToken.stringValue!;
+    int? arraySize;
     AstNode? initializer;
-    if (_currentToken.type == TokenType.assign) {
+    if (_currentToken.type == TokenType.openSquareBracket) {
+      _assertToken(TokenType.openSquareBracket);
+      final arraySizeExpression = _parseExpression();
+      _assertToken(TokenType.closeSquareBracket);
+
+      if (!arraySizeExpression.isConstant()) {
+        throw FormatException(
+          'Array size must be a constant near $_currentToken',
+        );
+      }
+
+      arraySize = arraySizeExpression.constantValue();
+      if (arraySize <= 0) {
+        throw FormatException(
+          'Array size must be greater than 0 near $_currentToken',
+        );
+      }
+    } else if (_currentToken.type == TokenType.assign) {
       _assertToken(TokenType.assign);
       initializer = _parseExpression();
     }
@@ -733,7 +761,7 @@ class Parser {
 
     _assertUniqueName(name);
 
-    final index = _function!.addLocalVar(name);
+    final index = _function!.addLocalVar(name, arraySize);
     if (initializer == null) {
       return NopAstNode();
     }
@@ -802,12 +830,28 @@ class Parser {
         );
       }
     } else if (_function!.locals.variables.containsKey(name)) {
-      final index = _function!.locals.variables[name]!;
-      return StoreValueAstNode(
-        isGlobal: false,
-        index: index,
-        expression: value,
-      );
+      final localVariable = _function!.locals.variables[name]!;
+      if (localVariable.arraySize != null) {
+        if (indexExpression == null) {
+          throw FormatException(
+            '$name is an array and requires an index near $_currentToken',
+          );
+        }
+        return StoreIndexedLocalValueAstNode(
+          localValueIndex: localVariable.index,
+          indexExpression: indexExpression,
+          expression: value,
+        );
+      } else {
+        if (indexExpression != null) {
+          throw FormatException('$name is not an array near $_currentToken');
+        }
+        return StoreValueAstNode(
+          isGlobal: false,
+          index: localVariable.index,
+          expression: value,
+        );
+      }
     } else {
       throw FormatException('Unknown variable $name near $_currentToken');
     }

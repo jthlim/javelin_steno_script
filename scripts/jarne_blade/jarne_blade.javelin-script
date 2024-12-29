@@ -440,7 +440,7 @@ func _releaseScanCode(scanCode, isModifier) {
     localPostRelease();
   }
 }
-// Button Overrides
+// Global Script: Button Overrides
 const LAYER_PRESS_TO_KEY_PRESS_THRESHOLD = 100;
 const KEY_PRESS_TO_LAYER_RELEASE_THRESHOLD = 50;
 
@@ -540,7 +540,7 @@ func globalRelease() {
   updateScreenSaverTimer();
 }
 
-// Display Scripts
+// Global Script: Display Scripts
 func updateDisplay() {
   dispatchToLayer([[[@drawDisplayAbc, @drawDisplaySymbol, @drawDisplayFunction, @drawDisplayNavigation, @drawBleSummary, @drawDisplayNumpad, @drawDisplaySecurityKey]]]);
 }
@@ -654,7 +654,7 @@ func drawDisplaySteno() {
   setAutoDraw(1, AUTO_DRAW_WPM);
 
   var mode = getParameter("steno_mode");
-  var text = "";
+  var text;
   if (mode == "gemini")  {
     text = "Gemini";
   } else if(mode == "tx_bolt") {
@@ -663,6 +663,8 @@ func drawDisplaySteno() {
     text = "ProCAT";
   } else if(mode == "plover_hid") {
     text = "Plover HID";
+  } else {
+    return;
   }
   drawText(0, DISPLAY_WIDTH/2, DISPLAY_HEIGHT - 48 + 10, FONT_ID_NORMAL, TEXT_ALIGNMENT_MIDDLE, text);
 }
@@ -784,7 +786,7 @@ func drawDisplayDynamicSteno() {
   }
 }
 
-// DrawOverlay Scripts
+// Global Script: DrawOverlay Scripts
 func drawDisplayOverlay() {
   const OVERLAY_HEIGHT = 16;
 
@@ -938,7 +940,7 @@ func redrawDisplayOverlay() {
   drawRect(0, 0, 0, 0, 0);
 }
 
-// Magic Key Scripts
+// Global Script: Magic Key Scripts
 var magicKey;
 
 func pressMagicKey(buttonIndex) {
@@ -975,7 +977,7 @@ func releaseMagicKey() {
   }
 }
 
-// Screen Saver Scripts
+// Global Script: Screen Saver Scripts
 const SCREEN_SAVER_TIMEOUT = 900000; // 15 minutes.
 
 func shouldUseScreenSaver() var {
@@ -1048,14 +1050,15 @@ func updateScreenSaverTimer() {
   startTimer(TIMER_ID_SCREEN_SAVER, SCREEN_SAVER_TIMEOUT, 1, @startScreenSaver);
 }
 
-// checkUserPresenceReply
-func checkUserPresenceReply() {
-  if (checkButtonState("000000000000000000000000100000000001000000")) {
-    replyUserPresence(1);
+// Global Script: onConnectionUpdate
+func onConnectionUpdate() {
+  if (isBleSummaryActive) {
+    drawBleSummary();
   }
+  redrawDisplayOverlay();
 }
 
-// checkWordCapsAndCapsLock
+// Layer 00 Script: checkWordCapsAndCapsLock
 func checkWordCapsAndCapsLock() {
   // Word caps when both shifts are pressed.
   // Caps lock when both shifts, alt and sym pressed.
@@ -1078,7 +1081,7 @@ func tapCapsLock() {
   });
 }
 
-// drawBar
+// Layer 04 Script: drawBar
 const BRIGHTNESS_IMAGE = [[
     10 10 80 01 86 61 8e 71 1c 38 d8 1b e0 07 70 0e
     37 ec 37 ec 70 0e e0 07 d8 1b 1c 38 8e 71 86 61
@@ -1162,7 +1165,7 @@ func drawBar(image, value) {
   drawImage(0, DISPLAY_WIDTH/2 + 4, DISPLAY_HEIGHT/2, BAR_IMAGES + value * 66);
 }
 
-// drawBleSummary
+// Layer 04 Script: drawBleSummary
 func drawSettings() {
   setAutoDraw(0, AUTO_DRAW_NONE);
   clearDisplay(0);
@@ -1248,27 +1251,26 @@ func drawBleSummary() {
   drawLine(0, DISPLAY_WIDTH-2, activeY - 2, DISPLAY_WIDTH-2, activeY + 17);
 }
 
-// drawSettingsFeedbackText
+// Layer 04 Script: drawSettingsFeedbackText
 func drawSettingsFeedbackText(text) {
   drawSettings();
   drawText(0, DISPLAY_WIDTH/2, DISPLAY_HEIGHT - 48 + 10, FONT_ID_NORMAL, TEXT_ALIGNMENT_MIDDLE, text);
 }
 
-// onConnectionUpdate
-func onConnectionUpdate() {
-  if (isBleSummaryActive) {
-    drawBleSummary();
-  }
-  redrawDisplayOverlay();
-}
-
-// startPairing
+// Layer 04 Script: startPairing
 func startPairing() {
   if (HAS_AUDIO) {
     // G-7 for 160ms, pause 160ms, G-7 for 160ms.
     playSequence([[5d 08 01 08 5d 08 00]]);
   }
   startBlePairing();
+}
+
+// Layer 06 Script: checkUserPresenceReply
+func checkUserPresenceReply() {
+  if (checkButtonState("000000000000000000000000100000000001000000")) {
+    replyUserPresence(1);
+  }
 }
 
 func _action_switchToNumpadLayer() {

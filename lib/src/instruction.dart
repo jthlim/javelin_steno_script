@@ -255,6 +255,24 @@ final class LoadIndexedGlobalValueInstruction extends ScriptInstruction {
   String toString() => '  load g$index[]';
 }
 
+final class LoadIndexedLocalValueInstruction extends ScriptInstruction {
+  LoadIndexedLocalValueInstruction(this.index);
+
+  final int index;
+
+  @override
+  int get byteCodeLength => 2;
+
+  @override
+  void addByteCode(ScriptByteCodeBuilder builder) {
+    builder.addOpcode(ScriptOpcode.loadLocalIndex);
+    builder.addByte(index);
+  }
+
+  @override
+  String toString() => '  load l$index[]';
+}
+
 final class StoreGlobalValueInstruction extends ScriptInstruction {
   StoreGlobalValueInstruction(this.index);
 
@@ -299,6 +317,24 @@ final class StoreIndexedGlobalValueInstruction extends ScriptInstruction {
 
   @override
   String toString() => '  store g$index[]';
+}
+
+final class StoreIndexedLocalValueInstruction extends ScriptInstruction {
+  StoreIndexedLocalValueInstruction(this.index);
+
+  final int index;
+
+  @override
+  int get byteCodeLength => 2;
+
+  @override
+  void addByteCode(ScriptByteCodeBuilder builder) {
+    builder.addOpcode(ScriptOpcode.storeLocalIndex);
+    builder.addByte(index);
+  }
+
+  @override
+  String toString() => '  store l$index[]';
 }
 
 final class PopValueInstruction extends ScriptInstruction {

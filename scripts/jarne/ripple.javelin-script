@@ -1,0 +1,93 @@
+// Jarne ripple effect.
+// In the visual editor, go to Global Layer -> User Scripts, and add this as a script named "RGB Ripple".
+// After that, go to the layers where this effect should be used and select "Ripple".
+
+// Key X positions in fixed point 4.4 format
+const xPositions = [[
+  00 10 20 30 40 50     a0 b0 c0 d0 e0 f0
+  00 10 20 30 40 50     a0 b0 c0 d0 e0 f0
+  00 10 20 30 40 50     a0 b0 c0 d0 e0 f0
+            3c 4e 60   90 a2 b4
+]];  
+
+// Key y positions in fixed point 4.4 format
+const yPositions = [[
+  03 03 01 00 01 02     02 01 00 01 03 03
+  13 13 11 10 11 12     12 11 10 11 13 13
+  23 23 21 20 21 22     22 21 20 21 23 23
+            38 39 3a   3a 39 38
+]];
+
+// Speed in .4 fixed point. 0x100 is 16 units/sec.
+const RIPPLE_SPEED = 0x100;
+
+// Time after which ripples are removed from processing in milliseconds.
+const MAX_RIPPLE_TIME = 2000;
+
+const MAX_RIPPLE_COUNT = 4;
+var rippleCount = 0;
+var rippleTimes[MAX_RIPPLE_COUNT];
+var rippleButtons[MAX_RIPPLE_COUNT];
+
+#option(rgbUpdate, "RGB Mode", "Ripple",  rgbUpdateRipple) 
+#option(rgbUpdateUnderglow, "RGB Mode", "Ripple",  rgbUpdateUnderglowOff) 
+#option(rgbButtonPress, "RGB Mode", "Ripple", rgbButtonPressRipple)
+
+func removeFirstRippleIndex() {
+  for (var i = 0; i < MAX_RIPPLE_COUNT-1; i = i + 1) {
+    rippleTimes[i] = rippleTimes[i+1];
+    rippleButtons[i] = rippleButtons[i+1];
+  }
+  rippleCount = rippleCount - 1;
+}
+
+func rgbUpdateRipple() {
+  var now = getTime();
+  while (rippleCount != 0 && now - rippleTimes[0] >= MAX_RIPPLE_TIME) {
+    removeFirstRippleIndex();
+  }
+
+  var lowerBounds[MAX_RIPPLE_COUNT];
+  var upperBounds[MAX_RIPPLE_COUNT];
+  for (var j = 0; j < rippleCount; j = j + 1) {
+    var rd = (now - rippleTimes[j]) * RIPPLE_SPEED / 1000;
+    upperBounds[j] = rd*rd + 16*rd + 0x40;
+    lowerBounds[j] = upperBounds[j] - 32*rd;
+  }
+
+  for (var i = 0; i < 42; i = i + 1) {
+    var v = 0;
+
+    // Key x,y
+    var kx = xPositions[i];
+    var ky = yPositions[i];
+    for (var j = 0; j < rippleCount; j = j + 1) {
+      // Ripple has center rx, ry, distance to key kd.
+      // In time ripple reaches distance rd * RIPPLE_SPEED * getTime() / (0x10 * 1000)
+      // Light up everything within rd-0.5 to rd+0.5
+      // i.e.
+      //             rd - 0.5 <= kd <= rd + 0.5
+      //    rd*rd - rd + 0.25 <= kd2 <= rd*rd + rd + 0.25
+      var dkx = xPositions[rippleButtons[j]] - kx;
+      var dky = yPositions[rippleButtons[j]] - ky;
+      var kd2 = dkx * dkx + dky * dky;
+
+      if (lowerBounds[j] <= kd2 && kd2 <= upperBounds[j]) {
+        v = v + 0x40;
+      }
+    }
+
+    if (v > 256) v = 256;
+
+    setHsv(i, getTime() * 64, 0xc0, v);
+  }
+}
+
+func rgbButtonPressRipple() {
+  if (rippleCount == MAX_RIPPLE_COUNT) {
+    removeFirstRippleIndex();
+  }
+  rippleTimes[rippleCount] = getTime();
+  rippleButtons[rippleCount] = lastButtonIndex;
+  rippleCount = rippleCount + 1;
+}

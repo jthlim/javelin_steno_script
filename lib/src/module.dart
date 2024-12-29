@@ -4,15 +4,28 @@ import 'functions.dart';
 import 'ast.dart';
 import 'byte_code_builder.dart';
 
+class ScriptLocalVariable {
+  ScriptLocalVariable(this.name, this.index, [this.arraySize]);
+
+  final String name;
+  final int index;
+  final int? arraySize;
+}
+
 class ScriptLocals {
-  ScriptLocals([Map<String, AstNode>? constants, Map<String, int>? variables])
-      : constants = constants ?? {},
+  ScriptLocals([
+    Map<String, AstNode>? constants,
+    Map<String, ScriptLocalVariable>? variables,
+    this.localVariableCount = 0,
+  ])  : constants = constants ?? {},
         variables = variables ?? {};
 
   final Map<String, AstNode> constants;
-  final Map<String, int> variables;
+  final Map<String, ScriptLocalVariable> variables;
+  int localVariableCount;
 
-  ScriptLocals clone() => ScriptLocals({...constants}, {...variables});
+  ScriptLocals clone() =>
+      ScriptLocals({...constants}, {...variables}, localVariableCount);
 }
 
 class ScriptFunction implements ScriptFunctionDefinition {
@@ -46,7 +59,7 @@ class ScriptFunction implements ScriptFunctionDefinition {
 
   void addParameter(String parameterName) {
     parameters.add(parameterName);
-    addLocalVar(parameterName);
+    addLocalVar(parameterName, null);
   }
 
   void addLocalConstant(String constantName, AstNode value) {
@@ -58,16 +71,19 @@ class ScriptFunction implements ScriptFunctionDefinition {
     locals.constants[constantName] = value;
   }
 
-  int addLocalVar(String localName) {
+  int addLocalVar(String localName, int? arraySize) {
     // Copy on write.
     if (localsStack.isNotEmpty && localsStack.last == locals) {
       locals = locals.clone();
     }
 
-    final index = locals.variables.length;
-    locals.variables[localName] = index;
-    if (index >= numberOfLocals) {
-      numberOfLocals = index + 1;
+    final index = locals.localVariableCount;
+    locals.variables[localName] =
+        ScriptLocalVariable(localName, index, arraySize);
+
+    locals.localVariableCount += arraySize ?? 1;
+    if (locals.localVariableCount > numberOfLocals) {
+      numberOfLocals = locals.localVariableCount;
     }
     return index;
   }

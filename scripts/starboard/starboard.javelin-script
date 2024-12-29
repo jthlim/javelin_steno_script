@@ -58,7 +58,7 @@ func _releaseScanCode(scanCode, isModifier) {
     localPostRelease();
   }
 }
-// StenoModeUpdate Callback
+// Global Script: StenoModeUpdate Callback
 func onStenoModeUpdate() {
   var stenoMode = getParameter("steno_mode");
   if (stenoMode == "embedded") {
@@ -441,12 +441,13 @@ func onPress26_0() {
   // Toggle Steno
   // Toggle the steno mode between embedded and Gemini PR when USR is pressed.
   // LED RGB is updated in Global StenoModeUpdate callback.
+  releaseAll();
   if (getParameter("steno_mode") != "embedded") {
     console("set_steno_mode embedded");
   } else {
     console("set_steno_mode gemini");
   }
-  releaseAll();
+
 }
 func onRelease26_0() {
 }

@@ -443,7 +443,7 @@ func _releaseScanCode(scanCode, isModifier) {
     localPostRelease();
   }
 }
-// Button Overrides
+// Global Script: Button Overrides
 func isModifierKey(key) var {
   return SC_L_CTRL <= key && key <= SC_R_META;
 }
@@ -542,7 +542,7 @@ func globalRelease() {
   updateScreenSaverTimer();
 }
 
-// Display Scripts
+// Global Script: Display Scripts
 func updateDisplay() {
   dispatchToLayer([[[@drawDisplayAbc, @drawDisplaySymbol, @drawDisplayFunction, @drawDisplayNavigation, @drawBleSummary, @drawDisplayNumpad, @drawDisplaySecurityKey]]]);
 }
@@ -656,7 +656,7 @@ func drawDisplaySteno() {
   setAutoDraw(1, AUTO_DRAW_WPM);
 
   var mode = getParameter("steno_mode");
-  var text = "";
+  var text;
   if (mode == "gemini")  {
     text = "Gemini";
   } else if(mode == "tx_bolt") {
@@ -665,6 +665,8 @@ func drawDisplaySteno() {
     text = "ProCAT";
   } else if(mode == "plover_hid") {
     text = "Plover HID";
+  } else {
+    return;
   }
   drawText(0, DISPLAY_WIDTH/2, DISPLAY_HEIGHT - 48 + 10, FONT_ID_NORMAL, TEXT_ALIGNMENT_MIDDLE, text);
 }
@@ -786,7 +788,7 @@ func drawDisplayDynamicSteno() {
   }
 }
 
-// DrawOverlay Scripts
+// Global Script: DrawOverlay Scripts
 func drawDisplayOverlay() {
   const OVERLAY_HEIGHT = 16;
 
@@ -940,7 +942,7 @@ func redrawDisplayOverlay() {
   drawRect(0, 0, 0, 0, 0);
 }
 
-// Magic Key Scripts
+// Global Script: Magic Key Scripts
 var magicKey;
 
 func pressMagicKey(buttonIndex) {
@@ -977,7 +979,7 @@ func releaseMagicKey() {
   }
 }
 
-// RGB Scripts
+// Global Script: RGB Scripts
 const SPEED_VALUES      = [[ 00 04 08 0c 10 18 20 30 40 ]];
 const HUE_SPREAD_VALUES = [[ 00 10 20 28 30 38 40 48 50 ]];
 const SATURATION_VALUES = [[ 00 20 40 50 60 68 70 78 80 ]];
@@ -1189,7 +1191,7 @@ func rgbButtonPressRandomColor() {
   keyColorData[lastButtonIndex] = rand() & 0xffff;
 
   // If there's no update of keys in the tick loop, update it now.
-  if (!isTimerActive(TIMER_ID_RGB_UPDATE)) {
+  if (!isTimerActive(TIMER_ID_RGB_UPDATE) && (isMainPowered() || isPairPowered())) {
     rgbUpdate();
   }
 }
@@ -1222,7 +1224,7 @@ func rgbUpdateUnderglowOff() {
   setUnderglowRgb(0, 0, 0);
 }
 
-// Screen Saver Scripts
+// Global Script: Screen Saver Scripts
 const SCREEN_SAVER_TIMEOUT = 900000; // 15 minutes.
 
 func shouldUseScreenSaver() var {
@@ -1246,11 +1248,9 @@ func startScreenSaver() {
 
   isShowingScreenSaver = 1;
   screenSaverStartTime = getTime();
-  for (var i = 0; i < 8; i = i + 2) {
-    screenSaverPosition[i] = rand();
-    screenSaverPosition[i + 1] = rand();
-  }
   for (var i = 0; i < 8; i = i + 1) {
+    screenSaverPosition[i] = rand();
+
     var velocity = (rand() & 0x1ff) - 256;
     velocity = velocity + (velocity < 0 ? -32 : 32);
     screenSaverVelocity[i] = velocity;
@@ -1295,14 +1295,48 @@ func updateScreenSaverTimer() {
   startTimer(TIMER_ID_SCREEN_SAVER, SCREEN_SAVER_TIMEOUT, 1, @startScreenSaver);
 }
 
-// checkUserPresenceReply
-func checkUserPresenceReply() {
-  if (checkButtonState("000000000000000000000000100000000001110010")) {
-    replyUserPresence(1);
+// Global Script: onConnectionUpdate
+func onConnectionUpdate() {
+  if (isBleSummaryActive) {
+    drawBleSummary();
   }
+  redrawDisplayOverlay();
+  updateBoardPower();
 }
 
-// checkWordCapsAndCapsLock
+// Global Script: updateBoardPower
+func updateBoardPower() {
+  const RGB_UPDATE_TIME = 10;
+  const BLE_UPDATE_TIME = 50;
+
+  if (([[00 00 00 00 00 00 01]][resolveLayerIndex()]) || isBleAdvertising()) {
+    startTimer(TIMER_ID_RGB_UPDATE, 32, 1, @rgbUpdate);
+    setBoardPower(1);
+  } else if (brightness == 0) {
+    stopTimer(TIMER_ID_RGB_UPDATE);
+    setBoardPower(getActivePairConnection() == PAIR_CONNECTION_CABLE);
+  } else if (getActivePairConnection() == PAIR_CONNECTION_BLE) {
+    if (isPairPowered() && isMainPowered()) {
+      startTimer(TIMER_ID_RGB_UPDATE, BLE_UPDATE_TIME, 1, @rgbUpdate);
+    } else {
+      stopTimer(TIMER_ID_RGB_UPDATE);
+    }
+    setBoardPower(isMainPowered());
+  } else {
+    // No pair, or cable pair.
+    if (isPairPowered() || isMainPowered()) {
+      startTimer(TIMER_ID_RGB_UPDATE, RGB_UPDATE_TIME, 1, @rgbUpdate);
+      setBoardPower(1);
+    } else {
+      stopTimer(TIMER_ID_RGB_UPDATE);
+      setBoardPower(0);
+    }
+  }
+  rgbUpdate();
+  rgbUpdateUnderglow();
+}
+
+// Layer 00 Script: checkWordCapsAndCapsLock
 func checkWordCapsAndCapsLock() {
   // Word caps when both shifts are pressed.
   // Caps lock when both shifts, alt and sym pressed.
@@ -1325,7 +1359,7 @@ func tapCapsLock() {
   });
 }
 
-// drawBar
+// Layer 04 Script: drawBar
 const BRIGHTNESS_IMAGE = [[
     10 10 80 01 86 61 8e 71 1c 38 d8 1b e0 07 70 0e
     37 ec 37 ec 70 0e e0 07 d8 1b 1c 38 8e 71 86 61
@@ -1409,7 +1443,7 @@ func drawBar(image, value) {
   drawImage(0, DISPLAY_WIDTH/2 + 4, DISPLAY_HEIGHT/2, BAR_IMAGES + value * 66);
 }
 
-// drawBleSummary
+// Layer 04 Script: drawBleSummary
 func drawSettings() {
   setAutoDraw(0, AUTO_DRAW_NONE);
   clearDisplay(0);
@@ -1495,22 +1529,29 @@ func drawBleSummary() {
   drawLine(0, DISPLAY_WIDTH-2, activeY - 2, DISPLAY_WIDTH-2, activeY + 17);
 }
 
-// drawSettingsFeedbackText
+// Layer 04 Script: drawSettingsFeedbackText
 func drawSettingsFeedbackText(text) {
   drawSettings();
   drawText(0, DISPLAY_WIDTH/2, DISPLAY_HEIGHT - 48 + 10, FONT_ID_NORMAL, TEXT_ALIGNMENT_MIDDLE, text);
 }
 
-// onConnectionUpdate
-func onConnectionUpdate() {
-  if (isBleSummaryActive) {
-    drawBleSummary();
+// Layer 04 Script: startPairing
+func startPairing() {
+  if (HAS_AUDIO) {
+    // G-7 for 160ms, pause 160ms, G-7 for 160ms.
+    playSequence([[5d 08 01 08 5d 08 00]]);
   }
-  redrawDisplayOverlay();
-  updateBoardPower();
+  startBlePairing();
 }
 
-// rgbUpdate
+// Layer 06 Script: checkUserPresenceReply
+func checkUserPresenceReply() {
+  if (checkButtonState("000000000000000000000000100000000001110010")) {
+    replyUserPresence(1);
+  }
+}
+
+// Layer 06 Script: rgbUpdate
 const U2F_KEY_ORDER = [[ 00 01 02 03 04 05 06 07 08 09 0a 0b 0a 09 08 07 06 05 04 03 02 01 ]];
 
 func rgbUpdateKeyU2fAlertCycle() {
@@ -1528,47 +1569,6 @@ func rgbUpdateKeyU2fAlertCycle() {
   setRgb(36, 0, 32, 0);
   setRgb(37, 0, 32, 0);
   setRgb(40, 0, 32, 0);
-}
-
-// startPairing
-func startPairing() {
-  if (HAS_AUDIO) {
-    // G-7 for 160ms, pause 160ms, G-7 for 160ms.
-    playSequence([[5d 08 01 08 5d 08 00]]);
-  }
-  startBlePairing();
-}
-
-// updateBoardPower
-func updateBoardPower() {
-  const RGB_UPDATE_TIME = 10;
-  const BLE_UPDATE_TIME = 50;
-
-  if (([[00 00 00 00 00 00 01]][resolveLayerIndex()]) || isBleAdvertising()) {
-    startTimer(TIMER_ID_RGB_UPDATE, 32, 1, @rgbUpdate);
-    setBoardPower(1);
-  } else if (brightness == 0) {
-    stopTimer(TIMER_ID_RGB_UPDATE);
-    setBoardPower(getActivePairConnection() == PAIR_CONNECTION_CABLE);
-  } else if (getActivePairConnection() == PAIR_CONNECTION_BLE) {
-    if (isPairPowered() && isMainPowered()) {
-      startTimer(TIMER_ID_RGB_UPDATE, BLE_UPDATE_TIME, 1, @rgbUpdate);
-    } else {
-      stopTimer(TIMER_ID_RGB_UPDATE);
-    }
-    setBoardPower(isMainPowered());
-  } else {
-    // No pair, or cable pair.
-    if (isPairPowered() || isMainPowered()) {
-      startTimer(TIMER_ID_RGB_UPDATE, RGB_UPDATE_TIME, 1, @rgbUpdate);
-      setBoardPower(1);
-    } else {
-      stopTimer(TIMER_ID_RGB_UPDATE);
-      setBoardPower(0);
-    }
-  }
-  rgbUpdate();
-  rgbUpdateUnderglow();
 }
 
 func _action_switchToNumpadLayer() {

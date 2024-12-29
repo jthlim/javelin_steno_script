@@ -770,26 +770,25 @@ class ForStatementAstNode extends AstNode {
 
     initialization?.addInstructions(builder);
     final condition = this.condition;
+
+    if (condition != null &&
+        condition.isConstant() &&
+        condition.constantValue() == 0) {
+      return;
+    }
+
     final originalContinueTargets = builder.continueTargets;
     final originalBreakTargets = builder.breakTargets;
     final continueTargets = <NopInstruction>[];
     final breakTargets = <NopInstruction>[];
     builder.continueTargets = continueTargets;
     builder.breakTargets = breakTargets;
-    if (condition == null) {
-      final jumpToStartInstruction = JumpInstruction();
-      builder.addInstruction(jumpToStartInstruction.target);
 
-      body.addInstructions(builder);
-      update?.addInstructions(builder);
-      builder.addInstruction(jumpToStartInstruction);
+    final jumpToConditionInstruction = JumpInstruction();
+    builder.addInstruction(jumpToConditionInstruction.target);
 
-      for (final continueTarget in continueTargets) {
-        jumpToStartInstruction.target.insertAfter(continueTarget);
-      }
-    } else if (!condition.isConstant() || condition.constantValue() != 0) {
-      final jumpToConditionInstruction = JumpInstruction();
-      builder.addInstruction(jumpToConditionInstruction.target);
+    if (condition != null &&
+        !(condition.isConstant() && condition.constantValue() != 0)) {
       condition.addInstructions(builder);
 
       final lastInstruction = builder.instructions.last;
@@ -802,14 +801,15 @@ class ForStatementAstNode extends AstNode {
         jumpToEndInstruction = JumpIfZeroInstruction();
       }
       builder.addInstruction(jumpToEndInstruction);
-      body.addInstructions(builder);
-      update?.addInstructions(builder);
-      for (final continueTarget in continueTargets) {
-        builder.addInstruction(continueTarget);
-      }
-      builder.addInstruction(jumpToConditionInstruction);
-      builder.addInstruction(jumpToEndInstruction.target);
+      breakTargets.add(jumpToEndInstruction.target);
     }
+
+    body.addInstructions(builder);
+    for (final continueTarget in continueTargets) {
+      builder.addInstruction(continueTarget);
+    }
+    update?.addInstructions(builder);
+    builder.addInstruction(jumpToConditionInstruction);
     for (final endTarget in breakTargets) {
       builder.addInstruction(endTarget);
     }
@@ -1089,10 +1089,27 @@ class LoadGlobalValueArrayAstNode extends AstNode {
   final ScriptGlobal global;
 }
 
-mixin IndexedGlobalValueMixin {
+class LoadLocalValueArrayAstNode extends AstNode {
+  LoadLocalValueArrayAstNode(this.local);
+
+  @override
+  bool isConstant() => false;
+
+  @override
+  int constantValue() => throw UnsupportedError('Should not be invoked');
+
+  @override
+  void addInstructions(ScriptByteCodeBuilder builder) {
+    throw Exception('Local value array ${local.name} must be indexed');
+  }
+
+  final ScriptLocalVariable local;
+}
+
+mixin IndexedValueMixin {
   static int calculateIndexOffset(
     AstNode indexExpression,
-    int globalValueIndex,
+    int valueIndex,
   ) {
     if (indexExpression.isConstant()) {
       // Special cased code generation
@@ -1108,7 +1125,7 @@ mixin IndexedGlobalValueMixin {
       return 0;
     }
 
-    final index = globalValueIndex + offset;
+    final index = valueIndex + offset;
     if (index < 0 || index > 255) {
       return 0;
     }
@@ -1118,10 +1135,9 @@ mixin IndexedGlobalValueMixin {
   }
 }
 
-class LoadIndexedGlobalValueAstNode extends AstNode
-    with IndexedGlobalValueMixin {
+class LoadIndexedGlobalValueAstNode extends AstNode with IndexedValueMixin {
   LoadIndexedGlobalValueAstNode(this.globalValue, this.indexExpression) {
-    globalIndexOffset = IndexedGlobalValueMixin.calculateIndexOffset(
+    globalIndexOffset = IndexedValueMixin.calculateIndexOffset(
       indexExpression,
       globalValue.global.index,
     );
@@ -1169,6 +1185,48 @@ class LoadIndexedGlobalValueAstNode extends AstNode
 
   int globalIndexOffset = 0;
   final LoadGlobalValueArrayAstNode globalValue;
+  final AstNode indexExpression;
+}
+
+class LoadIndexedLocalValueAstNode extends AstNode with IndexedValueMixin {
+  LoadIndexedLocalValueAstNode(this.localValue, this.indexExpression) {
+    localIndexOffset = IndexedValueMixin.calculateIndexOffset(
+      indexExpression,
+      localValue.local.index,
+    );
+  }
+
+  @override
+  bool isConstant() => false;
+
+  @override
+  int constantValue() => throw UnsupportedError('Should not be invoked');
+
+  @override
+  void mark(ScriptReachability context) {
+    indexExpression.mark(context);
+  }
+
+  @override
+  void addInstructions(ScriptByteCodeBuilder builder) {
+    if (indexExpression.isConstant()) {
+      builder.addInstruction(
+        LoadLocalValueInstruction(
+          localValue.local.index + indexExpression.constantValue(),
+        ),
+      );
+    } else {
+      indexExpression.addInstructions(builder);
+      builder.addInstruction(
+        LoadIndexedLocalValueInstruction(
+          localValue.local.index + localIndexOffset,
+        ),
+      );
+    }
+  }
+
+  int localIndexOffset = 0;
+  final LoadLocalValueArrayAstNode localValue;
   final AstNode indexExpression;
 }
 
@@ -1310,8 +1368,15 @@ class PushFunctionAddress extends AstNode {
   void mark(ScriptReachability context) {
     context.functions.add(name);
 
-    final function = context.module.functions[name] as ScriptFunction?;
-    function?.mark(context);
+    final function = context.module.functions[name];
+    if (function == null) return;
+    if (function is! ScriptFunction) {
+      throw FormatException(
+        'Cannot use address of inbuilt function ${function.functionName} '
+        'near $token',
+      );
+    }
+    function.mark(context);
   }
 
   @override
@@ -1374,14 +1439,13 @@ class StoreValueAstNode extends AstNode {
   final AstNode expression;
 }
 
-class StoreIndexedGlobalValueAstNode extends AstNode
-    with IndexedGlobalValueMixin {
+class StoreIndexedGlobalValueAstNode extends AstNode with IndexedValueMixin {
   StoreIndexedGlobalValueAstNode({
     required this.globalValueIndex,
     required this.indexExpression,
     required this.expression,
   }) {
-    globalIndexOffset = IndexedGlobalValueMixin.calculateIndexOffset(
+    globalIndexOffset = IndexedValueMixin.calculateIndexOffset(
       indexExpression,
       globalValueIndex,
     );
@@ -1431,6 +1495,56 @@ class StoreIndexedGlobalValueAstNode extends AstNode
 
   int globalIndexOffset = 0;
   final int globalValueIndex;
+  final AstNode indexExpression;
+  final AstNode expression;
+}
+
+class StoreIndexedLocalValueAstNode extends AstNode with IndexedValueMixin {
+  StoreIndexedLocalValueAstNode({
+    required this.localValueIndex,
+    required this.indexExpression,
+    required this.expression,
+  }) {
+    localIndexOffset = IndexedValueMixin.calculateIndexOffset(
+      indexExpression,
+      localValueIndex,
+    );
+  }
+
+  @override
+  bool isConstant() => false;
+
+  @override
+  int constantValue() => throw UnsupportedError('Should not be invoked');
+
+  @override
+  void mark(ScriptReachability context) {
+    indexExpression.mark(context);
+    expression.mark(context);
+  }
+
+  @override
+  void addInstructions(ScriptByteCodeBuilder builder) {
+    if (indexExpression.isConstant()) {
+      expression.addInstructions(builder);
+      builder.addInstruction(
+        StoreLocalValueInstruction(
+          localValueIndex + indexExpression.constantValue(),
+        ),
+      );
+    } else {
+      indexExpression.addInstructions(builder);
+      expression.addInstructions(builder);
+      builder.addInstruction(
+        StoreIndexedLocalValueInstruction(
+          localValueIndex + localIndexOffset,
+        ),
+      );
+    }
+  }
+
+  int localIndexOffset = 0;
+  final int localValueIndex;
   final AstNode indexExpression;
   final AstNode expression;
 }

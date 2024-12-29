@@ -17,22 +17,22 @@ class InstructionList extends Iterable<ScriptInstruction> {
   Iterator<ScriptInstruction> get iterator => instructions.iterator;
 
   void optimize({required int byteCodeVersion}) {
-    optimizeNot();
+    optimizeStoreLoad();
     optimizeTrueFalseJumps();
     optimizeRightFactor();
     optimizeJumpTarget(byteCodeVersion);
+    optimizeNot();
+    optimizeEqualsAndNotEquals();
     optimizeRightFactor();
     optimizeJumpTarget(byteCodeVersion);
+    optimizeRightFactor();
     optimizeCallReturn();
     optimizeDeadCode();
-    optimizeJumpToNext();
+    // optimizeJumpToNext();
     optimizeConditionalJumpOverJump();
-    optimizeNot();
     optimizeConditionalJumpToNext();
-    optimizeConsecutiveRet();
-    optimizeStoreLoad();
+    // optimizeConsecutiveRet();
     optimizeFunctionReference();
-    optimizeEqualsAndNotEquals();
     if (byteCodeVersion >= 4) {
       optimizeJumpOverRet();
     }
@@ -66,6 +66,7 @@ class InstructionList extends Iterable<ScriptInstruction> {
             reference.unlink();
             previousInstruction.insertBefore(instruction);
             previousReferenceInstruction.insertBefore(reference);
+            previousReferenceInstruction.unlink();
             continue;
           }
         }
@@ -185,7 +186,15 @@ class InstructionList extends Iterable<ScriptInstruction> {
     ScriptInstruction? instruction = instructions.first;
     while (instruction != null) {
       if (instruction is JumpInstructionBase) {
-        final target = instruction.target.firstNonNopInstruction;
+        ScriptInstruction? target = instruction.target.firstNonNopInstruction;
+
+        if (identical(instruction.next?.firstNonNopInstruction, target)) {
+          final previous = instruction.previous!;
+          instruction.unlink();
+          instruction = previous.next;
+          continue;
+        }
+
         ScriptInstruction? replacement;
         if (target is ReturnInstruction) {
           if (instruction is JumpInstruction) {
@@ -206,6 +215,12 @@ class InstructionList extends Iterable<ScriptInstruction> {
         if (replacement != null) {
           instruction.replaceWith(replacement);
           instruction = replacement;
+
+          while (target != null && !target.hasReference) {
+            final nextTarget = target.next;
+            target.unlink();
+            target = nextTarget;
+          }
         }
       }
       instruction = instruction.next;
@@ -282,6 +297,7 @@ class InstructionList extends Iterable<ScriptInstruction> {
     }
   }
 
+  // Remove unnecessary jump instructions
   void optimizeJumpToNext() {
     if (instructions.isEmpty) {
       return;
@@ -629,6 +645,7 @@ class InstructionList extends Iterable<ScriptInstruction> {
     }
   }
 
+  // If there are two consecutive ret instructions, remove the first one.
   void optimizeConsecutiveRet() {
     if (instructions.isEmpty) {
       return;
