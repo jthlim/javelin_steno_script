@@ -103,6 +103,31 @@ func _releaseScanCode(scanCode, isModifier) {
     localPostRelease();
   }
 }
+// Global Script: Encoders
+func onEncoderCW0(delta) {
+}
+
+func onEncoderCCW0(delta) {
+}
+
+func onEncoderCW1(delta) {
+}
+
+func onEncoderCCW1(delta) {
+}
+
+func onEncoderCW2(delta) {
+}
+
+func onEncoderCCW2(delta) {
+}
+
+func onEncoderCW3(delta) {
+}
+
+func onEncoderCCW3(delta) {
+}
+
 // Global Script: RGB
 const SPEED_VALUES      = [[ 00 04 08 0c 10 18 20 30 40 ]];
 const HUE_SPREAD_VALUES = [[ 00 10 20 28 30 38 40 48 50 ]];

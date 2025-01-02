@@ -2,6 +2,8 @@ import 'dart:collection';
 
 import 'instruction.dart';
 
+// spellchecker: words retz retnz
+
 class InstructionList extends Iterable<ScriptInstruction> {
   final instructions = LinkedList<ScriptInstruction>();
 

@@ -5,14 +5,22 @@ import 'dart:io';
 import 'package:javelin_steno_script/javelin_steno_script.dart';
 
 void main(List<String> arguments) {
-  if (arguments.length < 2) {
-    print('Usage: compile_script <button_count> script_file_name1 ...');
+  if (arguments.length < 3) {
+    print(
+      'Usage: compile_script <button_count> <encoder_count> script_file_name1 ...',
+    );
     return;
   }
 
   final buttonCount = int.tryParse(arguments[0]);
   if (buttonCount == null) {
-    print('Usage: compile_script <button_count> script_file_name1 ...');
+    print('Unable to parse button count');
+    return;
+  }
+
+  final encoderCount = int.tryParse(arguments[1]);
+  if (encoderCount == null) {
+    print('Unable to parse encoder count');
     return;
   }
 
@@ -27,8 +35,10 @@ void main(List<String> arguments) {
   final builder = ScriptByteCodeBuilder(
     module: module,
     byteCodeVersion: latestScriptByteCodeVersion,
-    requiredFunctions:
-        ScriptByteCodeBuilder.createScriptFunctionList(buttonCount),
+    requiredFunctions: ScriptByteCodeBuilder.createScriptFunctionList(
+      buttonCount,
+      encoderCount,
+    ),
   );
   final byteCode = builder.createByteCode();
   print(builder.disassemble(byteCode));

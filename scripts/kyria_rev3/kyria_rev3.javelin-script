@@ -1356,3 +1356,9 @@ func onRelease49() {
     setLayer(layer ^ SETTINGS_MASK);
   }
 }
+
+func onEncoderCW0(delta) {}
+func onEncoderCCW0(delta) {}
+
+func onEncoderCW1(delta) {}
+func onEncoderCCW1(delta) {}

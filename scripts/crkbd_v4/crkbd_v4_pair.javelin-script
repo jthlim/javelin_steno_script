@@ -215,3 +215,15 @@ func onRelease44() { }
 
 func onPress45() { }
 func onRelease45() { }
+
+func onEncoderCW0(delta) {}
+func onEncoderCCW0(delta) {}
+
+func onEncoderCW1(delta) {}
+func onEncoderCCW1(delta) {}
+
+func onEncoderCW2(delta) {}
+func onEncoderCCW2(delta) {}
+
+func onEncoderCW3(delta) {}
+func onEncoderCCW3(delta) {}

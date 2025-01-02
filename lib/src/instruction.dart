@@ -719,7 +719,7 @@ final class SetHalfWordFunctionDataValueInstruction
     } else {
       offset = builder.functions[targetName]?.offset;
       if (offset == null) {
-        throw Exception('Internal error: failed lookup on data');
+        throw Exception('Function $targetName not defined');
       }
     }
 

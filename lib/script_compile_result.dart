@@ -9,13 +9,14 @@ import 'src/parser.dart';
 class ScriptCompileResult {
   factory ScriptCompileResult(
     int scriptButtonCount,
+    int scriptEncoderCount,
     int maximumScriptByteCodeSize,
     int scriptByteCodeVersion,
     String scriptHeader,
     String script,
   ) {
     if (script.isEmpty) {
-      return ScriptCompileResult.failed('No script');
+      return const ScriptCompileResult.empty();
     }
 
     try {
@@ -27,8 +28,10 @@ class ScriptCompileResult {
       final builder = ScriptByteCodeBuilder(
         module: module,
         byteCodeVersion: scriptByteCodeVersion,
-        requiredFunctions:
-            ScriptByteCodeBuilder.createScriptFunctionList(scriptButtonCount),
+        requiredFunctions: ScriptByteCodeBuilder.createScriptFunctionList(
+          scriptButtonCount,
+          scriptEncoderCount,
+        ),
       );
       final byteCode = builder.createByteCode();
 
@@ -53,16 +56,28 @@ class ScriptCompileResult {
     ScriptByteCodeBuilder this.builder,
   )   : success = true,
         message = 'OK, $size bytes';
-  ScriptCompileResult.failed(this.message)
-      : success = false,
-        size = 0;
 
-  bool success;
-  String message;
-  int size;
-  Uint8List? data;
-  String? script;
-  ScriptByteCodeBuilder? builder;
+  const ScriptCompileResult.failed(this.message)
+      : success = false,
+        size = 0,
+        builder = null,
+        data = null,
+        script = null;
+
+  const ScriptCompileResult.empty()
+      : success = false,
+        size = 0,
+        message = 'No script',
+        builder = null,
+        data = null,
+        script = null;
+
+  final bool success;
+  final String message;
+  final int size;
+  final Uint8List? data;
+  final String? script;
+  final ScriptByteCodeBuilder? builder;
 
   int get crc => Crc32().convert(data ?? []).toBigInt().toInt();
 }

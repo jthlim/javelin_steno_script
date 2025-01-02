@@ -173,3 +173,9 @@ func onRelease48() { }
 
 func onPress49() { }
 func onRelease49() { }
+
+func onEncoderCW0(delta) {}
+func onEncoderCCW0(delta) {}
+
+func onEncoderCW1(delta) {}
+func onEncoderCCW1(delta) {}
