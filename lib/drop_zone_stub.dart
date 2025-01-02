@@ -9,12 +9,12 @@ class DropZone extends StatelessWidget {
   final void Function(List<io.File>?)? onDrop;
 
   const DropZone({
+    super.key,
     required this.child,
-    Key? key,
     this.onDrop,
     this.onDragEnter,
     this.onDragExit,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) => child;

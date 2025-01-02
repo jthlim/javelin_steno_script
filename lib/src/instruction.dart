@@ -7,6 +7,8 @@ import 'byte_code_builder.dart';
 import 'functions.dart';
 import 'string_data.dart';
 
+// spellchecker: words retz retnz
+
 enum ScriptOpcode {
   pushConstantBegin(0),
   pushConstantEnd(0x3b),
@@ -415,7 +417,7 @@ final class CallValueInstruction extends ScriptInstruction {
   }
 
   @override
-  String toString() => '  call_value';
+  String toString() => '  callValue';
 }
 
 final class JumpValueInstruction extends ScriptInstruction {
@@ -431,7 +433,7 @@ final class JumpValueInstruction extends ScriptInstruction {
   }
 
   @override
-  String toString() => '  jump_value';
+  String toString() => '  jumpValue';
 }
 
 final class PushFunctionAddressInstruction
@@ -693,7 +695,7 @@ final class PushStringValueInstruction extends ScriptInstruction {
   }
 
   @override
-  String toString() => '  push offset_of ${formatStringData(value)}';
+  String toString() => '  push offset-of ${formatStringData(value)}';
 
   final String value;
 }
@@ -729,8 +731,8 @@ final class SetHalfWordFunctionDataValueInstruction
 
   @override
   String toString() => functionName == targetName
-      ? '  ((set_data offset $valueOffset -> $functionName))'
-      : '  ((set_data offset $valueOffset -> $targetName ($functionName)))';
+      ? '  ((set2 offset $valueOffset -> $functionName))'
+      : '  ((set2 offset $valueOffset -> $targetName ($functionName)))';
 
   final Uint8List value;
   final int valueOffset;
@@ -754,7 +756,7 @@ final class PushDataValueInstruction extends ScriptInstruction {
   }
 
   @override
-  String toString() => '  push offset_of $value';
+  String toString() => '  push offset-of $value';
 
   final AstNode value;
 }
