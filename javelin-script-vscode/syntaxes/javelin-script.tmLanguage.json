@@ -59,6 +59,16 @@
           "patterns": [
             {
               "include": "#comments"
+            },
+            {
+              "match": "[0-9A-Fa-f]{2}"
+            },
+            {
+              "match": "\\s+"
+            },
+            {
+              "name": "invalid.illegal",
+              "match": "."
             }
           ]
         }
@@ -69,6 +79,10 @@
         {
           "name": "constant.character.escape",
           "match": "\\\\x[0-9A-Fa-f]{2}"
+        },
+        {
+          "name": "invalid.illegal",
+          "match": "\\\\x.."
         },
         {
           "name": "constant.character.escape",
