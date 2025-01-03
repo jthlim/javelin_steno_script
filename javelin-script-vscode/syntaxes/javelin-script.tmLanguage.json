@@ -165,6 +165,10 @@
         {
           "name": "keyword.operator",
           "match": "[,:;=<>+/*%&|^!\\-]"
+        },
+        {
+          "name": "entity.name.function",
+          "match": "\\b(pressScanCode|releaseScanCode|tapScanCode|isScanCodePressed|pressStenoKey|releaseStenoKey|isStenoKeyPressed|releaseAll|isButtonPressed|pressAll|sendText|console|checkButtonState|isInPressAll|setRgb|getTime|getLedStatus|setGpioPin|clearDisplay|setAutoDraw|setScreenOn|setScreenContrast|drawPixel|drawLine|drawImage|drawText|setDrawColor|drawRect|setHsv|rand|isUsbConnected|isUsbSuspended|getParameter|isConnected|getActiveConnection|setPreferredConnection|isPairConnected|startBlePairing|getBleProfile|setBleProfile|isHostSleeping|isMainPowered|isCharging|getBatteryPercentage|getActivePairConnection|setBoardPower|sendEvent|isPairPowered|setInputHint|setScript|isBoardPowered|startTimer|stopTimer|isTimerActive|isBleProfileConnected|disconnectBle|unpairBle|isBleProfilePaired|isBleProfileSleeping|isBleAdvertising|isBleScanning|isWaitingForUserPresence|replyUserPresence|setGpioInputPin|readGpioPin|drawGrayscaleRange|setGpioPinDutyCycle|cancelAllStenoKeys|cancelStenoKey|stopSound|playFrequency|playSequence|playWaveform|callAllReleaseScripts|isInReleaseAll|getPressCount|getReleaseCount|isStenoJoinNext|callPress|callRelease|pressMouseButton|releaseMouseButton|tapMouseButton|isMouseButtonPressed|moveMouse|wheelMouse|setEnableButtonStates|printValue|getWpm)\\b"
         }
       ]
     },
