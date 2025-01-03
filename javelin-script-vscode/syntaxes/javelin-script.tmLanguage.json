@@ -1,0 +1,173 @@
+{
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "name": "Javelin Script File",
+  "patterns": [
+    {
+      "include": "#comments"
+    },
+    {
+      "include": "#annotation"
+    },
+    {
+      "include": "#declaration"
+    },
+    {
+      "include": "#constants"
+    },
+    {
+      "include": "#keywords"
+    }
+  ],
+  "foldingStartMarker": "\\{\\s*$",
+  "foldingStopMarker": "^\\s*\\}",
+  "repository": {
+    "annotation": {
+      "patterns": [
+        {
+          "name": "markup.italic",
+          "begin": "#\\w+\\(",
+          "end": "\\)",
+          "patterns": [
+            {
+              "begin": "(\\w+)",
+              "end": ",|(?=\\))",
+              "beginCaptures": {
+                "0": {
+                  "name": "variable.parameter"
+                }
+              },
+              "patterns": [
+                {
+                  "include": "#constants"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "markup.italic",
+          "match": "#\\w+"
+        }
+      ]
+    },
+    "byte-list": {
+      "patterns": [
+        {
+          "name": "string",
+          "begin": "\\[\\[",
+          "end": "\\]\\]",
+          "patterns": [
+            {
+              "include": "#comments"
+            }
+          ]
+        }
+      ]
+    },
+    "character-escapes": {
+      "patterns": [
+        {
+          "name": "constant.character.escape",
+          "match": "\\\\x[0-9A-Fa-f]{2}"
+        },
+        {
+          "name": "constant.character.escape",
+          "match": "\\\\."
+        }
+      ]
+    },
+    "comments": {
+      "patterns": [
+        {
+          "name": "comment.line.double-slash",
+          "begin": "//",
+          "end": "\\n"
+        },
+        {
+          "name": "comment.block",
+          "begin": "/\\*",
+          "end": "\\*/"
+        }
+      ]
+    },
+    "constants": {
+      "patterns": [
+        {
+          "name": "constant.numeric",
+          "match": "\\b\\d+(\\.\\d+)?"
+        },
+        {
+          "include": "#strings"
+        },
+        {
+          "include": "#byte-list"
+        }
+      ]
+    },
+    "function-declaration": {
+      "patterns": [
+        {
+          "begin": "\\b(func)\\b\\s*",
+          "end": "(?=\\{)",
+          "beginCaptures": {
+            "1": {
+              "name": "keyword.other"
+            }
+          },
+          "patterns": [
+            {
+              "begin": "([A-Z]\\w*)\\b\\s*",
+              "end": "(?=\\{)",
+              "beginCaptures": {
+                "1": {
+                  "name": "entity.name.function"
+                }
+              }
+            },
+            {
+              "match": "\\s*\\w+"
+            }
+          ]
+        }
+      ]
+    },
+    "declaration": {
+      "patterns": [
+        {
+          "include": "#function-declaration"
+        }
+      ]
+    },
+    "keywords": {
+      "patterns": [
+        {
+          "name": "keyword",
+          "match": "\\b(const|var)\\b"
+        },
+        {
+          "name": "keyword.control",
+          "match": "\\b(for|do|if|while|else|return)\\b"
+        },
+        {
+          "name": "keyword.operator",
+          "match": "[,:;=<>+/*%&|^!\\-]"
+        }
+      ]
+    },
+    "strings": {
+      "patterns": [
+        {
+          "name": "string.quoted.double",
+          "begin": "\"",
+          "end": "\"",
+          "patterns": [
+            {
+              "include": "#character-escapes"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "scopeName": "source.javelin-script"
+}

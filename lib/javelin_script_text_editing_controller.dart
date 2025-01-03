@@ -19,12 +19,12 @@ class SyntaxHighlightingRule {
   static final rules = <SyntaxHighlightingRule>[
     // Data literals.
     SyntaxHighlightingRule(
-      RegExp(r'(?<!\[)\[\[(?!\[).*?\]\]', unicode: true, dotAll: true),
+      RegExp(r'(?<!\[)\[\[(?!\[).*?\]\]', dotAll: true),
       const TextStyle(color: Color(0xFF4527A0)), // purple800
       const TextStyle(color: Color(0xFFB39DDB)), // purple200
       [
         SyntaxHighlightingRule(
-          RegExp(r'//.*|/\*.*?\*/', unicode: true),
+          RegExp(r'//.*|/\*.*?\*/'),
           const TextStyle(color: Colors.green),
           const TextStyle(color: Colors.green),
         ),
@@ -33,14 +33,14 @@ class SyntaxHighlightingRule {
 
     // Comments
     SyntaxHighlightingRule(
-      RegExp(r'//.*|/\*.*?\*/', unicode: true),
+      RegExp(r'//.*|/\*.*?\*/'),
       const TextStyle(color: Colors.green),
       const TextStyle(color: Colors.green),
     ),
 
     // String literals.
     SyntaxHighlightingRule(
-      RegExp(r'"(?:\\.|[^\\"])*"?', unicode: true),
+      RegExp(r'"(?:[^\\"\n]|\\")*"?'),
       const TextStyle(color: Color(0xFF4527A0)), // purple800
       const TextStyle(color: Color(0xFFB39DDB)), // purple200
     ),
@@ -49,7 +49,6 @@ class SyntaxHighlightingRule {
     SyntaxHighlightingRule(
       RegExp(
         r'\b(?:func|for|const|var|return|if|else|while|do)\b',
-        unicode: true,
       ),
       const TextStyle(color: Color(0xFFAD1457)), // pink800
       const TextStyle(color: Color(0xFFF48FB1)), // pink200
@@ -57,21 +56,21 @@ class SyntaxHighlightingRule {
 
     // Operator
     SyntaxHighlightingRule(
-      RegExp(r'[!@*/%+=^&|?:;<>\[\],-]+', unicode: true),
+      RegExp(r'[!@*/%+=^&|?:;<>\[\],-]+'),
       const TextStyle(color: Colors.blueGrey),
       const TextStyle(color: Color(0xFF80DEEA)), // Colors.cyan[200],
     ),
 
     // Brackets
     SyntaxHighlightingRule(
-      RegExp(r'[{}()]+', unicode: true),
+      RegExp(r'[{}()]+'),
       const TextStyle(color: Colors.brown),
       const TextStyle(color: Color(0xFFFBC02D)), // Colors.yellow[700]
     ),
 
     // Numbers
     SyntaxHighlightingRule(
-      RegExp(r'\b(?:0x[0-9a-f]+|[0-9]+)\b', unicode: true),
+      RegExp(r'\b(?:0x[0-9a-f]+|[0-9]+)\b'),
       const TextStyle(color: Color(0xFFAA00FF)), // purpleAccent700
       const TextStyle(color: Color(0xFFEA80FC)), // purpleAccent100
     ),

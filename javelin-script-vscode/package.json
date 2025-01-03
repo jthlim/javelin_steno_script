@@ -1,0 +1,34 @@
+{
+  "name": "javelin-script",
+  "displayName": "Javelin Script",
+  "description": "Javelin Script Syntax Highlighter",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.57.0"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
+  "contributes": {
+    "languages": [
+      {
+        "id": "javelin-script",
+        "aliases": [
+          "Javelin Script File",
+          "javelin-script"
+        ],
+        "extensions": [
+          ".javelin-script"
+        ],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "javelin-script",
+        "scopeName": "source.javelin-script",
+        "path": "./syntaxes/javelin-script.tmLanguage.json"
+      }
+    ]
+  }
+}

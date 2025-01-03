@@ -54,7 +54,6 @@ func updateRgb() {
     updateDisconnectedKeyRgbCycle();
     startTimer(TIMER_ID_RGB_UPDATE, 32, 1, @updateDisconnectedKeyRgbCycle);
   } else {
-    clearRgb();
     stopTimer(TIMER_ID_RGB_UPDATE);
   }
 }

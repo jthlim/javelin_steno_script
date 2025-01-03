@@ -1,3 +1,5 @@
+// spellchecker: words retz retnz
+
 import 'dart:collection';
 import 'dart:typed_data';
 
@@ -6,8 +8,6 @@ import 'package:javelin_steno_script/src/ast.dart';
 import 'byte_code_builder.dart';
 import 'functions.dart';
 import 'string_data.dart';
-
-// spellchecker: words retz retnz
 
 enum ScriptOpcode {
   pushConstantBegin(0),
