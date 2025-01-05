@@ -77,7 +77,7 @@ func onStenoModeUpdate() {
 func init() {
   const SCRIPT_ID_STENO_MODE_UPDATE = 9;
 
-  // Update the LED color at startup, and register for steno mode update callbacks.
+  // Update the RGB LED and register callback for future steno mode updates.
   onStenoModeUpdate();
   setScript(SCRIPT_ID_STENO_MODE_UPDATE, @onStenoModeUpdate);
 
@@ -438,16 +438,15 @@ func onRelease26() {
 }
 
 func onPress26_0() {
-  // Toggle Steno
+  // Toggle\nSteno\nMode
   // Toggle the steno mode between embedded and Gemini PR when USR is pressed.
   // LED RGB is updated in Global StenoModeUpdate callback.
-  releaseAll();
   if (getParameter("steno_mode") != "embedded") {
     console("set_steno_mode embedded");
   } else {
     console("set_steno_mode gemini");
   }
-
+  releaseAll();
 }
 func onRelease26_0() {
 }

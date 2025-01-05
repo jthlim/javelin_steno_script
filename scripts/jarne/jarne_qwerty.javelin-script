@@ -1306,30 +1306,41 @@ func onConnectionUpdate() {
 
 // Global Script: updateBoardPower
 func updateBoardPower() {
+  const PAIR_BOARD_POWER_NO_OVERRIDE = 0;
+  const PAIR_BOARD_POWER_FORCE_OFF = 1;
+  const PAIR_BOARD_POWER_FORCE_ON = 2;
+
   const RGB_UPDATE_TIME = 10;
   const BLE_UPDATE_TIME = 50;
 
-  if (([[00 00 00 00 00 00 01]][resolveLayerIndex()]) || isBleAdvertising()) {
+  if (([[00 00 00 00 00 00 01]][resolveLayerIndex()])) {
+    setPairBoardPower(PAIR_BOARD_POWER_FORCE_ON);
     startTimer(TIMER_ID_RGB_UPDATE, 32, 1, @rgbUpdate);
     setBoardPower(1);
-  } else if (brightness == 0) {
-    stopTimer(TIMER_ID_RGB_UPDATE);
-    setBoardPower(getActivePairConnection() == PAIR_CONNECTION_CABLE);
-  } else if (getActivePairConnection() == PAIR_CONNECTION_BLE) {
-    if (isPairPowered() && isMainPowered()) {
-      startTimer(TIMER_ID_RGB_UPDATE, BLE_UPDATE_TIME, 1, @rgbUpdate);
-    } else {
-      stopTimer(TIMER_ID_RGB_UPDATE);
-    }
-    setBoardPower(isMainPowered());
   } else {
-    // No pair, or cable pair.
-    if (isPairPowered() || isMainPowered()) {
-      startTimer(TIMER_ID_RGB_UPDATE, RGB_UPDATE_TIME, 1, @rgbUpdate);
+    setPairBoardPower(PAIR_BOARD_POWER_NO_OVERRIDE);
+    if (isBleAdvertising()) {
+      startTimer(TIMER_ID_RGB_UPDATE, 32, 1, @rgbUpdate);
       setBoardPower(1);
-    } else {
+    } else if (brightness == 0) {
       stopTimer(TIMER_ID_RGB_UPDATE);
-      setBoardPower(0);
+      setBoardPower(getActivePairConnection() == PAIR_CONNECTION_CABLE);
+    } else if (getActivePairConnection() == PAIR_CONNECTION_BLE) {
+      if (isPairPowered() && isMainPowered()) {
+        startTimer(TIMER_ID_RGB_UPDATE, BLE_UPDATE_TIME, 1, @rgbUpdate);
+      } else {
+        stopTimer(TIMER_ID_RGB_UPDATE);
+      }
+      setBoardPower(isMainPowered());
+    } else {
+      // No pair, or cable pair.
+      if (isPairPowered() || isMainPowered()) {
+        startTimer(TIMER_ID_RGB_UPDATE, RGB_UPDATE_TIME, 1, @rgbUpdate);
+        setBoardPower(1);
+      } else {
+        stopTimer(TIMER_ID_RGB_UPDATE);
+        setBoardPower(0);
+      }
     }
   }
   rgbUpdate();

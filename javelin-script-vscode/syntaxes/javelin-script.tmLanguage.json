@@ -29,18 +29,11 @@
           "end": "\\)",
           "patterns": [
             {
-              "begin": "(\\w+)",
-              "end": ",|(?=\\))",
-              "beginCaptures": {
-                "0": {
-                  "name": "variable.parameter"
-                }
-              },
-              "patterns": [
-                {
-                  "include": "#constants"
-                }
-              ]
+              "include": "#constants"
+            },
+            {
+              "name": "keyword",
+              "match": "\\b(per_layer|local|true|false)\\b"
             }
           ]
         },

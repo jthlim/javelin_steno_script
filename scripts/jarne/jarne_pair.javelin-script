@@ -126,10 +126,6 @@ func init() {
   setScript(SCRIPT_ID_CONNECTION_UPDATE, @onConnectionUpdate);
   setScript(SCRIPT_ID_PAIR_CONNECTION_UPDATE, @onPairConnectionUpdate);
 
-  if (HAS_U2F) {
-    setScript(SCRIPT_ID_U2F_STATUS_UPDATE, @onU2fStatusUpdate);
-  }
-
   updateBoardPower();
 }
 
@@ -152,15 +148,6 @@ func onU2fStatusUpdate() {
 }
 
 func updateBoardPower() {
-  if (HAS_U2F && isWaitingForUserPresence()) {
-    stopTimer(TIMER_ID_RGB_UPDATE);
-    for (var i = 0; i < 54; i = i + 1) {
-      setRgb(i, 0, 0, 0);
-    }
-    setBoardPower(1);
-    return;
-  }
-
   var activePairConnection = getActivePairConnection();
   if (activePairConnection == PAIR_CONNECTION_NONE) {
     updateDisconnectedKeyRgbCycle();
