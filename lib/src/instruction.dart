@@ -3,8 +3,7 @@
 import 'dart:collection';
 import 'dart:typed_data';
 
-import 'package:javelin_steno_script/src/ast.dart';
-
+import 'ast.dart';
 import 'byte_code_builder.dart';
 import 'functions.dart';
 import 'string_data.dart';
@@ -560,7 +559,9 @@ sealed class JumpInstructionBase extends ScriptInstruction {
 
   @override
   void unlink() {
-    target.unlink();
+    if (target.list != null) {
+      target.unlink();
+    }
     super.unlink();
   }
 
@@ -908,12 +909,14 @@ final class ReturnIfNotZeroInstruction extends ScriptInstruction {
 }
 
 final class StartFunctionInstruction extends ScriptInstruction {
-  StartFunctionInstruction(this.function, this.isLocked);
+  StartFunctionInstruction(this.function, this.isLocked, this.isPure);
 
   final ScriptFunctionDefinition function;
 
   // Locked functions cannot have their body completely optimized out.
   final bool isLocked;
+
+  final bool isPure;
 
   @override
   bool get hasReference => true;
@@ -938,13 +941,17 @@ final class StartFunctionInstruction extends ScriptInstruction {
 
   @override
   String toString() {
-    if (function.numberOfParameters == 0 && function.numberOfLocals == 0) {
-      return '\n${function.functionName} (0x${offset.toRadixString(16)}):';
-    } else {
-      return '\n'
-          '${function.functionName} (0x${offset.toRadixString(16)}):'
-          '\n  enterFunction ${function.numberOfParameters} ${function.numberOfLocals - function.numberOfParameters}';
+    final buffer = StringBuffer();
+    buffer.write('\n${function.functionName} (0x${offset.toRadixString(16)}):');
+    if (isPure) {
+      buffer.write(' (pure)');
     }
+    if (function.numberOfParameters != 0 || function.numberOfLocals != 0) {
+      buffer.write(
+        '\n  enterFunction ${function.numberOfParameters} ${function.numberOfLocals - function.numberOfParameters}',
+      );
+    }
+    return buffer.toString();
   }
 }
 

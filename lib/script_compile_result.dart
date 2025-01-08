@@ -44,7 +44,7 @@ class ScriptCompileResult {
       }
 
       return ScriptCompileResult.ok(byteCode.length, byteCode, script, builder);
-    } on Exception catch (e) {
+    } on Object catch (e) {
       return ScriptCompileResult.failed(e.toString());
     }
   }

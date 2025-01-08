@@ -97,11 +97,12 @@ enum InBuiltScriptFunction implements ScriptFunctionDefinition {
   tapMouseButton(1, ReturnType.none, 0x52),
   isMouseButtonPressed(1, ReturnType.boolean, 0x53),
   moveMouse(2, ReturnType.none, 0x54),
-  wheelMouse(1, ReturnType.none, 0x55),
+  vWheelMouse(1, ReturnType.none, 0x55),
   setEnableButtonStates(1, ReturnType.none, 0x56),
   printValue(2, ReturnType.none, 0x57),
   getWpm(1, ReturnType.value, 0x58),
   setPairBoardPower(1, ReturnType.none, 0x59),
+  hWheelMouse(1, ReturnType.none, 0x5a),
   ;
 
   const InBuiltScriptFunction(

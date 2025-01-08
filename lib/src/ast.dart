@@ -1,11 +1,11 @@
 import 'dart:typed_data';
 
-import 'package:javelin_steno_script/src/token.dart';
-
-import 'instruction.dart';
-import 'functions.dart';
 import 'byte_code_builder.dart';
+import 'executor.dart';
+import 'functions.dart';
+import 'instruction.dart';
 import 'module.dart';
+import 'token.dart';
 
 class ScriptReachability {
   ScriptReachability(this.module);
@@ -27,6 +27,10 @@ abstract class AstNode {
   bool isReturn() => false;
   bool isConstant();
 
+  bool isPure();
+  ExecutionValue? evaluate(ExecutionContext context) =>
+      throw UnsupportedError('Should not be invoked');
+
   int constantValue();
   void addInstructions(ScriptByteCodeBuilder builder);
 
@@ -34,12 +38,16 @@ abstract class AstNode {
 
   Uint8List getData() => throw UnsupportedError('Internal error');
 
+  bool canUseAsPureParameter() => isConstant() || this is StringValueAstNode;
+
   AstNode simplify() {
     if (isConstant()) {
       return IntValueAstNode(constantValue());
     }
     return this;
   }
+
+  static const maximumEvaluationLoopCount = 32;
 }
 
 class StringValueAstNode extends AstNode {
@@ -52,6 +60,13 @@ class StringValueAstNode extends AstNode {
 
   @override
   int constantValue() => throw UnsupportedError('Should not be invoked');
+
+  @override
+  bool isPure() => true;
+
+  @override
+  ExecutionValue? evaluate(ExecutionContext context) =>
+      ExecutionValue.string(value);
 
   @override
   void mark(ScriptReachability context) {
@@ -77,6 +92,13 @@ class HalfWordListAstNode extends AstNode {
 
   @override
   int constantValue() => throw UnsupportedError('Should not be invoked');
+
+  @override
+  bool isPure() => false;
+
+  @override
+  ExecutionValue? evaluate(ExecutionContext context) =>
+      throw UnsupportedError('Should not be invoked');
 
   @override
   void mark(ScriptReachability context) {
@@ -150,6 +172,33 @@ class ByteIndexAstNode extends AstNode {
   int constantValue() => throw UnsupportedError('Should not be invoked');
 
   @override
+  bool isPure() => byteValue.isPure() && index.isPure();
+
+  @override
+  ExecutionValue? evaluate(ExecutionContext context) {
+    final byteValue = this.byteValue.evaluate(context);
+    if (byteValue == null || !byteValue.isString()) {
+      context.state = ExecutionState.error;
+      return null;
+    }
+
+    final index = this.index.evaluate(context);
+    if (index == null || !index.isInt()) {
+      context.state = ExecutionState.error;
+      return null;
+    }
+
+    if (index.intValue < 0 ||
+        index.intValue >= byteValue.stringValue!.length - 1) {
+      return ExecutionValue.zero;
+    }
+
+    return ExecutionValue.int(
+      byteValue.stringValue!.codeUnitAt(index.intValue + 1),
+    );
+  }
+
+  @override
   void mark(ScriptReachability context) {
     byteValue.mark(context);
     index.mark(context);
@@ -177,6 +226,9 @@ class HalfWordIndexAstNode extends AstNode {
 
   @override
   int constantValue() => throw UnsupportedError('Should not be invoked');
+
+  @override
+  bool isPure() => false;
 
   @override
   void mark(ScriptReachability context) {
@@ -207,6 +259,14 @@ class IntValueAstNode extends AstNode {
   int constantValue() => value;
 
   @override
+  bool isPure() => true;
+
+  @override
+  ExecutionValue? evaluate(ExecutionContext context) {
+    return ExecutionValue.int(value);
+  }
+
+  @override
   void addInstructions(ScriptByteCodeBuilder builder) {
     builder.addInstruction(PushIntValueInstruction(value));
   }
@@ -224,6 +284,25 @@ abstract class UnaryOperatorAstNode extends AstNode {
 
   @override
   bool isConstant() => statement.isConstant();
+
+  @override
+  bool isPure() => statement.isPure();
+
+  @override
+  ExecutionValue? evaluate(ExecutionContext context) {
+    final value = statement.evaluate(context);
+    if (value == null) {
+      context.state = ExecutionState.error;
+      return null;
+    }
+
+    return evaluateUnaryOp(value);
+  }
+
+  ExecutionValue? evaluateUnaryOp(ExecutionValue a);
+
+  @override
+  int constantValue() => -statement.constantValue();
 
   @override
   void mark(ScriptReachability context) {
@@ -255,6 +334,12 @@ class NotAstNode extends UnaryOperatorAstNode {
   int constantValue() => statement.constantValue() == 0 ? 1 : 0;
 
   @override
+  ExecutionValue? evaluateUnaryOp(ExecutionValue a) {
+    if (!a.isInt()) return null;
+    return ExecutionValue.int(a.intValue == 0 ? 1 : 0);
+  }
+
+  @override
   ScriptOperatorOpcode get opcode => ScriptOperatorOpcode.not;
 }
 
@@ -263,6 +348,12 @@ class NegateAstNode extends UnaryOperatorAstNode {
 
   @override
   int constantValue() => -statement.constantValue();
+
+  @override
+  ExecutionValue? evaluateUnaryOp(ExecutionValue a) {
+    if (!a.isInt()) return null;
+    return ExecutionValue.int(-a.intValue);
+  }
 
   @override
   ScriptOperatorOpcode get opcode => ScriptOperatorOpcode.negative;
@@ -276,6 +367,20 @@ class BitwiseNotAstNode extends AstNode {
 
   @override
   int constantValue() => ~expression.constantValue();
+
+  @override
+  bool isPure() => expression.isPure();
+
+  @override
+  ExecutionValue? evaluate(ExecutionContext context) {
+    final value = expression.evaluate(context);
+    if (value == null || !value.isInt()) {
+      context.state = ExecutionState.error;
+      return null;
+    }
+
+    return ExecutionValue.int(~value.intValue);
+  }
 
   @override
   void addInstructions(ScriptByteCodeBuilder builder) {
@@ -296,6 +401,27 @@ abstract class BinaryOperatorAstNode extends AstNode {
 
   @override
   bool isConstant() => statementA.isConstant() && statementB.isConstant();
+
+  @override
+  bool isPure() => statementA.isPure() && statementB.isPure();
+
+  @override
+  ExecutionValue? evaluate(ExecutionContext context) {
+    final a = statementA.evaluate(context);
+    if (a == null) {
+      context.state = ExecutionState.error;
+      return null;
+    }
+
+    final b = statementB.evaluate(context);
+    if (b == null) {
+      context.state = ExecutionState.error;
+      return null;
+    }
+    return evaluateBinaryOp(a, b);
+  }
+
+  ExecutionValue? evaluateBinaryOp(ExecutionValue a, ExecutionValue b);
 
   @override
   void mark(ScriptReachability context) {
@@ -353,6 +479,32 @@ class TermsAstNode extends AstNode {
           break;
         case TermMode.subtract:
           result -= value;
+          break;
+      }
+    }
+    return result;
+  }
+
+  @override
+  bool isPure() => terms.every((e) => e.statement.isPure());
+
+  @override
+  ExecutionValue? evaluate(ExecutionContext context) {
+    ExecutionValue? result = ExecutionValue.zero;
+    for (final term in terms) {
+      final value = term.statement.evaluate(context);
+      if (value == null ||
+          result == null ||
+          context.state != ExecutionState.running) {
+        context.state = ExecutionState.error;
+        return null;
+      }
+      switch (term.mode) {
+        case TermMode.add:
+          result = result + value;
+          break;
+        case TermMode.subtract:
+          result = result - value;
           break;
       }
     }
@@ -444,6 +596,14 @@ class MultiplyAstNode extends BinaryOperatorAstNode {
       statementA.constantValue() * statementB.constantValue();
 
   @override
+  ExecutionValue? evaluateBinaryOp(ExecutionValue a, ExecutionValue b) {
+    if (!a.isInt() || !b.isInt()) {
+      return null;
+    }
+    return ExecutionValue.int(a.intValue * b.intValue);
+  }
+
+  @override
   ScriptOperatorOpcode get opcode => ScriptOperatorOpcode.multiply;
 }
 
@@ -453,6 +613,14 @@ class QuotientAstNode extends BinaryOperatorAstNode {
   @override
   int constantValue() =>
       statementA.constantValue() ~/ statementB.constantValue();
+
+  @override
+  ExecutionValue? evaluateBinaryOp(ExecutionValue a, ExecutionValue b) {
+    if (!a.isInt() || !b.isInt()) {
+      return null;
+    }
+    return ExecutionValue.int(a.intValue ~/ b.intValue);
+  }
 
   @override
   ScriptOperatorOpcode get opcode => ScriptOperatorOpcode.quotient;
@@ -466,6 +634,14 @@ class RemainderAstNode extends BinaryOperatorAstNode {
       statementA.constantValue().remainder(statementB.constantValue());
 
   @override
+  ExecutionValue? evaluateBinaryOp(ExecutionValue a, ExecutionValue b) {
+    if (!a.isInt() || !b.isInt()) {
+      return null;
+    }
+    return ExecutionValue.int(a.intValue.remainder(b.intValue));
+  }
+
+  @override
   ScriptOperatorOpcode get opcode => ScriptOperatorOpcode.remainder;
 }
 
@@ -475,6 +651,14 @@ class BitwiseAndAstNode extends BinaryOperatorAstNode {
   @override
   int constantValue() =>
       statementA.constantValue() & statementB.constantValue();
+
+  @override
+  ExecutionValue? evaluateBinaryOp(ExecutionValue a, ExecutionValue b) {
+    if (!a.isInt() || !b.isInt()) {
+      return null;
+    }
+    return ExecutionValue.int(a.intValue & b.intValue);
+  }
 
   @override
   ScriptOperatorOpcode get opcode => ScriptOperatorOpcode.bitwiseAnd;
@@ -488,6 +672,14 @@ class BitwiseOrAstNode extends BinaryOperatorAstNode {
       statementA.constantValue() | statementB.constantValue();
 
   @override
+  ExecutionValue? evaluateBinaryOp(ExecutionValue a, ExecutionValue b) {
+    if (!a.isInt() || !b.isInt()) {
+      return null;
+    }
+    return ExecutionValue.int(a.intValue | b.intValue);
+  }
+
+  @override
   ScriptOperatorOpcode get opcode => ScriptOperatorOpcode.bitwiseOr;
 }
 
@@ -497,6 +689,14 @@ class BitwiseXorAstNode extends BinaryOperatorAstNode {
   @override
   int constantValue() =>
       statementA.constantValue() ^ statementB.constantValue();
+
+  @override
+  ExecutionValue? evaluateBinaryOp(ExecutionValue a, ExecutionValue b) {
+    if (!a.isInt() || !b.isInt()) {
+      return null;
+    }
+    return ExecutionValue.int(a.intValue ^ b.intValue);
+  }
 
   @override
   ScriptOperatorOpcode get opcode => ScriptOperatorOpcode.bitwiseXor;
@@ -510,6 +710,14 @@ class BitShiftLeftAstNode extends BinaryOperatorAstNode {
       statementA.constantValue() << statementB.constantValue();
 
   @override
+  ExecutionValue? evaluateBinaryOp(ExecutionValue a, ExecutionValue b) {
+    if (!a.isInt() || !b.isInt()) {
+      return null;
+    }
+    return ExecutionValue.int(a.intValue << b.intValue);
+  }
+
+  @override
   ScriptOperatorOpcode get opcode => ScriptOperatorOpcode.shiftLeft;
 }
 
@@ -521,6 +729,14 @@ class ArithmeticBitShiftRightAstNode extends BinaryOperatorAstNode {
       statementA.constantValue() >> statementB.constantValue();
 
   @override
+  ExecutionValue? evaluateBinaryOp(ExecutionValue a, ExecutionValue b) {
+    if (!a.isInt() || !b.isInt()) {
+      return null;
+    }
+    return ExecutionValue.int(a.intValue >> b.intValue);
+  }
+
+  @override
   ScriptOperatorOpcode get opcode => ScriptOperatorOpcode.arithmeticShiftRight;
 }
 
@@ -530,6 +746,14 @@ class LogicalBitShiftRightAstNode extends BinaryOperatorAstNode {
   @override
   int constantValue() =>
       statementA.constantValue() >>> statementB.constantValue();
+
+  @override
+  ExecutionValue? evaluateBinaryOp(ExecutionValue a, ExecutionValue b) {
+    if (!a.isInt() || !b.isInt()) {
+      return null;
+    }
+    return ExecutionValue.int(a.intValue >>> b.intValue);
+  }
 
   @override
   ScriptOperatorOpcode get opcode => ScriptOperatorOpcode.logicalShiftRight;
@@ -558,6 +782,17 @@ class LogicalAndAstNode extends BinaryOperatorAstNode {
       return 0;
     }
     return statementB.constantValue() != 0 ? 1 : 0;
+  }
+
+  @override
+  ExecutionValue? evaluateBinaryOp(ExecutionValue a, ExecutionValue b) {
+    // OK to do full evaluation here if there are no side effects.
+    if (!a.isInt() || !b.isInt()) {
+      return null;
+    }
+    return a.intValue != 0 && b.intValue != 0
+        ? ExecutionValue.one
+        : ExecutionValue.zero;
   }
 
   @override
@@ -590,6 +825,17 @@ class LogicalOrAstNode extends BinaryOperatorAstNode {
   }
 
   @override
+  ExecutionValue? evaluateBinaryOp(ExecutionValue a, ExecutionValue b) {
+    // OK to do full evaluation here if there are no side effects.
+    if (!a.isInt() || !b.isInt()) {
+      return null;
+    }
+    return a.intValue != 0 || b.intValue != 0
+        ? ExecutionValue.one
+        : ExecutionValue.zero;
+  }
+
+  @override
   ScriptOperatorOpcode get opcode => ScriptOperatorOpcode.logicalOr;
 }
 
@@ -602,6 +848,14 @@ class EqualsAstNode extends BinaryOperatorAstNode {
   @override
   int constantValue() {
     return statementA.constantValue() == statementB.constantValue() ? 1 : 0;
+  }
+
+  @override
+  ExecutionValue? evaluateBinaryOp(ExecutionValue a, ExecutionValue b) {
+    if (!a.isInt() || !b.isInt()) {
+      return null;
+    }
+    return a.intValue == b.intValue ? ExecutionValue.one : ExecutionValue.zero;
   }
 
   @override
@@ -630,6 +884,14 @@ class NotEqualsAstNode extends BinaryOperatorAstNode {
   @override
   int constantValue() {
     return statementA.constantValue() != statementB.constantValue() ? 1 : 0;
+  }
+
+  @override
+  ExecutionValue? evaluateBinaryOp(ExecutionValue a, ExecutionValue b) {
+    if (!a.isInt() || !b.isInt()) {
+      return null;
+    }
+    return a.intValue != b.intValue ? ExecutionValue.one : ExecutionValue.zero;
   }
 
   @override
@@ -663,6 +925,14 @@ class LessThanAstNode extends BinaryOperatorAstNode {
   }
 
   @override
+  ExecutionValue? evaluateBinaryOp(ExecutionValue a, ExecutionValue b) {
+    if (!a.isInt() || !b.isInt()) {
+      return null;
+    }
+    return a.intValue < b.intValue ? ExecutionValue.one : ExecutionValue.zero;
+  }
+
+  @override
   ScriptOperatorOpcode get opcode => ScriptOperatorOpcode.lessThan;
 }
 
@@ -675,6 +945,14 @@ class LessThanOrEqualToAstNode extends BinaryOperatorAstNode {
   @override
   int constantValue() {
     return statementA.constantValue() <= statementB.constantValue() ? 1 : 0;
+  }
+
+  @override
+  ExecutionValue? evaluateBinaryOp(ExecutionValue a, ExecutionValue b) {
+    if (!a.isInt() || !b.isInt()) {
+      return null;
+    }
+    return a.intValue <= b.intValue ? ExecutionValue.one : ExecutionValue.zero;
   }
 
   @override
@@ -693,6 +971,14 @@ class GreaterThanAstNode extends BinaryOperatorAstNode {
   }
 
   @override
+  ExecutionValue? evaluateBinaryOp(ExecutionValue a, ExecutionValue b) {
+    if (!a.isInt() || !b.isInt()) {
+      return null;
+    }
+    return a.intValue > b.intValue ? ExecutionValue.one : ExecutionValue.zero;
+  }
+
+  @override
   ScriptOperatorOpcode get opcode => ScriptOperatorOpcode.greaterThan;
 }
 
@@ -708,6 +994,14 @@ class GreaterThanOrEqualToAstNode extends BinaryOperatorAstNode {
   }
 
   @override
+  ExecutionValue? evaluateBinaryOp(ExecutionValue a, ExecutionValue b) {
+    if (!a.isInt() || !b.isInt()) {
+      return null;
+    }
+    return a.intValue >= b.intValue ? ExecutionValue.one : ExecutionValue.zero;
+  }
+
+  @override
   ScriptOperatorOpcode get opcode => ScriptOperatorOpcode.greaterThanOrEqualTo;
 }
 
@@ -717,6 +1011,14 @@ class NopAstNode extends AstNode {
 
   @override
   int constantValue() => throw UnsupportedError('Should not be invoked');
+
+  @override
+  bool isPure() => true;
+
+  @override
+  ExecutionValue? evaluate(ExecutionContext context) {
+    return null;
+  }
 
   @override
   void addInstructions(ScriptByteCodeBuilder builder) {}
@@ -740,6 +1042,65 @@ class ForStatementAstNode extends AstNode {
 
   @override
   int constantValue() => throw UnsupportedError('Should not be invoked');
+
+  @override
+  bool isPure() =>
+      (initialization?.isPure() ?? true) &&
+      (condition?.isPure() ?? true) &&
+      (update?.isPure() ?? true) & body.isPure();
+
+  @override
+  ExecutionValue? evaluate(ExecutionContext context) {
+    initialization?.evaluate(context);
+    if (context.state != ExecutionState.running) {
+      return null;
+    }
+    for (var loopCount = 0;
+        loopCount < AstNode.maximumEvaluationLoopCount;
+        ++loopCount) {
+      final condition = this.condition;
+      if (condition != null) {
+        final conditionValue = condition.evaluate(context);
+        if (conditionValue == null) {
+          context.state = ExecutionState.error;
+          return null;
+        }
+        if (conditionValue.isFalse()) {
+          return null;
+        }
+      }
+
+      final value = body.evaluate(context);
+      if (value != null) {
+        throw UnsupportedError('Internal error');
+      }
+      switch (context.state) {
+        case ExecutionState.running:
+          break;
+        case ExecutionState.finished:
+          return null;
+        case ExecutionState.timeout:
+          return null;
+        case ExecutionState.error:
+          return null;
+        case ExecutionState.doBreak:
+          context.state = ExecutionState.running;
+          return null;
+        case ExecutionState.doContinue:
+          context.state = ExecutionState.running;
+          break;
+      }
+
+      final updateValue = update?.evaluate(context);
+      if (updateValue != null) {
+        context.state = ExecutionState.error;
+        return null;
+      }
+    }
+
+    context.state = ExecutionState.timeout;
+    return null;
+  }
 
   @override
   void mark(ScriptReachability context) {
@@ -834,6 +1195,52 @@ class DoWhileStatementAstNode extends AstNode {
   int constantValue() => throw UnsupportedError('Should not be invoked');
 
   @override
+  bool isPure() => body.isPure() && condition.isPure();
+
+  @override
+  ExecutionValue? evaluate(ExecutionContext context) {
+    if (context.state != ExecutionState.running) {
+      return null;
+    }
+    for (var loopCount = 0;
+        loopCount < AstNode.maximumEvaluationLoopCount;
+        ++loopCount) {
+      final value = body.evaluate(context);
+      if (value != null) {
+        throw UnsupportedError('Internal error');
+      }
+      switch (context.state) {
+        case ExecutionState.running:
+          break;
+        case ExecutionState.finished:
+          return null;
+        case ExecutionState.timeout:
+          return null;
+        case ExecutionState.error:
+          return null;
+        case ExecutionState.doBreak:
+          context.state = ExecutionState.running;
+          return null;
+        case ExecutionState.doContinue:
+          context.state = ExecutionState.running;
+          break;
+      }
+
+      final conditionValue = condition.evaluate(context);
+      if (conditionValue == null) {
+        context.state = ExecutionState.error;
+        return null;
+      }
+      if (conditionValue.isFalse()) {
+        return null;
+      }
+    }
+
+    context.state = ExecutionState.timeout;
+    return null;
+  }
+
+  @override
   void mark(ScriptReachability context) {
     body.mark(context);
     condition.mark(context);
@@ -893,6 +1300,33 @@ class IfStatementAstNode extends AstNode {
 
   @override
   bool isBoolean() => isBooleanExpression;
+
+  @override
+  bool isPure() {
+    if (condition.isConstant()) {
+      final value = condition.constantValue();
+      if (value != 0) return whenTrue.isPure();
+      return whenFalse?.isPure() ?? true;
+    }
+
+    return condition.isPure() &&
+        whenTrue.isPure() &&
+        (whenFalse?.isPure() ?? true);
+  }
+
+  @override
+  ExecutionValue? evaluate(ExecutionContext context) {
+    final conditionValue = condition.evaluate(context);
+    if (conditionValue == null) {
+      context.state = ExecutionState.error;
+      return null;
+    }
+    if (conditionValue.isTrue()) {
+      return whenTrue.evaluate(context);
+    } else {
+      return whenFalse?.evaluate(context);
+    }
+  }
 
   @override
   bool isEmpty() {
@@ -997,6 +1431,15 @@ class BreakStatementAstNode extends AstNode {
   int constantValue() => throw UnsupportedError('Should not be invoked');
 
   @override
+  bool isPure() => true;
+
+  @override
+  ExecutionValue? evaluate(ExecutionContext context) {
+    context.state = ExecutionState.doBreak;
+    return null;
+  }
+
+  @override
   void addInstructions(ScriptByteCodeBuilder builder) {
     final targets = builder.breakTargets;
     if (targets == null) {
@@ -1014,6 +1457,15 @@ class ContinueStatementAstNode extends AstNode {
 
   @override
   int constantValue() => throw UnsupportedError('Should not be invoked');
+
+  @override
+  bool isPure() => true;
+
+  @override
+  ExecutionValue? evaluate(ExecutionContext context) {
+    context.state = ExecutionState.doContinue;
+    return null;
+  }
 
   @override
   void addInstructions(ScriptByteCodeBuilder builder) {
@@ -1052,6 +1504,23 @@ class StatementListAstNode extends AstNode {
   int constantValue() => throw UnsupportedError('Should not be invoked');
 
   @override
+  bool isPure() => statements.every((e) => e.isPure());
+
+  @override
+  ExecutionValue? evaluate(ExecutionContext context) {
+    for (final statement in statements) {
+      final value = statement.evaluate(context);
+      if (value != null) {
+        throw UnsupportedError('Internal error');
+      }
+      if (context.state != ExecutionState.running) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  @override
   void mark(ScriptReachability context) {
     for (final statement in statements) {
       statement.mark(context);
@@ -1082,6 +1551,9 @@ class LoadGlobalValueArrayAstNode extends AstNode {
   int constantValue() => throw UnsupportedError('Should not be invoked');
 
   @override
+  bool isPure() => false;
+
+  @override
   void addInstructions(ScriptByteCodeBuilder builder) {
     throw Exception('Global value array ${global.name} must be indexed');
   }
@@ -1097,6 +1569,14 @@ class LoadLocalValueArrayAstNode extends AstNode {
 
   @override
   int constantValue() => throw UnsupportedError('Should not be invoked');
+
+  @override
+  bool isPure() => throw UnsupportedError('Should not be invoked');
+
+  @override
+  ExecutionValue? evaluate(ExecutionContext context) {
+    return ExecutionValue.int(local.index);
+  }
 
   @override
   void addInstructions(ScriptByteCodeBuilder builder) {
@@ -1148,6 +1628,9 @@ class LoadIndexedGlobalValueAstNode extends AstNode with IndexedValueMixin {
 
   @override
   int constantValue() => throw UnsupportedError('Should not be invoked');
+
+  @override
+  bool isPure() => false;
 
   @override
   void mark(ScriptReachability context) {
@@ -1203,6 +1686,19 @@ class LoadIndexedLocalValueAstNode extends AstNode with IndexedValueMixin {
   int constantValue() => throw UnsupportedError('Should not be invoked');
 
   @override
+  bool isPure() => indexExpression.isPure();
+
+  @override
+  ExecutionValue? evaluate(ExecutionContext context) {
+    final index = indexExpression.evaluate(context);
+    if (index == null || !index.isInt()) {
+      context.state = ExecutionState.error;
+      return null;
+    }
+    return context.locals[localValue.local.index + index.intValue];
+  }
+
+  @override
   void mark(ScriptReachability context) {
     indexExpression.mark(context);
   }
@@ -1241,6 +1737,14 @@ class LoadValueAstNode extends AstNode {
 
   @override
   int constantValue() => throw UnsupportedError('Should not be invoked');
+
+  @override
+  bool isPure() => !isGlobal;
+
+  @override
+  ExecutionValue? evaluate(ExecutionContext context) {
+    return context.locals[index];
+  }
 
   @override
   void mark(ScriptReachability context) {
@@ -1285,6 +1789,9 @@ class CallFunctionAstNode extends AstNode {
   int constantValue() => throw UnsupportedError('Should not be invoked');
 
   @override
+  bool isPure() => false;
+
+  @override
   void mark(ScriptReachability context) {
     final definition = context.module.functions[name];
     if (definition is InBuiltScriptFunction) {
@@ -1292,16 +1799,41 @@ class CallFunctionAstNode extends AstNode {
         parameter.mark(context);
       }
     } else if (definition is ScriptFunction) {
-      if (definition.hasReturnValue ||
-          (!definition.statements.isReturn() &&
-              !definition.statements.isEmpty())) {
-        for (final parameter in parameters) {
-          parameter.mark(context);
-        }
+      if (definition.isPure()) {
+        if (!definition.hasReturnValue || !usesValue) return;
 
-        context.functions.add(name);
-        definition.mark(context);
+        if (hasEvaluated == false) {
+          hasEvaluated = true;
+          if (parameters.every((e) => e.canUseAsPureParameter())) {
+            final context = ExecutionContext(definition.numberOfLocals);
+            var offset = 0;
+            for (final parameter in parameters) {
+              if (parameter is StringValueAstNode) {
+                context.locals[offset++] =
+                    ExecutionValue.string(parameter.value);
+              } else if (parameter.isConstant()) {
+                context.locals[offset++] =
+                    ExecutionValue.int(parameter.constantValue());
+              } else {
+                break;
+              }
+            }
+            if (offset == parameters.length) {
+              evaluationResult = definition.evaluate(context);
+            }
+          }
+          if (evaluationResult?.isInt() ?? false) {
+            return;
+          }
+        }
       }
+
+      for (final parameter in parameters) {
+        parameter.mark(context);
+      }
+
+      context.functions.add(name);
+      definition.mark(context);
     }
   }
 
@@ -1332,15 +1864,21 @@ class CallFunctionAstNode extends AstNode {
         CallInBuiltFunctionInstruction(definition),
       );
     } else if (definition is ScriptFunction) {
-      if (definition.hasReturnValue ||
-          (!definition.statements.isReturn() &&
-              !definition.statements.isEmpty())) {
-        for (final parameter in parameters) {
-          parameter.addInstructions(builder);
-        }
+      if (definition.isPure()) {
+        if (!definition.hasReturnValue || !usesValue) return;
 
-        builder.addInstruction(CallFunctionInstruction(name));
+        if (evaluationResult?.isInt() ?? false) {
+          builder.addInstruction(
+            PushIntValueInstruction(evaluationResult!.intValue),
+          );
+          return;
+        }
       }
+      for (final parameter in parameters) {
+        parameter.addInstructions(builder);
+      }
+
+      builder.addInstruction(CallFunctionInstruction(name));
     }
 
     if (!usesValue && definition.hasReturnValue) {
@@ -1353,6 +1891,9 @@ class CallFunctionAstNode extends AstNode {
   final bool usesValue;
   final String name;
   final List<AstNode> parameters;
+
+  var hasEvaluated = false;
+  ExecutionValue? evaluationResult;
 }
 
 class PushFunctionAddress extends AstNode {
@@ -1363,6 +1904,9 @@ class PushFunctionAddress extends AstNode {
 
   @override
   int constantValue() => throw UnsupportedError('Should not be invoked');
+
+  @override
+  bool isPure() => false;
 
   @override
   void mark(ScriptReachability context) {
@@ -1404,6 +1948,21 @@ class StoreValueAstNode extends AstNode {
 
   @override
   int constantValue() => throw UnsupportedError('Should not be invoked');
+
+  @override
+  bool isPure() => !isGlobal && expression.isPure();
+
+  @override
+  ExecutionValue? evaluate(ExecutionContext context) {
+    assert(!isGlobal);
+    final value = expression.evaluate(context);
+    if (value == null) {
+      context.state = ExecutionState.error;
+      return null;
+    }
+    context.locals[index] = value;
+    return null;
+  }
 
   @override
   void mark(ScriptReachability context) {
@@ -1456,6 +2015,9 @@ class StoreIndexedGlobalValueAstNode extends AstNode with IndexedValueMixin {
 
   @override
   int constantValue() => throw UnsupportedError('Should not be invoked');
+
+  @override
+  bool isPure() => false;
 
   @override
   void mark(ScriptReachability context) {
@@ -1518,6 +2080,25 @@ class StoreIndexedLocalValueAstNode extends AstNode with IndexedValueMixin {
   int constantValue() => throw UnsupportedError('Should not be invoked');
 
   @override
+  bool isPure() => indexExpression.isPure() && expression.isPure();
+
+  @override
+  ExecutionValue? evaluate(ExecutionContext context) {
+    final index = indexExpression.evaluate(context);
+    if (index == null || !index.isInt()) {
+      context.state = ExecutionState.error;
+      return null;
+    }
+    final value = expression.evaluate(context);
+    if (value == null) {
+      context.state = ExecutionState.error;
+      return null;
+    }
+    context.locals[localValueIndex + index.intValue] = value;
+    return null;
+  }
+
+  @override
   void mark(ScriptReachability context) {
     indexExpression.mark(context);
     expression.mark(context);
@@ -1562,6 +2143,27 @@ class ReturnAstNode extends AstNode {
   int constantValue() => throw UnsupportedError('Should not be invoked');
 
   @override
+  bool isPure() => expression?.isPure() ?? true;
+
+  @override
+  ExecutionValue? evaluate(ExecutionContext context) {
+    final expression = this.expression;
+    if (expression == null) {
+      context.state = ExecutionState.finished;
+      return null;
+    }
+
+    final value = expression.evaluate(context);
+    if (value == null) {
+      context.state = ExecutionState.error;
+      return null;
+    }
+    context.returnValue = value;
+    context.state = ExecutionState.finished;
+    return null;
+  }
+
+  @override
   void mark(ScriptReachability context) {
     expression?.mark(context);
   }
@@ -1586,6 +2188,9 @@ class CallValueAstNode extends AstNode {
 
   @override
   int constantValue() => throw UnsupportedError('Should not be invoked');
+
+  @override
+  bool isPure() => false;
 
   @override
   void mark(ScriptReachability context) {

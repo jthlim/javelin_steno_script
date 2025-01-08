@@ -1,8 +1,9 @@
 import 'dart:typed_data';
 
-import 'functions.dart';
 import 'ast.dart';
 import 'byte_code_builder.dart';
+import 'executor.dart';
+import 'functions.dart';
 
 class ScriptLocalVariable {
   ScriptLocalVariable(this.name, this.index, [this.arraySize]);
@@ -36,6 +37,15 @@ class ScriptFunction implements ScriptFunctionDefinition {
 
   @override
   bool hasReturnValue = false;
+
+  bool isPure() => statements.isPure();
+
+  ExecutionValue? evaluate(ExecutionContext context) {
+    statements.evaluate(context);
+    return context.state == ExecutionState.finished
+        ? context.returnValue
+        : null;
+  }
 
   final parameters = <String>{};
   var locals = ScriptLocals();

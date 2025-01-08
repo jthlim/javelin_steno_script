@@ -459,6 +459,17 @@ class Parser {
         _nextToken();
         final indexExpression = _parseExpression();
         _assertToken(TokenType.closeSquareBracket);
+        if (result is StringValueAstNode && indexExpression.isConstant()) {
+          final index = indexExpression.constantValue();
+          if (index < 0 || index + 1 >= result.value.length) {
+            throw FormatException(
+              'Index $index out of bounds near $_currentToken',
+            );
+          }
+          return IntValueAstNode(
+            result.value.codeUnitAt(indexExpression.constantValue() + 1),
+          );
+        }
         return ByteIndexAstNode(result, indexExpression);
       case TokenType.openHalfWordList:
         _nextToken();

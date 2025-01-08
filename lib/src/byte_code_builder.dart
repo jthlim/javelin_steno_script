@@ -1,12 +1,13 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
-import 'package:javelin_steno_script/javelin_steno_script.dart';
-import 'package:javelin_steno_script/src/ast.dart';
+import 'package:crclib/catalog.dart';
 
+import 'ast.dart';
 import 'instruction.dart';
 import 'instruction_list.dart';
-import 'package:crclib/catalog.dart';
+import 'module.dart';
+import 'string_data.dart';
 
 class ScriptByteCodeBuilder {
   ScriptByteCodeBuilder({
@@ -72,7 +73,7 @@ class ScriptByteCodeBuilder {
   void _createInstructionList() {
     // Add header and root element. This name is used by InstructionList.
     addInstruction(
-      StartFunctionInstruction(ScriptFunction('\$byteCodeRoot'), true),
+      StartFunctionInstruction(ScriptFunction('\$byteCodeRoot'), true, false),
     );
     _headerBytes = Uint8List(6 + 2 * requiredFunctions.length);
     _headerBytes.setRange(0, 4, 'JSS$byteCodeVersion'.codeUnits);
@@ -95,8 +96,11 @@ class ScriptByteCodeBuilder {
         throw Exception('Internal error - inconsistent function name');
       }
       // Set up placeholder instruction.
-      final functionStart =
-          StartFunctionInstruction(function, function.isLocked);
+      final functionStart = StartFunctionInstruction(
+        function,
+        function.isLocked,
+        function.isPure(),
+      );
       functions[function.functionName] = functionStart;
       addInstruction(functionStart);
 
