@@ -96,12 +96,27 @@ class Tokenizer {
 
         case 0x22: // Double quote
         case 0x27: // Single quote
-          yield Token(
-            type: TokenType.stringValue,
-            line: _line,
-            column: _column,
-            stringValue: _parseString(closingCharacter: c),
-          );
+          final string = _parseString(closingCharacter: c);
+          if (c == 0x22) {
+            yield Token(
+              type: TokenType.stringValue,
+              line: _line,
+              column: _column,
+              stringValue: string,
+            );
+          } else {
+            if (string.length != 2) {
+              throw FormatException(
+                'Invalid character constant $string near $locator',
+              );
+            }
+            yield Token(
+              type: TokenType.intValue,
+              line: _line,
+              column: _column,
+              intValue: string.codeUnitAt(1),
+            );
+          }
           continue;
 
         case 0x2f: // '/'

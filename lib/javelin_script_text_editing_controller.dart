@@ -70,7 +70,7 @@ class SyntaxHighlightingRule {
 
     // Numbers
     SyntaxHighlightingRule(
-      RegExp(r'\b(?:0x[0-9a-f]+|[0-9]+)\b'),
+      RegExp(r"'\\?.'|\b(?:0x[0-9a-f]+|[0-9]+)\b"),
       const TextStyle(color: Color(0xFFAA00FF)), // purpleAccent700
       const TextStyle(color: Color(0xFFEA80FC)), // purpleAccent100
     ),

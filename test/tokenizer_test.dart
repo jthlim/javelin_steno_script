@@ -48,6 +48,15 @@ void main() {
       );
     });
 
+    test('should tokenize character constants', () {
+      final result = Tokenizer('\'a\' \'\\\\\' \'\\n\'', '').tokenize();
+
+      expect(
+        result.toList().map((token) => token.intValue),
+        const [0x61, 0x5c, 0x0a],
+      );
+    });
+
     test('should tokenize hex values correctly', () {
       final result = Tokenizer('0xff 0x10000', '').tokenize();
       expect(

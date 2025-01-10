@@ -7,12 +7,39 @@ void main() {
       final compiledCode = _compileScript('var a = -1;');
       expect(compiledCode, '''
 
-init (0xa):
-  push -1
-  store g0
-  ret
+\$byteCodeRoot (0x0):
+  ((set2 offset 6 -> null (init)))
+  ((set2 offset 8 -> null (tick)))
+  data [[4a 53 53 34 0a 00 00 00 00 00]]
+''');
+    });
 
-tick (0xe):
+    test('should inline calculation', () {
+      final compiledCode = _compileScript('''
+func tick() {
+  printValue("Test", calculate(provide3(7), 4));
+}
+
+func calculate(a, b) var {
+  return "0123456789"[2 * a + b / 4] - '0';
+}
+
+func provide3(x) var {
+  return x % 4;
+}
+
+''');
+      expect(compiledCode, '''
+
+\$byteCodeRoot (0x0):
+  ((set2 offset 6 -> null (init)))
+  ((set2 offset 8 -> tick))
+  data [[4a 53 53 34 18 00 00 00 0a 00]]
+
+tick (0xa):
+  push offset-of "Test"
+  push 7
+  call in-built-87 (printValue)
   ret
 ''');
     });

@@ -1,3 +1,5 @@
+import 'module.dart';
+
 enum ExecutionState {
   running,
   finished,
@@ -49,7 +51,7 @@ class ExecutionValue {
 }
 
 class ExecutionContext {
-  ExecutionContext(int maximumLocalsCount)
+  ExecutionContext(int maximumLocalsCount, this.module)
       : locals = List.generate(
           maximumLocalsCount,
           (_) => const ExecutionValue.int(0),
@@ -57,6 +59,10 @@ class ExecutionContext {
 
   var state = ExecutionState.running;
 
+  var scriptCallDepth = 0;
   ExecutionValue? returnValue;
   final List<ExecutionValue> locals;
+  final ScriptModule module;
+
+  static const maxScriptCallDepth = 8;
 }

@@ -38,7 +38,7 @@ abstract class AstNode {
 
   Uint8List getData() => throw UnsupportedError('Internal error');
 
-  bool canUseAsPureParameter() => isConstant() || this is StringValueAstNode;
+  bool canUseAsPureParameter(ExecutionContext context) => isConstant();
 
   AstNode simplify() {
     if (isConstant()) {
@@ -63,6 +63,9 @@ class StringValueAstNode extends AstNode {
 
   @override
   bool isPure() => true;
+
+  @override
+  bool canUseAsPureParameter(ExecutionContext context) => true;
 
   @override
   ExecutionValue? evaluate(ExecutionContext context) =>
@@ -1792,6 +1795,44 @@ class CallFunctionAstNode extends AstNode {
   bool isPure() => false;
 
   @override
+  bool canUseAsPureParameter(ExecutionContext context) {
+    updateEvaluation(context);
+    return evaluationResult?.isInt() ?? false;
+  }
+
+  @override
+  ExecutionValue? evaluate(ExecutionContext context) => evaluationResult;
+
+  void updateEvaluation(ExecutionContext context) {
+    if (hasEvaluated) return;
+    hasEvaluated = true;
+
+    if (context.scriptCallDepth > ExecutionContext.maxScriptCallDepth) {
+      return;
+    }
+
+    final definition = context.module.functions[name];
+    if (definition is! ScriptFunction) return;
+    if (!definition.isPure()) return;
+    if (!definition.hasReturnValue || !usesValue) return;
+
+    context.scriptCallDepth++;
+
+    if (parameters.every((e) => e.canUseAsPureParameter(context))) {
+      var offset = 0;
+      final localContext =
+          ExecutionContext(definition.numberOfLocals, context.module);
+      localContext.scriptCallDepth = context.scriptCallDepth;
+      for (final parameter in parameters) {
+        localContext.locals[offset++] = parameter.evaluate(localContext)!;
+      }
+      evaluationResult = definition.evaluate(localContext);
+    }
+
+    context.scriptCallDepth--;
+  }
+
+  @override
   void mark(ScriptReachability context) {
     final definition = context.module.functions[name];
     if (definition is InBuiltScriptFunction) {
@@ -1799,33 +1840,9 @@ class CallFunctionAstNode extends AstNode {
         parameter.mark(context);
       }
     } else if (definition is ScriptFunction) {
-      if (definition.isPure()) {
-        if (!definition.hasReturnValue || !usesValue) return;
-
-        if (hasEvaluated == false) {
-          hasEvaluated = true;
-          if (parameters.every((e) => e.canUseAsPureParameter())) {
-            final context = ExecutionContext(definition.numberOfLocals);
-            var offset = 0;
-            for (final parameter in parameters) {
-              if (parameter is StringValueAstNode) {
-                context.locals[offset++] =
-                    ExecutionValue.string(parameter.value);
-              } else if (parameter.isConstant()) {
-                context.locals[offset++] =
-                    ExecutionValue.int(parameter.constantValue());
-              } else {
-                break;
-              }
-            }
-            if (offset == parameters.length) {
-              evaluationResult = definition.evaluate(context);
-            }
-          }
-          if (evaluationResult?.isInt() ?? false) {
-            return;
-          }
-        }
+      updateEvaluation(ExecutionContext(0, context.module));
+      if (evaluationResult?.isInt() ?? false) {
+        return;
       }
 
       for (final parameter in parameters) {
