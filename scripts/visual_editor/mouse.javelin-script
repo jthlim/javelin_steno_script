@@ -1,0 +1,93 @@
+var vx;
+var vy;
+
+var mouseMask; // 0 = up, 1 = down, 2 = left, 3 = right
+
+// Scaled up *10
+const MOUSE_MAX_VELOCITY = 2000; // 200
+const MOUSE_ACCELERATION = 25;   // 2.5 units/tick
+
+func mouseUpPressed() {
+  mousePressed(1);
+}
+
+func mouseDownPressed() {
+  mousePressed(2);
+}
+
+func mouseLeftPressed() {
+  mousePressed(4);
+}
+
+func mouseRightPressed() {
+  mousePressed(8);
+}
+
+func mouseUpReleased() {
+  vy = 0;
+  mouseReleased(1);
+}
+
+func mouseDownReleased() {
+  vy = 0;
+  mouseReleased(2);
+}
+
+func mouseLeftReleased() {
+  vx = 0;
+  mouseReleased(4);
+}
+
+func mouseRightReleased() {
+  vx = 0;
+  mouseReleased(8);
+}
+
+func mousePressed(mask) {
+  mouseMask = mouseMask | mask;
+  startTimer(@updateMouse, 10, 1, @updateMouse);
+  updateMouse();
+}
+
+func mouseReleased(mask) {
+  mouseMask = mouseMask & ~mask;
+  if (mouseMask == 0) {
+    stopTimer(@updateMouse);
+  }
+}
+
+func mouseReleaseAll() {
+  mouseMask = 0;
+  stopTimer(@updateMouse);
+}
+
+func updateMouse() {
+  var upDown = mouseMask & 3;
+  if (upDown == 0 || upDown == 3) {
+    vy = 0;
+  } else if(upDown == 1) {
+    vy = vy - MOUSE_ACCELERATION;
+    if (vy < -MOUSE_MAX_VELOCITY) vy = -MOUSE_MAX_VELOCITY;
+  } else {
+    vy = vy + MOUSE_ACCELERATION;
+    if (vy > MOUSE_MAX_VELOCITY) vy = MOUSE_MAX_VELOCITY;
+  }
+
+  var leftRight = mouseMask >> 2;
+  if (leftRight == 0 || leftRight == 3) {
+    vx = 0;
+  } else if(leftRight == 1) {
+    vx = vx - MOUSE_ACCELERATION;
+    if (vx < -MOUSE_MAX_VELOCITY) vx = -MOUSE_MAX_VELOCITY;
+  } else {
+    vx = vx + MOUSE_ACCELERATION;
+    if (vx > MOUSE_MAX_VELOCITY) vx = MOUSE_MAX_VELOCITY;
+  }
+
+  moveMouse(vx/10, vy/10);
+}
+
+// #prefab Mouse:Up [{"t":"p","d":{"a":{"t":"s","script":"// Mouse\\nUp\nmouseUpPressed();"}}},{"t":"r","d":{"a":{"t":"s","script":"//\nmouseUpReleased();"}}}]
+// #prefab Mouse:Down [{"t":"p","d":{"a":{"t":"s","script":"// Mouse\\nDown\nmouseDownPressed();"}}},{"t":"r","d":{"a":{"t":"s","script":"// \nmouseDownReleased();"}}}]
+// #prefab Mouse:Left [{"t":"p","d":{"a":{"t":"s","script":"// Mouse\\nLeft\nmouseLeftPressed();"}}},{"t":"r","d":{"a":{"t":"s","script":"//\nmouseLeftReleased();"}}}]
+// #prefab Mouse:Right [{"t":"p","d":{"a":{"t":"s","script":"// Mouse\\nRight\nmouseRightPressed();"}}},{"t":"r","d":{"a":{"t":"s","script":"// \nmouseRightReleased();"}}}]
