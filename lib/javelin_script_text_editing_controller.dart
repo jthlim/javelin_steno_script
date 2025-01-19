@@ -131,6 +131,11 @@ class JavelinScriptTextEditingController extends TextEditingController {
     }
   }
 
+  TextSpan? cache;
+  var lastText = '';
+  TextStyle? lastStyle;
+  var lastBrightness = Brightness.light;
+
   @override
   TextSpan buildTextSpan({
     required BuildContext context,
@@ -138,14 +143,26 @@ class JavelinScriptTextEditingController extends TextEditingController {
     required bool withComposing,
   }) {
     final brightness = Theme.of(context).brightness;
-    return TextSpan(
-      style: style,
-      children: colorSpanWithRules(
-        brightness: brightness,
-        text: text,
-        rules: SyntaxHighlightingRule.rules,
-        index: 0,
-      ).toList(),
-    );
+
+    if (cache == null ||
+        brightness != lastBrightness ||
+        !identical(style, lastStyle) ||
+        !identical(text, lastText)) {
+      lastBrightness = brightness;
+      lastStyle = style;
+      lastText = text;
+
+      cache = TextSpan(
+        style: style,
+        children: colorSpanWithRules(
+          brightness: brightness,
+          text: text,
+          rules: SyntaxHighlightingRule.rules,
+          index: 0,
+        ).toList(),
+      );
+    }
+
+    return cache!;
   }
 }
