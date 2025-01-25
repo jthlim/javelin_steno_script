@@ -506,9 +506,7 @@ func activateGlobal() {
   }
   setEnableButtonStates(([[01 00 00 00 00 00 00 00]][resolveLayerIndex()]));
   updateDisplay();
-  rgbUpdate();
-  rgbUpdateUnderglow();
-
+  updateBoardPower();
 }
 func deactivate0() {
 
@@ -3243,6 +3241,7 @@ func modTapHandler41(action) {
 const modTapLayerActivations41 = [[00 07 00 00 01 00 00 00]];
 
 func init() {
+  // Global
   rgbInitRandomColors();
 
   setScript(SCRIPT_ID_DISPLAY_OVERLAY, @drawDisplayOverlay);
@@ -3922,9 +3921,11 @@ func onRelease11_6() {
   releaseScanCodeButton(42 /* "⌫" */);
 }
 
+var pressTime12;
 func onPress12() {
   globalPress(12);
 
+  if (!isInPressAll()) pressTime12 = getTime();
   dispatchToLayer([[[@onPress12_0, @onPress12_1, @onPress12_2, 0, 0, 0, 0, @onPress12_7]]]);
 }
 func onRelease12() {
@@ -3951,11 +3952,7 @@ func onRelease12() {
 
 }
 
-var timer12_0;
 func onPress12_0() {
-  if (!isInPressAll()) {
-    timer12_0 = getTime();
-  }
   // Auto-Return
   // Tag this so the global layer can return to steno later
   wasSteno12 = 1;
@@ -3968,7 +3965,7 @@ func onPress12_0() {
 }
 func onRelease12_0() {
   releaseScanCodeButton(224 /* "⌃" */);
-  if (getTime() - timer12_0 <= 200) {
+  if (getTime() - pressTime12 <= 200) {
     pressScanCodeButton(12, 0, 41 /* "⎋" */, 1);
     releaseScanCodeButton(41 /* "⎋" */);
 
@@ -4609,9 +4606,11 @@ func onRelease23_6() {
   releaseScanCodeButton(87 /* "+" */);
 }
 
+var pressTime24;
 func onPress24() {
   globalPress(24);
 
+  if (!isInPressAll()) pressTime24 = getTime();
   dispatchToLayer([[[@onPress24_0, @onPress24_1, 0, 0, 0, 0, 0, @onPress24_7]]]);
 }
 func onRelease24() {
@@ -4661,22 +4660,20 @@ func onRelease24_0() {
 }
 var pressCount24_1;
 var releaseCount24_1;
-var timer24_1;
 
 func onPress24_1() {
 
   if (!isInPressAll()) {
-    timer24_1 = getTime();
+    pressCount24_1 = getPressCount();
+    releaseCount24_1 = getReleaseCount();
   }
-  pressCount24_1 = getPressCount();
-  releaseCount24_1 = getReleaseCount();
   handleModTapPress(@modTapHandler24, 4, modTapLayerActivations24, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
   checkWordCapsAndCapsLock();
 
 }
 func onRelease24_1() {
 
-  if (getTime() - timer24_1 <= 200 && pressCount24_1 == getPressCount() && releaseCount24_1 + 1 == getReleaseCount()) {
+  if (getTime() - pressTime24 <= 200 && pressCount24_1 == getPressCount() && releaseCount24_1 + 1 == getReleaseCount()) {
     @{
       //
       // Prevent changing back to steno layer in some situations.
@@ -5230,9 +5227,11 @@ func onPress37_7() {
 func onRelease37_7() {
 }
 
+var pressTime38;
 func onPress38() {
   globalPress(38);
 
+  if (!isInPressAll()) pressTime38 = getTime();
   dispatchToLayer([[[@onPress38_0, @onPress38_1, @onPress38_2, 0, 0, 0, 0, 0]]]);
 }
 func onRelease38() {
@@ -5264,16 +5263,18 @@ func onRelease38_1() {
 
 }
 
-var timer38_2;
+var pressCount38_2;
+var releaseCount38_2;
 func onPress38_2() {
-  if (!isInPressAll()) {
-    timer38_2 = getTime();
-  }
   pressScanCodeButton(38, 0, 224 /* "⌃" */, 0);
+  if (!isInPressAll()) {
+    pressCount38_2 = getPressCount();
+    releaseCount38_2 = getReleaseCount();
+  }
 }
 func onRelease38_2() {
   releaseScanCodeButton(224 /* "⌃" */);
-  if (getTime() - timer38_2 <= 200) {
+  if (getTime() - pressTime38 <= 200 && pressCount38_2 == getPressCount() && releaseCount38_2 + 1 == getReleaseCount()) {
     pressScanCodeButton(38, 0, 44 /* "⎵" */, 1);
     releaseScanCodeButton(44 /* "⎵" */);
 

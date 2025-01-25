@@ -75,6 +75,7 @@ func onStenoModeUpdate() {
 }
 
 func init() {
+  // Global
   const SCRIPT_ID_STENO_MODE_UPDATE = 9;
 
   // Update the RGB LED and register callback for future steno mode updates.

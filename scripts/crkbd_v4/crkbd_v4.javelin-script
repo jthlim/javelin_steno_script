@@ -240,6 +240,7 @@ func rgbUpdateBlue() {
 }
 
 func init() {
+  // Global
   rgbUpdate();
   startTimer(TIMER_ID_RGB_UPDATE, 30, 1, @rgbUpdate);
   const SCRIPT_ID_USER1 = 11;
@@ -693,23 +694,21 @@ func onRelease13_4() {
   releaseScanCode(74 /* "⇱" */);
 }
 
+var pressTime14;
 func onPress14() {
+  if (!isInPressAll()) pressTime14 = getTime();
   dispatchToLayer([[[0, @onPress14_1, 0, 0, 0]]]);
 }
 func onRelease14() {
   dispatchToLayer([[[0, @onRelease14_1, 0, 0, 0]]]);
 }
 
-var timer14_1;
 func onPress14_1() {
-  if (!isInPressAll()) {
-    timer14_1 = getTime();
-  }
   pressScanCode(224 /* "⌃" */);
 }
 func onRelease14_1() {
   releaseScanCode(224 /* "⌃" */);
-  if (getTime() - timer14_1 <= 200) {
+  if (getTime() - pressTime14 <= 200) {
     pressScanCode(41 /* "⎋" */);
     releaseScanCode(41 /* "⎋" */);
 
@@ -1583,7 +1582,9 @@ func onRelease44_2() {
   onRelease44_1();
 }
 
+var pressTime45;
 func onPress45() {
+  if (!isInPressAll()) pressTime45 = getTime();
   dispatchToLayer([[[@onPress45_0, @onPress45_1, 0, 0, 0]]]);
 }
 func onRelease45() {
@@ -1597,18 +1598,14 @@ func onRelease45_0() {
   releaseStenoKey(27 /* "#2" */);
 }
 
-var timer45_1;
 func onPress45_1() {
-  if (!isInPressAll()) {
-    timer45_1 = getTime();
-  }
   deactivateGlobal();
   deactivate1();
   activate3();
   activateGlobal();
 }
 func onRelease45_1() {
-  if (getTime() - timer45_1 <= 200) {
+  if (getTime() - pressTime45 <= 200) {
     pressScanCode(40 /* "↵" */);
     releaseScanCode(40 /* "↵" */);
 

@@ -666,24 +666,22 @@ func onRelease11_4() {
   releaseScanCode(74 /* "⇱" */);
 }
 
+var pressTime12;
 func onPress12() {
+  if (!isInPressAll()) pressTime12 = getTime();
   dispatchToLayer([[[0, @onPress12_1, @onPress12_2, 0, 0]]]);
 }
 func onRelease12() {
   dispatchToLayer([[[0, @onRelease12_1, @onRelease12_2, 0, 0]]]);
 }
 
-var timer12_1;
 func onPress12_1() {
-  if (!isInPressAll()) {
-    timer12_1 = getTime();
-  }
   pressScanCodeButton(224 /* "⌃" */, 0);
 
 }
 func onRelease12_1() {
   releaseScanCode(224 /* "⌃" */);
-  if (getTime() - timer12_1 <= 200) {
+  if (getTime() - pressTime12 <= 200) {
     pressScanCodeButton(41 /* "⎋" */, 1);
 
     releaseScanCode(41 /* "⎋" */);
@@ -1209,7 +1207,9 @@ func onRelease23_4() {
   releaseScanCode(77 /* "⇲" */);
 }
 
+var pressTime24;
 func onPress24() {
+  if (!isInPressAll()) pressTime24 = getTime();
   dispatchToLayer([[[@onPress24_0, @onPress24_1, 0, 0, 0]]]);
 }
 func onRelease24() {
@@ -1227,19 +1227,17 @@ func onRelease24_0() {
 
 var pressCount24_1;
 var releaseCount24_1;
-var timer24_1;
 func onPress24_1() {
-  if (!isInPressAll()) {
-    timer24_1 = getTime();
-  }
   pressScanCodeButton(225 /* "⇧" */, 0);
 
-  pressCount24_1 = getPressCount();
-  releaseCount24_1 = getReleaseCount();
+  if (!isInPressAll()) {
+    pressCount24_1 = getPressCount();
+    releaseCount24_1 = getReleaseCount();
+  }
 }
 func onRelease24_1() {
   releaseScanCode(225 /* "⇧" */);
-  if (getTime() - timer24_1 <= 200 && pressCount24_1 == getPressCount() && releaseCount24_1 + 1 == getReleaseCount()) {
+  if (getTime() - pressTime24 <= 200 && pressCount24_1 == getPressCount() && releaseCount24_1 + 1 == getReleaseCount()) {
     deactivateGlobal();
     deactivate1();
     activate0();
@@ -1658,7 +1656,9 @@ func onRelease36_2() {
   releaseScanCode(227 /* "⌘" */);
 }
 
+var pressTime37;
 func onPress37() {
+  if (!isInPressAll()) pressTime37 = getTime();
   dispatchToLayer([[[@onPress37_0, @onPress37_1, @onPress37_2, 0, 0]]]);
 }
 func onRelease37() {
@@ -1672,17 +1672,13 @@ func onRelease37_0() {
   releaseStenoKey(8 /* "A" */);
 }
 
-var timer37_1;
 func onPress37_1() {
-  if (!isInPressAll()) {
-    timer37_1 = getTime();
-  }
   pressScanCodeButton(226 /* "⌥" */, 0);
 
 }
 func onRelease37_1() {
   releaseScanCode(226 /* "⌥" */);
-  if (getTime() - timer37_1 <= 200) {
+  if (getTime() - pressTime37 <= 200) {
     pressScanCodeButton(44 /* "⎵" */, 1);
 
     releaseScanCode(44 /* "⎵" */);
@@ -1802,7 +1798,9 @@ func onRelease40_4() {
   releaseScanCode(44 /* "⎵" */);
 }
 
+var pressTime41;
 func onPress41() {
+  if (!isInPressAll()) pressTime41 = getTime();
   dispatchToLayer([[[@onPress41_0, @onPress41_1, 0, 0, 0]]]);
 }
 func onRelease41() {
@@ -1819,18 +1817,14 @@ func onRelease41_0() {
 
 }
 
-var timer41_1;
 func onPress41_1() {
-  if (!isInPressAll()) {
-    timer41_1 = getTime();
-  }
   deactivateGlobal();
   deactivate1();
   activate3();
   activateGlobal();
 }
 func onRelease41_1() {
-  if (getTime() - timer41_1 <= 200) {
+  if (getTime() - pressTime41 <= 200) {
     pressScanCodeButton(40 /* "↵" */, 1);
 
     releaseScanCode(40 /* "↵" */);
@@ -1848,14 +1842,12 @@ func onRelease41_3() {
   onRelease41_1();
 }
 
-var timer42;
+var pressTime42;
 func onPress42() {
-  if (!isInPressAll()) {
-    timer42 = getTime();
-  }
+  if (!isInPressAll()) pressTime42 = getTime();
 }
 func onRelease42() {
-  if (getTime() - timer42 <= 200) {
+  if (getTime() - pressTime42 <= 200) {
     console("launch_bootloader");
 
   }

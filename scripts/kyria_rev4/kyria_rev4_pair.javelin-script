@@ -1,20 +1,5 @@
 //---------------------------------------------------------------------------
-// Default Kyria rev3 pair script.
-//---------------------------------------------------------------------------
-
-//---------------------------------------------------------------------------
-//
-// Kyria rev3 button layout:
-//
-// Button indexes
-//
-//      0   1   2   3   4   5          |           6   7   8   9  10  11
-//     12  13  14  15  16  17          |          18  19  20  21  22  23
-//     24  25  26  27  28  29  30  31  |  32  33  34  35  36  37  38  39
-//                 40  41  42  43  44  |  45  46  47  48  49
-//
-// RGB indices follow button indices, with underglow lights defined from 50-61.
-//
+// Default Kyria pair script.
 //---------------------------------------------------------------------------
 
 const PAIR_CONNECTION_NONE = 0;
@@ -27,9 +12,6 @@ const TIMER_ID_RGB_UPDATE = 0;
 //---------------------------------------------------------------------------
 
 func init() {
-  // Disable liatris power light.
-  // setGpioPin(24, 1);
-
   setScript(SCRIPT_ID_PAIR_CONNECTION_UPDATE, @updateRgbTimer);
   updateRgbTimer();
 }
@@ -210,8 +192,20 @@ func onRelease48() { }
 func onPress49() { }
 func onRelease49() { }
 
+func onPress50() { }
+func onRelease50() { }
+
+func onPress51() { }
+func onRelease51() { }
+
 func onEncoderCW0(delta) {}
 func onEncoderCCW0(delta) {}
 
 func onEncoderCW1(delta) {}
 func onEncoderCCW1(delta) {}
+
+func onEncoderCW2(delta) {}
+func onEncoderCCW2(delta) {}
+
+func onEncoderCW3(delta) {}
+func onEncoderCCW3(delta) {}

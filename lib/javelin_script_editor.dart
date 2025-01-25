@@ -22,11 +22,13 @@ class HideScrollbarBehavior extends MaterialScrollBehavior {
 class JavelinScriptEditor extends StatefulWidget {
   const JavelinScriptEditor({
     super.key,
+    required this.autofocus,
     required this.script,
     required this.padding,
     required this.onChanged,
   });
 
+  final bool autofocus;
   final String script;
   final EdgeInsetsGeometry padding;
   final void Function(String s) onChanged;
@@ -149,7 +151,7 @@ class JavelinScriptEditorState extends State<JavelinScriptEditor> {
             child: TextField(
               controller: _textEditingController,
               scrollController: _scrollController,
-              autofocus: true,
+              autofocus: widget.autofocus,
               maxLines: null,
               expands: true,
               style: GoogleFonts.robotoMono(),

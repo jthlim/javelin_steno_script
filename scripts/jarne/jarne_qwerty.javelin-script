@@ -376,8 +376,7 @@ func activateGlobal() {
   }
   setEnableButtonStates(00);
   updateDisplay();
-  rgbUpdate();
-  rgbUpdateUnderglow();
+  updateBoardPower();
 
 }
 func deactivate0() {
@@ -3109,6 +3108,7 @@ func modTapHandler41(action) {
 const modTapLayerActivations41 = [[07 00 00 01 00 00 00]];
 
 func init() {
+  // Global
   rgbInitRandomColors();
 
   setScript(SCRIPT_ID_DISPLAY_OVERLAY, @drawDisplayOverlay);
@@ -4789,9 +4789,11 @@ func onPress37_6() {
 func onRelease37_6() {
 }
 
+var pressTime38;
 func onPress38() {
   globalPress(38);
 
+  if (!isInPressAll()) pressTime38 = getTime();
   dispatchToLayer([[[@onPress38_0, @onPress38_1, 0, 0, 0, 0, 0]]]);
 }
 func onRelease38() {
@@ -4816,16 +4818,12 @@ func onRelease38_0() {
 
 }
 
-var timer38_1;
 func onPress38_1() {
-  if (!isInPressAll()) {
-    timer38_1 = getTime();
-  }
   pressScanCodeButton(38, 0, 224 /* "⌃" */, 0);
 }
 func onRelease38_1() {
   releaseScanCodeButton(224 /* "⌃" */);
-  if (getTime() - timer38_1 <= 200) {
+  if (getTime() - pressTime38 <= 200) {
     pressScanCodeButton(38, 0, 44 /* "⎵" */, 1);
     releaseScanCodeButton(44 /* "⎵" */);
 

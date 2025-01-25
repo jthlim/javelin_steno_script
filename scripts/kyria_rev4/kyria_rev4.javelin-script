@@ -212,8 +212,8 @@ const SCRIPT_ID_BLE_PAIR_COMPLETE = 10;
 
 // Layout constants
 
-const DISPLAY_WIDTH = JAVELIN_DISPLAY_WIDTH ?? 128;
-const DISPLAY_HEIGHT = JAVELIN_DISPLAY_HEIGHT ?? 64;
+const DISPLAY_WIDTH = JAVELIN_DISPLAY_WIDTH ?? 135;
+const DISPLAY_HEIGHT = JAVELIN_DISPLAY_HEIGHT ?? 240;
 const HAS_AUDIO = JAVELIN_HAS_AUDIO ?? 0;
 
 func noop() {}
@@ -474,7 +474,7 @@ func globalRelease() {
 
 // Global Script: Display Scripts
 func updateDisplay() {
-  dispatchToLayer([[[@drawDisplayDynamicSteno, @drawDisplayAbc, @drawDisplaySymbol, @drawDisplayFunction, @drawDisplayNavigation, @drawDisplaySettings]]]);
+  dispatchToLayer([[[@drawDisplaySteno, @drawDisplayAbc, @drawDisplaySymbol, @drawDisplayFunction, @drawDisplayNavigation, @drawDisplaySettings]]]);
 }
 
 func blankDisplay() {
@@ -490,11 +490,13 @@ func drawPaperTape() {
 }
 
 func drawStrokes() {
+  setDrawColor(0, 0x80ff00);
   setAutoDraw(0, AUTO_DRAW_STROKES);
+  setDrawColor(1, 0x8080ff);
   setAutoDraw(1, AUTO_DRAW_WPM);
 }
 
-func drawDisplay0(layerImage) {
+func drawDisplay0(layerImage, drawColor) {
   const ICON_POSITIONS = [[
       08 00 00 00 00 00 00 00
       00 00 10 00 00 00 00 00
@@ -535,30 +537,33 @@ func drawDisplay0(layerImage) {
   setAutoDraw(0, AUTO_DRAW_NONE);
 
   clearDisplay(0);
+  setDrawColor(0, drawColor);
+
   drawImage(0, (DISPLAY_WIDTH - layerImage[0]) >> 1, DISPLAY_HEIGHT/2 - 24, layerImage);
 
   var iconCount = (isScanCodePressed(SC_L_SHIFT) || isScanCodePressed(SC_R_SHIFT))
       + (isScanCodePressed(SC_L_CTRL) || isScanCodePressed(SC_R_CTRL))
       + (isScanCodePressed(SC_L_ALT) || isScanCodePressed(SC_R_ALT))
       + (isScanCodePressed(SC_L_META) || isScanCodePressed(SC_R_META));
-  var positions = ICON_POSITIONS + 8 * (iconCount - 1);
-  var xOffset = DISPLAY_WIDTH/2 - 16;
-  var yOffset = DISPLAY_HEIGHT/2;
+  var iconWidth = iconCount * 16 + (iconCount - 1) * 4;
+  var xOffset = DISPLAY_WIDTH / 2 - iconWidth / 2;
+  var yOffset = DISPLAY_HEIGHT - 32;
 
+  setDrawColor(0, 0x808080);
   if (isScanCodePressed(SC_L_SHIFT) || isScanCodePressed(SC_R_SHIFT)) {
-    drawImage(0, xOffset+positions[0], yOffset+positions[1], SHIFT_IMAGE);
-    positions = positions + 2;
+    drawImage(0, xOffset, yOffset, SHIFT_IMAGE);
+    xOffset = xOffset + 20;
   }
   if (isScanCodePressed(SC_L_CTRL) || isScanCodePressed(SC_R_CTRL)) {
-    drawImage(0, xOffset+positions[0], yOffset+positions[1], CONTROL_IMAGE);
-    positions = positions + 2;
+    drawImage(0, xOffset, yOffset, CONTROL_IMAGE);
+    xOffset = xOffset + 20;
   }
   if (isScanCodePressed(SC_L_ALT) || isScanCodePressed(SC_R_ALT)) {
-    drawImage(0, xOffset+positions[0], yOffset+positions[1], ALT_IMAGE);
-    positions = positions + 2;
+    drawImage(0, xOffset, yOffset, ALT_IMAGE);
+    xOffset = xOffset + 20;
   }
   if (isScanCodePressed(SC_L_META) || isScanCodePressed(SC_R_META)) {
-    drawImage(0, xOffset+positions[0], yOffset+positions[1], COMMAND_IMAGE);
+    drawImage(0, xOffset, yOffset, COMMAND_IMAGE);
   }
 
   if (getLedStatus(LED_STATUS_CAPS_LOCK)) {
@@ -581,7 +586,8 @@ func drawDisplaySteno() {
       00 00
   ]];
 
-  drawDisplay0(STENO_IMAGE);
+  drawDisplay0(STENO_IMAGE, 0x9af9da);
+  setDrawColor(1, 0x8080ff);
   setAutoDraw(1, AUTO_DRAW_WPM);
 
   var mode = getParameter("steno_mode");
@@ -597,7 +603,7 @@ func drawDisplaySteno() {
   } else {
     return;
   }
-  drawText(0, DISPLAY_WIDTH/2, DISPLAY_HEIGHT - 16 + 10, FONT_ID_NORMAL, TEXT_ALIGNMENT_MIDDLE, text);
+  drawText(0, DISPLAY_WIDTH/2, DISPLAY_HEIGHT/2 + 32, FONT_ID_NORMAL, TEXT_ALIGNMENT_MIDDLE, text);
 }
 
 func drawDisplayAbc() {
@@ -613,7 +619,8 @@ func drawDisplayAbc() {
       00 00
   ]];
 
-  drawDisplay0(ABC_IMAGE);
+  drawDisplay0(ABC_IMAGE, 0xffffff);
+  setDrawColor(1, 0x8080ff);
   setAutoDraw(1, AUTO_DRAW_WPM);
 }
 
@@ -630,7 +637,8 @@ func drawDisplayFunction() {
       06 00 00 60 0c 00 00 30 f8 ff ff 1f f0 ff ff 0f
   ]];
 
-  drawDisplay0(FUNCTION_IMAGE);
+  drawDisplay0(FUNCTION_IMAGE, 0x80c0ff);
+  setDrawColor(1, 0x8080ff);
   setAutoDraw(1, AUTO_DRAW_WPM);
 }
 
@@ -647,7 +655,8 @@ func drawDisplaySymbol() {
       18 00
   ]];
 
-  drawDisplay0(SYMBOL_IMAGE);
+  drawDisplay0(SYMBOL_IMAGE, 0xffffff);
+  setDrawColor(1, 0x8080ff);
   setAutoDraw(1, AUTO_DRAW_WPM);
 }
 
@@ -664,12 +673,14 @@ func drawDisplayNavigation() {
       00 00
   ]];
 
-  drawDisplay0(NAVIGATION_IMAGE);
+  drawDisplay0(NAVIGATION_IMAGE, 0xffc0c0);
+  setDrawColor(1, 0x8080ff);
   setAutoDraw(1, AUTO_DRAW_WPM);
 }
 
 func drawDisplaySettings() {
-  drawDisplay0(SETTINGS_IMAGE);
+  drawDisplay0(SETTINGS_IMAGE, 0xffc000);
+  setDrawColor(1, 0x8080ff);
   setAutoDraw(1, AUTO_DRAW_WPM);
 }
 
@@ -686,7 +697,8 @@ func drawDisplayNumpad() {
       00 00
   ]];
 
-  drawDisplay0(NUMPAD_IMAGE);
+  drawDisplay0(NUMPAD_IMAGE, 0xffff00);
+  setDrawColor(1, 0x8080ff);
   setAutoDraw(1, AUTO_DRAW_WPM);
 }
 
@@ -1010,7 +1022,7 @@ func startScreenSaver() {
     screenSaverPosition[i] = rand();
 
     var velocity = (rand() & 0x1ff) - 256;
-    velocity = velocity + (velocity < 0 ? -32 : 32);
+    velocity = velocity + (velocity < 0 ? -128 : 128);
     screenSaverVelocity[i] = velocity;
   }
   drawScreenSaver();
@@ -1032,8 +1044,9 @@ func drawScreenSaver() {
     var index = 4 * display;
     clearDisplay(display);
 
-    for (var i = 0; i < 5; i = i + 1) {
+    for (var i = 0; i < 12; i = i + 1) {
       var effectiveTime = timeElapsed + i * 100;
+      setDrawColorHsv(display, 10 * effectiveTime, 224, 255);
       drawLine(
           display,
           wrap(screenSaverPosition[index    ] + (effectiveTime * screenSaverVelocity[index    ] >> 13), DISPLAY_WIDTH),
@@ -1173,14 +1186,16 @@ const BAR_IMAGES = [[
 
 func drawBar(image, value) {
   drawDisplaySettings();
-  drawImage(0, 18, 48, image);
-  drawImage(0, 40, 52, BAR_IMAGES + value * 66);
+  setDrawColor(0, 0xffffff);
+  drawImage(0, 18, 3*DISPLAY_HEIGHT/4 - 4, image);
+  drawImage(0, 40, 3*DISPLAY_HEIGHT/4, BAR_IMAGES + value * 66);
 
 }
 
 // Layer 05 Script: drawSettingsFeedbackText
 func drawSettingsFeedbackText(text) {
   drawDisplaySettings();
+  setDrawColor(0, 0xffffff);
   drawText(0, DISPLAY_WIDTH/2, DISPLAY_HEIGHT - 16 + 10, FONT_ID_NORMAL, TEXT_ALIGNMENT_MIDDLE, text);
 }
 
@@ -2859,8 +2874,7 @@ func onPress42_1() {
 func onRelease42_1() {
   releaseScanCodeButton(226 /* "⌥" */);
   if (getTime() - pressTime42 <= 200) {
-    pressScanCodeButton(42, 0, 40 /* "↵" */, 1);
-    releaseScanCodeButton(40 /* "↵" */);
+    pressScanCodeButton(42, 0, 40 /* "↵" */, 0);
 
   }
 }
@@ -3022,8 +3036,7 @@ func onPress47_1() {
 func onRelease47_1() {
   releaseScanCodeButton(230 /* "⌥" */);
   if (getTime() - pressTime47 <= 200) {
-    pressScanCodeButton(47, 0, 40 /* "↵" */, 1);
-    releaseScanCodeButton(40 /* "↵" */);
+    pressScanCodeButton(47, 0, 40 /* "↵" */, 0);
 
   }
 }
@@ -3088,5 +3101,15 @@ func onRelease49_5() {
   activate1();
   activateGlobal();
   onRelease49_1();
+}
+
+func onPress50() {
+}
+func onRelease50() {
+}
+
+func onPress51() {
+}
+func onRelease51() {
 }
 

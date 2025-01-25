@@ -103,6 +103,15 @@ enum InBuiltScriptFunction implements ScriptFunctionDefinition {
   getWpm(1, ReturnType.value, 0x58),
   setPairBoardPower(1, ReturnType.none, 0x59),
   hWheelMouse(1, ReturnType.none, 0x5a),
+  enableConsole(0, ReturnType.none, 0x5b),
+  disableConsole(0, ReturnType.none, 0x5c),
+  isConsoleEnabled(0, ReturnType.boolean, 0x5d),
+  enableFlashWrite(0, ReturnType.none, 0x5e),
+  disableFlashWrite(0, ReturnType.none, 0x5f),
+  isFlashWriteEnabled(0, ReturnType.boolean, 0x60),
+  isInReinit(0, ReturnType.boolean, 0x61),
+  setDrawColorRgb(4, ReturnType.none, 0x62),
+  setDrawColorHsv(4, ReturnType.none, 0x63),
   ;
 
   const InBuiltScriptFunction(
