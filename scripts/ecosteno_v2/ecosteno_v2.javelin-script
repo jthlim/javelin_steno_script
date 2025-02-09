@@ -1,0 +1,574 @@
+
+// Generated from javelin-layout file
+// Global
+const BLINK_TIMER_ID = 0;
+
+var layer;
+func setLayer(layerIndex, layerIdEvent) {
+  releaseAll();
+  layer = layerIndex;
+  sendEvent(layerIdEvent);
+}
+
+func dispatchToLayer(functions) {
+  var f = functions[[[resolveLayerIndex()]]];
+  f();
+}
+
+func resolveLayerIndex() var {
+  return 0;
+}
+
+func activate0() {
+}
+
+func activateDynamic() {
+  activate0();
+}
+func activateGlobal() {
+  setEnableButtonStates(01);
+  updateLeds();
+}
+func deactivate0() {
+}
+
+func deactivateDynamic() {}
+func deactivateGlobal() {
+}
+// Global Script: LED Scripts
+const RED_LED_PIN = 17;
+const GREEN_LED_PIN = 16;
+
+var blinkLedCallback;
+var blinkLedCount;
+
+func updateLeds() {
+  if (blinkLedCount == 0) {
+    @setLedsForStenoMode();
+  }
+}
+
+func updateLedNoChange() {}
+
+func updateLedGreenOnly() {
+  setGpioPin(GREEN_LED_PIN, 1);
+  setGpioPin(RED_LED_PIN, 0);
+}
+
+func updateLedBothOff() {
+  setGpioPin(GREEN_LED_PIN, 0);
+  setGpioPin(RED_LED_PIN, 0);
+}
+
+func updateLedRedOnly() {
+  setGpioPin(GREEN_LED_PIN, 0);
+  setGpioPin(RED_LED_PIN, 1);
+}
+
+func updateLedDimRedOnly() {
+  setGpioPin(GREEN_LED_PIN, 0);
+  setGpioPinDutyCycle(RED_LED_PIN, 25);
+}
+
+func updateLedGreenAndRed() {
+  setGpioPin(GREEN_LED_PIN, 1);
+  setGpioPin(RED_LED_PIN, 1);
+}
+
+func setLedsForStenoMode() {
+  var stenoMode = getParameter("steno_mode");
+  if (stenoMode == "embedded") {
+    setGpioPin(GREEN_LED_PIN, 1);
+    setGpioPin(RED_LED_PIN, 0);
+  } else {
+    setGpioPin(GREEN_LED_PIN, 1);
+    setGpioPinDutyCycle(RED_LED_PIN, 25);
+  }
+}
+
+func blinkCallback() {
+  blinkLedCount = blinkLedCount - 1;
+  if (blinkLedCount == 0) {
+    stopTimer(BLINK_TIMER_ID);
+    updateLeds();
+  } else if (blinkLedCount & 1) {
+    updateLedBothOff();
+  } else {
+    blinkLedCallback();
+  }
+}
+
+func blinkLed(function, count) {
+  blinkLedCallback = function;
+  blinkLedCount = 2 * count + 1;
+  startTimer(BLINK_TIMER_ID, 500, 1, @blinkCallback);
+  blinkCallback();
+}
+
+func init() {
+  // Global
+  const SCRIPT_ID_STENO_MODE_UPDATE = 9;
+
+  setScript(SCRIPT_ID_STENO_MODE_UPDATE, @updateLeds);
+  updateLeds();
+
+  activate0();
+  activateGlobal();
+}
+
+func onPress0() {
+  onPress0_0();
+}
+func onRelease0() {
+  onRelease0_0();
+}
+
+func onPress0_0() {
+  pressStenoKey(26 /* "#1" */);
+}
+func onRelease0_0() {
+  releaseStenoKey(26 /* "#1" */);
+}
+
+func onPress1() {
+  onPress1_0();
+}
+func onRelease1() {
+  onRelease1_0();
+}
+
+func onPress1_0() {
+  pressStenoKey(27 /* "#2" */);
+}
+func onRelease1_0() {
+  releaseStenoKey(27 /* "#2" */);
+}
+
+func onPress2() {
+  onPress2_0();
+}
+func onRelease2() {
+  onRelease2_0();
+}
+
+func onPress2_0() {
+  pressStenoKey(28 /* "#3" */);
+}
+func onRelease2_0() {
+  releaseStenoKey(28 /* "#3" */);
+}
+
+func onPress3() {
+  onPress3_0();
+}
+func onRelease3() {
+  onRelease3_0();
+}
+
+func onPress3_0() {
+  pressStenoKey(29 /* "#4" */);
+}
+func onRelease3_0() {
+  releaseStenoKey(29 /* "#4" */);
+}
+
+func onPress4() {
+}
+func onRelease4() {
+}
+
+func onPress5() {
+  onPress5_0();
+}
+func onRelease5() {
+  onRelease5_0();
+}
+
+func onPress5_0() {
+  pressStenoKey(0 /* "S1" */);
+}
+func onRelease5_0() {
+  releaseStenoKey(0 /* "S1" */);
+}
+
+func onPress6() {
+  onPress6_0();
+}
+func onRelease6() {
+  onRelease6_0();
+}
+
+func onPress6_0() {
+  pressStenoKey(2 /* "T-" */);
+}
+func onRelease6_0() {
+  releaseStenoKey(2 /* "T-" */);
+}
+
+func onPress7() {
+  onPress7_0();
+}
+func onRelease7() {
+  onRelease7_0();
+}
+
+func onPress7_0() {
+  pressStenoKey(4 /* "P-" */);
+}
+func onRelease7_0() {
+  releaseStenoKey(4 /* "P-" */);
+}
+
+func onPress8() {
+  onPress8_0();
+}
+func onRelease8() {
+  onRelease8_0();
+}
+
+func onPress8_0() {
+  pressStenoKey(6 /* "H-" */);
+}
+func onRelease8_0() {
+  releaseStenoKey(6 /* "H-" */);
+}
+
+func onPress9() {
+  onPress9_0();
+}
+func onRelease9() {
+  onRelease9_0();
+}
+
+func onPress9_0() {
+  pressStenoKey(10 /* "*1" */);
+}
+func onRelease9_0() {
+  releaseStenoKey(10 /* "*1" */);
+}
+
+func onPress10() {
+  onPress10_0();
+}
+func onRelease10() {
+  onRelease10_0();
+}
+
+func onPress10_0() {
+  pressStenoKey(11 /* "*2" */);
+}
+func onRelease10_0() {
+  releaseStenoKey(11 /* "*2" */);
+}
+
+func onPress11() {
+  onPress11_0();
+}
+func onRelease11() {
+  onRelease11_0();
+}
+
+func onPress11_0() {
+  pressStenoKey(16 /* "-F" */);
+}
+func onRelease11_0() {
+  releaseStenoKey(16 /* "-F" */);
+}
+
+func onPress12() {
+  onPress12_0();
+}
+func onRelease12() {
+  onRelease12_0();
+}
+
+func onPress12_0() {
+  pressStenoKey(18 /* "-P" */);
+}
+func onRelease12_0() {
+  releaseStenoKey(18 /* "-P" */);
+}
+
+func onPress13() {
+  onPress13_0();
+}
+func onRelease13() {
+  onRelease13_0();
+}
+
+func onPress13_0() {
+  pressStenoKey(20 /* "-L" */);
+}
+func onRelease13_0() {
+  releaseStenoKey(20 /* "-L" */);
+}
+
+func onPress14() {
+  onPress14_0();
+}
+func onRelease14() {
+  onRelease14_0();
+}
+
+func onPress14_0() {
+  pressStenoKey(22 /* "-T" */);
+}
+func onRelease14_0() {
+  releaseStenoKey(22 /* "-T" */);
+}
+
+func onPress15() {
+  onPress15_0();
+}
+func onRelease15() {
+  onRelease15_0();
+}
+
+func onPress15_0() {
+  pressStenoKey(24 /* "-D" */);
+}
+func onRelease15_0() {
+  releaseStenoKey(24 /* "-D" */);
+}
+
+func onPress16() {
+  onPress16_0();
+}
+func onRelease16() {
+}
+
+func onPress16_0() {
+  // Toggle\nSteno\nMode
+  // Toggle the steno mode between embedded and Gemini PR when USR is pressed.
+  // LED RGB is updated in Global StenoModeUpdate callback.
+  if (getParameter("steno_mode") != "embedded") {
+    console("set_steno_mode embedded");
+  } else {
+    console("set_steno_mode gemini");
+  }
+  releaseAll();
+}
+func onRelease16_0() {
+}
+
+func onPress17() {
+  onPress17_0();
+}
+func onRelease17() {
+  onRelease17_0();
+}
+
+func onPress17_0() {
+  pressStenoKey(1 /* "S2" */);
+}
+func onRelease17_0() {
+  releaseStenoKey(1 /* "S2" */);
+}
+
+func onPress18() {
+  onPress18_0();
+}
+func onRelease18() {
+  onRelease18_0();
+}
+
+func onPress18_0() {
+  pressStenoKey(3 /* "K-" */);
+}
+func onRelease18_0() {
+  releaseStenoKey(3 /* "K-" */);
+}
+
+func onPress19() {
+  onPress19_0();
+}
+func onRelease19() {
+  onRelease19_0();
+}
+
+func onPress19_0() {
+  pressStenoKey(5 /* "W-" */);
+}
+func onRelease19_0() {
+  releaseStenoKey(5 /* "W-" */);
+}
+
+func onPress20() {
+  onPress20_0();
+}
+func onRelease20() {
+  onRelease20_0();
+}
+
+func onPress20_0() {
+  pressStenoKey(7 /* "R-" */);
+}
+func onRelease20_0() {
+  releaseStenoKey(7 /* "R-" */);
+}
+
+func onPress21() {
+  onPress21_0();
+}
+func onRelease21() {
+  onRelease21_0();
+}
+
+func onPress21_0() {
+  pressStenoKey(12 /* "*3" */);
+}
+func onRelease21_0() {
+  releaseStenoKey(12 /* "*3" */);
+}
+
+func onPress22() {
+  onPress22_0();
+}
+func onRelease22() {
+  onRelease22_0();
+}
+
+func onPress22_0() {
+  pressStenoKey(13 /* "*4" */);
+}
+func onRelease22_0() {
+  releaseStenoKey(13 /* "*4" */);
+}
+
+func onPress23() {
+  onPress23_0();
+}
+func onRelease23() {
+  onRelease23_0();
+}
+
+func onPress23_0() {
+  pressStenoKey(17 /* "-R" */);
+}
+func onRelease23_0() {
+  releaseStenoKey(17 /* "-R" */);
+}
+
+func onPress24() {
+  onPress24_0();
+}
+func onRelease24() {
+  onRelease24_0();
+}
+
+func onPress24_0() {
+  pressStenoKey(19 /* "-B" */);
+}
+func onRelease24_0() {
+  releaseStenoKey(19 /* "-B" */);
+}
+
+func onPress25() {
+  onPress25_0();
+}
+func onRelease25() {
+  onRelease25_0();
+}
+
+func onPress25_0() {
+  pressStenoKey(21 /* "-G" */);
+}
+func onRelease25_0() {
+  releaseStenoKey(21 /* "-G" */);
+}
+
+func onPress26() {
+  onPress26_0();
+}
+func onRelease26() {
+  onRelease26_0();
+}
+
+func onPress26_0() {
+  pressStenoKey(23 /* "-S" */);
+}
+func onRelease26_0() {
+  releaseStenoKey(23 /* "-S" */);
+}
+
+func onPress27() {
+  onPress27_0();
+}
+func onRelease27() {
+  onRelease27_0();
+}
+
+func onPress27_0() {
+  pressStenoKey(25 /* "-Z" */);
+}
+func onRelease27_0() {
+  releaseStenoKey(25 /* "-Z" */);
+}
+
+func onPress28() {
+  onPress28_0();
+}
+func onRelease28() {
+  onRelease28_0();
+}
+
+func onPress28_0() {
+  pressStenoKey(8 /* "A" */);
+}
+func onRelease28_0() {
+  releaseStenoKey(8 /* "A" */);
+}
+
+func onPress29() {
+  onPress29_0();
+}
+func onRelease29() {
+  onRelease29_0();
+}
+
+func onPress29_0() {
+  pressStenoKey(9 /* "O" */);
+}
+func onRelease29_0() {
+  releaseStenoKey(9 /* "O" */);
+}
+
+func onPress30() {
+  onPress30_0();
+}
+func onRelease30() {
+  onRelease30_0();
+}
+
+func onPress30_0() {
+  pressStenoKey(14 /* "E" */);
+}
+func onRelease30_0() {
+  releaseStenoKey(14 /* "E" */);
+}
+
+func onPress31() {
+  onPress31_0();
+}
+func onRelease31() {
+  onRelease31_0();
+}
+
+func onPress31_0() {
+  pressStenoKey(15 /* "U" */);
+}
+func onRelease31_0() {
+  releaseStenoKey(15 /* "U" */);
+}
+
+func onPress32() {
+  onPress32_0();
+}
+func onRelease32() {
+}
+
+func onPress32_0() {
+  console("launch_bootloader");
+}
+func onRelease32_0() {
+}

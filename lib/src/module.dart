@@ -134,17 +134,19 @@ class ScriptModule {
 
   var globalsUsedCount = 0;
 
-  Uint8List createByteCode(
-    int buttonCount,
-    int encoderCount,
-    int scriptByteCodeVersion,
-  ) =>
+  Uint8List createByteCode({
+    required int buttonCount,
+    required int encoderCount,
+    required int pointerCount,
+    required int scriptByteCodeVersion,
+  }) =>
       ScriptByteCodeBuilder(
         module: this,
         byteCodeVersion: scriptByteCodeVersion,
         requiredFunctions: ScriptByteCodeBuilder.createScriptFunctionList(
-          buttonCount,
-          encoderCount,
+          buttonCount: buttonCount,
+          encoderCount: encoderCount,
+          pointerCount: pointerCount,
         ),
       ).createByteCode();
 

@@ -209,3 +209,7 @@ func onEncoderCCW2(delta) {}
 
 func onEncoderCW3(delta) {}
 func onEncoderCCW3(delta) {}
+
+func onPointerUpdate0(x, y, z) {}
+
+func onPointerUpdate1(x, y, z) {}

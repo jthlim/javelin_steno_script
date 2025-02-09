@@ -1,4 +1,6 @@
+
 // Generated from javelin-layout file
+// Global
 // Javelin constants
 const SC_NONE = 0;
 
@@ -186,9 +188,12 @@ const TEXT_ALIGNMENT_MIDDLE = 1;
 const TEXT_ALIGNMENT_RIGHT = 2;
 
 const FONT_ID_NORMAL = 0;
-const FONT_ID_SMALL_DIGITS = 1;
-const FONT_ID_MEDIUM_DIGITS = 2;
-const FONT_ID_LARGE_DIGITS = 3;
+const FONT_ID_LARGE = 1;
+const FONT_ID_DOS = 2;
+const FONT_ID_SMALL_DIGITS = 3;
+const FONT_ID_MEDIUM_DIGITS = 4;
+const FONT_ID_LARGE_DIGITS = 5;
+const FONT_ID_HUGE_DIGITS = 6;
 
 const CONNECTION_NONE = 0;
 const CONNECTION_BLE = 1;
@@ -280,22 +285,18 @@ func resolveLayerIndex() var {
 func activate0() {
   setLayer(0, "layer_id: 87377230");
   wordCaps = 0;
-
 }
 
 func activate1() {
   setLayer(1, "layer_id: 1128808786");
-
 }
 
 func activate2() {
   setLayer(2, "layer_id: 262857896");
-
 }
 
 func activate3() {
   setLayer(3, "layer_id: 41429312");
-
 }
 
 func activate4() {
@@ -307,7 +308,6 @@ func activate4() {
 
 func activate5() {
   setLayer(5, "layer_id: 125635709");
-
 }
 
 func activateDynamic() {
@@ -319,59 +319,27 @@ func activateGlobal() {
   }
   setEnableButtonStates(([[01 00 00 00 00 00]][resolveLayerIndex()]));
   updateDisplay();
-
 }
 func deactivate0() {
-
 }
 
 func deactivate1() {
-
 }
 
 func deactivate2() {
-
 }
 
 func deactivate3() {
-
 }
 
 func deactivate4() {
-
 }
 
 func deactivate5() {
-
 }
 
 func deactivateDynamic() {}
 func deactivateGlobal() {
-
-}
-var postPress;
-var postRelease;
-
-func _pressScanCode(scanCode, isModifier) {
-  pressScanCode(scanCode);
-  if (isModifier) return;
-
-  if (postPress) {
-    var localPostPress = postPress;
-    postPress = 0;
-    localPostPress();
-  }
-}
-
-func _releaseScanCode(scanCode, isModifier) {
-  releaseScanCode(scanCode);
-  if (isModifier) return;
-
-  if (postRelease) {
-    var localPostRelease = postRelease;
-    postRelease = 0;
-    localPostRelease();
-  }
 }
 // Global Script: Button Overrides
 func isModifierKey(key) var {
@@ -1175,7 +1143,6 @@ func drawBar(image, value) {
   drawDisplaySettings();
   drawImage(0, 18, 48, image);
   drawImage(0, 40, 52, BAR_IMAGES + value * 66);
-
 }
 
 // Layer 05 Script: drawSettingsFeedbackText
@@ -1189,7 +1156,6 @@ func _action_switchToNumpadLayer() {
   deactivate1();
   activate0();
   activateGlobal();
-
 }
 
 func init() {
@@ -1374,7 +1340,6 @@ func onPress3_5() {
   console("set_steno_mode embedded");
   //
   drawSettingsFeedbackText("Javelin");
-
 }
 func onRelease3_5() {
 }
@@ -1682,7 +1647,6 @@ func onRelease10_4() {
 func onPress10_5() {
   // Hue +
   hueShift = hueShift + 0x800;
-
 }
 func onRelease10_5() {
 }
@@ -1758,7 +1722,6 @@ func onRelease12_1() {
   if (getTime() - pressTime12 <= 200) {
     pressScanCodeButton(12, 0, 41 /* "⎋" */, 1);
     releaseScanCodeButton(41 /* "⎋" */);
-
   }
 }
 
@@ -1919,7 +1882,6 @@ func onPress15_5() {
   console("set_steno_mode gemini");
   //
   drawSettingsFeedbackText("Gemini");
-
 }
 func onRelease15_5() {
 }
@@ -2276,7 +2238,6 @@ func onRelease22_4() {
 func onPress22_5() {
   // Hue -
   hueShift = hueShift - 0x800;
-
 }
 func onRelease22_5() {
 }
@@ -2462,7 +2423,6 @@ func onPress27_5() {
   console("set_steno_mode plover_hid");
   //
   drawSettingsFeedbackText("Plover HID");
-
 }
 func onRelease27_5() {
 }
@@ -2778,7 +2738,6 @@ func onPress40() {
 }
 func onRelease40() {
   globalRelease();
-
 }
 
 func onPress40_0() {
@@ -2796,7 +2755,6 @@ func onPress40_1() {
   deactivate1();
   activate0();
   activateGlobal();
-
 }
 func onRelease40_1() {
 }
@@ -2861,7 +2819,6 @@ func onRelease42_1() {
   if (getTime() - pressTime42 <= 200) {
     pressScanCodeButton(42, 0, 40 /* "↵" */, 1);
     releaseScanCodeButton(40 /* "↵" */);
-
   }
 }
 
@@ -3024,7 +2981,6 @@ func onRelease47_1() {
   if (getTime() - pressTime47 <= 200) {
     pressScanCodeButton(47, 0, 40 /* "↵" */, 1);
     releaseScanCodeButton(40 /* "↵" */);
-
   }
 }
 
@@ -3089,4 +3045,3 @@ func onRelease49_5() {
   activateGlobal();
   onRelease49_1();
 }
-

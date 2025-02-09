@@ -112,6 +112,7 @@ enum InBuiltScriptFunction implements ScriptFunctionDefinition {
   isInReinit(0, ReturnType.boolean, 0x61),
   setDrawColorRgb(4, ReturnType.none, 0x62),
   setDrawColorHsv(4, ReturnType.none, 0x63),
+  drawEffect(3, ReturnType.none, 0x64),
   ;
 
   const InBuiltScriptFunction(

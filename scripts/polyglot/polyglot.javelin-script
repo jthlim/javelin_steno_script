@@ -1,3 +1,4 @@
+
 // Generated from javelin-layout file
 var layer;
 func setLayer(layerIndex, layerIdEvent) {
@@ -17,27 +18,22 @@ func resolveLayerIndex() var {
 
 func activate0() {
   setLayer(0, "layer_id: 87377230");
-
 }
 
 func activate1() {
   setLayer(1, "layer_id: 1128808786");
-
 }
 
 func activate2() {
   setLayer(2, "layer_id: 148942692");
-
 }
 
 func activate3() {
   setLayer(3, "layer_id: 105007919");
-
 }
 
 func activate4() {
   setLayer(4, "layer_id: 259868619");
-
 }
 
 func activateDynamic() {
@@ -48,55 +44,24 @@ func activateGlobal() {
     pressAll();
   }
   setEnableButtonStates(([[01 00 00 00 00]][resolveLayerIndex()]));
-
 }
 func deactivate0() {
-
 }
 
 func deactivate1() {
-
 }
 
 func deactivate2() {
-
 }
 
 func deactivate3() {
-
 }
 
 func deactivate4() {
-
 }
 
 func deactivateDynamic() {}
 func deactivateGlobal() {
-
-}
-var postPress;
-var postRelease;
-
-func _pressScanCode(scanCode, isModifier) {
-  pressScanCode(scanCode);
-  if (isModifier) return;
-
-  if (postPress) {
-    var localPostPress = postPress;
-    postPress = 0;
-    localPostPress();
-  }
-}
-
-func _releaseScanCode(scanCode, isModifier) {
-  releaseScanCode(scanCode);
-  if (isModifier) return;
-
-  if (postRelease) {
-    var localPostRelease = postRelease;
-    postRelease = 0;
-    localPostRelease();
-  }
 }
 // Global Script: Button Overrides
 const SC_L_CTRL = 0xe0;
@@ -234,12 +199,10 @@ func onPress0_0() {
   updateStenoMode();
 }
 func onRelease0_0() {
-
 }
 
 func onPress0_1() {
   pressScanCodeButton(43 /* "⇥" */, 0);
-
 }
 func onRelease0_1() {
   releaseScanCode(43 /* "⇥" */);
@@ -247,7 +210,6 @@ func onRelease0_1() {
 
 func onPress0_2() {
   pressScanCodeButton(53 /* "`" */, 0);
-
 }
 func onRelease0_2() {
   releaseScanCode(53 /* "`" */);
@@ -269,7 +231,6 @@ func onRelease1_0() {
 
 func onPress1_1() {
   pressScanCodeButton(20 /* "Q" */, 0);
-
 }
 func onRelease1_1() {
   releaseScanCode(20 /* "Q" */);
@@ -277,7 +238,6 @@ func onRelease1_1() {
 
 func onPress1_2() {
   pressScanCodeButton(30 /* "1" */, 0);
-
 }
 func onRelease1_2() {
   releaseScanCode(30 /* "1" */);
@@ -285,7 +245,6 @@ func onRelease1_2() {
 
 func onPress1_3() {
   pressScanCodeButton(66 /* "F9" */, 0);
-
 }
 func onRelease1_3() {
   releaseScanCode(66 /* "F9" */);
@@ -307,7 +266,6 @@ func onRelease2_0() {
 
 func onPress2_1() {
   pressScanCodeButton(26 /* "W" */, 0);
-
 }
 func onRelease2_1() {
   releaseScanCode(26 /* "W" */);
@@ -315,7 +273,6 @@ func onRelease2_1() {
 
 func onPress2_2() {
   pressScanCodeButton(31 /* "2" */, 0);
-
 }
 func onRelease2_2() {
   releaseScanCode(31 /* "2" */);
@@ -323,7 +280,6 @@ func onRelease2_2() {
 
 func onPress2_3() {
   pressScanCodeButton(67 /* "F10" */, 0);
-
 }
 func onRelease2_3() {
   releaseScanCode(67 /* "F10" */);
@@ -345,7 +301,6 @@ func onRelease3_0() {
 
 func onPress3_1() {
   pressScanCodeButton(8 /* "E" */, 0);
-
 }
 func onRelease3_1() {
   releaseScanCode(8 /* "E" */);
@@ -353,7 +308,6 @@ func onRelease3_1() {
 
 func onPress3_2() {
   pressScanCodeButton(32 /* "3" */, 0);
-
 }
 func onRelease3_2() {
   releaseScanCode(32 /* "3" */);
@@ -361,7 +315,6 @@ func onRelease3_2() {
 
 func onPress3_3() {
   pressScanCodeButton(68 /* "F11" */, 0);
-
 }
 func onRelease3_3() {
   releaseScanCode(68 /* "F11" */);
@@ -383,7 +336,6 @@ func onRelease4_0() {
 
 func onPress4_1() {
   pressScanCodeButton(21 /* "R" */, 0);
-
 }
 func onRelease4_1() {
   releaseScanCode(21 /* "R" */);
@@ -391,7 +343,6 @@ func onRelease4_1() {
 
 func onPress4_2() {
   pressScanCodeButton(33 /* "4" */, 0);
-
 }
 func onRelease4_2() {
   releaseScanCode(33 /* "4" */);
@@ -399,7 +350,6 @@ func onRelease4_2() {
 
 func onPress4_3() {
   pressScanCodeButton(69 /* "F12" */, 0);
-
 }
 func onRelease4_3() {
   releaseScanCode(69 /* "F12" */);
@@ -421,7 +371,6 @@ func onRelease5_0() {
 
 func onPress5_1() {
   pressScanCodeButton(23 /* "T" */, 0);
-
 }
 func onRelease5_1() {
   releaseScanCode(23 /* "T" */);
@@ -429,7 +378,6 @@ func onRelease5_1() {
 
 func onPress5_2() {
   pressScanCodeButton(34 /* "5" */, 0);
-
 }
 func onRelease5_2() {
   releaseScanCode(34 /* "5" */);
@@ -451,7 +399,6 @@ func onRelease6_0() {
 
 func onPress6_1() {
   pressScanCodeButton(28 /* "Y" */, 0);
-
 }
 func onRelease6_1() {
   releaseScanCode(28 /* "Y" */);
@@ -459,7 +406,6 @@ func onRelease6_1() {
 
 func onPress6_2() {
   pressScanCodeButton(35 /* "6" */, 0);
-
 }
 func onRelease6_2() {
   releaseScanCode(35 /* "6" */);
@@ -467,7 +413,6 @@ func onRelease6_2() {
 
 func onPress6_4() {
   pressScanCodeButton(217 /* "🔊" */, 0);
-
 }
 func onRelease6_4() {
   releaseScanCode(217 /* "🔊" */);
@@ -489,7 +434,6 @@ func onRelease7_0() {
 
 func onPress7_1() {
   pressScanCodeButton(24 /* "U" */, 0);
-
 }
 func onRelease7_1() {
   releaseScanCode(24 /* "U" */);
@@ -497,7 +441,6 @@ func onRelease7_1() {
 
 func onPress7_2() {
   pressScanCodeButton(36 /* "7" */, 0);
-
 }
 func onRelease7_2() {
   releaseScanCode(36 /* "7" */);
@@ -505,7 +448,6 @@ func onRelease7_2() {
 
 func onPress7_4() {
   pressScanCodeButton(42 /* "⌫" */, 0);
-
 }
 func onRelease7_4() {
   releaseScanCode(42 /* "⌫" */);
@@ -527,7 +469,6 @@ func onRelease8_0() {
 
 func onPress8_1() {
   pressScanCodeButton(12 /* "I" */, 0);
-
 }
 func onRelease8_1() {
   releaseScanCode(12 /* "I" */);
@@ -535,7 +476,6 @@ func onRelease8_1() {
 
 func onPress8_2() {
   pressScanCodeButton(37 /* "8" */, 0);
-
 }
 func onRelease8_2() {
   releaseScanCode(37 /* "8" */);
@@ -543,7 +483,6 @@ func onRelease8_2() {
 
 func onPress8_4() {
   pressScanCodeButton(82 /* "↑" */, 0);
-
 }
 func onRelease8_4() {
   releaseScanCode(82 /* "↑" */);
@@ -565,7 +504,6 @@ func onRelease9_0() {
 
 func onPress9_1() {
   pressScanCodeButton(18 /* "O" */, 0);
-
 }
 func onRelease9_1() {
   releaseScanCode(18 /* "O" */);
@@ -573,7 +511,6 @@ func onRelease9_1() {
 
 func onPress9_2() {
   pressScanCodeButton(38 /* "9" */, 0);
-
 }
 func onRelease9_2() {
   releaseScanCode(38 /* "9" */);
@@ -581,7 +518,6 @@ func onRelease9_2() {
 
 func onPress9_4() {
   pressScanCodeButton(76 /* "⌦" */, 0);
-
 }
 func onRelease9_4() {
   releaseScanCode(76 /* "⌦" */);
@@ -603,7 +539,6 @@ func onRelease10_0() {
 
 func onPress10_1() {
   pressScanCodeButton(19 /* "P" */, 0);
-
 }
 func onRelease10_1() {
   releaseScanCode(19 /* "P" */);
@@ -611,7 +546,6 @@ func onRelease10_1() {
 
 func onPress10_2() {
   pressScanCodeButton(39 /* "0" */, 0);
-
 }
 func onRelease10_2() {
   releaseScanCode(39 /* "0" */);
@@ -619,7 +553,6 @@ func onRelease10_2() {
 
 func onPress10_4() {
   pressScanCodeButton(75 /* "⇞" */, 0);
-
 }
 func onRelease10_4() {
   releaseScanCode(75 /* "⇞" */);
@@ -639,12 +572,10 @@ func onPress11_0() {
 }
 func onRelease11_0() {
   releaseStenoKey(24 /* "-D" */);
-
 }
 
 func onPress11_1() {
   pressScanCodeButton(42 /* "⌫" */, 0);
-
 }
 func onRelease11_1() {
   releaseScanCode(42 /* "⌫" */);
@@ -652,7 +583,6 @@ func onRelease11_1() {
 
 func onPress11_2() {
   pressScanCodeButton(46 /* "=" */, 0);
-
 }
 func onRelease11_2() {
   releaseScanCode(46 /* "=" */);
@@ -660,7 +590,6 @@ func onRelease11_2() {
 
 func onPress11_4() {
   pressScanCodeButton(74 /* "⇱" */, 0);
-
 }
 func onRelease11_4() {
   releaseScanCode(74 /* "⇱" */);
@@ -677,7 +606,6 @@ func onRelease12() {
 
 func onPress12_1() {
   pressScanCodeButton(224 /* "⌃" */, 0);
-
 }
 func onRelease12_1() {
   releaseScanCode(224 /* "⌃" */);
@@ -685,7 +613,6 @@ func onRelease12_1() {
     pressScanCodeButton(41 /* "⎋" */, 1);
 
     releaseScanCode(41 /* "⎋" */);
-
   }
 }
 
@@ -693,7 +620,6 @@ func onPress12_2() {
   pressScanCodeButton(225 /* "⇧" */, 1);
 
   pressScanCodeButton(53 /* "`" */, 0);
-
 }
 func onRelease12_2() {
   releaseScanCode(53 /* "`" */);
@@ -716,7 +642,6 @@ func onRelease13_0() {
 
 func onPress13_1() {
   pressScanCodeButton(4 /* "A" */, 0);
-
 }
 func onRelease13_1() {
   releaseScanCode(4 /* "A" */);
@@ -726,7 +651,6 @@ func onPress13_2() {
   pressScanCodeButton(225 /* "⇧" */, 1);
 
   pressScanCodeButton(30 /* "1" */, 0);
-
 }
 func onRelease13_2() {
   releaseScanCode(30 /* "1" */);
@@ -735,7 +659,6 @@ func onRelease13_2() {
 
 func onPress13_3() {
   pressScanCodeButton(62 /* "F5" */, 0);
-
 }
 func onRelease13_3() {
   releaseScanCode(62 /* "F5" */);
@@ -743,7 +666,6 @@ func onRelease13_3() {
 
 func onPress13_4() {
   pressScanCodeButton(227 /* "⌘" */, 0);
-
 }
 func onRelease13_4() {
   releaseScanCode(227 /* "⌘" */);
@@ -765,7 +687,6 @@ func onRelease14_0() {
 
 func onPress14_1() {
   pressScanCodeButton(22 /* "S" */, 0);
-
 }
 func onRelease14_1() {
   releaseScanCode(22 /* "S" */);
@@ -775,7 +696,6 @@ func onPress14_2() {
   pressScanCodeButton(225 /* "⇧" */, 1);
 
   pressScanCodeButton(31 /* "2" */, 0);
-
 }
 func onRelease14_2() {
   releaseScanCode(31 /* "2" */);
@@ -784,7 +704,6 @@ func onRelease14_2() {
 
 func onPress14_3() {
   pressScanCodeButton(63 /* "F6" */, 0);
-
 }
 func onRelease14_3() {
   releaseScanCode(63 /* "F6" */);
@@ -792,7 +711,6 @@ func onRelease14_3() {
 
 func onPress14_4() {
   pressScanCodeButton(226 /* "⌥" */, 0);
-
 }
 func onRelease14_4() {
   releaseScanCode(226 /* "⌥" */);
@@ -814,7 +732,6 @@ func onRelease15_0() {
 
 func onPress15_1() {
   pressScanCodeButton(7 /* "D" */, 0);
-
 }
 func onRelease15_1() {
   releaseScanCode(7 /* "D" */);
@@ -824,7 +741,6 @@ func onPress15_2() {
   pressScanCodeButton(225 /* "⇧" */, 1);
 
   pressScanCodeButton(32 /* "3" */, 0);
-
 }
 func onRelease15_2() {
   releaseScanCode(32 /* "3" */);
@@ -833,7 +749,6 @@ func onRelease15_2() {
 
 func onPress15_3() {
   pressScanCodeButton(64 /* "F7" */, 0);
-
 }
 func onRelease15_3() {
   releaseScanCode(64 /* "F7" */);
@@ -841,7 +756,6 @@ func onRelease15_3() {
 
 func onPress15_4() {
   pressScanCodeButton(224 /* "⌃" */, 0);
-
 }
 func onRelease15_4() {
   releaseScanCode(224 /* "⌃" */);
@@ -863,7 +777,6 @@ func onRelease16_0() {
 
 func onPress16_1() {
   pressScanCodeButton(9 /* "F" */, 0);
-
 }
 func onRelease16_1() {
   releaseScanCode(9 /* "F" */);
@@ -873,7 +786,6 @@ func onPress16_2() {
   pressScanCodeButton(225 /* "⇧" */, 1);
 
   pressScanCodeButton(33 /* "4" */, 0);
-
 }
 func onRelease16_2() {
   releaseScanCode(33 /* "4" */);
@@ -882,7 +794,6 @@ func onRelease16_2() {
 
 func onPress16_3() {
   pressScanCodeButton(65 /* "F8" */, 0);
-
 }
 func onRelease16_3() {
   releaseScanCode(65 /* "F8" */);
@@ -890,7 +801,6 @@ func onRelease16_3() {
 
 func onPress16_4() {
   pressScanCodeButton(225 /* "⇧" */, 0);
-
 }
 func onRelease16_4() {
   releaseScanCode(225 /* "⇧" */);
@@ -912,7 +822,6 @@ func onRelease17_0() {
 
 func onPress17_1() {
   pressScanCodeButton(10 /* "G" */, 0);
-
 }
 func onRelease17_1() {
   releaseScanCode(10 /* "G" */);
@@ -922,7 +831,6 @@ func onPress17_2() {
   pressScanCodeButton(225 /* "⇧" */, 1);
 
   pressScanCodeButton(34 /* "5" */, 0);
-
 }
 func onRelease17_2() {
   releaseScanCode(34 /* "5" */);
@@ -945,7 +853,6 @@ func onRelease18_0() {
 
 func onPress18_1() {
   pressScanCodeButton(11 /* "H" */, 0);
-
 }
 func onRelease18_1() {
   releaseScanCode(11 /* "H" */);
@@ -955,7 +862,6 @@ func onPress18_2() {
   pressScanCodeButton(225 /* "⇧" */, 1);
 
   pressScanCodeButton(35 /* "6" */, 0);
-
 }
 func onRelease18_2() {
   releaseScanCode(35 /* "6" */);
@@ -964,7 +870,6 @@ func onRelease18_2() {
 
 func onPress18_4() {
   pressScanCodeButton(218 /* "🔈" */, 0);
-
 }
 func onRelease18_4() {
   releaseScanCode(218 /* "🔈" */);
@@ -986,7 +891,6 @@ func onRelease19_0() {
 
 func onPress19_1() {
   pressScanCodeButton(13 /* "J" */, 0);
-
 }
 func onRelease19_1() {
   releaseScanCode(13 /* "J" */);
@@ -996,7 +900,6 @@ func onPress19_2() {
   pressScanCodeButton(225 /* "⇧" */, 1);
 
   pressScanCodeButton(36 /* "7" */, 0);
-
 }
 func onRelease19_2() {
   releaseScanCode(36 /* "7" */);
@@ -1005,7 +908,6 @@ func onRelease19_2() {
 
 func onPress19_3() {
   pressScanCodeButton(225 /* "⇧" */, 0);
-
 }
 func onRelease19_3() {
   releaseScanCode(225 /* "⇧" */);
@@ -1013,7 +915,6 @@ func onRelease19_3() {
 
 func onPress19_4() {
   pressScanCodeButton(80 /* "←" */, 0);
-
 }
 func onRelease19_4() {
   releaseScanCode(80 /* "←" */);
@@ -1035,7 +936,6 @@ func onRelease20_0() {
 
 func onPress20_1() {
   pressScanCodeButton(14 /* "K" */, 0);
-
 }
 func onRelease20_1() {
   releaseScanCode(14 /* "K" */);
@@ -1045,7 +945,6 @@ func onPress20_2() {
   pressScanCodeButton(225 /* "⇧" */, 1);
 
   pressScanCodeButton(37 /* "8" */, 0);
-
 }
 func onRelease20_2() {
   releaseScanCode(37 /* "8" */);
@@ -1054,7 +953,6 @@ func onRelease20_2() {
 
 func onPress20_3() {
   pressScanCodeButton(224 /* "⌃" */, 0);
-
 }
 func onRelease20_3() {
   releaseScanCode(224 /* "⌃" */);
@@ -1062,7 +960,6 @@ func onRelease20_3() {
 
 func onPress20_4() {
   pressScanCodeButton(81 /* "↓" */, 0);
-
 }
 func onRelease20_4() {
   releaseScanCode(81 /* "↓" */);
@@ -1084,7 +981,6 @@ func onRelease21_0() {
 
 func onPress21_1() {
   pressScanCodeButton(15 /* "L" */, 0);
-
 }
 func onRelease21_1() {
   releaseScanCode(15 /* "L" */);
@@ -1094,7 +990,6 @@ func onPress21_2() {
   pressScanCodeButton(225 /* "⇧" */, 1);
 
   pressScanCodeButton(38 /* "9" */, 0);
-
 }
 func onRelease21_2() {
   releaseScanCode(38 /* "9" */);
@@ -1103,7 +998,6 @@ func onRelease21_2() {
 
 func onPress21_3() {
   pressScanCodeButton(226 /* "⌥" */, 0);
-
 }
 func onRelease21_3() {
   releaseScanCode(226 /* "⌥" */);
@@ -1111,7 +1005,6 @@ func onRelease21_3() {
 
 func onPress21_4() {
   pressScanCodeButton(79 /* "→" */, 0);
-
 }
 func onRelease21_4() {
   releaseScanCode(79 /* "→" */);
@@ -1133,7 +1026,6 @@ func onRelease22_0() {
 
 func onPress22_1() {
   pressScanCodeButton(51 /* ";" */, 0);
-
 }
 func onRelease22_1() {
   releaseScanCode(51 /* ";" */);
@@ -1143,7 +1035,6 @@ func onPress22_2() {
   pressScanCodeButton(225 /* "⇧" */, 1);
 
   pressScanCodeButton(39 /* "0" */, 0);
-
 }
 func onRelease22_2() {
   releaseScanCode(39 /* "0" */);
@@ -1152,7 +1043,6 @@ func onRelease22_2() {
 
 func onPress22_3() {
   pressScanCodeButton(227 /* "⌘" */, 0);
-
 }
 func onRelease22_3() {
   releaseScanCode(227 /* "⌘" */);
@@ -1160,7 +1050,6 @@ func onRelease22_3() {
 
 func onPress22_4() {
   pressScanCodeButton(78 /* "⇟" */, 0);
-
 }
 func onRelease22_4() {
   releaseScanCode(78 /* "⇟" */);
@@ -1182,7 +1071,6 @@ func onRelease23_0() {
 
 func onPress23_1() {
   pressScanCodeButton(52 /* "'" */, 0);
-
 }
 func onRelease23_1() {
   releaseScanCode(52 /* "'" */);
@@ -1192,7 +1080,6 @@ func onPress23_2() {
   pressScanCodeButton(225 /* "⇧" */, 1);
 
   pressScanCodeButton(46 /* "=" */, 0);
-
 }
 func onRelease23_2() {
   releaseScanCode(46 /* "=" */);
@@ -1201,7 +1088,6 @@ func onRelease23_2() {
 
 func onPress23_4() {
   pressScanCodeButton(77 /* "⇲" */, 0);
-
 }
 func onRelease23_4() {
   releaseScanCode(77 /* "⇲" */);
@@ -1242,7 +1128,6 @@ func onRelease24_1() {
     deactivate1();
     activate0();
     activateGlobal();
-
   }
 }
 
@@ -1255,7 +1140,6 @@ func onRelease25() {
 
 func onPress25_0() {
   pressScanCodeButton(225 /* "⇧" */, 0);
-
 }
 func onRelease25_0() {
   releaseScanCode(225 /* "⇧" */);
@@ -1263,7 +1147,6 @@ func onRelease25_0() {
 
 func onPress25_1() {
   pressScanCodeButton(29 /* "Z" */, 0);
-
 }
 func onRelease25_1() {
   releaseScanCode(29 /* "Z" */);
@@ -1273,7 +1156,6 @@ func onPress25_2() {
   pressScanCodeButton(225 /* "⇧" */, 1);
 
   pressScanCodeButton(49 /* "\" */, 0);
-
 }
 func onRelease25_2() {
   releaseScanCode(49 /* "\" */);
@@ -1282,7 +1164,6 @@ func onRelease25_2() {
 
 func onPress25_3() {
   pressScanCodeButton(58 /* "F1" */, 0);
-
 }
 func onRelease25_3() {
   releaseScanCode(58 /* "F1" */);
@@ -1297,7 +1178,6 @@ func onRelease26() {
 
 func onPress26_0() {
   pressScanCodeButton(224 /* "⌃" */, 0);
-
 }
 func onRelease26_0() {
   releaseScanCode(224 /* "⌃" */);
@@ -1305,7 +1185,6 @@ func onRelease26_0() {
 
 func onPress26_1() {
   pressScanCodeButton(27 /* "X" */, 0);
-
 }
 func onRelease26_1() {
   releaseScanCode(27 /* "X" */);
@@ -1313,7 +1192,6 @@ func onRelease26_1() {
 
 func onPress26_2() {
   pressScanCodeButton(49 /* "\" */, 0);
-
 }
 func onRelease26_2() {
   releaseScanCode(49 /* "\" */);
@@ -1321,7 +1199,6 @@ func onRelease26_2() {
 
 func onPress26_3() {
   pressScanCodeButton(59 /* "F2" */, 0);
-
 }
 func onRelease26_3() {
   releaseScanCode(59 /* "F2" */);
@@ -1336,7 +1213,6 @@ func onRelease27() {
 
 func onPress27_0() {
   pressScanCodeButton(226 /* "⌥" */, 0);
-
 }
 func onRelease27_0() {
   releaseScanCode(226 /* "⌥" */);
@@ -1344,7 +1220,6 @@ func onRelease27_0() {
 
 func onPress27_1() {
   pressScanCodeButton(6 /* "C" */, 0);
-
 }
 func onRelease27_1() {
   releaseScanCode(6 /* "C" */);
@@ -1352,7 +1227,6 @@ func onRelease27_1() {
 
 func onPress27_2() {
   pressScanCodeButton(45 /* "-" */, 0);
-
 }
 func onRelease27_2() {
   releaseScanCode(45 /* "-" */);
@@ -1360,7 +1234,6 @@ func onRelease27_2() {
 
 func onPress27_3() {
   pressScanCodeButton(60 /* "F3" */, 0);
-
 }
 func onRelease27_3() {
   releaseScanCode(60 /* "F3" */);
@@ -1375,7 +1248,6 @@ func onRelease28() {
 
 func onPress28_0() {
   pressScanCodeButton(227 /* "⌘" */, 0);
-
 }
 func onRelease28_0() {
   releaseScanCode(227 /* "⌘" */);
@@ -1383,7 +1255,6 @@ func onRelease28_0() {
 
 func onPress28_1() {
   pressScanCodeButton(25 /* "V" */, 0);
-
 }
 func onRelease28_1() {
   releaseScanCode(25 /* "V" */);
@@ -1391,7 +1262,6 @@ func onRelease28_1() {
 
 func onPress28_2() {
   pressScanCodeButton(47 /* "[" */, 0);
-
 }
 func onRelease28_2() {
   releaseScanCode(47 /* "[" */);
@@ -1399,7 +1269,6 @@ func onRelease28_2() {
 
 func onPress28_3() {
   pressScanCodeButton(61 /* "F4" */, 0);
-
 }
 func onRelease28_3() {
   releaseScanCode(61 /* "F4" */);
@@ -1414,7 +1283,6 @@ func onRelease29() {
 
 func onPress29_0() {
   pressScanCodeButton(44 /* "⎵" */, 0);
-
 }
 func onRelease29_0() {
   releaseScanCode(44 /* "⎵" */);
@@ -1422,7 +1290,6 @@ func onRelease29_0() {
 
 func onPress29_1() {
   pressScanCodeButton(5 /* "B" */, 0);
-
 }
 func onRelease29_1() {
   releaseScanCode(5 /* "B" */);
@@ -1432,7 +1299,6 @@ func onPress29_2() {
   pressScanCodeButton(225 /* "⇧" */, 1);
 
   pressScanCodeButton(47 /* "[" */, 0);
-
 }
 func onRelease29_2() {
   releaseScanCode(47 /* "[" */);
@@ -1448,7 +1314,6 @@ func onRelease30() {
 
 func onPress30_0() {
   pressScanCodeButton(218 /* "🔈" */, 0);
-
 }
 func onRelease30_0() {
   releaseScanCode(218 /* "🔈" */);
@@ -1456,7 +1321,6 @@ func onRelease30_0() {
 
 func onPress30_1() {
   pressScanCodeButton(17 /* "N" */, 0);
-
 }
 func onRelease30_1() {
   releaseScanCode(17 /* "N" */);
@@ -1466,7 +1330,6 @@ func onPress30_2() {
   pressScanCodeButton(225 /* "⇧" */, 1);
 
   pressScanCodeButton(48 /* "]" */, 0);
-
 }
 func onRelease30_2() {
   releaseScanCode(48 /* "]" */);
@@ -1475,7 +1338,6 @@ func onRelease30_2() {
 
 func onPress30_4() {
   pressScanCodeButton(210 /* "🔇" */, 0);
-
 }
 func onRelease30_4() {
   releaseScanCode(210 /* "🔇" */);
@@ -1490,7 +1352,6 @@ func onRelease31() {
 
 func onPress31_0() {
   pressScanCodeButton(80 /* "←" */, 0);
-
 }
 func onRelease31_0() {
   releaseScanCode(80 /* "←" */);
@@ -1498,7 +1359,6 @@ func onRelease31_0() {
 
 func onPress31_1() {
   pressScanCodeButton(16 /* "M" */, 0);
-
 }
 func onRelease31_1() {
   releaseScanCode(16 /* "M" */);
@@ -1506,7 +1366,6 @@ func onRelease31_1() {
 
 func onPress31_2() {
   pressScanCodeButton(48 /* "]" */, 0);
-
 }
 func onRelease31_2() {
   releaseScanCode(48 /* "]" */);
@@ -1521,7 +1380,6 @@ func onRelease32() {
 
 func onPress32_0() {
   pressScanCodeButton(81 /* "↓" */, 0);
-
 }
 func onRelease32_0() {
   releaseScanCode(81 /* "↓" */);
@@ -1529,7 +1387,6 @@ func onRelease32_0() {
 
 func onPress32_1() {
   pressScanCodeButton(54 /* "," */, 0);
-
 }
 func onRelease32_1() {
   releaseScanCode(54 /* "," */);
@@ -1539,7 +1396,6 @@ func onPress32_2() {
   pressScanCodeButton(225 /* "⇧" */, 1);
 
   pressScanCodeButton(45 /* "-" */, 0);
-
 }
 func onRelease32_2() {
   releaseScanCode(45 /* "-" */);
@@ -1555,7 +1411,6 @@ func onRelease33() {
 
 func onPress33_0() {
   pressScanCodeButton(82 /* "↑" */, 0);
-
 }
 func onRelease33_0() {
   releaseScanCode(82 /* "↑" */);
@@ -1563,7 +1418,6 @@ func onRelease33_0() {
 
 func onPress33_1() {
   pressScanCodeButton(55 /* "." */, 0);
-
 }
 func onRelease33_1() {
   releaseScanCode(55 /* "." */);
@@ -1571,7 +1425,6 @@ func onRelease33_1() {
 
 func onPress33_2() {
   pressScanCodeButton(56 /* "/" */, 0);
-
 }
 func onRelease33_2() {
   releaseScanCode(56 /* "/" */);
@@ -1586,7 +1439,6 @@ func onRelease34() {
 
 func onPress34_0() {
   pressScanCodeButton(79 /* "→" */, 0);
-
 }
 func onRelease34_0() {
   releaseScanCode(79 /* "→" */);
@@ -1594,7 +1446,6 @@ func onRelease34_0() {
 
 func onPress34_1() {
   pressScanCodeButton(56 /* "/" */, 0);
-
 }
 func onRelease34_1() {
   releaseScanCode(56 /* "/" */);
@@ -1609,7 +1460,6 @@ func onRelease35() {
 
 func onPress35_0() {
   pressScanCodeButton(217 /* "🔊" */, 0);
-
 }
 func onRelease35_0() {
   releaseScanCode(217 /* "🔊" */);
@@ -1617,7 +1467,6 @@ func onRelease35_0() {
 
 func onPress35_1() {
   pressScanCodeButton(229 /* "⇧" */, 0);
-
 }
 func onRelease35_1() {
   releaseScanCode(229 /* "⇧" */);
@@ -1637,12 +1486,10 @@ func onPress36_0() {
 }
 func onRelease36_0() {
   releaseStenoKey(26 /* "#1" */);
-
 }
 
 func onPress36_1() {
   pressScanCodeButton(227 /* "⌘" */, 0);
-
 }
 func onRelease36_1() {
   releaseScanCode(227 /* "⌘" */);
@@ -1650,7 +1497,6 @@ func onRelease36_1() {
 
 func onPress36_2() {
   pressScanCodeButton(227 /* "⌘" */, 0);
-
 }
 func onRelease36_2() {
   releaseScanCode(227 /* "⌘" */);
@@ -1674,7 +1520,6 @@ func onRelease37_0() {
 
 func onPress37_1() {
   pressScanCodeButton(226 /* "⌥" */, 0);
-
 }
 func onRelease37_1() {
   releaseScanCode(226 /* "⌥" */);
@@ -1682,13 +1527,11 @@ func onRelease37_1() {
     pressScanCodeButton(44 /* "⎵" */, 1);
 
     releaseScanCode(44 /* "⎵" */);
-
   }
 }
 
 func onPress37_2() {
   pressScanCodeButton(226 /* "⌥" */, 0);
-
 }
 func onRelease37_2() {
   releaseScanCode(226 /* "⌥" */);
@@ -1719,7 +1562,6 @@ func onRelease38_1() {
 
 func onPress38_2() {
   pressScanCodeButton(224 /* "⌃" */, 0);
-
 }
 func onRelease38_2() {
   releaseScanCode(224 /* "⌃" */);
@@ -1784,7 +1626,6 @@ func onRelease40_0() {
 
 func onPress40_1() {
   pressScanCodeButton(44 /* "⎵" */, 0);
-
 }
 func onRelease40_1() {
   releaseScanCode(44 /* "⎵" */);
@@ -1792,7 +1633,6 @@ func onRelease40_1() {
 
 func onPress40_4() {
   pressScanCodeButton(44 /* "⎵" */, 0);
-
 }
 func onRelease40_4() {
   releaseScanCode(44 /* "⎵" */);
@@ -1814,7 +1654,6 @@ func onPress41_0() {
 }
 func onRelease41_0() {
   releaseStenoKey(27 /* "#2" */);
-
 }
 
 func onPress41_1() {
@@ -1828,7 +1667,6 @@ func onRelease41_1() {
     pressScanCodeButton(40 /* "↵" */, 1);
 
     releaseScanCode(40 /* "↵" */);
-
   }
 }
 
@@ -1849,7 +1687,5 @@ func onPress42() {
 func onRelease42() {
   if (getTime() - pressTime42 <= 200) {
     console("launch_bootloader");
-
   }
 }
-

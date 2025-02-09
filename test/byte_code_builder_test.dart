@@ -52,7 +52,11 @@ String _compileScript(String script) {
   final builder = ScriptByteCodeBuilder(
     module: module,
     byteCodeVersion: latestScriptByteCodeVersion,
-    requiredFunctions: ScriptByteCodeBuilder.createScriptFunctionList(0, 0),
+    requiredFunctions: ScriptByteCodeBuilder.createScriptFunctionList(
+      buttonCount: 0,
+      encoderCount: 0,
+      pointerCount: 0,
+    ),
   );
   builder.createByteCode();
 

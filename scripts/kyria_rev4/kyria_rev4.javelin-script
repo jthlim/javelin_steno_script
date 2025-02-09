@@ -1,4 +1,6 @@
+
 // Generated from javelin-layout file
+// Global
 // Javelin constants
 const SC_NONE = 0;
 
@@ -185,10 +187,13 @@ const TEXT_ALIGNMENT_LEFT = 0;
 const TEXT_ALIGNMENT_MIDDLE = 1;
 const TEXT_ALIGNMENT_RIGHT = 2;
 
-const FONT_ID_NORMAL = 0;
-const FONT_ID_SMALL_DIGITS = 1;
-const FONT_ID_MEDIUM_DIGITS = 2;
-const FONT_ID_LARGE_DIGITS = 3;
+const FONT_ID_DEFAULT = 0;
+const FONT_ID_LARGE = 1;
+const FONT_ID_DOS = 2;
+const FONT_ID_SMALL_DIGITS = 3;
+const FONT_ID_MEDIUM_DIGITS = 4;
+const FONT_ID_LARGE_DIGITS = 5;
+const FONT_ID_HUGE_DIGITS = 6;
 
 const CONNECTION_NONE = 0;
 const CONNECTION_BLE = 1;
@@ -230,6 +235,7 @@ const TIMER_ID_RGB_UPDATE = 0;
 const TIMER_ID_SCREEN_SAVER = 1;
 const TIMER_ID_PAIRING_HOLD = 2;
 const TIMER_ID_CAPS_RELEASE = 3;
+const TIMER_ID_MOUSE_RETURN_DELAY = 4;
 
 const DYNAMIC_STENO_DISPLAY_WPM = 0;
 const DYNAMIC_STENO_DISPLAY_PAPER_TAPE = 1;
@@ -248,25 +254,14 @@ var wasSteno36;
 
 const KEY_SHIFT = 0x100;
 
-// Defined globally since drawBleSummary() also needs it.
-const SETTINGS_IMAGE = [[
-    20 20 00 00 00 00 00 c0 03 00 00 e0 07 00 00 e0
-    07 00 c0 e0 07 03 e0 f3 cf 07 f0 ff ff 0f f0 ff
-    ff 0f e0 ff ff 07 e0 ff ff 07 c0 ff ff 03 c0 7f
-    fe 03 e0 1f f8 07 fc 0f f0 3f fe 0f f0 7f fe 07
-    e0 7f fe 07 e0 7f fe 0f f0 7f fc 0f f0 3f e0 1f
-    f8 07 c0 7f fe 03 c0 ff ff 03 e0 ff ff 07 e0 ff
-    ff 07 f0 ff ff 0f f0 ff ff 0f e0 f3 cf 07 c0 e0
-    07 03 00 e0 07 00 00 e0 07 00 00 c0 03 00 00 00
-    00 00
-]];
-
 var layer;
 func setLayer(layerIndex, layerIdEvent) {
   releaseAll();
   layer = layerIndex;
   sendEvent(layerIdEvent);
 }
+
+var wasSteno;
 
 func dispatchToLayer(functions) {
   var f = functions[[[resolveLayerIndex()]]];
@@ -280,22 +275,18 @@ func resolveLayerIndex() var {
 func activate0() {
   setLayer(0, "layer_id: 87377230");
   wordCaps = 0;
-
 }
 
 func activate1() {
   setLayer(1, "layer_id: 1128808786");
-
 }
 
 func activate2() {
   setLayer(2, "layer_id: 262857896");
-
 }
 
 func activate3() {
   setLayer(3, "layer_id: 41429312");
-
 }
 
 func activate4() {
@@ -307,71 +298,45 @@ func activate4() {
 
 func activate5() {
   setLayer(5, "layer_id: 125635709");
+}
 
+func activate6() {
+  setLayer(6, "layer_id: 47696887");
 }
 
 func activateDynamic() {
-  dispatchToLayer([[[@activate0, @activate1, @activate2, @activate3, @activate4, @activate5]]]);
+  dispatchToLayer([[[@activate0, @activate1, @activate2, @activate3, @activate4, @activate5, @activate6]]]);
 }
 func activateGlobal() {
-  if (([[00 01 01 01 01 00]][resolveLayerIndex()])) {
+  if (([[00 01 01 01 01 00 01]][resolveLayerIndex()])) {
     pressAll();
   }
-  setEnableButtonStates(([[01 00 00 00 00 00]][resolveLayerIndex()]));
+  setEnableButtonStates(([[01 00 00 00 00 00 01]][resolveLayerIndex()]));
   updateDisplay();
-
 }
 func deactivate0() {
-
 }
 
 func deactivate1() {
-
 }
 
 func deactivate2() {
-
 }
 
 func deactivate3() {
-
 }
 
 func deactivate4() {
-
 }
 
 func deactivate5() {
+}
 
+func deactivate6() {
 }
 
 func deactivateDynamic() {}
 func deactivateGlobal() {
-
-}
-var postPress;
-var postRelease;
-
-func _pressScanCode(scanCode, isModifier) {
-  pressScanCode(scanCode);
-  if (isModifier) return;
-
-  if (postPress) {
-    var localPostPress = postPress;
-    postPress = 0;
-    localPostPress();
-  }
-}
-
-func _releaseScanCode(scanCode, isModifier) {
-  releaseScanCode(scanCode);
-  if (isModifier) return;
-
-  if (postRelease) {
-    var localPostRelease = postRelease;
-    postRelease = 0;
-    localPostRelease();
-  }
 }
 // Global Script: Button Overrides
 func isModifierKey(key) var {
@@ -465,7 +430,7 @@ func pressStenoKeyButton(scanCode) {
 func globalPress(buttonIndex) {
   lastButtonIndex = buttonIndex;
   updateScreenSaverTimer();
-  dispatchToLayer([[[@noop, @rgbButtonPressRandomColor, @rgbButtonPressRandomColor, @rgbButtonPressRandomColor, @rgbButtonPressRandomColor, @rgbButtonPressRandomColor]]]);
+  dispatchToLayer([[[@noop, @rgbButtonPressRandomColor, @rgbButtonPressRandomColor, @rgbButtonPressRandomColor, @rgbButtonPressRandomColor, @rgbButtonPressRandomColor, @noop]]]);
 }
 
 func globalRelease() {
@@ -474,7 +439,7 @@ func globalRelease() {
 
 // Global Script: Display Scripts
 func updateDisplay() {
-  dispatchToLayer([[[@drawDisplaySteno, @drawDisplayAbc, @drawDisplaySymbol, @drawDisplayFunction, @drawDisplayNavigation, @drawDisplaySettings]]]);
+  dispatchToLayer([[[@drawDisplayDynamicSteno, @drawDisplayAbc, @drawDisplaySymbol, @drawDisplayFunction, @drawDisplayNavigation, @drawDisplaySettings, @drawDisplayMouse]]]);
 }
 
 func blankDisplay() {
@@ -497,13 +462,6 @@ func drawStrokes() {
 }
 
 func drawDisplay0(layerImage, drawColor) {
-  const ICON_POSITIONS = [[
-      08 00 00 00 00 00 00 00
-      00 00 10 00 00 00 00 00
-      00 00 10 00 08 12 00 00
-      00 00 10 00 00 12 10 12
-  ]];
-
   const SHIFT_IMAGE = [[
       10 10
       00 01 80 01 c0 01 e0 01 f0 7f f8 7f fc 7f fe 7f
@@ -539,28 +497,28 @@ func drawDisplay0(layerImage, drawColor) {
   clearDisplay(0);
   setDrawColor(0, drawColor);
 
-  drawImage(0, (DISPLAY_WIDTH - layerImage[0]) >> 1, DISPLAY_HEIGHT/2 - 24, layerImage);
+  drawImage(0, (DISPLAY_WIDTH - layerImage[0]) >> 1, (DISPLAY_HEIGHT - layerImage[1])/2 - 16, layerImage);
 
   var iconCount = (isScanCodePressed(SC_L_SHIFT) || isScanCodePressed(SC_R_SHIFT))
       + (isScanCodePressed(SC_L_CTRL) || isScanCodePressed(SC_R_CTRL))
       + (isScanCodePressed(SC_L_ALT) || isScanCodePressed(SC_R_ALT))
       + (isScanCodePressed(SC_L_META) || isScanCodePressed(SC_R_META));
-  var iconWidth = iconCount * 16 + (iconCount - 1) * 4;
+  var iconWidth = iconCount * 16 + (iconCount - 1) * 2;
   var xOffset = DISPLAY_WIDTH / 2 - iconWidth / 2;
   var yOffset = DISPLAY_HEIGHT - 32;
 
   setDrawColor(0, 0x808080);
   if (isScanCodePressed(SC_L_SHIFT) || isScanCodePressed(SC_R_SHIFT)) {
     drawImage(0, xOffset, yOffset, SHIFT_IMAGE);
-    xOffset = xOffset + 20;
+    xOffset = xOffset + 18;
   }
   if (isScanCodePressed(SC_L_CTRL) || isScanCodePressed(SC_R_CTRL)) {
     drawImage(0, xOffset, yOffset, CONTROL_IMAGE);
-    xOffset = xOffset + 20;
+    xOffset = xOffset + 18;
   }
   if (isScanCodePressed(SC_L_ALT) || isScanCodePressed(SC_R_ALT)) {
     drawImage(0, xOffset, yOffset, ALT_IMAGE);
-    xOffset = xOffset + 20;
+    xOffset = xOffset + 18;
   }
   if (isScanCodePressed(SC_L_META) || isScanCodePressed(SC_R_META)) {
     drawImage(0, xOffset, yOffset, COMMAND_IMAGE);
@@ -574,15 +532,39 @@ func drawDisplay0(layerImage, drawColor) {
 }
 
 func drawDisplaySteno() {
-  const STENO_IMAGE = [[
-      20 20 ff ff 3f 00 ff ff ff 00 ff ff ff 03 ff ff
-      ff 07 ff ff ff 0f ff ff ff 1f ff f9 f3 3f ff f0
-      e1 3f ff f0 e1 7f ff e1 f0 7f ff e3 f8 ff ff 47
-      fc ff ff 07 fc ff ff 0f fe ff 0f 00 00 fe 0f 00
-      00 fe 0f 00 00 fe ff 0f fe ff ff 07 fc ff ff 47
-      fc ff ff e3 f8 ff ff e1 f0 7f ff f0 e1 7f ff f0
-      e1 3f ff f9 f3 3f ff ff ff 1f ff ff ff 0f ff ff
-      ff 07 ff ff ff 03 ff ff ff 00 ff ff 3f 00 00 00
+  const STENO_IMAGE = /* steno.png */ [[
+      40 40 ff ff ff ff ff 1f 00 00 ff ff ff ff ff ff
+      01 00 ff ff ff ff ff ff 03 00 ff ff ff ff ff ff
+      1f 00 ff ff ff ff ff ff 1f 00 ff ff ff ff ff ff
+      7f 00 ff ff ff ff ff ff 7f 00 ff ff ff ff ff ff
+      ff 01 ff ff ff ff ff ff ff 01 ff ff ff ff ff ff
+      ff 07 ff ff ff ff ff ff ff 07 ff ff ff ff ff ff
+      ff 1f ff ff ff ff ff ff ff 1f ff ff c3 ff 0f ff
+      ff 1f ff ff 81 ff 07 fe ff 3f ff ff 81 ff 07 fe
+      ff 7f ff ff 01 ff 03 fe ff 7f ff ff 01 fe 01 fe
+      ff 7f ff ff 03 fe 01 ff ff 7f ff ff 07 fe 81 ff
+      ff ff ff ff 0f fc c0 ff ff ff ff ff 1f 78 e0 ff
+      ff ff ff ff 1f 78 e0 ff ff ff ff ff 3f 38 f0 ff
+      ff ff ff ff 7f 10 f8 ff ff ff ff ff 7f 00 f8 ff
+      ff ff ff ff ff 00 fc ff ff ff ff ff ff 01 fe ff
+      ff ff ff ff ff 01 fe ff ff ff ff 01 00 00 00 00
+      fe ff ff 01 00 00 00 00 fe ff ff 01 00 00 00 00
+      fe ff ff 01 00 00 00 00 fe ff ff ff ff 01 fe ff
+      ff ff ff ff ff 01 fe ff ff ff ff ff ff 00 fc ff
+      ff ff ff ff 7f 00 f8 ff ff ff ff ff 7f 10 f8 ff
+      ff ff ff ff 3f 38 f0 ff ff ff ff ff 1f 78 e0 ff
+      ff ff ff ff 1f 78 e0 ff ff ff ff ff 0f fc c0 ff
+      ff ff ff ff 07 fe 81 ff ff ff ff ff 03 fe 01 ff
+      ff 7f ff ff 01 fe 01 fe ff 7f ff ff 01 ff 03 fe
+      ff 7f ff ff 81 ff 07 fe ff 7f ff ff 81 ff 07 fe
+      ff 3f ff ff c3 ff 0f ff ff 1f ff ff ff ff ff ff
+      ff 1f ff ff ff ff ff ff ff 1f ff ff ff ff ff ff
+      ff 07 ff ff ff ff ff ff ff 07 ff ff ff ff ff ff
+      ff 01 ff ff ff ff ff ff ff 01 ff ff ff ff ff ff
+      7f 00 ff ff ff ff ff ff 7f 00 ff ff ff ff ff ff
+      1f 00 ff ff ff ff ff ff 1f 00 ff ff ff ff ff ff
+      07 00 ff ff ff ff ff ff 01 00 ff ff ff ff ff 3f
+      00 00 ff ff ff ff ff 0f 00 00 00 00 00 00 00 00
       00 00
   ]];
 
@@ -603,38 +585,86 @@ func drawDisplaySteno() {
   } else {
     return;
   }
-  drawText(0, DISPLAY_WIDTH/2, DISPLAY_HEIGHT/2 + 32, FONT_ID_NORMAL, TEXT_ALIGNMENT_MIDDLE, text);
+  drawText(0, DISPLAY_WIDTH/2, 4*DISPLAY_HEIGHT/5, FONT_ID_LARGE, TEXT_ALIGNMENT_MIDDLE, text);
 }
 
 func drawDisplayAbc() {
-  const ABC_IMAGE = [[
-      20 20 00 00 00 00 00 00 08 00 00 00 0c 00 00 00
-      0f 00 00 c0 0f 00 00 f0 09 00 00 bc 00 00 80 8f
-      00 00 80 bf 00 00 00 fc 08 00 00 f0 0f 00 00 c0
-      0f 00 00 00 0e 00 00 00 08 00 80 00 08 00 80 ff
-      0f 00 80 ff 0f 00 00 30 0c 00 00 10 08 00 00 30
-      0c 00 00 f0 0f 00 00 e0 07 00 00 00 00 00 00 e0
-      07 00 00 f0 0f 00 00 30 0c 00 00 10 08 00 00 30
-      0c 00 00 70 0e 00 00 60 06 00 00 00 00 00 00 00
-      00 00
+  const QWERTY_IMAGE = /* qwerty.png */ [[
+      82 1d 00 00 00 00 00 3e 00 00 c0 ff 01 00 e0 ff
+      07 00 f8 ff 0f 00 f8 ff 1f 00 7c 00 1e 00 1c 00
+      38 04 0e 00 38 06 06 00 30 07 06 00 60 03 06 00
+      e0 03 02 00 e0 03 06 00 e0 03 06 00 e0 03 06 00
+      60 03 0e 00 70 07 0e 00 38 0f 3c 00 3c 0e fc 80
+      1f 0e f8 ff 1f 0e f0 ff 0f 0e e0 ff 03 0c 86 ff
+      00 0c 0e 00 00 0c 3e 00 00 0c fe 01 00 0c fe 0f
+      00 0c fe ff 00 0e e6 ff 07 0f 06 ff 3f 00 00 f0
+      7f 00 00 80 7f 00 00 c0 0f 00 00 f8 01 00 00 3f
+      00 00 e0 03 00 00 7c 00 00 00 fe 03 00 00 fe 1f
+      00 00 f0 ff 00 00 80 ff 03 00 00 fe 1f 00 00 f0
+      7f 00 00 80 7f 00 00 c0 1f 00 06 f8 01 00 86 3f
+      00 00 fe 03 00 00 7e 00 00 00 0e 00 00 00 06 00
+      20 00 06 00 20 00 06 00 20 00 0e 00 38 00 fe ff
+      3f 00 fe ff 3f 00 fe ff 3f 00 fe ff 3f 00 06 0c
+      20 00 06 0c 20 00 06 0c 20 00 06 1e 20 00 86 7f
+      20 00 0e 00 30 00 1e 00 30 00 7e 00 38 00 7e 00
+      3e 00 00 80 3f 00 06 80 3f 00 06 00 20 00 06 00
+      20 00 1e 00 38 00 fe ff 3f 00 fe ff 3f 00 fe ff
+      3f 00 fe ff 3f 00 06 18 20 00 06 38 20 00 06 78
+      20 00 06 fc 00 00 0e fc 03 00 be ff 07 00 fc cf
+      0f 00 fc 87 1f 00 f8 03 3f 00 f0 01 3e 00 7e 00
+      38 00 7e 00 38 00 1e 00 30 00 06 00 20 00 06 00
+      20 00 06 00 20 00 06 00 20 00 06 00 20 00 06 00
+      30 00 fe ff 3f 00 fe ff 3f 00 fe ff 3f 00 fe ff
+      3f 00 06 00 30 00 06 00 20 00 06 00 20 00 06 00
+      00 00 06 00 00 00 0e 00 00 00 3e 00 00 00 7e 00
+      00 00 06 00 00 00 0e 00 00 00 1e 00 00 00 7e 00
+      00 00 fe 01 00 00 fe 03 20 00 f6 0f 20 00 c6 3f
+      30 00 80 ff 3f 00 00 fe 3f 00 00 f8 3f 00 00 f8
+      3f 00 00 1c 30 00 06 0f 20 00 c6 03 20 00 fe 00
+      00 00 7e 00 00 00 1e 00 00 00 0e 00 00 00 06 00
+      00 00 06 00 00 00 00 00 00 00
   ]];
 
-  drawDisplay0(ABC_IMAGE, 0xffffff);
+  drawDisplay0(QWERTY_IMAGE, 0xffffff);
   setDrawColor(1, 0x8080ff);
   setAutoDraw(1, AUTO_DRAW_WPM);
 }
 
 func drawDisplayFunction() {
-  const FUNCTION_IMAGE = [[
-      20 20
-      f0 ff ff 0f f8 ff ff 1f 0c 00 00 30 06 00 00 60
-      03 00 00 c0 03 00 06 c0 03 00 06 c0 03 c0 ff c7
-      03 e0 ff c7 03 60 06 c0 03 60 06 c0 03 00 00 c0
-      03 00 fe c7 03 00 fe c7 03 00 0c c0 03 00 06 c0
-      03 00 0e c0 03 00 fc c7 03 00 f8 c7 03 00 00 c0
-      03 00 00 c0 03 00 00 c0 03 00 00 c0 03 00 00 c0
-      03 00 00 c0 03 00 00 c0 03 00 00 c0 03 00 00 c0
-      06 00 00 60 0c 00 00 30 f8 ff ff 1f f0 ff ff 0f
+  const FUNCTION_IMAGE = /* function.png */ [[
+      40 40 00 fc ff ff ff ff 3f 00 00 ff ff ff ff ff
+      ff 00 c0 ff ff ff ff ff ff 03 e0 ff ff ff ff ff
+      ff 07 f0 07 00 00 00 00 e0 0f f8 01 00 00 00 00
+      80 1f fc 00 00 00 00 00 00 3f 7c 00 00 00 00 00
+      00 3e 3e 00 00 00 00 00 00 7c 1e 00 00 00 00 00
+      00 78 1f 00 00 00 3c 00 00 f8 0f 00 00 00 3c 00
+      00 f0 0f 00 00 00 3c 00 00 f0 0f 00 00 00 3c 00
+      00 f0 0f 00 00 f0 ff ff 3f f0 0f 00 00 f8 ff ff
+      3f f0 0f 00 00 fc ff ff 3f f0 0f 00 00 fc ff ff
+      3f f0 0f 00 00 3c 3c 00 00 f0 0f 00 00 3c 3c 00
+      00 f0 0f 00 00 3c 3c 00 00 f0 0f 00 00 3c 3c 00
+      00 f0 0f 00 00 00 00 00 00 f0 0f 00 00 00 00 00
+      00 f0 0f 00 00 00 fc ff 3f f0 0f 00 00 00 fc ff
+      3f f0 0f 00 00 00 fc ff 3f f0 0f 00 00 00 fc ff
+      3f f0 0f 00 00 00 f0 01 00 f0 0f 00 00 00 f8 00
+      00 f0 0f 00 00 00 7c 00 00 f0 0f 00 00 00 7c 00
+      00 f0 0f 00 00 00 fc 00 00 f0 0f 00 00 00 fc 01
+      00 f0 0f 00 00 00 f8 ff 3f f0 0f 00 00 00 f0 ff
+      3f f0 0f 00 00 00 e0 ff 3f f0 0f 00 00 00 c0 ff
+      3f f0 0f 00 00 00 00 00 00 f0 0f 00 00 00 00 00
+      00 f0 0f 00 00 00 00 00 00 f0 0f 00 00 00 00 00
+      00 f0 0f 00 00 00 00 00 00 f0 0f 00 00 00 00 00
+      00 f0 0f 00 00 00 00 00 00 f0 0f 00 00 00 00 00
+      00 f0 0f 00 00 00 00 00 00 f0 0f 00 00 00 00 00
+      00 f0 0f 00 00 00 00 00 00 f0 0f 00 00 00 00 00
+      00 f0 0f 00 00 00 00 00 00 f0 0f 00 00 00 00 00
+      00 f0 0f 00 00 00 00 00 00 f0 1f 00 00 00 00 00
+      00 f8 1e 00 00 00 00 00 00 78 3e 00 00 00 00 00
+      00 7c 7c 00 00 00 00 00 00 3e fc 00 00 00 00 00
+      00 3f f8 01 00 00 00 00 80 1f f0 07 00 00 00 00
+      e0 0f e0 ff ff ff ff ff ff 07 c0 ff ff ff ff ff
+      ff 03 00 ff ff ff ff ff ff 00 00 fc ff ff ff ff
+      3f 00
   ]];
 
   drawDisplay0(FUNCTION_IMAGE, 0x80c0ff);
@@ -643,16 +673,40 @@ func drawDisplayFunction() {
 }
 
 func drawDisplaySymbol() {
-  const SYMBOL_IMAGE = [[
-      20 20 00 00 00 00 00 00 00 00 18 00 00 00 18 00
-      00 00 1c 00 00 00 fe 3f ff 1b fe 3f ff 1b fe 3f
-      ff 1b 00 00 00 00 00 00 fc 0f 00 00 fe 1f 1c 38
-      ff 3f 1e 3c 07 38 1e 3e f3 33 06 3f f3 37 86 37
-      f3 37 c6 33 07 36 fe 31 ff 3b fe 30 fe 3b 3c 30
-      fc 19 00 00 00 00 1c 0c 00 03 1e 1c 18 3f 1e 3c
-      f8 3f c6 38 ff 3f c6 30 ff 03 e6 30 1f 3f fe 39
-      f8 3f fe 3f ff 3f bc 1f ff 03 00 0e 1f 03 00 00
-      18 00
+  const SYMBOL_IMAGE = /* symbols.png */ [[
+      40 40 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+      00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+      00 00 c0 03 00 00 00 00 00 00 c0 03 00 00 00 00
+      00 00 e0 03 00 00 00 00 00 00 e0 03 00 00 00 00
+      00 00 f0 03 00 00 00 00 00 00 f8 03 00 00 00 00
+      00 00 fc ff ff 0f ff ff cf 03 fc ff ff 0f ff ff
+      cf 03 fc ff ff 0f ff ff cf 03 fc ff ff 0f ff ff
+      cf 03 fc ff ff 0f ff ff cf 03 fc ff ff 0f ff ff
+      cf 03 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+      00 00 00 00 00 00 f0 ff ff 00 00 00 00 00 f8 ff
+      ff 01 00 00 00 00 fc ff ff 03 00 00 00 00 fe ff
+      ff 07 c0 01 80 0f fe ff ff 0f e0 03 c0 0f ff ff
+      ff 0f f0 03 e0 0f 7f 00 c0 0f f8 03 f0 0f 3f 00
+      80 0f fc 01 f8 0f 1f ff 0f 0f fc 00 fc 0f 8f ff
+      1f 0f 7c 00 fe 0f 8f ff 3f 0f 3c 00 7f 0f 8f ff
+      3f 0f 3c 80 3f 0f 8f ff 3f 0f 3c c0 1f 0f 1f ff
+      3f 0f 3c e0 0f 0f 3f 00 3c 0f 7c f0 07 0f 7f 00
+      1e 0f fc fc 03 0f ff ff 8f 0f f8 ff 01 0f fe ff
+      cf 0f f8 ff 00 0f fe ff cf 0f f0 3f 00 0f fc ff
+      c7 0f e0 1f 00 0f f8 ff c3 07 80 0f 00 0f f0 ff
+      c1 03 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+      00 00 c0 01 60 00 00 00 0f 00 f0 03 f0 00 00 00
+      0f 0f f8 03 f0 01 c0 03 ff 0f f8 03 f0 03 c0 e3
+      ff 0f fc 03 f0 07 c0 ff ff 0f fc 01 e0 07 c0 ff
+      ff 0f 7c f0 c0 0f f8 ff ff 00 3c f0 80 0f ff ff
+      0f 00 3c f0 00 0f ff 1f 0f 00 3c f0 00 0f ff 03
+      0f 00 3c f8 00 0f ff 03 0f 0f 7c fc 00 0f cf 03
+      ff 0f fc ff 81 0f c0 e3 ff 0f fc ff 83 0f c0 ff
+      ff 0f f8 ff cf 0f c0 ff ff 0f f8 ff ff 07 f8 ff
+      ff 00 f0 cf ff 03 ff ff 0f 00 c0 87 ff 01 ff 1f
+      0f 00 00 00 fc 00 ff 03 0f 00 00 00 78 00 ff 03
+      0f 00 00 00 00 00 cf 03 00 00 00 00 00 00 c0 03
+      00 00
   ]];
 
   drawDisplay0(SYMBOL_IMAGE, 0xffffff);
@@ -661,15 +715,39 @@ func drawDisplaySymbol() {
 }
 
 func drawDisplayNavigation() {
-  const NAVIGATION_IMAGE = [[
-      20 20 00 00 00 00 00 80 01 00 00 c0 03 00 00 e0
-      07 00 00 f0 0f 00 00 f8 1f 00 00 fc 3f 00 00 e0
-      07 00 00 e0 07 00 00 e0 07 00 40 e0 07 02 60 e0
-      07 06 70 00 00 0e f8 0f f0 1f fc 0f f0 3f fe 0f
-      f0 7f fe 0f f0 7f fc 0f f0 3f f8 0f f0 1f 70 00
-      00 0e 60 e0 07 06 40 e0 07 02 00 e0 07 00 00 e0
-      07 00 00 e0 07 00 00 fc 3f 00 00 f8 1f 00 00 f0
-      0f 00 00 e0 07 00 00 c0 03 00 00 80 01 00 00 00
+  const NAVIGATION_IMAGE = /* navigation.png */ [[
+      40 40 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+      00 00 00 00 00 c0 03 00 00 00 00 00 00 e0 07 00
+      00 00 00 00 00 70 0e 00 00 00 00 00 00 38 1c 00
+      00 00 00 00 00 1c 38 00 00 00 00 00 00 0e 70 00
+      00 00 00 00 00 07 e0 00 00 00 00 00 80 03 c0 01
+      00 00 00 00 c0 01 80 03 00 00 00 00 e0 00 00 07
+      00 00 00 00 f0 0f f0 0f 00 00 00 00 f0 0f f0 0f
+      00 00 00 00 00 0c 30 00 00 00 00 00 00 0c 30 00
+      00 00 00 00 00 0c 30 00 00 00 00 00 00 0c 30 00
+      00 00 00 00 00 0c 30 00 00 00 00 00 00 0c 30 00
+      00 00 00 30 00 0c 30 00 0c 00 00 38 00 0c 30 00
+      1c 00 00 3c 00 fc 3f 00 3c 00 00 3e 00 fc 3f 00
+      7c 00 00 37 00 00 00 00 ec 00 80 33 00 00 00 00
+      cc 01 c0 f1 ff 00 00 ff 8f 03 e0 f0 ff 00 00 ff
+      0f 07 70 00 c0 00 00 03 00 0e 38 00 c0 00 00 03
+      00 1c 1c 00 c0 00 00 03 00 38 0c 00 c0 00 00 03
+      00 30 0c 00 c0 00 00 03 00 30 1c 00 c0 00 00 03
+      00 38 38 00 c0 00 00 03 00 1c 70 00 c0 00 00 03
+      00 0e e0 f0 ff 00 00 ff 0f 07 c0 f1 ff 00 00 ff
+      8f 03 80 33 00 00 00 00 cc 01 00 37 00 00 00 00
+      ec 00 00 3e 00 fc 3f 00 7c 00 00 3c 00 fc 3f 00
+      3c 00 00 38 00 0c 30 00 1c 00 00 30 00 0c 30 00
+      0c 00 00 00 00 0c 30 00 00 00 00 00 00 0c 30 00
+      00 00 00 00 00 0c 30 00 00 00 00 00 00 0c 30 00
+      00 00 00 00 00 0c 30 00 00 00 00 00 00 0c 30 00
+      00 00 00 00 f0 0f f0 0f 00 00 00 00 f0 0f f0 0f
+      00 00 00 00 e0 00 00 07 00 00 00 00 c0 01 80 03
+      00 00 00 00 80 03 c0 01 00 00 00 00 00 07 e0 00
+      00 00 00 00 00 0e 70 00 00 00 00 00 00 1c 38 00
+      00 00 00 00 00 38 1c 00 00 00 00 00 00 70 0e 00
+      00 00 00 00 00 e0 07 00 00 00 00 00 00 c0 03 00
+      00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
       00 00
   ]];
 
@@ -679,21 +757,81 @@ func drawDisplayNavigation() {
 }
 
 func drawDisplaySettings() {
+  const SETTINGS_IMAGE = /* settings.png */ [[
+      40 40 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+      00 00 00 00 00 f0 0f 00 00 00 00 00 00 f8 1f 00
+      00 00 00 00 00 fc 3f 00 00 00 00 00 00 fc 3f 00
+      00 00 00 00 00 fc 3f 00 00 00 00 00 00 fe 7f 00
+      00 00 00 f0 00 fe 7f 00 0f 00 00 f8 03 fe 7f c0
+      1f 00 00 fc 0f ff ff f0 3f 00 00 fe 9f ff ff f9
+      7f 00 00 ff ff ff ff ff ff 00 00 ff ff ff ff ff
+      ff 00 00 ff ff ff ff ff ff 00 00 ff ff ff ff ff
+      ff 00 00 fe ff ff ff ff 7f 00 00 fc ff ff ff ff
+      7f 00 00 fc ff ff ff ff 3f 00 00 fc ff ff ff ff
+      3f 00 00 f8 ff ff ff ff 1f 00 00 f0 ff ff ff ff
+      0f 00 00 f0 ff 3f fc ff 0f 00 00 f8 ff 0f f0 ff
+      1f 00 00 fc ff 03 c0 ff 3f 00 80 ff ff 01 80 ff
+      ff 01 f0 ff ff 00 00 ff ff 0f f8 ff ff 00 00 ff
+      ff 1f fc ff 7f 00 00 fe ff 3f fc ff 7f 00 00 fe
+      ff 3f fc ff 3f 00 00 fc ff 3f fc ff 3f 00 00 fc
+      ff 3f fc ff 3f 00 00 fc ff 3f fc ff 3f 00 00 fc
+      ff 3f fc ff 7f 00 00 fe ff 3f fc ff 7f 00 00 fe
+      ff 3f f8 ff ff 00 00 ff ff 1f f0 ff ff 00 00 ff
+      ff 0f 80 ff ff 01 80 ff ff 01 00 fc ff 03 c0 ff
+      3f 00 00 f8 ff 0f f0 ff 1f 00 00 f0 ff 3f fc ff
+      0f 00 00 f0 ff ff ff ff 0f 00 00 f8 ff ff ff ff
+      1f 00 00 fc ff ff ff ff 3f 00 00 fc ff ff ff ff
+      3f 00 00 fe ff ff ff ff 7f 00 00 fe ff ff ff ff
+      7f 00 00 ff ff ff ff ff ff 00 00 ff ff ff ff ff
+      ff 00 00 ff ff ff ff ff ff 00 00 ff ff ff ff ff
+      ff 00 00 fe 9f ff ff f9 7f 00 00 fc 0f ff ff f0
+      3f 00 00 f8 03 fe 7f c0 1f 00 00 f0 00 fe 7f 00
+      0f 00 00 00 00 fe 7f 00 00 00 00 00 00 fc 3f 00
+      00 00 00 00 00 fc 3f 00 00 00 00 00 00 fc 3f 00
+      00 00 00 00 00 f8 1f 00 00 00 00 00 00 f0 0f 00
+      00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+      00 00
+  ]];
+
   drawDisplay0(SETTINGS_IMAGE, 0xffc000);
   setDrawColor(1, 0x8080ff);
   setAutoDraw(1, AUTO_DRAW_WPM);
 }
 
 func drawDisplayNumpad() {
-  const NUMPAD_IMAGE = [[
-      20 20 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-      00 00 00 00 00 00 00 00 00 00 7e 7e 7e 7e 7e 7e
-      7e 7e 7e 7e 7e 7e 7e 7e 7e 7e 7e 7e 7e 7e 7e 7e
-      7e 7e 00 00 00 7e 00 00 00 7e 7e 7e 7e 7e 7e 7e
-      7e 7e 7e 7e 7e 7e 7e 7e 7e 7e 7e 7e 7e 7e 7e 7e
-      7e 7e 00 00 00 00 00 00 00 00 7e 7e 7e 7e 7e 7e
-      7e 7e 7e 7e 7e 7e 7e 7e 7e 7e 7e 7e 7e 7e 7e 7e
-      7e 7e 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  const NUMPAD_IMAGE = /* numpad.png */ [[
+      40 40 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+      00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+      00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+      00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+      00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+      00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+      00 00 f8 1f f8 1f f8 1f f8 1f fc 3f fc 3f fc 3f
+      fc 3f fc 3f fc 3f fc 3f fc 3f fc 3f fc 3f fc 3f
+      fc 3f fc 3f fc 3f fc 3f fc 3f fc 3f fc 3f fc 3f
+      fc 3f fc 3f fc 3f fc 3f fc 3f fc 3f fc 3f fc 3f
+      fc 3f fc 3f fc 3f fc 3f fc 3f fc 3f fc 3f fc 3f
+      fc 3f fc 3f fc 3f fc 3f fc 3f f8 1f f8 1f f8 1f
+      fc 3f 00 00 00 00 00 00 fc 3f 00 00 00 00 00 00
+      fc 3f 00 00 00 00 00 00 fc 3f 00 00 00 00 00 00
+      fc 3f f8 1f f8 1f f8 1f fc 3f fc 3f fc 3f fc 3f
+      fc 3f fc 3f fc 3f fc 3f fc 3f fc 3f fc 3f fc 3f
+      fc 3f fc 3f fc 3f fc 3f fc 3f fc 3f fc 3f fc 3f
+      fc 3f fc 3f fc 3f fc 3f fc 3f fc 3f fc 3f fc 3f
+      fc 3f fc 3f fc 3f fc 3f fc 3f fc 3f fc 3f fc 3f
+      fc 3f fc 3f fc 3f fc 3f fc 3f f8 1f f8 1f f8 1f
+      f8 1f 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+      00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+      00 00 f8 1f f8 1f f8 1f f8 1f fc 3f fc 3f fc 3f
+      fc 3f fc 3f fc 3f fc 3f fc 3f fc 3f fc 3f fc 3f
+      fc 3f fc 3f fc 3f fc 3f fc 3f fc 3f fc 3f fc 3f
+      fc 3f fc 3f fc 3f fc 3f fc 3f fc 3f fc 3f fc 3f
+      fc 3f fc 3f fc 3f fc 3f fc 3f fc 3f fc 3f fc 3f
+      fc 3f fc 3f fc 3f fc 3f fc 3f f8 1f f8 1f f8 1f
+      f8 1f 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+      00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+      00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+      00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
       00 00
   ]];
 
@@ -712,37 +850,50 @@ func drawDisplayDynamicSteno() {
   }
 }
 
+func drawWPM() {
+  setDrawColor(0, 0x8080ff);
+  setAutoDraw(0, AUTO_DRAW_WPM);
+}
+
 // Global Script: Encoder Scripts
 func onEncoderCW0(delta) {
   printValue("onEncoderCW0", delta);
+  tapScanCode(0xd9);
 }
 
 func onEncoderCCW0(delta) {
   printValue("onEncoderCCW0", delta);
+  tapScanCode(0xda);
 }
 
 func onEncoderCW1(delta) {
   printValue("onEncoderCW1", delta);
+  tapScanCode(0xd9);
 }
 
 func onEncoderCCW1(delta) {
   printValue("onEncoderCCW1", delta);
+  tapScanCode(0xda);
 }
 
 func onEncoderCW2(delta) {
   printValue("onEncoderCW2", delta);
+  tapScanCode(0xd9);
 }
 
 func onEncoderCCW2(delta) {
   printValue("onEncoderCCW2", delta);
+  tapScanCode(0xda);
 }
 
 func onEncoderCW3(delta) {
   printValue("onEncoderCW3", delta);
+  tapScanCode(0xd9);
 }
 
 func onEncoderCCW3(delta) {
   printValue("onEncoderCCW3", delta);
+  tapScanCode(0xda);
 }
 
 // Global Script: Magic Key Scripts
@@ -780,6 +931,67 @@ func releaseMagicKey() {
   if (magicKey & KEY_SHIFT) {
     releaseScanCodeButton(SC_L_SHIFT);
   }
+}
+
+// Global Script: Pointer Scripts
+var lastX0;
+var lastY0;
+var lastZ0;
+var z0PressTime;
+var z0ReleaseTime;
+func onPointerUpdate0(x, y, z) {
+  if (z == 0) {
+    if (lastZ0 != 0) {
+      z0ReleaseTime = getTime();
+      var timeSincePress = getTime() - z0PressTime;
+      if (25 < timeSincePress && timeSincePress < 100) {
+        tapMouseButton(0);
+      }
+      onMouseInactive();
+    }
+  } else {
+    if (lastZ0 == 0) {
+      if (getTime() - z0ReleaseTime > 150) {
+        z0PressTime = getTime();
+      }
+      onMouseActive();
+    } else {
+      moveMouse(x - lastX0, y - lastY0);
+    }
+  }
+  lastX0 = x;
+  lastY0 = y;
+  lastZ0 = z;
+}
+
+var lastX1;
+var lastY1;
+var lastZ1;
+var z1PressTime;
+var z1ReleaseTime;
+func onPointerUpdate1(x, y, z) {
+  if (z == 0) {
+    if (lastZ1 != 0) {
+      z1ReleaseTime = getTime();
+      var timeSincePress = getTime() - z1PressTime;
+      if (25 < timeSincePress && timeSincePress < 100) {
+        tapMouseButton(0);
+      }
+      onMouseInactive();
+    }
+  } else {
+    if (lastZ1 == 0) {
+      if (getTime() - z1ReleaseTime > 150) {
+        z1PressTime = getTime();
+      }
+      onMouseActive();
+    } else {
+      moveMouse(x - lastX1, y - lastY1);
+    }
+  }
+  lastX1 = x;
+  lastY1 = y;
+  lastZ1 = z;
 }
 
 // Global Script: RGB Scripts
@@ -921,7 +1133,7 @@ func rgbUpdate() {
   if (isHostSleeping()) {
     rgbUpdateKeyBreatheCycle();
   } else {
-    dispatchToLayer([[[@rgbUpdateHueCycle, @rgbUpdateRandomColors, @rgbUpdateRandomColors, @rgbUpdateRandomColors, @rgbUpdateRandomColors, @rgbUpdateRandomColors]]]);
+    dispatchToLayer([[[@rgbUpdateHueCycle, @rgbUpdateRandomColors, @rgbUpdateRandomColors, @rgbUpdateRandomColors, @rgbUpdateRandomColors, @rgbUpdateRandomColors, @rgbUpdateMouseLayer]]]);
   }
 }
 
@@ -949,7 +1161,7 @@ func rgbUpdateUnderglow() {
   } else if (isHostSleeping()) {
     setUnderglowRgb(8, 8, 8);
   } else {
-    dispatchToLayer([[[@noop, @rgbUpdateUnderglowWhite, @rgbUpdateUnderglowWhite, @rgbUpdateUnderglowWhite, @rgbUpdateUnderglowWhite, @rgbUpdateUnderglowWhite]]]);
+    dispatchToLayer([[[@noop, @rgbUpdateUnderglowWhite, @rgbUpdateUnderglowWhite, @rgbUpdateUnderglowWhite, @rgbUpdateUnderglowWhite, @rgbUpdateUnderglowWhite, @rgbUpdateUnderglowOff]]]);
   }
 }
 
@@ -1008,8 +1220,6 @@ func shouldUseScreenSaver() var {
 
 var isShowingScreenSaver = 0;
 var screenSaverStartTime;
-var screenSaverPosition[8];
-var screenSaverVelocity[8];
 func startScreenSaver() {
   if (!shouldUseScreenSaver()) return;
 
@@ -1018,6 +1228,30 @@ func startScreenSaver() {
 
   isShowingScreenSaver = 1;
   screenSaverStartTime = getTime();
+
+  startGameOfLife();
+
+  drawScreenSaver();
+  startTimer(TIMER_ID_SCREEN_SAVER, 50, 1, @drawScreenSaver);
+}
+
+func drawScreenSaver() {
+  drawGameOfLife();
+}
+
+func updateScreenSaverTimer() {
+  if (isShowingScreenSaver) {
+    isShowingScreenSaver = 0;
+    updateDisplay();
+  }
+  startTimer(TIMER_ID_SCREEN_SAVER, SCREEN_SAVER_TIMEOUT, 1, @startScreenSaver);
+}
+
+// Global Script: Screen Saver: Bouncing Lines
+var screenSaverPosition[8];
+var screenSaverVelocity[8];
+
+func startBouncingLines() {
   for (var i = 0; i < 8; i = i + 1) {
     screenSaverPosition[i] = rand();
 
@@ -1025,17 +1259,9 @@ func startScreenSaver() {
     velocity = velocity + (velocity < 0 ? -128 : 128);
     screenSaverVelocity[i] = velocity;
   }
-  drawScreenSaver();
-  startTimer(TIMER_ID_SCREEN_SAVER, 50, 1, @drawScreenSaver);
 }
 
-func wrap(x, max) var {
-  x = x % (2 * max);
-  if (x < 0) x = -x;
-  return x < max ? x : 2 * max - x;
-}
-
-func drawScreenSaver() {
+func drawBouncingLines() {
   const OVERLAY_HEIGHT = 16;
 
   var timeElapsed = getTime() - screenSaverStartTime;
@@ -1058,12 +1284,60 @@ func drawScreenSaver() {
   }
 }
 
-func updateScreenSaverTimer() {
-  if (isShowingScreenSaver) {
-    isShowingScreenSaver = 0;
-    updateDisplay();
+func wrap(x, max) var {
+  x = x % (2 * max);
+  if (x < 0) x = -x;
+  return x < max ? x : 2 * max - x;
+}
+
+// Global Script: Screen Saver: Game of Life
+var pixelSpawnCounter;
+
+func startGameOfLife() {
+  for (var d = 0; d < 2; d = d + 1) {
+    clearDisplay(d);
+    for (var i = 0; i < 32; i = i + 1) {
+      spawnPixelBundle(d);
+    }
   }
-  startTimer(TIMER_ID_SCREEN_SAVER, SCREEN_SAVER_TIMEOUT, 1, @startScreenSaver);
+}
+
+func drawGameOfLife() {
+  var timeElapsed = getTime() - screenSaverStartTime;
+  var counterElapsed = timeElapsed / 250;
+  if (counterElapsed != pixelSpawnCounter) {
+    pixelSpawnCounter = counterElapsed;
+    spawnPixelBundle(0);
+    spawnPixelBundle(1);
+  }
+
+  drawEffect(0, 0, 0);
+  drawEffect(1, 0, 0);
+}
+
+func spawnPixelBundle(d) {
+  const COLORS = [[
+      ff 00 00
+      00 ff 00
+      00 00 ff
+      ff ff 00
+      ff 00 ff
+      00 ff ff
+      ff ff ff
+  ]];
+  var colOffset = (rand() % 7) * 3;
+  setDrawColorRgb(d, COLORS[colOffset], COLORS[colOffset+1], COLORS[colOffset+2]);
+
+  var x = rand();
+  var y = rand();
+
+  for (var yy = 0; yy < 5; yy = yy + 1) {
+    for (var xx = 0; xx < 5; xx = xx + 1) {
+      if (rand() % 100 <= 80) {
+        drawPixel(d, (x + xx) % DISPLAY_WIDTH, (y + yy) % DISPLAY_HEIGHT);
+      }
+    }
+  }
 }
 
 // Global Script: onConnectionUpdate
@@ -1189,14 +1463,95 @@ func drawBar(image, value) {
   setDrawColor(0, 0xffffff);
   drawImage(0, 18, 3*DISPLAY_HEIGHT/4 - 4, image);
   drawImage(0, 40, 3*DISPLAY_HEIGHT/4, BAR_IMAGES + value * 66);
-
 }
 
 // Layer 05 Script: drawSettingsFeedbackText
 func drawSettingsFeedbackText(text) {
   drawDisplaySettings();
   setDrawColor(0, 0xffffff);
-  drawText(0, DISPLAY_WIDTH/2, DISPLAY_HEIGHT - 16 + 10, FONT_ID_NORMAL, TEXT_ALIGNMENT_MIDDLE, text);
+  drawText(0, DISPLAY_WIDTH/2, 4*DISPLAY_HEIGHT/5, FONT_ID_LARGE, TEXT_ALIGNMENT_MIDDLE, text);
+}
+
+// Layer 06 Script: Mouse Activate
+var preMouseLayer = -1;
+
+func onMouseActive() {
+  if(!1) {
+    return;
+  }
+
+  stopTimer(TIMER_ID_MOUSE_RETURN_DELAY);
+  if (preMouseLayer == -1) {
+    preMouseLayer = layer;
+    _action_setMouseLayer();
+  }
+}
+
+func onMouseInactive() {
+  if(!1) {
+    return;
+  }
+
+  startTimer(TIMER_ID_MOUSE_RETURN_DELAY, 100, 0, @returnFromMouseLayer);
+}
+
+func returnFromMouseLayer() {
+  if (preMouseLayer == -1) return;
+
+  deactivateGlobal();
+  deactivateDynamic();
+  layer = preMouseLayer;
+  preMouseLayer = -1;
+  activateDynamic();
+  activateGlobal();
+}
+
+// Layer 06 Script: Mouse Display
+
+func drawDisplayMouse() {
+  const MOUSE_IMAGE = /* mouse.png */ [[
+      20 30 00 00 00 00 00 00 00 fe ff ff 7f 00 80 ff
+      ff ff ff 01 c0 01 00 00 80 03 70 00 00 00 00 0e
+      38 00 00 00 00 1c 18 00 00 00 00 18 0c 00 00 00
+      00 30 06 00 00 00 00 60 06 00 00 00 00 60 03 00
+      00 00 00 c0 03 00 00 00 00 c0 03 7c 00 00 00 c0
+      03 ff 01 00 00 c0 83 01 03 00 00 c0 ff 01 fe 01
+      00 c0 ff 01 fe 01 00 c0 83 01 03 00 00 c0 03 ff
+      01 00 00 c0 03 7c 00 00 00 c0 03 00 00 00 00 c0
+      03 00 00 00 00 c0 06 00 00 00 00 60 06 00 00 00
+      00 60 0c 00 00 00 00 30 18 00 00 00 00 18 38 00
+      00 00 00 1c 70 00 00 00 00 0e c0 01 00 00 80 03
+      80 ff ff ff ff 01 00 fe ff ff 7f 00 00 00 00 00
+      00 00
+  ]];
+
+  drawDisplay0(MOUSE_IMAGE, 0xffff);
+  setDrawColor(1, 0x8080ff);
+  setAutoDraw(1, AUTO_DRAW_WPM);
+}
+
+// Layer 06 Script: RGB
+
+func rgbUpdateMouseLayer() {
+  for (var i = 0; i < 60; i = i + 1) {
+    setRgb(i, 0, 0, 0);
+  }
+
+  setRgb(13, 0, 0, 32);
+  setRgb(14, 0, 0, 32);
+  setRgb(15, 0, 0, 32);
+  setRgb(16, 0, 0, 32);
+  setRgb(12, 0, 32, 0);
+  setRgb(24, 0, 32, 0);
+  setRgb(41, 0, 32, 0);
+  setRgb(42, 0, 32, 0);
+}
+
+func _action_setMouseLayer() {
+  deactivateGlobal();
+  deactivate6();
+  activate6();
+  activateGlobal();
 }
 
 func _action_switchToNumpadLayer() {
@@ -1204,7 +1559,6 @@ func _action_switchToNumpadLayer() {
   deactivate1();
   activate0();
   activateGlobal();
-
 }
 
 func init() {
@@ -1236,6 +1590,7 @@ func user1ScriptSetLayer(layerId) {
   if (layerId == 41429312) layerActivate = @activate3;
   if (layerId == 212846523) layerActivate = @activate4;
   if (layerId == 125635709) layerActivate = @activate5;
+  if (layerId == 47696887) layerActivate = @activate6;
   if (layerActivate == 0) return;
   deactivateGlobal();
   deactivateDynamic();
@@ -1246,12 +1601,12 @@ func user1ScriptSetLayer(layerId) {
 func onPress0() {
   globalPress(0);
 
-  dispatchToLayer([[[0, @onPress0_1, @onPress0_2, 0, 0, 0]]]);
+  dispatchToLayer([[[0, @onPress0_1, @onPress0_2, 0, 0, 0, 0]]]);
 }
 func onRelease0() {
   globalRelease();
 
-  dispatchToLayer([[[0, @onRelease0_1, @onRelease0_2, 0, 0, 0]]]);
+  dispatchToLayer([[[0, @onRelease0_1, @onRelease0_2, 0, 0, 0, 0]]]);
 }
 
 func onPress0_1() {
@@ -1271,12 +1626,12 @@ func onRelease0_2() {
 func onPress1() {
   globalPress(1);
 
-  dispatchToLayer([[[@onPress1_0, @onPress1_1, @onPress1_2, @onPress1_3, 0, 0]]]);
+  dispatchToLayer([[[@onPress1_0, @onPress1_1, @onPress1_2, @onPress1_3, 0, 0, 0]]]);
 }
 func onRelease1() {
   globalRelease();
 
-  dispatchToLayer([[[@onRelease1_0, @onRelease1_1, @onRelease1_2, @onRelease1_3, 0, 0]]]);
+  dispatchToLayer([[[@onRelease1_0, @onRelease1_1, @onRelease1_2, @onRelease1_3, 0, 0, 0]]]);
 }
 
 func onPress1_0() {
@@ -1310,12 +1665,12 @@ func onRelease1_3() {
 func onPress2() {
   globalPress(2);
 
-  dispatchToLayer([[[@onPress2_0, @onPress2_1, @onPress2_2, @onPress2_3, 0, 0]]]);
+  dispatchToLayer([[[@onPress2_0, @onPress2_1, @onPress2_2, @onPress2_3, 0, 0, 0]]]);
 }
 func onRelease2() {
   globalRelease();
 
-  dispatchToLayer([[[@onRelease2_0, @onRelease2_1, @onRelease2_2, @onRelease2_3, 0, 0]]]);
+  dispatchToLayer([[[@onRelease2_0, @onRelease2_1, @onRelease2_2, @onRelease2_3, 0, 0, 0]]]);
 }
 
 func onPress2_0() {
@@ -1349,12 +1704,12 @@ func onRelease2_3() {
 func onPress3() {
   globalPress(3);
 
-  dispatchToLayer([[[@onPress3_0, @onPress3_1, @onPress3_2, @onPress3_3, 0, @onPress3_5]]]);
+  dispatchToLayer([[[@onPress3_0, @onPress3_1, @onPress3_2, @onPress3_3, 0, @onPress3_5, 0]]]);
 }
 func onRelease3() {
   globalRelease();
 
-  dispatchToLayer([[[@onRelease3_0, @onRelease3_1, @onRelease3_2, @onRelease3_3, 0, 0]]]);
+  dispatchToLayer([[[@onRelease3_0, @onRelease3_1, @onRelease3_2, @onRelease3_3, 0, 0, 0]]]);
 }
 
 func onPress3_0() {
@@ -1389,7 +1744,6 @@ func onPress3_5() {
   console("set_steno_mode embedded");
   //
   drawSettingsFeedbackText("Javelin");
-
 }
 func onRelease3_5() {
 }
@@ -1397,12 +1751,12 @@ func onRelease3_5() {
 func onPress4() {
   globalPress(4);
 
-  dispatchToLayer([[[@onPress4_0, @onPress4_1, @onPress4_2, @onPress4_3, 0, 0]]]);
+  dispatchToLayer([[[@onPress4_0, @onPress4_1, @onPress4_2, @onPress4_3, 0, 0, 0]]]);
 }
 func onRelease4() {
   globalRelease();
 
-  dispatchToLayer([[[@onRelease4_0, @onRelease4_1, @onRelease4_2, @onRelease4_3, 0, 0]]]);
+  dispatchToLayer([[[@onRelease4_0, @onRelease4_1, @onRelease4_2, @onRelease4_3, 0, 0, 0]]]);
 }
 
 func onPress4_0() {
@@ -1436,12 +1790,12 @@ func onRelease4_3() {
 func onPress5() {
   globalPress(5);
 
-  dispatchToLayer([[[@onPress5_0, @onPress5_1, @onPress5_2, 0, 0, 0]]]);
+  dispatchToLayer([[[@onPress5_0, @onPress5_1, @onPress5_2, 0, 0, 0, 0]]]);
 }
 func onRelease5() {
   globalRelease();
 
-  dispatchToLayer([[[@onRelease5_0, @onRelease5_1, @onRelease5_2, 0, 0, 0]]]);
+  dispatchToLayer([[[@onRelease5_0, @onRelease5_1, @onRelease5_2, 0, 0, 0, 0]]]);
 }
 
 func onPress5_0() {
@@ -1468,12 +1822,12 @@ func onRelease5_2() {
 func onPress6() {
   globalPress(6);
 
-  dispatchToLayer([[[@onPress6_0, @onPress6_1, @onPress6_2, 0, @onPress6_4, @onPress6_5]]]);
+  dispatchToLayer([[[@onPress6_0, @onPress6_1, @onPress6_2, 0, @onPress6_4, @onPress6_5, 0]]]);
 }
 func onRelease6() {
   globalRelease();
 
-  dispatchToLayer([[[@onRelease6_0, @onRelease6_1, @onRelease6_2, 0, @onRelease6_4, 0]]]);
+  dispatchToLayer([[[@onRelease6_0, @onRelease6_1, @onRelease6_2, 0, @onRelease6_4, 0, 0]]]);
 }
 
 func onPress6_0() {
@@ -1519,12 +1873,12 @@ func onRelease6_5() {
 func onPress7() {
   globalPress(7);
 
-  dispatchToLayer([[[@onPress7_0, @onPress7_1, @onPress7_2, 0, @onPress7_4, 0]]]);
+  dispatchToLayer([[[@onPress7_0, @onPress7_1, @onPress7_2, 0, @onPress7_4, 0, 0]]]);
 }
 func onRelease7() {
   globalRelease();
 
-  dispatchToLayer([[[@onRelease7_0, @onRelease7_1, @onRelease7_2, 0, @onRelease7_4, 0]]]);
+  dispatchToLayer([[[@onRelease7_0, @onRelease7_1, @onRelease7_2, 0, @onRelease7_4, 0, 0]]]);
 }
 
 func onPress7_0() {
@@ -1558,12 +1912,12 @@ func onRelease7_4() {
 func onPress8() {
   globalPress(8);
 
-  dispatchToLayer([[[@onPress8_0, @onPress8_1, @onPress8_2, 0, @onPress8_4, @onPress8_5]]]);
+  dispatchToLayer([[[@onPress8_0, @onPress8_1, @onPress8_2, 0, @onPress8_4, @onPress8_5, 0]]]);
 }
 func onRelease8() {
   globalRelease();
 
-  dispatchToLayer([[[@onRelease8_0, @onRelease8_1, @onRelease8_2, 0, @onRelease8_4, 0]]]);
+  dispatchToLayer([[[@onRelease8_0, @onRelease8_1, @onRelease8_2, 0, @onRelease8_4, 0, 0]]]);
 }
 
 func onPress8_0() {
@@ -1608,12 +1962,12 @@ func onRelease8_5() {
 func onPress9() {
   globalPress(9);
 
-  dispatchToLayer([[[@onPress9_0, @onPress9_1, @onPress9_2, 0, @onPress9_4, @onPress9_5]]]);
+  dispatchToLayer([[[@onPress9_0, @onPress9_1, @onPress9_2, 0, @onPress9_4, @onPress9_5, 0]]]);
 }
 func onRelease9() {
   globalRelease();
 
-  dispatchToLayer([[[@onRelease9_0, @onRelease9_1, @onRelease9_2, 0, @onRelease9_4, 0]]]);
+  dispatchToLayer([[[@onRelease9_0, @onRelease9_1, @onRelease9_2, 0, @onRelease9_4, 0, 0]]]);
 }
 
 func onPress9_0() {
@@ -1658,12 +2012,12 @@ func onRelease9_5() {
 func onPress10() {
   globalPress(10);
 
-  dispatchToLayer([[[@onPress10_0, @onPress10_1, @onPress10_2, 0, @onPress10_4, @onPress10_5]]]);
+  dispatchToLayer([[[@onPress10_0, @onPress10_1, @onPress10_2, 0, @onPress10_4, @onPress10_5, 0]]]);
 }
 func onRelease10() {
   globalRelease();
 
-  dispatchToLayer([[[@onRelease10_0, @onRelease10_1, @onRelease10_2, 0, @onRelease10_4, 0]]]);
+  dispatchToLayer([[[@onRelease10_0, @onRelease10_1, @onRelease10_2, 0, @onRelease10_4, 0, 0]]]);
 }
 
 func onPress10_0() {
@@ -1697,7 +2051,6 @@ func onRelease10_4() {
 func onPress10_5() {
   // Hue +
   hueShift = hueShift + 0x800;
-
 }
 func onRelease10_5() {
 }
@@ -1705,12 +2058,12 @@ func onRelease10_5() {
 func onPress11() {
   globalPress(11);
 
-  dispatchToLayer([[[@onPress11_0, @onPress11_1, @onPress11_2, 0, @onPress11_4, @onPress11_5]]]);
+  dispatchToLayer([[[@onPress11_0, @onPress11_1, @onPress11_2, 0, @onPress11_4, @onPress11_5, 0]]]);
 }
 func onRelease11() {
   globalRelease();
 
-  dispatchToLayer([[[@onRelease11_0, @onRelease11_1, @onRelease11_2, 0, @onRelease11_4, 0]]]);
+  dispatchToLayer([[[@onRelease11_0, @onRelease11_1, @onRelease11_2, 0, @onRelease11_4, 0, 0]]]);
 }
 
 func onPress11_0() {
@@ -1757,12 +2110,12 @@ func onPress12() {
   globalPress(12);
 
   if (!isInPressAll()) pressTime12 = getTime();
-  dispatchToLayer([[[0, @onPress12_1, @onPress12_2, 0, 0, 0]]]);
+  dispatchToLayer([[[0, @onPress12_1, @onPress12_2, 0, 0, 0, @onPress12_6]]]);
 }
 func onRelease12() {
   globalRelease();
 
-  dispatchToLayer([[[0, @onRelease12_1, @onRelease12_2, 0, 0, 0]]]);
+  dispatchToLayer([[[0, @onRelease12_1, @onRelease12_2, 0, 0, 0, @onRelease12_6]]]);
 }
 
 func onPress12_1() {
@@ -1773,7 +2126,6 @@ func onRelease12_1() {
   if (getTime() - pressTime12 <= 200) {
     pressScanCodeButton(12, 0, 41 /* "⎋" */, 1);
     releaseScanCodeButton(41 /* "⎋" */);
-
   }
 }
 
@@ -1786,15 +2138,22 @@ func onRelease12_2() {
   releaseScanCodeButton(225 /* "⇧" */);
 }
 
+func onPress12_6() {
+  pressScanCodeButton(12, 0, 224 /* "⌃" */, 0);
+}
+func onRelease12_6() {
+  releaseScanCodeButton(224 /* "⌃" */);
+}
+
 func onPress13() {
   globalPress(13);
 
-  dispatchToLayer([[[@onPress13_0, @onPress13_1, @onPress13_2, @onPress13_3, @onPress13_4, 0]]]);
+  dispatchToLayer([[[@onPress13_0, @onPress13_1, @onPress13_2, @onPress13_3, @onPress13_4, 0, @onPress13_6]]]);
 }
 func onRelease13() {
   globalRelease();
 
-  dispatchToLayer([[[@onRelease13_0, @onRelease13_1, @onRelease13_2, @onRelease13_3, @onRelease13_4, 0]]]);
+  dispatchToLayer([[[@onRelease13_0, @onRelease13_1, @onRelease13_2, @onRelease13_3, @onRelease13_4, 0, @onRelease13_6]]]);
 }
 
 func onPress13_0() {
@@ -1834,15 +2193,22 @@ func onRelease13_4() {
   releaseScanCodeButton(227 /* "⌘" */);
 }
 
+func onPress13_6() {
+  pressMouseButton(3 /* "🖱️4" */);
+}
+func onRelease13_6() {
+  releaseMouseButton(3 /* "🖱️4" */);
+}
+
 func onPress14() {
   globalPress(14);
 
-  dispatchToLayer([[[@onPress14_0, @onPress14_1, @onPress14_2, @onPress14_3, @onPress14_4, 0]]]);
+  dispatchToLayer([[[@onPress14_0, @onPress14_1, @onPress14_2, @onPress14_3, @onPress14_4, 0, @onPress14_6]]]);
 }
 func onRelease14() {
   globalRelease();
 
-  dispatchToLayer([[[@onRelease14_0, @onRelease14_1, @onRelease14_2, @onRelease14_3, @onRelease14_4, 0]]]);
+  dispatchToLayer([[[@onRelease14_0, @onRelease14_1, @onRelease14_2, @onRelease14_3, @onRelease14_4, 0, @onRelease14_6]]]);
 }
 
 func onPress14_0() {
@@ -1882,15 +2248,22 @@ func onRelease14_4() {
   releaseScanCodeButton(226 /* "⌥" */);
 }
 
+func onPress14_6() {
+  pressMouseButton(2 /* "🖱️3" */);
+}
+func onRelease14_6() {
+  releaseMouseButton(2 /* "🖱️3" */);
+}
+
 func onPress15() {
   globalPress(15);
 
-  dispatchToLayer([[[@onPress15_0, @onPress15_1, @onPress15_2, @onPress15_3, @onPress15_4, @onPress15_5]]]);
+  dispatchToLayer([[[@onPress15_0, @onPress15_1, @onPress15_2, @onPress15_3, @onPress15_4, @onPress15_5, @onPress15_6]]]);
 }
 func onRelease15() {
   globalRelease();
 
-  dispatchToLayer([[[@onRelease15_0, @onRelease15_1, @onRelease15_2, @onRelease15_3, @onRelease15_4, 0]]]);
+  dispatchToLayer([[[@onRelease15_0, @onRelease15_1, @onRelease15_2, @onRelease15_3, @onRelease15_4, 0, @onRelease15_6]]]);
 }
 
 func onPress15_0() {
@@ -1934,20 +2307,26 @@ func onPress15_5() {
   console("set_steno_mode gemini");
   //
   drawSettingsFeedbackText("Gemini");
-
 }
 func onRelease15_5() {
+}
+
+func onPress15_6() {
+  pressMouseButton(1 /* "🖱️2" */);
+}
+func onRelease15_6() {
+  releaseMouseButton(1 /* "🖱️2" */);
 }
 
 func onPress16() {
   globalPress(16);
 
-  dispatchToLayer([[[@onPress16_0, @onPress16_1, @onPress16_2, @onPress16_3, @onPress16_4, 0]]]);
+  dispatchToLayer([[[@onPress16_0, @onPress16_1, @onPress16_2, @onPress16_3, @onPress16_4, 0, @onPress16_6]]]);
 }
 func onRelease16() {
   globalRelease();
 
-  dispatchToLayer([[[@onRelease16_0, @onRelease16_1, @onRelease16_2, @onRelease16_3, @onRelease16_4, 0]]]);
+  dispatchToLayer([[[@onRelease16_0, @onRelease16_1, @onRelease16_2, @onRelease16_3, @onRelease16_4, 0, @onRelease16_6]]]);
 }
 
 func onPress16_0() {
@@ -1987,15 +2366,22 @@ func onRelease16_4() {
   releaseScanCodeButton(225 /* "⇧" */);
 }
 
+func onPress16_6() {
+  pressMouseButton(0 /* "🖱️1" */);
+}
+func onRelease16_6() {
+  releaseMouseButton(0 /* "🖱️1" */);
+}
+
 func onPress17() {
   globalPress(17);
 
-  dispatchToLayer([[[@onPress17_0, @onPress17_1, @onPress17_2, 0, 0, 0]]]);
+  dispatchToLayer([[[@onPress17_0, @onPress17_1, @onPress17_2, 0, 0, 0, 0]]]);
 }
 func onRelease17() {
   globalRelease();
 
-  dispatchToLayer([[[@onRelease17_0, @onRelease17_1, @onRelease17_2, 0, 0, 0]]]);
+  dispatchToLayer([[[@onRelease17_0, @onRelease17_1, @onRelease17_2, 0, 0, 0, 0]]]);
 }
 
 func onPress17_0() {
@@ -2024,12 +2410,12 @@ func onRelease17_2() {
 func onPress18() {
   globalPress(18);
 
-  dispatchToLayer([[[@onPress18_0, @onPress18_1, @onPress18_2, 0, @onPress18_4, @onPress18_5]]]);
+  dispatchToLayer([[[@onPress18_0, @onPress18_1, @onPress18_2, 0, @onPress18_4, @onPress18_5, 0]]]);
 }
 func onRelease18() {
   globalRelease();
 
-  dispatchToLayer([[[@onRelease18_0, @onRelease18_1, @onRelease18_2, 0, @onRelease18_4, 0]]]);
+  dispatchToLayer([[[@onRelease18_0, @onRelease18_1, @onRelease18_2, 0, @onRelease18_4, 0, 0]]]);
 }
 
 func onPress18_0() {
@@ -2077,12 +2463,12 @@ func onRelease18_5() {
 func onPress19() {
   globalPress(19);
 
-  dispatchToLayer([[[@onPress19_0, @onPress19_1, @onPress19_2, @onPress19_3, @onPress19_4, 0]]]);
+  dispatchToLayer([[[@onPress19_0, @onPress19_1, @onPress19_2, @onPress19_3, @onPress19_4, 0, 0]]]);
 }
 func onRelease19() {
   globalRelease();
 
-  dispatchToLayer([[[@onRelease19_0, @onRelease19_1, @onRelease19_2, @onRelease19_3, @onRelease19_4, 0]]]);
+  dispatchToLayer([[[@onRelease19_0, @onRelease19_1, @onRelease19_2, @onRelease19_3, @onRelease19_4, 0, 0]]]);
 }
 
 func onPress19_0() {
@@ -2125,12 +2511,12 @@ func onRelease19_4() {
 func onPress20() {
   globalPress(20);
 
-  dispatchToLayer([[[@onPress20_0, @onPress20_1, @onPress20_2, @onPress20_3, @onPress20_4, @onPress20_5]]]);
+  dispatchToLayer([[[@onPress20_0, @onPress20_1, @onPress20_2, @onPress20_3, @onPress20_4, @onPress20_5, 0]]]);
 }
 func onRelease20() {
   globalRelease();
 
-  dispatchToLayer([[[@onRelease20_0, @onRelease20_1, @onRelease20_2, @onRelease20_3, @onRelease20_4, 0]]]);
+  dispatchToLayer([[[@onRelease20_0, @onRelease20_1, @onRelease20_2, @onRelease20_3, @onRelease20_4, 0, 0]]]);
 }
 
 func onPress20_0() {
@@ -2184,12 +2570,12 @@ func onRelease20_5() {
 func onPress21() {
   globalPress(21);
 
-  dispatchToLayer([[[@onPress21_0, @onPress21_1, @onPress21_2, @onPress21_3, @onPress21_4, @onPress21_5]]]);
+  dispatchToLayer([[[@onPress21_0, @onPress21_1, @onPress21_2, @onPress21_3, @onPress21_4, @onPress21_5, 0]]]);
 }
 func onRelease21() {
   globalRelease();
 
-  dispatchToLayer([[[@onRelease21_0, @onRelease21_1, @onRelease21_2, @onRelease21_3, @onRelease21_4, 0]]]);
+  dispatchToLayer([[[@onRelease21_0, @onRelease21_1, @onRelease21_2, @onRelease21_3, @onRelease21_4, 0, 0]]]);
 }
 
 func onPress21_0() {
@@ -2243,12 +2629,12 @@ func onRelease21_5() {
 func onPress22() {
   globalPress(22);
 
-  dispatchToLayer([[[@onPress22_0, @onPress22_1, @onPress22_2, @onPress22_3, @onPress22_4, @onPress22_5]]]);
+  dispatchToLayer([[[@onPress22_0, @onPress22_1, @onPress22_2, @onPress22_3, @onPress22_4, @onPress22_5, 0]]]);
 }
 func onRelease22() {
   globalRelease();
 
-  dispatchToLayer([[[@onRelease22_0, @onRelease22_1, @onRelease22_2, @onRelease22_3, @onRelease22_4, 0]]]);
+  dispatchToLayer([[[@onRelease22_0, @onRelease22_1, @onRelease22_2, @onRelease22_3, @onRelease22_4, 0, 0]]]);
 }
 
 func onPress22_0() {
@@ -2291,7 +2677,6 @@ func onRelease22_4() {
 func onPress22_5() {
   // Hue -
   hueShift = hueShift - 0x800;
-
 }
 func onRelease22_5() {
 }
@@ -2299,12 +2684,12 @@ func onRelease22_5() {
 func onPress23() {
   globalPress(23);
 
-  dispatchToLayer([[[@onPress23_0, @onPress23_1, @onPress23_2, 0, @onPress23_4, @onPress23_5]]]);
+  dispatchToLayer([[[@onPress23_0, @onPress23_1, @onPress23_2, 0, @onPress23_4, @onPress23_5, 0]]]);
 }
 func onRelease23() {
   globalRelease();
 
-  dispatchToLayer([[[@onRelease23_0, @onRelease23_1, @onRelease23_2, 0, @onRelease23_4, 0]]]);
+  dispatchToLayer([[[@onRelease23_0, @onRelease23_1, @onRelease23_2, 0, @onRelease23_4, 0, 0]]]);
 }
 
 func onPress23_0() {
@@ -2351,12 +2736,12 @@ func onRelease23_5() {
 func onPress24() {
   globalPress(24);
 
-  dispatchToLayer([[[0, @onPress24_1, @onPress24_2, 0, 0, 0]]]);
+  dispatchToLayer([[[0, @onPress24_1, @onPress24_2, 0, 0, 0, @onPress24_6]]]);
 }
 func onRelease24() {
   globalRelease();
 
-  dispatchToLayer([[[0, @onRelease24_1, @onRelease24_2, 0, 0, 0]]]);
+  dispatchToLayer([[[0, @onRelease24_1, @onRelease24_2, 0, 0, 0, @onRelease24_6]]]);
 }
 
 func onPress24_1() {
@@ -2375,15 +2760,22 @@ func onRelease24_2() {
   releaseScanCodeButton(225 /* "⇧" */);
 }
 
+func onPress24_6() {
+  pressScanCodeButton(24, 0, 225 /* "⇧" */, 0);
+}
+func onRelease24_6() {
+  releaseScanCodeButton(225 /* "⇧" */);
+}
+
 func onPress25() {
   globalPress(25);
 
-  dispatchToLayer([[[0, @onPress25_1, @onPress25_2, @onPress25_3, 0, 0]]]);
+  dispatchToLayer([[[0, @onPress25_1, @onPress25_2, @onPress25_3, 0, 0, 0]]]);
 }
 func onRelease25() {
   globalRelease();
 
-  dispatchToLayer([[[0, @onRelease25_1, @onRelease25_2, @onRelease25_3, 0, 0]]]);
+  dispatchToLayer([[[0, @onRelease25_1, @onRelease25_2, @onRelease25_3, 0, 0, 0]]]);
 }
 
 func onPress25_1() {
@@ -2410,12 +2802,12 @@ func onRelease25_3() {
 func onPress26() {
   globalPress(26);
 
-  dispatchToLayer([[[0, @onPress26_1, @onPress26_2, @onPress26_3, 0, 0]]]);
+  dispatchToLayer([[[0, @onPress26_1, @onPress26_2, @onPress26_3, 0, 0, 0]]]);
 }
 func onRelease26() {
   globalRelease();
 
-  dispatchToLayer([[[0, @onRelease26_1, @onRelease26_2, @onRelease26_3, 0, 0]]]);
+  dispatchToLayer([[[0, @onRelease26_1, @onRelease26_2, @onRelease26_3, 0, 0, 0]]]);
 }
 
 func onPress26_1() {
@@ -2444,12 +2836,12 @@ func onRelease26_3() {
 func onPress27() {
   globalPress(27);
 
-  dispatchToLayer([[[0, @onPress27_1, @onPress27_2, @onPress27_3, 0, @onPress27_5]]]);
+  dispatchToLayer([[[0, @onPress27_1, @onPress27_2, @onPress27_3, 0, @onPress27_5, 0]]]);
 }
 func onRelease27() {
   globalRelease();
 
-  dispatchToLayer([[[0, @onRelease27_1, @onRelease27_2, @onRelease27_3, 0, 0]]]);
+  dispatchToLayer([[[0, @onRelease27_1, @onRelease27_2, @onRelease27_3, 0, 0, 0]]]);
 }
 
 func onPress27_1() {
@@ -2477,7 +2869,6 @@ func onPress27_5() {
   console("set_steno_mode plover_hid");
   //
   drawSettingsFeedbackText("Plover HID");
-
 }
 func onRelease27_5() {
 }
@@ -2485,12 +2876,12 @@ func onRelease27_5() {
 func onPress28() {
   globalPress(28);
 
-  dispatchToLayer([[[0, @onPress28_1, @onPress28_2, @onPress28_3, 0, 0]]]);
+  dispatchToLayer([[[0, @onPress28_1, @onPress28_2, @onPress28_3, 0, 0, 0]]]);
 }
 func onRelease28() {
   globalRelease();
 
-  dispatchToLayer([[[0, @onRelease28_1, @onRelease28_2, @onRelease28_3, 0, 0]]]);
+  dispatchToLayer([[[0, @onRelease28_1, @onRelease28_2, @onRelease28_3, 0, 0, 0]]]);
 }
 
 func onPress28_1() {
@@ -2517,12 +2908,12 @@ func onRelease28_3() {
 func onPress29() {
   globalPress(29);
 
-  dispatchToLayer([[[0, @onPress29_1, @onPress29_2, 0, 0, 0]]]);
+  dispatchToLayer([[[0, @onPress29_1, @onPress29_2, 0, 0, 0, 0]]]);
 }
 func onRelease29() {
   globalRelease();
 
-  dispatchToLayer([[[0, @onRelease29_1, @onRelease29_2, 0, 0, 0]]]);
+  dispatchToLayer([[[0, @onRelease29_1, @onRelease29_2, 0, 0, 0, 0]]]);
 }
 
 func onPress29_1() {
@@ -2542,12 +2933,12 @@ func onRelease29_2() {
 func onPress30() {
   globalPress(30);
 
-  dispatchToLayer([[[0, @onPress30_1, @onPress30_2, 0, 0, 0]]]);
+  dispatchToLayer([[[0, @onPress30_1, @onPress30_2, 0, 0, 0, 0]]]);
 }
 func onRelease30() {
   globalRelease();
 
-  dispatchToLayer([[[0, @onRelease30_1, @onRelease30_2, 0, 0, 0]]]);
+  dispatchToLayer([[[0, @onRelease30_1, @onRelease30_2, 0, 0, 0, 0]]]);
 }
 
 func onPress30_1() {
@@ -2569,12 +2960,12 @@ func onRelease30_2() {
 func onPress31() {
   globalPress(31);
 
-  dispatchToLayer([[[0, @onPress31_1, 0, 0, 0, 0]]]);
+  dispatchToLayer([[[0, @onPress31_1, 0, 0, 0, 0, 0]]]);
 }
 func onRelease31() {
   globalRelease();
 
-  dispatchToLayer([[[0, @onRelease31_1, 0, 0, 0, 0]]]);
+  dispatchToLayer([[[0, @onRelease31_1, 0, 0, 0, 0, 0]]]);
 }
 
 func onPress31_1() {
@@ -2587,15 +2978,26 @@ func onRelease31_1() {
 func onPress32() {
   globalPress(32);
 
-  dispatchToLayer([[[0, @onPress32_1, 0, 0, 0, 0]]]);
+  dispatchToLayer([[[@onPress32_0, @onPress32_1, 0, 0, 0, 0, 0]]]);
 }
 func onRelease32() {
   globalRelease();
 
-  dispatchToLayer([[[0, 0, 0, @onRelease32_3, 0, 0]]]);
+  dispatchToLayer([[[0, 0, 0, @onRelease32_3, 0, 0, 0]]]);
+}
+
+func onPress32_0() {
+  wasSteno = 1;
+  deactivateGlobal();
+  deactivate0();
+  activate3();
+  activateGlobal();
+}
+func onRelease32_0() {
 }
 
 func onPress32_1() {
+  wasSteno = 0;
   deactivateGlobal();
   deactivate1();
   activate3();
@@ -2607,22 +3009,37 @@ func onRelease32_1() {
 func onPress32_3() {
 }
 func onRelease32_3() {
-  deactivateGlobal();
-  deactivate3();
-  activate1();
-  activateGlobal();
-  onRelease32_1();
+  if (wasSteno) {
+    deactivateGlobal();
+    deactivate3();
+    activate0();
+    activateGlobal();
+    onRelease32_0();
+  } else {
+    deactivateGlobal();
+    deactivate3();
+    activate1();
+    activateGlobal();
+    onRelease32_1();
+  }
 }
 
 func onPress33() {
   globalPress(33);
 
-  dispatchToLayer([[[0, 0, @onPress33_2, 0, 0, 0]]]);
+  dispatchToLayer([[[0, @onPress33_1, @onPress33_2, 0, 0, 0, 0]]]);
 }
 func onRelease33() {
   globalRelease();
 
-  dispatchToLayer([[[0, 0, @onRelease33_2, 0, 0, 0]]]);
+  dispatchToLayer([[[0, @onRelease33_1, @onRelease33_2, 0, 0, 0, 0]]]);
+}
+
+func onPress33_1() {
+  pressScanCodeButton(33, 0, 48 /* "]" */, 0);
+}
+func onRelease33_1() {
+  releaseScanCodeButton(48 /* "]" */);
 }
 
 func onPress33_2() {
@@ -2637,12 +3054,12 @@ func onRelease33_2() {
 func onPress34() {
   globalPress(34);
 
-  dispatchToLayer([[[0, @onPress34_1, @onPress34_2, 0, @onPress34_4, 0]]]);
+  dispatchToLayer([[[0, @onPress34_1, @onPress34_2, 0, @onPress34_4, 0, 0]]]);
 }
 func onRelease34() {
   globalRelease();
 
-  dispatchToLayer([[[0, @onRelease34_1, @onRelease34_2, 0, @onRelease34_4, 0]]]);
+  dispatchToLayer([[[0, @onRelease34_1, @onRelease34_2, 0, @onRelease34_4, 0, 0]]]);
 }
 
 func onPress34_1() {
@@ -2669,12 +3086,12 @@ func onRelease34_4() {
 func onPress35() {
   globalPress(35);
 
-  dispatchToLayer([[[0, @onPress35_1, @onPress35_2, 0, 0, 0]]]);
+  dispatchToLayer([[[0, @onPress35_1, @onPress35_2, 0, 0, 0, 0]]]);
 }
 func onRelease35() {
   globalRelease();
 
-  dispatchToLayer([[[0, @onRelease35_1, @onRelease35_2, 0, 0, 0]]]);
+  dispatchToLayer([[[0, @onRelease35_1, @onRelease35_2, 0, 0, 0, 0]]]);
 }
 
 func onPress35_1() {
@@ -2696,12 +3113,12 @@ func onRelease35_2() {
 func onPress36() {
   globalPress(36);
 
-  dispatchToLayer([[[0, @onPress36_1, @onPress36_2, 0, 0, 0]]]);
+  dispatchToLayer([[[0, @onPress36_1, @onPress36_2, 0, 0, 0, 0]]]);
 }
 func onRelease36() {
   globalRelease();
 
-  dispatchToLayer([[[0, @onRelease36_1, @onRelease36_2, 0, 0, 0]]]);
+  dispatchToLayer([[[0, @onRelease36_1, @onRelease36_2, 0, 0, 0, 0]]]);
 }
 
 func onPress36_1() {
@@ -2721,12 +3138,12 @@ func onRelease36_2() {
 func onPress37() {
   globalPress(37);
 
-  dispatchToLayer([[[0, @onPress37_1, @onPress37_2, 0, 0, 0]]]);
+  dispatchToLayer([[[0, @onPress37_1, @onPress37_2, 0, 0, 0, 0]]]);
 }
 func onRelease37() {
   globalRelease();
 
-  dispatchToLayer([[[0, @onRelease37_1, @onRelease37_2, 0, 0, 0]]]);
+  dispatchToLayer([[[0, @onRelease37_1, @onRelease37_2, 0, 0, 0, 0]]]);
 }
 
 func onPress37_1() {
@@ -2746,12 +3163,12 @@ func onRelease37_2() {
 func onPress38() {
   globalPress(38);
 
-  dispatchToLayer([[[0, @onPress38_1, @onPress38_2, 0, 0, 0]]]);
+  dispatchToLayer([[[0, @onPress38_1, @onPress38_2, 0, 0, 0, 0]]]);
 }
 func onRelease38() {
   globalRelease();
 
-  dispatchToLayer([[[0, @onRelease38_1, @onRelease38_2, 0, 0, 0]]]);
+  dispatchToLayer([[[0, @onRelease38_1, @onRelease38_2, 0, 0, 0, 0]]]);
 }
 
 func onPress38_1() {
@@ -2771,12 +3188,12 @@ func onRelease38_2() {
 func onPress39() {
   globalPress(39);
 
-  dispatchToLayer([[[0, @onPress39_1, 0, 0, 0, 0]]]);
+  dispatchToLayer([[[0, @onPress39_1, 0, 0, 0, 0, 0]]]);
 }
 func onRelease39() {
   globalRelease();
 
-  dispatchToLayer([[[0, @onRelease39_1, 0, 0, 0, 0]]]);
+  dispatchToLayer([[[0, @onRelease39_1, 0, 0, 0, 0, 0]]]);
 }
 
 func onPress39_1() {
@@ -2789,11 +3206,10 @@ func onRelease39_1() {
 func onPress40() {
   globalPress(40);
 
-  dispatchToLayer([[[@onPress40_0, @onPress40_1, 0, 0, 0, 0]]]);
+  dispatchToLayer([[[@onPress40_0, @onPress40_1, 0, 0, 0, 0, 0]]]);
 }
 func onRelease40() {
   globalRelease();
-
 }
 
 func onPress40_0() {
@@ -2806,12 +3222,13 @@ func onRelease40_0() {
 }
 
 func onPress40_1() {
+  //
+  // Don't process this when activated by a layer change.
   if (isInPressAll()) return;
   deactivateGlobal();
   deactivate1();
   activate0();
   activateGlobal();
-
 }
 func onRelease40_1() {
 }
@@ -2819,12 +3236,12 @@ func onRelease40_1() {
 func onPress41() {
   globalPress(41);
 
-  dispatchToLayer([[[@onPress41_0, @onPress41_1, @onPress41_2, 0, 0, 0]]]);
+  dispatchToLayer([[[@onPress41_0, @onPress41_1, @onPress41_2, 0, 0, 0, @onPress41_6]]]);
 }
 func onRelease41() {
   globalRelease();
 
-  dispatchToLayer([[[@onRelease41_0, @onRelease41_1, @onRelease41_2, 0, 0, 0]]]);
+  dispatchToLayer([[[@onRelease41_0, @onRelease41_1, @onRelease41_2, 0, 0, 0, @onRelease41_6]]]);
 }
 
 func onPress41_0() {
@@ -2848,17 +3265,24 @@ func onRelease41_2() {
   releaseScanCodeButton(227 /* "⌘" */);
 }
 
+func onPress41_6() {
+  pressScanCodeButton(41, 0, 227 /* "⌘" */, 0);
+}
+func onRelease41_6() {
+  releaseScanCodeButton(227 /* "⌘" */);
+}
+
 var pressTime42;
 func onPress42() {
   globalPress(42);
 
   if (!isInPressAll()) pressTime42 = getTime();
-  dispatchToLayer([[[@onPress42_0, @onPress42_1, @onPress42_2, 0, 0, 0]]]);
+  dispatchToLayer([[[@onPress42_0, @onPress42_1, @onPress42_2, 0, 0, 0, @onPress42_6]]]);
 }
 func onRelease42() {
   globalRelease();
 
-  dispatchToLayer([[[@onRelease42_0, @onRelease42_1, @onRelease42_2, 0, 0, 0]]]);
+  dispatchToLayer([[[@onRelease42_0, @onRelease42_1, @onRelease42_2, 0, 0, 0, @onRelease42_6]]]);
 }
 
 func onPress42_0() {
@@ -2874,8 +3298,8 @@ func onPress42_1() {
 func onRelease42_1() {
   releaseScanCodeButton(226 /* "⌥" */);
   if (getTime() - pressTime42 <= 200) {
-    pressScanCodeButton(42, 0, 40 /* "↵" */, 0);
-
+    pressScanCodeButton(42, 0, 40 /* "↵" */, 1);
+    releaseScanCodeButton(40 /* "↵" */);
   }
 }
 
@@ -2886,15 +3310,22 @@ func onRelease42_2() {
   releaseScanCodeButton(226 /* "⌥" */);
 }
 
+func onPress42_6() {
+  pressScanCodeButton(42, 0, 226 /* "⌥" */, 0);
+}
+func onRelease42_6() {
+  releaseScanCodeButton(226 /* "⌥" */);
+}
+
 func onPress43() {
   globalPress(43);
 
-  dispatchToLayer([[[@onPress43_0, @onPress43_1, @onPress43_2, 0, 0, 0]]]);
+  dispatchToLayer([[[@onPress43_0, @onPress43_1, @onPress43_2, 0, 0, 0, 0]]]);
 }
 func onRelease43() {
   globalRelease();
 
-  dispatchToLayer([[[@onRelease43_0, @onRelease43_1, @onRelease43_2, 0, 0, 0]]]);
+  dispatchToLayer([[[@onRelease43_0, @onRelease43_1, @onRelease43_2, 0, 0, 0, 0]]]);
 }
 
 func onPress43_0() {
@@ -2921,15 +3352,26 @@ func onRelease43_2() {
 func onPress44() {
   globalPress(44);
 
-  dispatchToLayer([[[0, @onPress44_1, 0, 0, 0, 0]]]);
+  dispatchToLayer([[[@onPress44_0, @onPress44_1, 0, 0, 0, 0, 0]]]);
 }
 func onRelease44() {
   globalRelease();
 
-  dispatchToLayer([[[0, 0, 0, 0, @onRelease44_4, 0]]]);
+  dispatchToLayer([[[0, 0, 0, 0, @onRelease44_4, 0, 0]]]);
+}
+
+func onPress44_0() {
+  wasSteno = 1;
+  deactivateGlobal();
+  deactivate0();
+  activate4();
+  activateGlobal();
+}
+func onRelease44_0() {
 }
 
 func onPress44_1() {
+  wasSteno = 0;
   deactivateGlobal();
   deactivate1();
   activate4();
@@ -2941,25 +3383,44 @@ func onRelease44_1() {
 func onPress44_4() {
 }
 func onRelease44_4() {
-  deactivateGlobal();
-  deactivate4();
-  activate1();
-  activateGlobal();
-  onRelease44_1();
+  if (wasSteno) {
+    deactivateGlobal();
+    deactivate4();
+    activate0();
+    activateGlobal();
+    onRelease44_0();
+  } else {
+    deactivateGlobal();
+    deactivate4();
+    activate1();
+    activateGlobal();
+    onRelease44_1();
+  }
 }
 
 func onPress45() {
   globalPress(45);
 
-  dispatchToLayer([[[0, @onPress45_1, 0, 0, 0, 0]]]);
+  dispatchToLayer([[[@onPress45_0, @onPress45_1, 0, 0, 0, 0, 0]]]);
 }
 func onRelease45() {
   globalRelease();
 
-  dispatchToLayer([[[0, 0, @onRelease45_2, 0, 0, 0]]]);
+  dispatchToLayer([[[0, 0, @onRelease45_2, 0, 0, 0, 0]]]);
+}
+
+func onPress45_0() {
+  wasSteno = 1;
+  deactivateGlobal();
+  deactivate0();
+  activate2();
+  activateGlobal();
+}
+func onRelease45_0() {
 }
 
 func onPress45_1() {
+  wasSteno = 0;
   deactivateGlobal();
   deactivate1();
   activate2();
@@ -2971,22 +3432,30 @@ func onRelease45_1() {
 func onPress45_2() {
 }
 func onRelease45_2() {
-  deactivateGlobal();
-  deactivate2();
-  activate1();
-  activateGlobal();
-  onRelease45_1();
+  if (wasSteno) {
+    deactivateGlobal();
+    deactivate2();
+    activate0();
+    activateGlobal();
+    onRelease45_0();
+  } else {
+    deactivateGlobal();
+    deactivate2();
+    activate1();
+    activateGlobal();
+    onRelease45_1();
+  }
 }
 
 func onPress46() {
   globalPress(46);
 
-  dispatchToLayer([[[@onPress46_0, @onPress46_1, 0, 0, @onPress46_4, 0]]]);
+  dispatchToLayer([[[@onPress46_0, @onPress46_1, 0, 0, @onPress46_4, 0, 0]]]);
 }
 func onRelease46() {
   globalRelease();
 
-  dispatchToLayer([[[@onRelease46_0, @onRelease46_1, 0, 0, @onRelease46_4, 0]]]);
+  dispatchToLayer([[[@onRelease46_0, @onRelease46_1, 0, 0, @onRelease46_4, 0, 0]]]);
 }
 
 func onPress46_0() {
@@ -3015,12 +3484,12 @@ func onPress47() {
   globalPress(47);
 
   if (!isInPressAll()) pressTime47 = getTime();
-  dispatchToLayer([[[@onPress47_0, @onPress47_1, 0, 0, @onPress47_4, 0]]]);
+  dispatchToLayer([[[@onPress47_0, @onPress47_1, 0, 0, @onPress47_4, 0, 0]]]);
 }
 func onRelease47() {
   globalRelease();
 
-  dispatchToLayer([[[@onRelease47_0, @onRelease47_1, 0, 0, @onRelease47_4, 0]]]);
+  dispatchToLayer([[[@onRelease47_0, @onRelease47_1, 0, 0, @onRelease47_4, 0, 0]]]);
 }
 
 func onPress47_0() {
@@ -3036,8 +3505,8 @@ func onPress47_1() {
 func onRelease47_1() {
   releaseScanCodeButton(230 /* "⌥" */);
   if (getTime() - pressTime47 <= 200) {
-    pressScanCodeButton(47, 0, 40 /* "↵" */, 0);
-
+    pressScanCodeButton(47, 0, 40 /* "↵" */, 1);
+    releaseScanCodeButton(40 /* "↵" */);
   }
 }
 
@@ -3051,12 +3520,12 @@ func onRelease47_4() {
 func onPress48() {
   globalPress(48);
 
-  dispatchToLayer([[[@onPress48_0, @onPress48_1, 0, 0, 0, 0]]]);
+  dispatchToLayer([[[@onPress48_0, @onPress48_1, 0, 0, 0, 0, 0]]]);
 }
 func onRelease48() {
   globalRelease();
 
-  dispatchToLayer([[[@onRelease48_0, @onRelease48_1, 0, 0, 0, 0]]]);
+  dispatchToLayer([[[@onRelease48_0, @onRelease48_1, 0, 0, 0, 0, 0]]]);
 }
 
 func onPress48_0() {
@@ -3076,15 +3545,26 @@ func onRelease48_1() {
 func onPress49() {
   globalPress(49);
 
-  dispatchToLayer([[[0, @onPress49_1, 0, 0, 0, 0]]]);
+  dispatchToLayer([[[@onPress49_0, @onPress49_1, 0, 0, 0, 0, 0]]]);
 }
 func onRelease49() {
   globalRelease();
 
-  dispatchToLayer([[[0, 0, 0, 0, 0, @onRelease49_5]]]);
+  dispatchToLayer([[[0, 0, 0, 0, 0, @onRelease49_5, 0]]]);
+}
+
+func onPress49_0() {
+  wasSteno = 1;
+  deactivateGlobal();
+  deactivate0();
+  activate5();
+  activateGlobal();
+}
+func onRelease49_0() {
 }
 
 func onPress49_1() {
+  wasSteno = 0;
   deactivateGlobal();
   deactivate1();
   activate5();
@@ -3096,11 +3576,19 @@ func onRelease49_1() {
 func onPress49_5() {
 }
 func onRelease49_5() {
-  deactivateGlobal();
-  deactivate5();
-  activate1();
-  activateGlobal();
-  onRelease49_1();
+  if (wasSteno) {
+    deactivateGlobal();
+    deactivate5();
+    activate0();
+    activateGlobal();
+    onRelease49_0();
+  } else {
+    deactivateGlobal();
+    deactivate5();
+    activate1();
+    activateGlobal();
+    onRelease49_1();
+  }
 }
 
 func onPress50() {
@@ -3112,4 +3600,3 @@ func onPress51() {
 }
 func onRelease51() {
 }
-

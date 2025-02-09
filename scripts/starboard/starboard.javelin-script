@@ -1,3 +1,4 @@
+
 // Generated from javelin-layout file
 var layer;
 func setLayer(layerIndex, layerIdEvent) {
@@ -16,7 +17,6 @@ func resolveLayerIndex() var {
 }
 
 func activate0() {
-
 }
 
 func activateDynamic() {
@@ -24,39 +24,12 @@ func activateDynamic() {
 }
 func activateGlobal() {
   setEnableButtonStates(01);
-
 }
 func deactivate0() {
-
 }
 
 func deactivateDynamic() {}
 func deactivateGlobal() {
-
-}
-var postPress;
-var postRelease;
-
-func _pressScanCode(scanCode, isModifier) {
-  pressScanCode(scanCode);
-  if (isModifier) return;
-
-  if (postPress) {
-    var localPostPress = postPress;
-    postPress = 0;
-    localPostPress();
-  }
-}
-
-func _releaseScanCode(scanCode, isModifier) {
-  releaseScanCode(scanCode);
-  if (isModifier) return;
-
-  if (postRelease) {
-    var localPostRelease = postRelease;
-    postRelease = 0;
-    localPostRelease();
-  }
 }
 // Global Script: StenoModeUpdate Callback
 func onStenoModeUpdate() {
@@ -463,4 +436,3 @@ func onPress27_0() {
 }
 func onRelease27_0() {
 }
-

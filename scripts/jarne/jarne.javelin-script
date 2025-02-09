@@ -1,4 +1,6 @@
+
 // Generated from javelin-layout file
+// Global
 // Steno
 //
 // ,-------------------------------------------.        ,-------------------------------------------.
@@ -303,9 +305,12 @@ const TEXT_ALIGNMENT_MIDDLE = 1;
 const TEXT_ALIGNMENT_RIGHT = 2;
 
 const FONT_ID_NORMAL = 0;
-const FONT_ID_SMALL_DIGITS = 1;
-const FONT_ID_MEDIUM_DIGITS = 2;
-const FONT_ID_LARGE_DIGITS = 3;
+const FONT_ID_LARGE = 1;
+const FONT_ID_DOS = 2;
+const FONT_ID_SMALL_DIGITS = 3;
+const FONT_ID_MEDIUM_DIGITS = 4;
+const FONT_ID_LARGE_DIGITS = 5;
+const FONT_ID_HUGE_DIGITS = 6;
 
 const CONNECTION_NONE = 0;
 const CONNECTION_BLE = 1;
@@ -407,46 +412,38 @@ func activate0() {
   clearPendingModTap();
   setLayer(0, "layer_id: 87377230");
   wordCaps = 0;
-
 }
 
 func activate0NoRelease() {
   setLayerNoRelease(0, "layer_id: 87377230");
   wordCaps = 0;
-
 }
 
 func activate1() {
   clearPendingModTap();
   setLayer(1, "layer_id: 1128808786");
-
 }
 
 func activate1NoRelease() {
   setLayerNoRelease(1, "layer_id: 1128808786");
-
 }
 
 func activate2() {
   clearPendingModTap();
   setLayer(2, "layer_id: 262857896");
-
 }
 
 func activate2NoRelease() {
   setLayerNoRelease(2, "layer_id: 262857896");
-
 }
 
 func activate3() {
   clearPendingModTap();
   setLayer(3, "layer_id: 41429312");
-
 }
 
 func activate3NoRelease() {
   setLayerNoRelease(3, "layer_id: 41429312");
-
 }
 
 func activate4() {
@@ -467,34 +464,28 @@ func activate4NoRelease() {
 func activate5() {
   clearPendingModTap();
   setLayer(5, "layer_id: 125635709");
-
 }
 
 func activate5NoRelease() {
   setLayerNoRelease(5, "layer_id: 125635709");
-
 }
 
 func activate6() {
   clearPendingModTap();
   setLayer(6, "layer_id: 58064650");
-
 }
 
 func activate6NoRelease() {
   setLayerNoRelease(6, "layer_id: 58064650");
-
 }
 
 func activate7() {
   clearPendingModTap();
   setLayer(7, "layer_id: 61572736");
-
 }
 
 func activate7NoRelease() {
   setLayerNoRelease(7, "layer_id: 61572736");
-
 }
 
 func activateDynamic() {
@@ -509,71 +500,37 @@ func activateGlobal() {
   updateBoardPower();
 }
 func deactivate0() {
-
 }
 
 func deactivate1() {
   clearResolvedModTap();
-
 }
 
 func deactivate2() {
-
 }
 
 func deactivate3() {
   clearResolvedModTap();
-
 }
 
 func deactivate4() {
   clearResolvedModTap();
-
 }
 
 func deactivate5() {
   isBleSummaryActive = 0;
-
 }
 
 func deactivate6() {
-
 }
 
 func deactivate7() {
-
 }
 
 func deactivateDynamic() {
   dispatchToLayer([[[0, @deactivate1, 0, @deactivate3, @deactivate4, @deactivate5, 0, 0]]]);
-
 }
 func deactivateGlobal() {
-
-}
-var postPress;
-var postRelease;
-
-func _pressScanCode(scanCode, isModifier) {
-  pressScanCode(scanCode);
-  if (isModifier) return;
-
-  if (postPress) {
-    var localPostPress = postPress;
-    postPress = 0;
-    localPostPress();
-  }
-}
-
-func _releaseScanCode(scanCode, isModifier) {
-  releaseScanCode(scanCode);
-  if (isModifier) return;
-
-  if (postRelease) {
-    var localPostRelease = postRelease;
-    postRelease = 0;
-    localPostRelease();
-  }
 }
 // Global Script: Button Overrides
 func isModifierKey(key) var {
@@ -1234,7 +1191,7 @@ func rgbUpdateKeyBreatheCycle() {
   // Sine wave between 4-20 brightness, with staggering of r, g, b values
   // to reduce harsh steps.
   var w = (0xc00 + (SINE_TABLE[(animationTime() >> 5) & 0xff] - 0x80) * (2 * 8));
-  rgbUpdateKeyConstantColor((w + 0x53) >> 8, w >> 8, (w + 0xa6) >> 8);
+  rgbUpdateAllConstantColor((w + 0x53) >> 8, w >> 8, (w + 0xa6) >> 8);
 }
 
 const DISCONNECTED_KEY_ORDER = [[ 00 01 02 03 04 05 04 03 02 01 ]];
@@ -1719,7 +1676,6 @@ func _action_switchToNumpadLayer() {
   deactivate1();
   activate6();
   activateGlobal();
-
 }
 
 const MODTAP_HANDLER_PRESS_TAP = 0;
@@ -3340,7 +3296,6 @@ func onPress0_5() {
   // USB L
   setPreferredConnection(CONNECTION_USB, CONNECTION_USB2, CONNECTION_BLE);
   redrawDisplayOverlay();
-
 }
 func onRelease0_5() {
 }
@@ -3384,6 +3339,11 @@ func onRelease1_3() {
 }
 
 func onPress1_5() {
+  // BLE 1
+  setPreferredConnection(CONNECTION_BLE, CONNECTION_USB, CONNECTION_USB2);
+  setBleProfile(0);
+  drawBleSummary();
+
   startTimer(100, 2000, 0, @{
     if (layer != 5) return;
 
@@ -3391,13 +3351,7 @@ func onPress1_5() {
 
     // Hold to Pair
     startPairing();
-
   });
-  // BLE 1
-  setPreferredConnection(CONNECTION_BLE, CONNECTION_USB, CONNECTION_USB2);
-  setBleProfile(0);
-  drawBleSummary();
-
 }
 func onRelease1_5() {
   stopTimer(100);
@@ -3442,6 +3396,11 @@ func onRelease2_3() {
 }
 
 func onPress2_5() {
+  // BLE 2
+  setPreferredConnection(CONNECTION_BLE, CONNECTION_USB, CONNECTION_USB2);
+  setBleProfile(1);
+  drawBleSummary();
+
   startTimer(101, 2000, 0, @{
     if (layer != 5) return;
 
@@ -3449,13 +3408,7 @@ func onPress2_5() {
 
     // Hold to Pair
     startPairing();
-
   });
-  // BLE 2
-  setPreferredConnection(CONNECTION_BLE, CONNECTION_USB, CONNECTION_USB2);
-  setBleProfile(1);
-  drawBleSummary();
-
 }
 func onRelease2_5() {
   stopTimer(101);
@@ -3500,6 +3453,11 @@ func onRelease3_3() {
 }
 
 func onPress3_5() {
+  // BLE 3
+  setPreferredConnection(CONNECTION_BLE, CONNECTION_USB, CONNECTION_USB2);
+  setBleProfile(2);
+  drawBleSummary();
+
   startTimer(102, 2000, 0, @{
     if (layer != 5) return;
 
@@ -3507,13 +3465,7 @@ func onPress3_5() {
 
     // Hold to Pair
     startPairing();
-
   });
-  // BLE 3
-  setPreferredConnection(CONNECTION_BLE, CONNECTION_USB, CONNECTION_USB2);
-  setBleProfile(2);
-  drawBleSummary();
-
 }
 func onRelease3_5() {
   stopTimer(102);
@@ -3558,6 +3510,11 @@ func onRelease4_3() {
 }
 
 func onPress4_5() {
+  // BLE 4
+  setPreferredConnection(CONNECTION_BLE, CONNECTION_USB, CONNECTION_USB2);
+  setBleProfile(3);
+  drawBleSummary();
+
   startTimer(103, 2000, 0, @{
     if (layer != 5) return;
 
@@ -3565,13 +3522,7 @@ func onPress4_5() {
 
     // Hold to Pair
     startPairing();
-
   });
-  // BLE 4
-  setPreferredConnection(CONNECTION_BLE, CONNECTION_USB, CONNECTION_USB2);
-  setBleProfile(3);
-  drawBleSummary();
-
 }
 func onRelease4_5() {
   stopTimer(103);
@@ -3619,7 +3570,6 @@ func onPress5_5() {
   // USB R
   setPreferredConnection(CONNECTION_USB2, CONNECTION_USB, CONNECTION_BLE);
   redrawDisplayOverlay();
-
 }
 func onRelease5_5() {
 }
@@ -3909,7 +3859,6 @@ func onRelease11_4() {
 func onPress11_5() {
   // Disconnect BLE
   disconnectBle();
-
 }
 func onRelease11_5() {
 }
@@ -3949,7 +3898,6 @@ func onRelease12() {
   activate0();
   activateGlobal();
   onRelease12_0();
-
 }
 
 func onPress12_0() {
@@ -3961,14 +3909,12 @@ func onPress12_0() {
   activate1();
   activateGlobal();
   pressScanCodeButton(12, 0, 224 /* "⌃" */, 0);
-
 }
 func onRelease12_0() {
   releaseScanCodeButton(224 /* "⌃" */);
   if (getTime() - pressTime12 <= 200) {
     pressScanCodeButton(12, 0, 41 /* "⎋" */, 1);
     releaseScanCodeButton(41 /* "⎋" */);
-
   }
 }
 
@@ -3992,7 +3938,6 @@ func onPress12_7() {
   releaseScanCodeButton(41 /* "⎋" */);
   // Cancel
   replyUserPresence(0);
-
 }
 func onRelease12_7() {
 }
@@ -4047,7 +3992,6 @@ func onPress13_5() {
   console("set_steno_mode embedded");
   //
   drawSettingsFeedbackText("Javelin");
-
 }
 func onRelease13_5() {
 }
@@ -4109,7 +4053,6 @@ func onPress14_5() {
   console("set_steno_mode gemini");
   //
   drawSettingsFeedbackText("Gemini");
-
 }
 func onRelease14_5() {
 }
@@ -4171,7 +4114,6 @@ func onPress15_5() {
   console("set_steno_mode tx_bolt");
   //
   drawSettingsFeedbackText("TX Bolt");
-
 }
 func onRelease15_5() {
 }
@@ -4233,7 +4175,6 @@ func onPress16_5() {
   console("set_steno_mode plover_hid");
   //
   drawSettingsFeedbackText("Plover HID");
-
 }
 func onRelease16_5() {
 }
@@ -4637,7 +4578,6 @@ func onRelease24() {
   activate0();
   activateGlobal();
   onRelease24_0();
-
 }
 
 func onPress24_0() {
@@ -4654,7 +4594,6 @@ func onPress24_0() {
   deactivate0();
   activate1();
   activateGlobal();
-
 }
 func onRelease24_0() {
 }
@@ -4669,7 +4608,6 @@ func onPress24_1() {
   }
   handleModTapPress(@modTapHandler24, 4, modTapLayerActivations24, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
   checkWordCapsAndCapsLock();
-
 }
 func onRelease24_1() {
 
@@ -4686,9 +4624,7 @@ func onRelease24_1() {
       deactivate1();
       activate0();
       activateGlobal();
-
     }();
-
   }
 }
 
@@ -5060,7 +4996,6 @@ func onPress35_1() {
   checkWordCapsAndCapsLock();
 }
 func onRelease35_1() {
-
 }
 
 func onPress35_2() {
@@ -5077,7 +5012,6 @@ func onPress35_5() {
   // Unpair BLE
   unpairBle();
   drawBleSummary();
-
 }
 func onRelease35_5() {
 }
@@ -5125,7 +5059,6 @@ func onRelease36() {
   activate0();
   activateGlobal();
   onRelease36_0();
-
 }
 
 func onPress36_0() {
@@ -5137,7 +5070,6 @@ func onPress36_0() {
   activate1();
   activateGlobal();
   pressScanCodeButton(36, 0, 227 /* "⌘" */, 0);
-
 }
 func onRelease36_0() {
   releaseScanCodeButton(227 /* "⌘" */);
@@ -5191,7 +5123,6 @@ func onPress37_1() {
   checkWordCapsAndCapsLock();
 }
 func onRelease37_1() {
-
 }
 
 func onPress37_2() {
@@ -5255,12 +5186,10 @@ func onPress38_1() {
   }
   modTapLayerPossibility[4] = 1;
   handleModTapPress(@modTapHandler38, 4, modTapLayerActivations38, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
-
 }
 func onRelease38_1() {
   modTapLayerPossibility[1] = 0;
   modTapLayerPossibility[4] = 0;
-
 }
 
 var pressCount38_2;
@@ -5277,7 +5206,6 @@ func onRelease38_2() {
   if (getTime() - pressTime38 <= 200 && pressCount38_2 == getPressCount() && releaseCount38_2 + 1 == getReleaseCount()) {
     pressScanCodeButton(38, 0, 44 /* "⎵" */, 1);
     releaseScanCodeButton(44 /* "⎵" */);
-
   }
 }
 
@@ -5398,7 +5326,6 @@ func onRelease40_5() {
   activate3();
   activateGlobal();
   onRelease40_3();
-
 }
 
 func onPress40_6() {
@@ -5481,7 +5408,6 @@ func onRelease41_5() {
   activate2();
   activateGlobal();
   onRelease41_2();
-
 }
 
 func onPress41_6() {
@@ -5490,4 +5416,3 @@ func onPress41_6() {
 func onRelease41_6() {
   releaseScanCodeButton(99 /* "." */);
 }
-

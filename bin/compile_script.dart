@@ -24,6 +24,12 @@ void main(List<String> arguments) {
     return;
   }
 
+  final pointerCount = int.tryParse(arguments[2]);
+  if (pointerCount == null) {
+    print('Unable to parse pointer count');
+    return;
+  }
+
   final module = ScriptModule();
 
   for (var i = 1; i < arguments.length; ++i) {
@@ -36,8 +42,9 @@ void main(List<String> arguments) {
     module: module,
     byteCodeVersion: latestScriptByteCodeVersion,
     requiredFunctions: ScriptByteCodeBuilder.createScriptFunctionList(
-      buttonCount,
-      encoderCount,
+      buttonCount: buttonCount,
+      encoderCount: encoderCount,
+      pointerCount: pointerCount,
     ),
   );
   final byteCode = builder.createByteCode();

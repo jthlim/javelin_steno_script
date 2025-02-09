@@ -26,12 +26,16 @@ class JavelinScriptEditor extends StatefulWidget {
     required this.script,
     required this.padding,
     required this.onChanged,
+    this.maxLines,
+    this.hintText,
   });
 
   final bool autofocus;
   final String script;
   final EdgeInsetsGeometry padding;
   final void Function(String s) onChanged;
+  final int? maxLines;
+  final String? hintText;
 
   @override
   State<StatefulWidget> createState() => JavelinScriptEditorState();
@@ -116,7 +120,6 @@ class JavelinScriptEditorState extends State<JavelinScriptEditor> {
   }
 
   void _handleDrop(File obj) async {
-    setState(() => _borderColor = null);
     final code = await stringForDroppedFile(obj);
     final textEditingValue = _textEditingController.value;
     _textEditingController.value =
@@ -139,6 +142,7 @@ class JavelinScriptEditorState extends State<JavelinScriptEditor> {
         },
         onDragExit: () => setState(() => _borderColor = null),
         onDrop: (files) {
+          setState(() => _borderColor = null);
           if (files == null) return;
           for (final file in files) {
             _handleDrop(file);
@@ -152,12 +156,13 @@ class JavelinScriptEditorState extends State<JavelinScriptEditor> {
               controller: _textEditingController,
               scrollController: _scrollController,
               autofocus: widget.autofocus,
-              maxLines: null,
-              expands: true,
+              maxLines: widget.maxLines,
+              expands: widget.maxLines == null,
               style: GoogleFonts.robotoMono(),
               decoration: InputDecoration(
                 contentPadding: widget.padding,
                 border: InputBorder.none,
+                hintText: widget.hintText,
               ),
               onChanged: widget.onChanged,
             ),

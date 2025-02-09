@@ -1,4 +1,6 @@
+
 // Generated from javelin-layout file
+// Global
 const TIMER_ID_RGB_UPDATE = 0;
 
 var speed = 1;
@@ -25,27 +27,22 @@ func resolveLayerIndex() var {
 
 func activate0() {
   setLayer(0, "layer_id: 87377230");
-
 }
 
 func activate1() {
   setLayer(1, "layer_id: 1128808786");
-
 }
 
 func activate2() {
   setLayer(2, "layer_id: 50258991");
-
 }
 
 func activate3() {
   setLayer(3, "layer_id: 175277611");
-
 }
 
 func activate4() {
   setLayer(4, "layer_id: 122649869");
-
 }
 
 func activateDynamic() {
@@ -53,55 +50,24 @@ func activateDynamic() {
 }
 func activateGlobal() {
   setEnableButtonStates(([[01 00 00 00 00]][resolveLayerIndex()]));
-
 }
 func deactivate0() {
-
 }
 
 func deactivate1() {
-
 }
 
 func deactivate2() {
-
 }
 
 func deactivate3() {
-
 }
 
 func deactivate4() {
-
 }
 
 func deactivateDynamic() {}
 func deactivateGlobal() {
-
-}
-var postPress;
-var postRelease;
-
-func _pressScanCode(scanCode, isModifier) {
-  pressScanCode(scanCode);
-  if (isModifier) return;
-
-  if (postPress) {
-    var localPostPress = postPress;
-    postPress = 0;
-    localPostPress();
-  }
-}
-
-func _releaseScanCode(scanCode, isModifier) {
-  releaseScanCode(scanCode);
-  if (isModifier) return;
-
-  if (postRelease) {
-    var localPostRelease = postRelease;
-    postRelease = 0;
-    localPostRelease();
-  }
 }
 // Global Script: Encoders
 func onEncoderCW0(delta) {
@@ -711,7 +677,6 @@ func onRelease14_1() {
   if (getTime() - pressTime14 <= 200) {
     pressScanCode(41 /* "⎋" */);
     releaseScanCode(41 /* "⎋" */);
-
   }
 }
 
@@ -1608,7 +1573,6 @@ func onRelease45_1() {
   if (getTime() - pressTime45 <= 200) {
     pressScanCode(40 /* "↵" */);
     releaseScanCode(40 /* "↵" */);
-
   }
 }
 
@@ -1621,4 +1585,3 @@ func onRelease45_3() {
   activateGlobal();
   onRelease45_1();
 }
-

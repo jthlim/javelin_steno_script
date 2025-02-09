@@ -10,6 +10,7 @@ class ScriptCompileResult {
   factory ScriptCompileResult(
     int scriptButtonCount,
     int scriptEncoderCount,
+    int scriptPointerCount,
     int maximumScriptByteCodeSize,
     int scriptByteCodeVersion,
     String scriptHeader,
@@ -29,8 +30,9 @@ class ScriptCompileResult {
         module: module,
         byteCodeVersion: scriptByteCodeVersion,
         requiredFunctions: ScriptByteCodeBuilder.createScriptFunctionList(
-          scriptButtonCount,
-          scriptEncoderCount,
+          buttonCount: scriptButtonCount,
+          encoderCount: scriptEncoderCount,
+          pointerCount: scriptPointerCount,
         ),
       );
       final byteCode = builder.createByteCode();
