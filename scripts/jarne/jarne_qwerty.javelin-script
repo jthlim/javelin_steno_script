@@ -285,9 +285,6 @@ func dispatchToLayer(functions) {
 }
 
 func resolveLayerIndex() var {
-  if (isWaitingForUserPresence()) {
-    return 6;
-  }
   return layer;
 }
 
@@ -297,6 +294,7 @@ func activate0() {
 }
 
 func activate0NoRelease() {
+  cancelAllStenoKeys();
   setLayerNoRelease(0, "layer_id: 1128808786");
 }
 
@@ -306,6 +304,7 @@ func activate1() {
 }
 
 func activate1NoRelease() {
+  cancelAllStenoKeys();
   setLayerNoRelease(1, "layer_id: 262857896");
 }
 
@@ -315,6 +314,7 @@ func activate2() {
 }
 
 func activate2NoRelease() {
+  cancelAllStenoKeys();
   setLayerNoRelease(2, "layer_id: 41429312");
 }
 
@@ -327,6 +327,7 @@ func activate3() {
 }
 
 func activate3NoRelease() {
+  cancelAllStenoKeys();
   setLayerNoRelease(3, "layer_id: 212846523");
   if (isButtonPressed(37)) {
     onPress37();
@@ -339,6 +340,7 @@ func activate4() {
 }
 
 func activate4NoRelease() {
+  cancelAllStenoKeys();
   setLayerNoRelease(4, "layer_id: 125635709");
 }
 
@@ -348,6 +350,7 @@ func activate5() {
 }
 
 func activate5NoRelease() {
+  cancelAllStenoKeys();
   setLayerNoRelease(5, "layer_id: 58064650");
 }
 
@@ -357,6 +360,7 @@ func activate6() {
 }
 
 func activate6NoRelease() {
+  cancelAllStenoKeys();
   setLayerNoRelease(6, "layer_id: 61572736");
 }
 
@@ -1520,6 +1524,27 @@ func checkUserPresenceReply() {
   }
 }
 
+// Layer 06 Script: onU2fStatusUpdate
+var preFidoLayer = -1;
+
+func onU2fStatusUpdate() {
+  if (isWaitingForUserPresence()) {
+    if (preFidoLayer != -1) return;
+
+    preFidoLayer = layer;
+    _action_setFidoLayer();
+  } else {
+    if (preFidoLayer == -1) return;
+
+    deactivateGlobal();
+    deactivateDynamic();
+    layer = preFidoLayer;
+    preFidoLayer = -1;
+    activateDynamic();
+    activateGlobal();
+  }
+}
+
 // Layer 06 Script: rgbUpdate
 const U2F_KEY_ORDER = [[ 00 01 02 03 04 05 06 07 08 09 0a 0b 0a 09 08 07 06 05 04 03 02 01 ]];
 
@@ -1538,6 +1563,13 @@ func rgbUpdateKeyU2fAlertCycle() {
   setRgb(36, 0, 32, 0);
   setRgb(37, 0, 32, 0);
   setRgb(40, 0, 32, 0);
+}
+
+func _action_setFidoLayer() {
+  deactivateGlobal();
+  deactivate6();
+  activate6();
+  activateGlobal();
 }
 
 func _action_switchToNumpadLayer() {
@@ -3092,10 +3124,6 @@ func init() {
     }
   });
   setScript(SCRIPT_ID_BLE_ADVERTISING_UPDATE, @onConnectionUpdate);
-  setScript(SCRIPT_ID_U2F_STATUS_UPDATE, @{
-    updateDisplay();
-    updateBoardPower();
-  });
   if (HAS_AUDIO) {
     setScript(SCRIPT_ID_BLE_PAIR_COMPLETE, @{
       // C-7 G-7 C-8 G-7 C-8 each for 100ms.
@@ -3106,6 +3134,8 @@ func init() {
   updateBoardPower();
   updateScreenSaverTimer();
 
+  // FIDO
+  setScript(SCRIPT_ID_U2F_STATUS_UPDATE, @onU2fStatusUpdate);
   const SCRIPT_ID_USER1 = 11;
   setScript(SCRIPT_ID_USER1, @user1ScriptSetLayer);
   activate0();

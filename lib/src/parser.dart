@@ -131,11 +131,18 @@ class Parser {
     final expression = _parseExpression();
     _assertToken(TokenType.semiColon);
 
-    _assertUniqueName(name);
-
     if (!expression.isConstant() && expression is! StringValueAstNode) {
       throw Exception('$name not a constant value near $_currentToken');
     }
+
+    if (expression.isEquivalentConstant(
+      _module.constants[nameToken.stringValue!],
+    )) {
+      // Already defined to same value.
+      return;
+    }
+
+    _assertUniqueName(name);
 
     _module.constants[nameToken.stringValue!] = expression;
   }
@@ -793,11 +800,25 @@ class Parser {
     final expression = _parseExpression();
     _assertToken(TokenType.semiColon);
 
-    _assertUniqueName(name);
-
     if (!expression.isConstant() && expression is! StringValueAstNode) {
       throw Exception('$name not a constant value near $_currentToken');
     }
+
+    if (expression.isEquivalentConstant(
+      _module.constants[nameToken.stringValue!],
+    )) {
+      // Already defined to same value.
+      return;
+    }
+
+    if (expression.isEquivalentConstant(
+      _function!.locals.constants[nameToken.stringValue!],
+    )) {
+      // Already defined to same value.
+      return;
+    }
+
+    _assertUniqueName(name);
 
     _function!.addLocalConstant(name, expression);
   }

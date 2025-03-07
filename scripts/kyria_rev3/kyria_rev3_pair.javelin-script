@@ -45,7 +45,7 @@ func updateRgbTimer() {
   }
 }
 
-const DISCONNECTED_KEY_ORDER = [[ 06 07 08 09 0a 0b 0a 09 08 07 ]];
+const DISCONNECTED_KEY_ORDER = [[ 00 01 02 03 04 05 04 03 02 01 ]];
 func updateDisconnectedKeyRgbCycle() {
   for (var i = 0; i < 62; i = i + 1) {
     setRgb(i, 0, 0, 0);
@@ -54,6 +54,7 @@ func updateDisconnectedKeyRgbCycle() {
   var index = getTime() >> 6;
   var keyId = DISCONNECTED_KEY_ORDER[index % 10];
   setHsv(keyId, index << 10, 0xf0, 16);
+  setHsv(keyId + 6, index << 10, 0xf0, 16);
 }
 
 //---------------------------------------------------------------------------

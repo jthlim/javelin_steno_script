@@ -293,6 +293,7 @@ func activate0() {
 }
 
 func activate0NoRelease() {
+  cancelAllStenoKeys();
   setLayerNoRelease(0, "layer_id: 1128808786");
 }
 
@@ -302,6 +303,7 @@ func activate1() {
 }
 
 func activate1NoRelease() {
+  cancelAllStenoKeys();
   setLayerNoRelease(1, "layer_id: 262857896");
 }
 
@@ -311,6 +313,7 @@ func activate2() {
 }
 
 func activate2NoRelease() {
+  cancelAllStenoKeys();
   setLayerNoRelease(2, "layer_id: 41429312");
 }
 
@@ -323,6 +326,7 @@ func activate3() {
 }
 
 func activate3NoRelease() {
+  cancelAllStenoKeys();
   setLayerNoRelease(3, "layer_id: 212846523");
   if (isButtonPressed(37)) {
     onPress37();
@@ -335,6 +339,7 @@ func activate4() {
 }
 
 func activate4NoRelease() {
+  cancelAllStenoKeys();
   setLayerNoRelease(4, "layer_id: 125635709");
 }
 
@@ -344,6 +349,7 @@ func activate5() {
 }
 
 func activate5NoRelease() {
+  cancelAllStenoKeys();
   setLayerNoRelease(5, "layer_id: 58064650");
 }
 
@@ -353,6 +359,7 @@ func activate6() {
 }
 
 func activate6NoRelease() {
+  cancelAllStenoKeys();
   setLayerNoRelease(6, "layer_id: 61572736");
 }
 

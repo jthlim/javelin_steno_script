@@ -464,10 +464,10 @@ func drawStrokes() {
 
 func drawDisplay0(layerImage) {
   const ICON_POSITIONS = [[
-      08 00 00 00 00 00 00 00
-      00 00 10 00 00 00 00 00
-      00 00 10 00 08 12 00 00
-      00 00 10 00 00 12 10 12
+      38 0c 00 00 00 00 00 00
+      2f 0c 41 0c 00 00 00 00
+      26 0c 38 0c 4a 0c 00 00
+      1d 0c 2f 0c 41 0c 53 0c
   ]];
 
   const SHIFT_IMAGE = [[
@@ -510,7 +510,7 @@ func drawDisplay0(layerImage) {
       + (isScanCodePressed(SC_L_ALT) || isScanCodePressed(SC_R_ALT))
       + (isScanCodePressed(SC_L_META) || isScanCodePressed(SC_R_META));
   var positions = ICON_POSITIONS + 8 * (iconCount - 1);
-  var xOffset = DISPLAY_WIDTH/2 - 16;
+  var xOffset = DISPLAY_WIDTH/2 - 64;
   var yOffset = DISPLAY_HEIGHT/2;
 
   if (isScanCodePressed(SC_L_SHIFT) || isScanCodePressed(SC_R_SHIFT)) {
@@ -530,9 +530,9 @@ func drawDisplay0(layerImage) {
   }
 
   if (getLedStatus(LED_STATUS_CAPS_LOCK)) {
-    drawImage(0, DISPLAY_WIDTH/2 - 8, DISPLAY_HEIGHT/2 + 48, CAPS_LOCK_IMAGE);
+    drawImage(0, 0, DISPLAY_HEIGHT - 16, CAPS_LOCK_IMAGE);
   } else if (wordCaps) {
-    drawImage(0, DISPLAY_WIDTH/2 - 8, DISPLAY_HEIGHT/2 + 48, SHIFT_IMAGE);
+    drawImage(0, 0, DISPLAY_HEIGHT - 16, SHIFT_IMAGE);
   }
 }
 

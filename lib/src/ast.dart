@@ -47,6 +47,18 @@ abstract class AstNode {
     return this;
   }
 
+  bool isEquivalentConstant(AstNode? other) {
+    if (other == null) return false;
+
+    final th = this;
+    if (th is StringValueAstNode) {
+      return other is StringValueAstNode && th.value == other.value;
+    } else if (th.isConstant() && other.isConstant()) {
+      return th.constantValue() == other.constantValue();
+    }
+    return false;
+  }
+
   static const maximumEvaluationLoopCount = 32;
 }
 
@@ -1881,6 +1893,21 @@ class CallFunctionAstNode extends AstNode {
         CallInBuiltFunctionInstruction(definition),
       );
     } else if (definition is ScriptFunction) {
+      // Special case inline when return is a global value
+      if (usesValue &&
+          definition.parameters.isEmpty &&
+          definition.statements.statements.length == 1) {
+        final inst = definition.statements.statements.first;
+        if (inst is ReturnAstNode) {
+          final expr = inst.expression;
+          if (expr is IntValueAstNode ||
+              (expr is LoadValueAstNode && expr.isGlobal)) {
+            expr!.addInstructions(builder);
+            return;
+          }
+        }
+      }
+
       if (definition.isPure()) {
         if (!definition.hasReturnValue || !usesValue) return;
 

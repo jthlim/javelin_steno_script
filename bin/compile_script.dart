@@ -5,9 +5,9 @@ import 'dart:io';
 import 'package:javelin_steno_script/javelin_steno_script.dart';
 
 void main(List<String> arguments) {
-  if (arguments.length < 3) {
+  if (arguments.length < 4) {
     print(
-      'Usage: compile_script <button_count> <encoder_count> script_file_name1 ...',
+      'Usage: compile_script <button_count> <encoder_count> <pointer_count> script_file_name1 ...',
     );
     return;
   }
@@ -32,7 +32,7 @@ void main(List<String> arguments) {
 
   final module = ScriptModule();
 
-  for (var i = 1; i < arguments.length; ++i) {
+  for (var i = 3; i < arguments.length; ++i) {
     final filename = arguments[i];
     final source = File(filename).readAsStringSync();
     Parser(input: source, filename: filename, module: module).parse();
