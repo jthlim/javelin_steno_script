@@ -14,9 +14,8 @@ class Parser {
     return Parser.tokenizer(Tokenizer(input, filename), module);
   }
 
-  Parser.tokenizer(Tokenizer tokenizer, ScriptModule? module)
-      : _tokens = tokenizer.tokenize().iterator,
-        _module = module ?? ScriptModule() {
+  Parser.tokenizer(Tokenizer tokenizer, this._module)
+      : _tokens = tokenizer.tokenize().iterator {
     _hasNextToken = _tokens.moveNext();
     _nextToken();
   }
@@ -788,6 +787,7 @@ class Parser {
       isGlobal: false,
       index: index,
       expression: initializer,
+      isInitialization: true,
     );
   }
 
@@ -830,10 +830,111 @@ class Parser {
       indexExpression = _parseExpression();
       _assertToken(TokenType.closeSquareBracket);
     }
-    _assertToken(TokenType.assign);
-    final value = _parseExpression();
+    final assignType = _currentToken.type;
+    switch (assignType) {
+      case TokenType.assign:
+      case TokenType.addAssign:
+      case TokenType.subtractAssign:
+      case TokenType.multiplyAssign:
+      case TokenType.divideAssign:
+      case TokenType.remainderAssign:
+      case TokenType.shiftLeftAssign:
+      case TokenType.arithmeticShiftRightAssign:
+      case TokenType.logicalShiftRightAssign:
+      case TokenType.bitwiseAndAssign:
+      case TokenType.bitwiseXorAssign:
+      case TokenType.bitwiseOrAssign:
+        break;
+      default:
+        throw FormatException(
+          'Expected assignment operator, found $_currentToken',
+        );
+    }
+    _nextToken();
+    var value = _parseExpression();
     if (requireSemicolon) {
       _assertToken(TokenType.semiColon);
+    }
+
+    if (assignType != TokenType.assign) {
+      if (indexExpression != null) {
+        throw FormatException(
+          'Only simple assignment supports index near $_currentToken',
+        );
+      }
+      final AstNode loadValueAstNode;
+      if (_module.globals.containsKey(name)) {
+        final global = _module.globals[name]!;
+        if (global.arraySize != null) {
+          throw FormatException(
+            '$name is an array and requires an index near $_currentToken',
+          );
+        }
+        if (indexExpression != null) {
+          throw FormatException('$name is not an array near $_currentToken');
+        }
+        loadValueAstNode =
+            LoadValueAstNode(isGlobal: true, index: global.index);
+      } else if (_function!.locals.variables.containsKey(name)) {
+        final localVariable = _function!.locals.variables[name]!;
+        if (localVariable.arraySize != null) {
+          throw FormatException(
+            '$name is an array and requires an index near $_currentToken',
+          );
+        } else {
+          if (indexExpression != null) {
+            throw FormatException('$name is not an array near $_currentToken');
+          }
+          loadValueAstNode =
+              LoadValueAstNode(isGlobal: false, index: localVariable.index);
+        }
+      } else {
+        throw FormatException('Unknown variable $name near $_currentToken');
+      }
+
+      switch (assignType) {
+        case TokenType.addAssign:
+          final termsExpression = TermsAstNode();
+          termsExpression.terms.add(Term(TermMode.add, loadValueAstNode));
+          termsExpression.terms.add(Term(TermMode.add, value));
+          value = termsExpression;
+          break;
+        case TokenType.subtractAssign:
+          final termsExpression = TermsAstNode();
+          termsExpression.terms.add(Term(TermMode.add, loadValueAstNode));
+          termsExpression.terms.add(Term(TermMode.subtract, value));
+          value = termsExpression;
+          break;
+        case TokenType.multiplyAssign:
+          value = MultiplyAstNode(loadValueAstNode, value);
+          break;
+        case TokenType.divideAssign:
+          value = QuotientAstNode(loadValueAstNode, value);
+          break;
+        case TokenType.remainderAssign:
+          value = RemainderAstNode(loadValueAstNode, value);
+          break;
+        case TokenType.shiftLeftAssign:
+          value = BitShiftLeftAstNode(loadValueAstNode, value);
+          break;
+        case TokenType.arithmeticShiftRightAssign:
+          value = ArithmeticBitShiftRightAstNode(loadValueAstNode, value);
+          break;
+        case TokenType.logicalShiftRightAssign:
+          value = LogicalBitShiftRightAstNode(loadValueAstNode, value);
+          break;
+        case TokenType.bitwiseAndAssign:
+          value = BitwiseAndAstNode(loadValueAstNode, value);
+          break;
+        case TokenType.bitwiseXorAssign:
+          value = BitwiseXorAstNode(loadValueAstNode, value);
+          break;
+        case TokenType.bitwiseOrAssign:
+          value = BitwiseOrAstNode(loadValueAstNode, value);
+          break;
+        default:
+          throw UnimplementedError('Unhandled assign $assignType');
+      }
     }
 
     // Assignment can be to global or local.
@@ -859,6 +960,7 @@ class Parser {
           isGlobal: true,
           index: global.index,
           expression: value,
+          isInitialization: false,
         );
       }
     } else if (_function!.locals.variables.containsKey(name)) {
@@ -882,6 +984,7 @@ class Parser {
           isGlobal: false,
           index: localVariable.index,
           expression: value,
+          isInitialization: false,
         );
       }
     } else {
@@ -912,6 +1015,17 @@ class Parser {
 
     switch (peekNextToken()?.type) {
       case TokenType.assign:
+      case TokenType.addAssign:
+      case TokenType.subtractAssign:
+      case TokenType.multiplyAssign:
+      case TokenType.divideAssign:
+      case TokenType.remainderAssign:
+      case TokenType.shiftLeftAssign:
+      case TokenType.arithmeticShiftRightAssign:
+      case TokenType.logicalShiftRightAssign:
+      case TokenType.bitwiseAndAssign:
+      case TokenType.bitwiseXorAssign:
+      case TokenType.bitwiseOrAssign:
       case TokenType.openSquareBracket:
         _assertToken(TokenType.identifier);
         return _parseAssignment(name, requireSemicolon: requireSemicolon);
@@ -1006,7 +1120,7 @@ class Parser {
 
     _assertToken(TokenType.closeParen);
 
-    final body = _parseBlock();
+    final body = _parseStatement();
 
     _function?.endLocalScope();
 
@@ -1028,7 +1142,7 @@ class Parser {
     final condition = _parseExpression();
     _assertToken(TokenType.closeParen);
 
-    final body = _parseBlock();
+    final body = _parseStatement();
 
     _function?.endLocalScope();
 

@@ -2,6 +2,7 @@
 
 import 'dart:io';
 
+import 'package:javelin_steno_script/button_script_in_built_functions.dart';
 import 'package:javelin_steno_script/javelin_steno_script.dart';
 
 void main(List<String> arguments) {
@@ -30,7 +31,7 @@ void main(List<String> arguments) {
     return;
   }
 
-  final module = ScriptModule();
+  final module = ScriptModule(ButtonScriptInBuiltFunctions.functions);
 
   for (var i = 3; i < arguments.length; ++i) {
     final filename = arguments[i];

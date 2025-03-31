@@ -122,9 +122,9 @@ class ScriptGlobal {
 }
 
 class ScriptModule {
-  ScriptModule() {
-    for (final builtInFunction in InBuiltScriptFunction.values) {
-      functions[builtInFunction.name] = builtInFunction;
+  ScriptModule(List<InBuiltScriptFunction> builtInFunctions) {
+    for (final builtInFunction in builtInFunctions) {
+      functions[builtInFunction.functionName] = builtInFunction;
     }
   }
 
@@ -202,6 +202,7 @@ class ScriptModule {
           isGlobal: true,
           index: global.index,
           expression: initializer,
+          isInitialization: true,
         ),
       );
     }

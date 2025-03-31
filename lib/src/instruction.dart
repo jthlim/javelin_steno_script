@@ -42,6 +42,7 @@ enum ScriptOpcode {
   jumpValue(0x96),
   retIfZero(0x97),
   retIfNotZero(0x98),
+  dup(0x99),
   jumpShortBegin(0xa0),
   jumpShortEnd(0xbe),
   jumpLong(0xbf),
@@ -183,7 +184,7 @@ final class LoadLocalValueInstruction extends ScriptInstruction {
 }
 
 final class StoreLocalValueInstruction extends ScriptInstruction {
-  StoreLocalValueInstruction(this.index);
+  StoreLocalValueInstruction(this.index, this.isInitialization);
 
   @override
   int get byteCodeLength {
@@ -205,6 +206,7 @@ final class StoreLocalValueInstruction extends ScriptInstruction {
   }
 
   final int index;
+  final bool isInitialization;
 
   @override
   String toString() => '  store l$index';
@@ -336,19 +338,6 @@ final class StoreIndexedLocalValueInstruction extends ScriptInstruction {
 
   @override
   String toString() => '  store l$index[]';
-}
-
-final class PopValueInstruction extends ScriptInstruction {
-  @override
-  int get byteCodeLength => 1;
-
-  @override
-  void addByteCode(ScriptByteCodeBuilder builder) {
-    builder.addOpcode(ScriptOpcode.pop);
-  }
-
-  @override
-  String toString() => '  pop';
 }
 
 final class CallInBuiltFunctionInstruction extends ScriptInstruction {
@@ -846,63 +835,65 @@ final class NopInstruction extends ScriptInstruction {
   String toString() => ' 0x${offset.toRadixString(16)}:';
 }
 
-final class OpcodeInstruction extends ScriptInstruction {
-  OpcodeInstruction(this.opcode);
+final class OperatorInstruction extends ScriptInstruction {
+  OperatorInstruction(this.operator);
+
+  final ScriptOperatorOpcode operator;
 
   @override
-  bool get isBooleanResult => opcode.isBooleanResult;
+  bool get isBooleanResult => operator.isBooleanResult;
 
   @override
   int get byteCodeLength => 1;
 
   @override
   void addByteCode(ScriptByteCodeBuilder builder) {
-    builder.addOperatorOpcode(opcode);
+    builder.addOperatorOpcode(operator);
   }
 
-  final ScriptOperatorOpcode opcode;
-
   @override
-  String toString() => '  ${opcode.name}';
+  String toString() => '  ${operator.name}';
 }
 
-final class ReturnInstruction extends ScriptInstruction {
+sealed class SingleOpcodeInstruction extends ScriptInstruction {
   @override
   int get byteCodeLength => 1;
 
+  @override
+  void addByteCode(ScriptByteCodeBuilder builder) {
+    builder.addOpcode(opcode);
+  }
+
+  @override
+  String toString() => '  ${opcode.name}';
+
+  ScriptOpcode get opcode;
+}
+
+final class PopValueInstruction extends SingleOpcodeInstruction {
+  @override
+  ScriptOpcode get opcode => ScriptOpcode.pop;
+}
+
+final class ReturnInstruction extends SingleOpcodeInstruction {
   @override
   bool get implicitNext => false;
 
   @override
-  void addByteCode(ScriptByteCodeBuilder builder) {
-    builder.addOpcode(ScriptOpcode.ret);
-  }
-
-  @override
-  String toString() => '  ret';
+  ScriptOpcode get opcode => ScriptOpcode.ret;
 }
 
-final class ReturnIfZeroInstruction extends ScriptInstruction {
+final class ReturnIfZeroInstruction extends SingleOpcodeInstruction {
   @override
-  int get byteCodeLength => 1;
-
-  @override
-  void addByteCode(ScriptByteCodeBuilder builder) {
-    builder.addOpcode(ScriptOpcode.retIfZero);
-  }
+  ScriptOpcode get opcode => ScriptOpcode.retIfZero;
 
   @override
   String toString() => '  retz';
 }
 
-final class ReturnIfNotZeroInstruction extends ScriptInstruction {
+final class ReturnIfNotZeroInstruction extends SingleOpcodeInstruction {
   @override
-  int get byteCodeLength => 1;
-
-  @override
-  void addByteCode(ScriptByteCodeBuilder builder) {
-    builder.addOpcode(ScriptOpcode.retIfNotZero);
-  }
+  ScriptOpcode get opcode => ScriptOpcode.retIfNotZero;
 
   @override
   String toString() => '  retnz';

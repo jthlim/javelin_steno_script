@@ -53,7 +53,22 @@ class Tokenizer {
           continue;
 
         case 0x25: // '%'
-          yield Token(type: TokenType.remainder, line: _line, column: _column);
+          if (_offset < _length && _input.codeUnitAt(_offset) == 0x3d) {
+            // '%='
+            ++_column;
+            ++_offset;
+            yield Token(
+              type: TokenType.remainderAssign,
+              line: _line,
+              column: _column,
+            );
+          } else {
+            yield Token(
+              type: TokenType.remainder,
+              line: _line,
+              column: _column,
+            );
+          }
           continue;
 
         case 0x26: // '&'
@@ -61,6 +76,15 @@ class Tokenizer {
             ++_column;
             ++_offset;
             yield Token(type: TokenType.and, line: _line, column: _column);
+          } else if (_offset < _length && _input.codeUnitAt(_offset) == 0x3d) {
+            // '&='
+            ++_column;
+            ++_offset;
+            yield Token(
+              type: TokenType.bitwiseAndAssign,
+              line: _line,
+              column: _column,
+            );
           } else {
             yield Token(
               type: TokenType.bitwiseAnd,
@@ -79,11 +103,33 @@ class Tokenizer {
           continue;
 
         case 0x2a: // '*'
-          yield Token(type: TokenType.multiply, line: _line, column: _column);
+          if (_offset < _length && _input.codeUnitAt(_offset) == 0x3d) {
+            // '*='
+            ++_column;
+            ++_offset;
+            yield Token(
+              type: TokenType.multiplyAssign,
+              line: _line,
+              column: _column,
+            );
+          } else {
+            yield Token(type: TokenType.multiply, line: _line, column: _column);
+          }
           continue;
 
         case 0x2b: // '+'
-          yield Token(type: TokenType.plus, line: _line, column: _column);
+          if (_offset < _length && _input.codeUnitAt(_offset) == 0x3d) {
+            // '+='
+            ++_column;
+            ++_offset;
+            yield Token(
+              type: TokenType.addAssign,
+              line: _line,
+              column: _column,
+            );
+          } else {
+            yield Token(type: TokenType.plus, line: _line, column: _column);
+          }
           continue;
 
         case 0x2c: // ','
@@ -91,7 +137,18 @@ class Tokenizer {
           continue;
 
         case 0x2d: // '-'
-          yield Token(type: TokenType.minus, line: _line, column: _column);
+          if (_offset < _length && _input.codeUnitAt(_offset) == 0x3d) {
+            // '-='
+            ++_column;
+            ++_offset;
+            yield Token(
+              type: TokenType.subtractAssign,
+              line: _line,
+              column: _column,
+            );
+          } else {
+            yield Token(type: TokenType.minus, line: _line, column: _column);
+          }
           continue;
 
         case 0x22: // Double quote
@@ -122,6 +179,17 @@ class Tokenizer {
         case 0x2f: // '/'
           if (_offset >= _length) {
             yield Token(type: TokenType.quotient, line: _line, column: _column);
+            continue;
+          }
+          if (_input.codeUnitAt(_offset) == 0x3d) {
+            // '/='
+            ++_column;
+            ++_offset;
+            yield Token(
+              type: TokenType.divideAssign,
+              line: _line,
+              column: _column,
+            );
             continue;
           }
           switch (_input.codeUnitAt(_offset)) {
@@ -185,11 +253,21 @@ class Tokenizer {
           } else if (_offset < _length && _input.codeUnitAt(_offset) == 0x3c) {
             ++_offset;
             ++_column;
-            yield Token(
-              type: TokenType.shiftLeft,
-              line: _line,
-              column: _column,
-            );
+            if (_offset < _length && _input.codeUnitAt(_offset) == 0x3d) {
+              ++_column;
+              ++_offset;
+              yield Token(
+                type: TokenType.shiftLeftAssign,
+                line: _line,
+                column: _column,
+              );
+            } else {
+              yield Token(
+                type: TokenType.shiftLeft,
+                line: _line,
+                column: _column,
+              );
+            }
           } else {
             yield Token(type: TokenType.lessThan, line: _line, column: _column);
           }
@@ -220,17 +298,39 @@ class Tokenizer {
             if (_offset < _length && _input.codeUnitAt(_offset) == 0x3e) {
               ++_offset;
               ++_column;
-              yield Token(
-                type: TokenType.logicalShiftRight,
-                line: _line,
-                column: _column,
-              );
+              if (_offset < _length && _input.codeUnitAt(_offset) == 0x3d) {
+                // '>>>='
+                ++_column;
+                ++_offset;
+                yield Token(
+                  type: TokenType.logicalShiftRightAssign,
+                  line: _line,
+                  column: _column,
+                );
+              } else {
+                yield Token(
+                  type: TokenType.logicalShiftRight,
+                  line: _line,
+                  column: _column,
+                );
+              }
             } else {
-              yield Token(
-                type: TokenType.arithmeticShiftRight,
-                line: _line,
-                column: _column,
-              );
+              if (_offset < _length && _input.codeUnitAt(_offset) == 0x3d) {
+                // '-='
+                ++_column;
+                ++_offset;
+                yield Token(
+                  type: TokenType.arithmeticShiftRightAssign,
+                  line: _line,
+                  column: _column,
+                );
+              } else {
+                yield Token(
+                  type: TokenType.arithmeticShiftRight,
+                  line: _line,
+                  column: _column,
+                );
+              }
             }
           } else {
             yield Token(
@@ -268,7 +368,22 @@ class Tokenizer {
           continue;
 
         case 0x5e: // '^'
-          yield Token(type: TokenType.bitwiseXor, line: _line, column: _column);
+          if (_offset < _length && _input.codeUnitAt(_offset) == 0x3d) {
+            // '^='
+            ++_column;
+            ++_offset;
+            yield Token(
+              type: TokenType.bitwiseXorAssign,
+              line: _line,
+              column: _column,
+            );
+          } else {
+            yield Token(
+              type: TokenType.bitwiseXor,
+              line: _line,
+              column: _column,
+            );
+          }
           continue;
 
         case 0x7b: // '{'
@@ -280,6 +395,15 @@ class Tokenizer {
             ++_column;
             ++_offset;
             yield Token(type: TokenType.or, line: _line, column: _column);
+          } else if (_offset < _length && _input.codeUnitAt(_offset) == 0x3d) {
+            // '|='
+            ++_column;
+            ++_offset;
+            yield Token(
+              type: TokenType.bitwiseOrAssign,
+              line: _line,
+              column: _column,
+            );
           } else {
             yield Token(
               type: TokenType.bitwiseOr,

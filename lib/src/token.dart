@@ -50,6 +50,17 @@ enum TokenType {
   logicalShiftRight,
   openHalfWordList,
   closeHalfWordList,
+  addAssign,
+  subtractAssign,
+  multiplyAssign,
+  divideAssign,
+  remainderAssign,
+  shiftLeftAssign,
+  arithmeticShiftRightAssign,
+  logicalShiftRightAssign,
+  bitwiseAndAssign,
+  bitwiseXorAssign,
+  bitwiseOrAssign,
 }
 
 class Token {

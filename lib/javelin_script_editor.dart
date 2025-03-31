@@ -57,10 +57,9 @@ class JavelinScriptEditorState extends State<JavelinScriptEditor> {
 
   @override
   void dispose() {
-    super.dispose();
     _textEditingController.dispose();
     _scrollController.dispose();
-    //  _dropZoneController = null;
+    super.dispose();
   }
 
   static bool isOn(Pixel pixel) =>

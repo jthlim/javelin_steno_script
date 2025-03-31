@@ -114,8 +114,8 @@ class InstructionList extends Iterable<ScriptInstruction> {
         instruction = instruction.next;
         continue;
       }
-      if (instruction is OpcodeInstruction &&
-          instruction.opcode == ScriptOperatorOpcode.not) {
+      if (instruction is OperatorInstruction &&
+          instruction.operator == ScriptOperatorOpcode.not) {
         isNonZero = !isNonZero;
         instruction = instruction.next;
         continue;
@@ -416,16 +416,16 @@ class InstructionList extends Iterable<ScriptInstruction> {
       if (previous.value == 1) {
         previous.unlink();
         instruction
-            .replaceWith(OpcodeInstruction(ScriptOperatorOpcode.decrement));
+            .replaceWith(OperatorInstruction(ScriptOperatorOpcode.decrement));
         return;
       } else if (previous.value == -1) {
         previous.unlink();
         instruction
-            .replaceWith(OpcodeInstruction(ScriptOperatorOpcode.increment));
+            .replaceWith(OperatorInstruction(ScriptOperatorOpcode.increment));
         return;
       }
     }
-    instruction.replaceWith(OpcodeInstruction(ScriptOperatorOpcode.subtract));
+    instruction.replaceWith(OperatorInstruction(ScriptOperatorOpcode.subtract));
   }
 
   // Replaces equals and not equals with subtract when possible.
@@ -440,12 +440,12 @@ class InstructionList extends Iterable<ScriptInstruction> {
 
     ScriptInstruction? instruction = instructions.first;
     while (instruction != null) {
-      if (instruction is! OpcodeInstruction) {
+      if (instruction is! OperatorInstruction) {
         instruction = instruction.next;
         continue;
       }
 
-      switch (instruction.opcode) {
+      switch (instruction.operator) {
         case ScriptOperatorOpcode.notEquals:
           final next = instruction.next;
           if ((next is JumpInstructionBase && next.isConditional) ||
@@ -517,8 +517,8 @@ class InstructionList extends Iterable<ScriptInstruction> {
 
     ScriptInstruction? instruction = instructions.first;
     while (instruction != null) {
-      if (instruction is! OpcodeInstruction ||
-          instruction.opcode != ScriptOperatorOpcode.not) {
+      if (instruction is! OperatorInstruction ||
+          instruction.operator != ScriptOperatorOpcode.not) {
         instruction = instruction.next;
         continue;
       }
@@ -526,23 +526,23 @@ class InstructionList extends Iterable<ScriptInstruction> {
       final next = instruction.next;
       final previous = instruction.previous!;
       if (previous.isBooleanResult &&
-          next is OpcodeInstruction &&
-          next.opcode == ScriptOperatorOpcode.not) {
+          next is OperatorInstruction &&
+          next.operator == ScriptOperatorOpcode.not) {
         final nextNext = next.next;
         instruction.unlink();
         next.unlink();
         instruction = nextNext;
         continue;
-      } else if (previous is OpcodeInstruction &&
-          previous.opcode.opposite != null) {
-        final opposite = previous.opcode.opposite!;
-        previous.replaceWith(OpcodeInstruction(opposite));
+      } else if (previous is OperatorInstruction &&
+          previous.operator.opposite != null) {
+        final opposite = previous.operator.opposite!;
+        previous.replaceWith(OperatorInstruction(opposite));
         instruction.unlink();
-      } else if (next is OpcodeInstruction &&
-          next.opcode == ScriptOperatorOpcode.not) {
+      } else if (next is OperatorInstruction &&
+          next.operator == ScriptOperatorOpcode.not) {
         final nextNext = next.next;
-        if (nextNext is OpcodeInstruction &&
-            nextNext.opcode == ScriptOperatorOpcode.not) {
+        if (nextNext is OperatorInstruction &&
+            nextNext.operator == ScriptOperatorOpcode.not) {
           next.unlink();
           nextNext.unlink();
           continue;
@@ -687,6 +687,21 @@ class InstructionList extends Iterable<ScriptInstruction> {
     }
   }
 
+  static bool hasJumpInstruction(ScriptInstruction? instruction) {
+    for (;;) {
+      if (instruction == null) {
+        return false;
+      }
+      if (instruction is StartFunctionInstruction) {
+        return false;
+      }
+      if (instruction is JumpInstructionBase) {
+        return true;
+      }
+      instruction = instruction.next;
+    }
+  }
+
   void optimizeStoreLoad() {
     if (instructions.isEmpty) {
       return;
@@ -706,6 +721,12 @@ class InstructionList extends Iterable<ScriptInstruction> {
       }
 
       if (instruction.index != nextInstruction.index) {
+        instruction = nextInstruction;
+        continue;
+      }
+
+      if (!instruction.isInitialization &&
+          hasJumpInstruction(nextInstruction)) {
         instruction = nextInstruction;
         continue;
       }

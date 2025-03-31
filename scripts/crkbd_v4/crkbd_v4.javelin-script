@@ -71,27 +71,43 @@ func deactivateGlobal() {
 }
 // Global Script: Encoders
 func onEncoderCW0(delta) {
+  printValue("onEncoderCW0", delta);
+  tapScanCode(0xd9);
 }
 
 func onEncoderCCW0(delta) {
+  printValue("onEncoderCCW0", delta);
+  tapScanCode(0xda);
 }
 
 func onEncoderCW1(delta) {
+  printValue("onEncoderCW1", delta);
+  tapScanCode(0xd9);
 }
 
 func onEncoderCCW1(delta) {
+  printValue("onEncoderCCW1", delta);
+  tapScanCode(0xda);
 }
 
 func onEncoderCW2(delta) {
+  printValue("onEncoderCW2", delta);
+  tapScanCode(0xd9);
 }
 
 func onEncoderCCW2(delta) {
+  printValue("onEncoderCCW2", delta);
+  tapScanCode(0xda);
 }
 
 func onEncoderCW3(delta) {
+  printValue("onEncoderCW3", delta);
+  tapScanCode(0xd9);
 }
 
 func onEncoderCCW3(delta) {
+  printValue("onEncoderCCW3", delta);
+  tapScanCode(0xda);
 }
 
 // Global Script: RGB

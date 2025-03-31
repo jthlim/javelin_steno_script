@@ -1,3 +1,4 @@
+import 'package:javelin_steno_script/button_script_in_built_functions.dart';
 import 'package:javelin_steno_script/javelin_steno_script.dart';
 import 'package:test/test.dart';
 
@@ -47,7 +48,7 @@ tick (0xa):
 }
 
 String _compileScript(String script) {
-  final module = ScriptModule();
+  final module = ScriptModule(ButtonScriptInBuiltFunctions.functions);
   Parser(input: script, filename: '', module: module).parse();
   final builder = ScriptByteCodeBuilder(
     module: module,
