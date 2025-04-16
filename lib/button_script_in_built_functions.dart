@@ -1,4 +1,4 @@
- import 'src/functions.dart';
+import 'src/functions.dart';
 
 class ButtonScriptInBuiltFunctions {
   static const functions = <InBuiltScriptFunction>[
@@ -67,7 +67,7 @@ class ButtonScriptInBuiltFunctions {
     InBuiltScriptFunction('replyUserPresence', 1, ReturnType.none, 0x3e),
     InBuiltScriptFunction('setGpioInputPin', 2, ReturnType.none, 0x3f),
     InBuiltScriptFunction('readGpioPin', 1, ReturnType.boolean, 0x40),
-    InBuiltScriptFunction('drawGrayscaleRange', 6, ReturnType.none, 0x41),
+    InBuiltScriptFunction('drawLuminanceRange', 6, ReturnType.none, 0x41),
     InBuiltScriptFunction('setGpioPinDutyCycle', 2, ReturnType.none, 0x42),
     InBuiltScriptFunction('cancelAllStenoKeys', 0, ReturnType.none, 0x43),
     InBuiltScriptFunction('cancelStenoKey', 1, ReturnType.none, 0x44),
@@ -103,5 +103,14 @@ class ButtonScriptInBuiltFunctions {
     InBuiltScriptFunction('setDrawColorRgb', 4, ReturnType.none, 0x62),
     InBuiltScriptFunction('setDrawColorHsv', 4, ReturnType.none, 0x63),
     InBuiltScriptFunction('drawEffect', 3, ReturnType.none, 0x64),
- ];
+    InBuiltScriptFunction('sin', 1, ReturnType.value, 0x65),
+    InBuiltScriptFunction('cos', 1, ReturnType.value, 0x66),
+    InBuiltScriptFunction('tan', 1, ReturnType.value, 0x67),
+    InBuiltScriptFunction('asin', 1, ReturnType.value, 0x68),
+    InBuiltScriptFunction('acos', 1, ReturnType.value, 0x69),
+    InBuiltScriptFunction('atan', 1, ReturnType.value, 0x6a),
+    InBuiltScriptFunction('atan2', 2, ReturnType.value, 0x6b),
+    InBuiltScriptFunction('formatString', 2, ReturnType.value, 0x6c),
+    InBuiltScriptFunction('getAsset', 1, ReturnType.value, 0x6d),
+  ];
 }

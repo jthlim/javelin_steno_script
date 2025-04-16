@@ -1,3 +1,5 @@
+// Copy-paste the contents of this script into a Layer's User Scripts
+// After that, clicking on a key will show mouse movement options.
 var vx;
 var vy;
 

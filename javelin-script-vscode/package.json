@@ -1,5 +1,6 @@
 {
   "name": "javelin-script",
+  "publisher": "Jeffrey Lim",
   "displayName": "Javelin Script",
   "description": "Javelin Script Syntax Highlighter",
   "version": "0.0.1",

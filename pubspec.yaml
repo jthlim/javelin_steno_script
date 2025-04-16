@@ -20,6 +20,8 @@ dependencies:
     path: ../../third_party/dropzone
   flutter:
     sdk: flutter
+  javelin_extensions:
+    path: ../javelin_extensions
   google_fonts: ^6.2.1
   image: ^4.0.15
   web: ^1.0.0

@@ -1,8 +1,7 @@
-import 'dart:typed_data';
-
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:image/image.dart' show Pixel, decodePng;
+import 'package:image/image.dart' show Pixel;
+import 'package:javelin_steno_script/image_convert.dart';
 
 import 'drop_zone.dart';
 import 'file_helper.dart';
@@ -67,47 +66,22 @@ class JavelinScriptEditorState extends State<JavelinScriptEditor> {
 
   Future<String> stringForDroppedFile(File file) async {
     final filename = file.name;
-    if (file.type != 'image/png') {
-      return '/* Unable to convert: Only PNG files supported. */';
-    }
-
     final bytes = await file.bytes;
     if (bytes == null) {
       return '/* Unable to read file data. */';
     }
 
-    final image = decodePng(bytes);
+    final image = ImageConvert.decodeImage(bytes);
     if (image == null) {
-      return '/* Unable to decode PNG. */';
-    }
-    final width = image.width;
-    final height = image.height;
-
-    if (width == 0 || height == 0 || width >= 256 || height >= 256) {
-      return '/* PNG width & height must be less than 256. */';
+      return '/* Unable to decode image. */';
     }
 
-    final imageData = BytesBuilder();
-    imageData.addByte(width);
-    imageData.addByte(height);
-
-    for (var x = 0; x < width; ++x) {
-      for (var yy = 0; yy < height; yy += 8) {
-        var data = 0;
-        for (var y = 0; y < 8; ++y) {
-          if (yy + y >= height) {
-            break;
-          }
-          if (isOn(image.getPixel(x, yy + y))) {
-            data |= 1 << y;
-          }
-        }
-        imageData.addByte(data);
-      }
+    final imageDataBytes = ImageConvert.convertBitmapImage(image);
+    if (imageDataBytes == null) {
+      return '/* Invalid image width or height. */';
     }
 
     final buffer = StringBuffer();
-    final imageDataBytes = imageData.toBytes();
     buffer.write('/* $filename */ [[');
     for (var i = 0; i < imageDataBytes.length; ++i) {
       if (i % 16 == 0) buffer.write('\n ');

@@ -68,9 +68,8 @@ class Parser {
     return true;
   }
 
-  ScriptModule parse() {
+  void parse() {
     parseModule();
-    return _module;
   }
 
   void parseModule() {
