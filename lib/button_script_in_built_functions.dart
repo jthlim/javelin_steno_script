@@ -63,7 +63,7 @@ class ButtonScriptInBuiltFunctions {
     InBuiltScriptFunction('isBleProfileSleeping', 1, ReturnType.boolean, 0x3a),
     InBuiltScriptFunction('isBleAdvertising', 0, ReturnType.boolean, 0x3b),
     InBuiltScriptFunction('isBleScanning', 0, ReturnType.boolean, 0x3c),
-    InBuiltScriptFunction('isWaitingForUserPresence', 0, ReturnType.boolean, 0x3d),
+    InBuiltScriptFunction('isWaitingForUserPresence', 0, ReturnType.boolean, 0x3d,),
     InBuiltScriptFunction('replyUserPresence', 1, ReturnType.none, 0x3e),
     InBuiltScriptFunction('setGpioInputPin', 2, ReturnType.none, 0x3f),
     InBuiltScriptFunction('readGpioPin', 1, ReturnType.boolean, 0x40),
@@ -112,5 +112,7 @@ class ButtonScriptInBuiltFunctions {
     InBuiltScriptFunction('atan2', 2, ReturnType.value, 0x6b),
     InBuiltScriptFunction('formatString', 2, ReturnType.value, 0x6c),
     InBuiltScriptFunction('getAsset', 1, ReturnType.value, 0x6d),
+    InBuiltScriptFunction('addCombo', 5, ReturnType.none, 0x6e),
+    InBuiltScriptFunction('resetCombos', 0, ReturnType.none, 0x6f),
   ];
 }

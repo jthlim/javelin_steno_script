@@ -969,25 +969,38 @@ func onPointerUpdate0(x, y, z) {
       if (getTime() - z0ReleaseTime > 150) {
         z0PressTime = getTime();
 
-        if (y > 1300) {
+        if (y > 1200) {
           pointer0Mode = 1;
-        } else if (x < 400) {
+        } else if (x < 500) {
           pointer0Mode = 2;
         } else {
           pointer0Mode = 0;
         }
       }
       onMouseActive();
-    } else if (pointer0Mode == 0) {
-      moveMouse(x - lastX0, y - lastY0);
-    } else if (!((lastX0 == 1024 && lastY0 == 1024) || (x == 1024 && y == 1024))) {
-      var startAngle = atan2(lastY0 - 1024, lastX0 - 1024) >> 12;
-      var endAngle = atan2(y - 1024, x - 1024) >> 12;
-      var deltaAngle = (startAngle - endAngle) << 28 >> 28;
-      if (pointer0Mode == 1) {
-        hWheelMouse(deltaAngle);
-      } else if (pointer0Mode == 2) {
-        vWheelMouse(deltaAngle);
+    } else {
+      var dx = x - lastX0;
+      var dy = y - lastY0;
+      if (pointer0Mode >= 3) {
+        if (dx * dx + dy * dy < 32*32) return;
+        if (pointer0Mode == 4) {
+          pointer0Mode = (4 * dx * dx < dy * dy) ? 2 : 0;
+        } else {
+          pointer0Mode = (4 * dy * dy < dx * dx) ? 1 : 0;
+        }
+      }
+
+      if (pointer0Mode == 0) {
+        moveMouse(dx, dy);
+      } else if (!((lastX0 == 1024 && lastY0 == 1024) || (x == 1024 && y == 1024))) {
+        var startAngle = atan2(lastY0 - 1024, lastX0 - 1024) >> 12;
+        var endAngle = atan2(y - 1024, x - 1024) >> 12;
+        var deltaAngle = (startAngle - endAngle) << 28 >> 28;
+        if (pointer0Mode == 1) {
+          hWheelMouse(deltaAngle);
+        } else if (pointer0Mode == 2) {
+          vWheelMouse(deltaAngle);
+        }
       }
     }
   }
@@ -1001,7 +1014,7 @@ var lastY1;
 var lastZ1;
 var z1PressTime;
 var z1ReleaseTime;
-var pointer1Mode; // 0 = move, 1 = horizontal scroll, 2 = vertical scroll
+var pointer1Mode; // 0 = move, 1 = horizontal scroll, 2 = vertical scroll, 3=pending horizontal scroll, 4= pending vertical scroll.
 func onPointerUpdate1(x, y, z) {
   if (z == 0) {
     if (lastZ1 != 0) {
@@ -1017,25 +1030,38 @@ func onPointerUpdate1(x, y, z) {
       if (getTime() - z1ReleaseTime > 150) {
         z1PressTime = getTime();
 
-        if (y > 1300) {
-          pointer1Mode = 1;
-        } else if (x > 1700) {
-          pointer1Mode = 2;
+        if (y > 1200) {
+          pointer1Mode = 3;
+        } else if (x > 1600) {
+          pointer1Mode = 4;
         } else {
           pointer1Mode = 0;
         }
       }
       onMouseActive();
-    } else if (pointer1Mode == 0) {
-      moveMouse(x - lastX1, y - lastY1);
-    } else if (!((lastX1 == 1024 && lastY1 == 1024) || (x == 1024 && y == 1024))) {
-      var startAngle = atan2(lastY1 - 1024, lastX1 - 1024) >> 12;
-      var endAngle = atan2(y - 1024, x - 1024) >> 12;
-      var deltaAngle = (startAngle - endAngle) << 28 >> 28;
-      if (pointer1Mode == 1) {
-        hWheelMouse(deltaAngle);
-      } else if (pointer1Mode == 2) {
-        vWheelMouse(deltaAngle);
+    } else {
+      var dx = x - lastX1;
+      var dy = y - lastY1;
+      if (pointer1Mode >= 3) {
+        if (dx * dx + dy * dy < 32*32) return;
+        if (pointer1Mode == 4) {
+          pointer1Mode = (4 * dx * dx < dy * dy) ? 2 : 0;
+        } else {
+          pointer1Mode = (4 * dy * dy < dx * dx) ? 1 : 0;
+        }
+      }
+
+      if (pointer1Mode == 0) {
+        moveMouse(dx, dy);
+      } else if (!((lastX1 == 1024 && lastY1 == 1024) || (x == 1024 && y == 1024))) {
+        var startAngle = atan2(lastY1 - 1024, lastX1 - 1024) >> 12;
+        var endAngle = atan2(y - 1024, x - 1024) >> 12;
+        var deltaAngle = (startAngle - endAngle) << 28 >> 28;
+        if (pointer1Mode == 1) {
+          hWheelMouse(deltaAngle);
+        } else if (pointer1Mode == 2) {
+          vWheelMouse(deltaAngle);
+        }
       }
     }
   }
