@@ -175,8 +175,8 @@ class HalfWordListAstNode extends AstNode {
   }
 }
 
-class ByteIndexAstNode extends AstNode {
-  ByteIndexAstNode(this.byteValue, this.index);
+class ReadByteIndexAstNode extends AstNode {
+  ReadByteIndexAstNode(this.byteValue, this.index);
 
   // Do NOT mark this as constant, otherwise integer folding instructions
   // will be attempted.
@@ -227,16 +227,56 @@ class ByteIndexAstNode extends AstNode {
     byteValue.addInstructions(builder);
     index.addInstructions(builder);
 
-    builder
-        .addInstruction(OperatorInstruction(ScriptOperatorOpcode.byteLookup));
+    builder.addInstruction(
+      OperatorInstruction(ScriptOperatorOpcode.readByteIndex),
+    );
   }
 
   final AstNode byteValue;
   final AstNode index;
 }
 
-class HalfWordIndexAstNode extends AstNode {
-  HalfWordIndexAstNode(this.value, this.index);
+class WriteByteIndexAstNode extends AstNode {
+  WriteByteIndexAstNode(this.byteValue, this.index, this.value);
+
+  @override
+  bool isConstant() => false;
+
+  @override
+  int constantValue() => throw UnsupportedError('Should not be invoked');
+
+  @override
+  bool isPure() => false;
+
+  @override
+  ExecutionValue? evaluate(ExecutionContext context) {
+    context.state = ExecutionState.error;
+    return null;
+  }
+
+  @override
+  void mark(ScriptReachability context) {
+    byteValue.mark(context);
+    index.mark(context);
+    value.mark(context);
+  }
+
+  @override
+  void addInstructions(ScriptByteCodeBuilder builder) {
+    byteValue.addInstructions(builder);
+    index.addInstructions(builder);
+    value.addInstructions(builder);
+
+    builder.addInstruction(WriteByteIndexInstruction());
+  }
+
+  final AstNode byteValue;
+  final AstNode index;
+  final AstNode value;
+}
+
+class ReadHalfWordIndexAstNode extends AstNode {
+  ReadHalfWordIndexAstNode(this.value, this.index);
 
   // Do NOT mark this as constant, otherwise integer folding instructions
   // will be attempted.
@@ -261,7 +301,7 @@ class HalfWordIndexAstNode extends AstNode {
     index.addInstructions(builder);
 
     builder.addInstruction(
-      OperatorInstruction(ScriptOperatorOpcode.halfWordLookup),
+      OperatorInstruction(ScriptOperatorOpcode.readHalfWordIndex),
     );
   }
 

@@ -961,6 +961,7 @@ func drawDisplayOverlay() {
       02 10 b0 01 b0 01
       02 10 d8 06 d8 06
       02 10 b6 0d b6 0d
+      02 10 db 36 db 36
   ]];
 
   // Clear the region.

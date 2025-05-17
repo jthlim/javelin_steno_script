@@ -475,12 +475,12 @@ class Parser {
             result.value.codeUnitAt(indexExpression.constantValue() + 1),
           );
         }
-        return ByteIndexAstNode(result, indexExpression);
+        return ReadByteIndexAstNode(result, indexExpression);
       case TokenType.openHalfWordList:
         _nextToken();
         final indexExpression = _parseExpression();
         _assertToken(TokenType.closeHalfWordList);
-        return HalfWordIndexAstNode(result, indexExpression);
+        return ReadHalfWordIndexAstNode(result, indexExpression);
       default:
         return result;
     }
@@ -855,40 +855,60 @@ class Parser {
       _assertToken(TokenType.semiColon);
     }
 
+    var symbolIsArray = false;
     if (assignType != TokenType.assign) {
-      if (indexExpression != null) {
+      if (indexExpression != null && !indexExpression.isPure()) {
         throw FormatException(
-          'Only simple assignment supports index near $_currentToken',
+          'Only pure expressions can be used in compound assignnments near $_currentToken',
         );
       }
-      final AstNode loadValueAstNode;
+
+      AstNode loadValueAstNode;
       if (_module.globals.containsKey(name)) {
         final global = _module.globals[name]!;
         if (global.arraySize != null) {
-          throw FormatException(
-            '$name is an array and requires an index near $_currentToken',
+          symbolIsArray = true;
+          if (indexExpression == null) {
+            throw FormatException(
+              '$name is an array and requires an index near $_currentToken',
+            );
+          }
+
+          loadValueAstNode = LoadIndexedGlobalValueAstNode(
+            LoadGlobalValueArrayAstNode(global),
+            indexExpression,
           );
+        } else {
+          loadValueAstNode =
+              LoadValueAstNode(isGlobal: true, index: global.index);
         }
-        if (indexExpression != null) {
-          throw FormatException('$name is not an array near $_currentToken');
-        }
-        loadValueAstNode =
-            LoadValueAstNode(isGlobal: true, index: global.index);
       } else if (_function!.locals.variables.containsKey(name)) {
         final localVariable = _function!.locals.variables[name]!;
         if (localVariable.arraySize != null) {
-          throw FormatException(
-            '$name is an array and requires an index near $_currentToken',
+          symbolIsArray = true;
+          if (indexExpression == null) {
+            throw FormatException(
+              '$name is an array and requires an index near $_currentToken',
+            );
+          }
+
+          loadValueAstNode = LoadIndexedLocalValueAstNode(
+            LoadLocalValueArrayAstNode(localVariable),
+            indexExpression,
           );
         } else {
-          if (indexExpression != null) {
-            throw FormatException('$name is not an array near $_currentToken');
-          }
           loadValueAstNode =
               LoadValueAstNode(isGlobal: false, index: localVariable.index);
         }
       } else {
         throw FormatException('Unknown variable $name near $_currentToken');
+      }
+
+      if (indexExpression != null && !symbolIsArray) {
+        loadValueAstNode = ReadByteIndexAstNode(
+          loadValueAstNode,
+          indexExpression,
+        );
       }
 
       switch (assignType) {
@@ -953,7 +973,11 @@ class Parser {
         );
       } else {
         if (indexExpression != null) {
-          throw FormatException('$name is not an array near $_currentToken');
+          return WriteByteIndexAstNode(
+            LoadValueAstNode(isGlobal: true, index: global.index),
+            indexExpression,
+            value,
+          );
         }
         return StoreValueAstNode(
           isGlobal: true,
@@ -977,7 +1001,11 @@ class Parser {
         );
       } else {
         if (indexExpression != null) {
-          throw FormatException('$name is not an array near $_currentToken');
+          return WriteByteIndexAstNode(
+            LoadValueAstNode(isGlobal: false, index: localVariable.index),
+            indexExpression,
+            value,
+          );
         }
         return StoreValueAstNode(
           isGlobal: false,

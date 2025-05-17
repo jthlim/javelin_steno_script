@@ -32,6 +32,9 @@ enum ScriptOpcode {
   storeLocalValue(0x6e),
   storeLocalIndex(0x6f),
   operatorBegin(0x70),
+  writeByteIndex(0x8a),
+  writeHalfWordIndex(0x8b),
+  writeWordIndex(0x8c),
   operatorEnd(0x8f),
   callInternalFunction(0x90),
   callFunction(0x91),
@@ -80,11 +83,11 @@ enum ScriptOperatorOpcode {
   shiftLeft(0x12, false),
   arithmeticShiftRight(0x13, false),
   logicalShiftRight(0x14, false),
-  byteLookup(0x15, false),
-  wordLookup(0x16, false),
+  readByteIndex(0x15, false),
+  readWordIndex(0x16, false),
   increment(0x17, false),
   decrement(0x18, false),
-  halfWordLookup(0x19, false),
+  readHalfWordIndex(0x19, false),
   ;
 
   const ScriptOperatorOpcode(int value, this.isBooleanResult)
@@ -873,6 +876,11 @@ sealed class SingleOpcodeInstruction extends ScriptInstruction {
 final class PopValueInstruction extends SingleOpcodeInstruction {
   @override
   ScriptOpcode get opcode => ScriptOpcode.pop;
+}
+
+final class WriteByteIndexInstruction extends SingleOpcodeInstruction {
+  @override
+  ScriptOpcode get opcode => ScriptOpcode.writeByteIndex;
 }
 
 final class ReturnInstruction extends SingleOpcodeInstruction {

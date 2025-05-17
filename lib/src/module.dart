@@ -4,6 +4,7 @@ import 'ast.dart';
 import 'byte_code_builder.dart';
 import 'executor.dart';
 import 'functions.dart';
+import 'parser.dart';
 
 class ScriptLocalVariable {
   ScriptLocalVariable(this.name, this.index, [this.arraySize]);
@@ -126,6 +127,13 @@ class ScriptModule {
     for (final builtInFunction in builtInFunctions) {
       functions[builtInFunction.functionName] = builtInFunction;
     }
+  }
+
+  factory ScriptModule.header(String header) {
+    final result = ScriptModule(const []);
+    final parser = Parser(input: header, filename: '', module: result);
+    parser.parse();
+    return result;
   }
 
   final functions = <String, ScriptFunctionDefinition>{};

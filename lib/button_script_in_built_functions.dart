@@ -119,5 +119,10 @@ class ButtonScriptInBuiltFunctions {
     InBuiltScriptFunction('getAsset', 1, ReturnType.value, 0x6d),
     InBuiltScriptFunction('addCombo', 5, ReturnType.none, 0x6e),
     InBuiltScriptFunction('resetCombos', 0, ReturnType.none, 0x6f),
+    InBuiltScriptFunction('sendInfraredMessage', 4, ReturnType.none, 0x70),
+    InBuiltScriptFunction('sendInfraredData', 3, ReturnType.none, 0x71),
+    InBuiltScriptFunction('stopInfrared', 0, ReturnType.none, 0x72),
+    InBuiltScriptFunction('printData', 3, ReturnType.none, 0x73),
+    InBuiltScriptFunction('measureTextWidth', 2, ReturnType.value, 0x74),
   ];
 }

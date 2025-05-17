@@ -591,11 +591,11 @@ class Tokenizer {
           continue;
 
         case 0x75: // 'u'
-          _parseHexCharCode(buffer, 2);
+          _parseHexCharCode(buffer, 4);
           continue;
 
         case 0x78: // 'x'
-          _parseHexCharCode(buffer, 4);
+          _parseHexCharCode(buffer, 2);
           continue;
 
         default:

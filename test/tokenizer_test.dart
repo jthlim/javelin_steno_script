@@ -65,6 +65,14 @@ void main() {
       );
     });
 
+    test('should tokenize string values correctly', () {
+      final result = Tokenizer('"\\x23\\xcb\\u1234"', '').tokenize();
+      expect(
+        result.toList().map((token) => token.stringValue?.codeUnits),
+        const [83 /*S, the string marker*/, 0x23, 0xcb, 0x1234],
+      );
+    });
+
     test('should tokenize numbers correctly', () {
       final result = Tokenizer(
         '0 1 12 0x123',
