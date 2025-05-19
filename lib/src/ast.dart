@@ -134,23 +134,37 @@ class HalfWordListAstNode extends AstNode {
         final v = e.constantValue();
         bytesBuilder.addByte(v & 0xff);
         bytesBuilder.addByte(v >> 8);
-      } else if (e is PushFunctionAddress) {
+      } else if (e is PushFunctionAddress || e is StringValueAstNode) {
         bytesBuilder.addByte(0xff);
         bytesBuilder.addByte(0xff);
+      } else {
+        throw UnsupportedError('Internal error');
       }
     }
     bytes = bytesBuilder.toBytes();
 
     var offset = 0;
     for (final e in values) {
-      if (!e.isConstant() && e is PushFunctionAddress) {
-        builder.addInstruction(
-          SetHalfWordFunctionDataValueInstruction(
-            value: bytes,
-            valueOffset: offset,
-            functionName: e.name,
-          ),
-        );
+      if (!e.isConstant()) {
+        if (e is PushFunctionAddress) {
+          builder.addInstruction(
+            SetHalfWordFunctionDataValueInstruction(
+              value: bytes,
+              valueOffset: offset,
+              functionName: e.name,
+            ),
+          );
+        } else if (e is StringValueAstNode) {
+          builder.addInstruction(
+            SetHalfWordStringValueInstruction(
+              value: bytes,
+              valueOffset: offset,
+              stringValue: e.value,
+            ),
+          );
+        } else {
+          throw UnsupportedError('Internal error');
+        }
       }
       offset += 2;
     }

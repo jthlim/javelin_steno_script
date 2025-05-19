@@ -129,7 +129,9 @@ class Parser {
     final expression = _parseExpression();
     _assertToken(TokenType.semiColon);
 
-    if (!expression.isConstant() && expression is! StringValueAstNode) {
+    if (!expression.isConstant() &&
+        expression is! StringValueAstNode &&
+        expression is! HalfWordListAstNode) {
       throw Exception('$name not a constant value near $_currentToken');
     }
 
@@ -325,6 +327,10 @@ class Parser {
     }
 
     if (value is PushFunctionAddress) {
+      return value;
+    }
+
+    if (value is StringValueAstNode) {
       return value;
     }
 
@@ -799,7 +805,9 @@ class Parser {
     final expression = _parseExpression();
     _assertToken(TokenType.semiColon);
 
-    if (!expression.isConstant() && expression is! StringValueAstNode) {
+    if (!expression.isConstant() &&
+        expression is! StringValueAstNode &&
+        expression is! HalfWordListAstNode) {
       throw Exception('$name not a constant value near $_currentToken');
     }
 

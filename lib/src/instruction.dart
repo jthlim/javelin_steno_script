@@ -731,6 +731,36 @@ final class SetHalfWordFunctionDataValueInstruction
   final int valueOffset;
 }
 
+final class SetHalfWordStringValueInstruction extends ScriptInstruction {
+  SetHalfWordStringValueInstruction({
+    required this.stringValue,
+    required this.value,
+    required this.valueOffset,
+  });
+
+  @override
+  int get byteCodeLength => 0;
+
+  @override
+  void addByteCode(ScriptByteCodeBuilder builder) {
+    final offset = builder.stringTable[stringValue];
+    if (offset == null) {
+      throw Exception('Internal error $stringValue not found');
+    }
+
+    value[valueOffset] = offset & 0xff;
+    value[valueOffset + 1] = offset >> 8;
+  }
+
+  @override
+  String toString() =>
+      '  ((set2 offset $valueOffset -> "${formatStringData(stringValue)}"))';
+
+  final Uint8List value;
+  final int valueOffset;
+  final String stringValue;
+}
+
 final class PushDataValueInstruction extends ScriptInstruction {
   PushDataValueInstruction(this.value);
 

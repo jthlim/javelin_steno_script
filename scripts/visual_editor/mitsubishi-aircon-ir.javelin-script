@@ -1,0 +1,202 @@
+// Copy-paste the contents of this script into a layer's User Scripts
+// After that, clicking on a key will show Aircon options.
+var airConditionerTemperature = 27;
+var isAirConditionerOn = 1;
+var fanMode = 0;
+var vaneMode = 0;
+
+func drawOutlineRect(d, left, top, right, bottom) {
+  drawLine(d, left, top, right, top);
+  drawLine(d, right, top, right, bottom);
+  drawLine(d, right, bottom, left, bottom);
+  drawLine(d, left, bottom, left, top);
+}
+
+func getFanModeIcon() var {
+  const FAN_AUTO = [[
+    10 10 e0 03 70 03 18 00 8c 1f c4 31 e4 63 34 46
+    14 cc 1c cc 38 de f2 5b c6 79 04 08 0c 0c 18 06
+    f0 03
+  ]];
+  const FAN1 = [[04 0f 00 78 00 78 00 7c 00 7c]];
+  const FAN2 = [[09 0f 00 78 00 78 00 7c 00 7c 00 00 00 7e 00 7e 00 7f 00 7f]];
+  const FAN3 = [[
+    0e 0f 00 78 00 78 00 7c 00 7c 00 00 00 7e 00 7e
+    00 7f 00 7f 00 00 80 7f 80 7f c0 7f c0 7f
+  ]];
+  const FAN4 = [[
+    13 0f 00 78 00 78 00 7c 00 7c 00 00 00 7e 00 7e
+    00 7f 00 7f 00 00 80 7f 80 7f c0 7f c0 7f 00 00
+    e0 7f e0 7f f0 7f f0 7f
+  ]];
+  const FAN_ICONS = [[[FAN_AUTO, FAN1, FAN2, FAN3, FAN4]]];
+  return FAN_ICONS[[[fanMode]]];
+}
+
+func getVaneModeIcon() var {
+  const VANE_AUTO = [[
+    10 10 e0 03 70 03 18 00 8c 1f c4 31 e4 63 34 46
+    14 cc 1c cc 38 de f2 5b c6 79 04 08 0c 0c 18 06
+    f0 03
+  ]];
+  const VANE1 = [[
+    10 10 00 00 03 00 03 00 03 00 03 00 03 00 03 00
+    03 00 03 00 03 00 03 00 03 00 00 00 00 00 00 00
+    00 00
+  ]];
+  const VANE2 = [[
+    10 10 00 00 00 00 c0 00 c0 00 60 00 60 00 30 00
+    30 00 18 00 18 00 0c 00 0c 00 00 00 00 00 00 00
+    00 00
+  ]];
+  const VANE3 = [[
+    10 10 00 00 00 00 00 00 00 00 00 0c 00 0e 00 07
+    80 03 c0 01 e0 00 70 00 38 00 18 00 00 00 00 00
+    00 00
+  ]];
+  const VANE4 = [[
+    10 10 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    00 00 00 30 00 3c 00 0f c0 03 f0 00 30 00 00 00
+    00 00
+  ]];
+  const VANE5 = [[
+    10 10 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 f0 7f
+    f0 7f
+  ]];
+  const VANE_SWING = [[
+    10 10 20 00 33 00 fb 00 33 03 23 04 03 08 03 10
+    03 10 03 20 03 20 03 f8 03 70 00 20 00 00 f0 7f
+    f0 7f
+  ]];
+
+  const VANE_ICONS = [[[VANE_AUTO, VANE1, VANE2, VANE3, VANE4, VANE5, VANE_SWING]]];
+  return VANE_ICONS[[[vaneMode]]];
+}
+
+#option(drawDisplay, "Display", "Air Conditioner", drawAirConditioner)
+func drawAirConditioner() {
+  clearDisplay(0);
+  setAutoDraw(0, AUTO_DRAW_NONE);
+
+  setDrawColor(0, 1);
+  drawRect(0, 2 + 32*isAirConditionerOn, 22, 34 + 32*isAirConditionerOn, 40);
+
+  setDrawColor(0, isAirConditionerOn);
+  drawText(0, 18, 35, 0, 1, "Off");
+
+  setDrawColor(0, !isAirConditionerOn);
+  drawText(0, 50, 35, 0, 1, "On");
+
+  setDrawColor(0, 1);
+  drawOutlineRect(0, 2, 44, 66, 96);
+  drawText(0, 36, 84, 5, TEXT_ALIGNMENT_MIDDLE, formatString("%d", airConditionerTemperature));
+  const degreesIcon = [[08 08 3c 7e e7 c3 c3 e7 7e 3c]];
+  drawImage(0, 56, 54, degreesIcon);
+
+  for (var i = 16; i <= airConditionerTemperature; i += 1) {
+    var y = 92 + 48 - 3*i;
+    drawRect(0, 4, y, 12, y+2);
+  }
+
+  // Fan speed
+  const FAN_SPEED_ICON = [[
+    0f 10 00 1e 18 3f 7e 7f 7f 7e ff 7e ff 3e fe 0f
+    c0 62 f0 ff f8 fe fc fe fc fc fc 7c f8 38 70 00
+  ]];
+
+  drawOutlineRect(0, 2, 100, 66, 126);
+  drawImage(0, 13, 105, FAN_SPEED_ICON);
+  drawImage(0, 37, 105, getFanModeIcon());
+
+  const VANE_ICON = [[
+    0e 10 00 00 60 00 20 03 20 09 a0 1d 80 0c 00 26
+    00 38 3e 1c 41 c0 81 f0 81 00 81 00 fe 00
+  ]];
+  drawOutlineRect(0, 2, 130, 66, 156);
+  drawImage(0, 14, 135, VANE_ICON);
+  drawImage(0, 37, 135, getVaneModeIcon());
+}
+
+func reverseBits(v, n) var {
+  var result = 0;
+  for (var i = 0; i < n; i += 1) {
+    result = (result << 1) | (v & 1);
+    v >>>= 1;
+  }
+  return result;
+}
+
+func updateAirConditioner() {
+  var MITSUBISHI_CONFIGURATION = [[[
+    // Repeat
+    2, 0,
+    17000, 0,
+    1,
+    38000,
+    33,
+    16,
+    0x840, 0x420,
+    0x108, 0x108,
+    0x108, 0x318,
+    0x108, 0
+  ]]];
+
+  // Hack to get editable buffer. This will change in the future.
+  var airconData = formatString("123456789012345678%Z", 0);
+  const AIRCON_BASE_DATA = [[ c4 d3 64 80 00 00 18 00 6c 00 00 00 00 00 00 00 00 00 ]];
+  const VANE_DATA = [[01 12 0a 1a 06 16 1e]];
+
+  for(var i = 0; i < 18; i += 1) airconData[i] = AIRCON_BASE_DATA[i];
+  airconData[5] = isAirConditionerOn << 2;
+  airconData[7] = reverseBits(airConditionerTemperature - 16, 8);
+  airconData[9] = reverseBits(fanMode, 8) | VANE_DATA[vaneMode];
+
+  var checksum = 0;
+  for (var i = 0; i < 17; i += 1) {
+    checksum += reverseBits(airconData[i], 8);
+  }
+  airconData[17] = reverseBits(checksum, 8);
+
+  sendInfraredData(airconData, 144, MITSUBISHI_CONFIGURATION);
+  drawAirConditioner();
+}
+
+func toggleAirConditionerPower() {
+  isAirConditionerOn = !isAirConditionerOn;
+  updateAirConditioner();
+}
+
+func decreaseAirConditionerTemperature() {
+  if (airConditionerTemperature <= 16) return;
+  airConditionerTemperature -= 1;
+  updateAirConditioner();
+}
+
+func increaseAirConditionerTemperature() {
+  if (airConditionerTemperature >= 31) return;
+  airConditionerTemperature += 1;
+  updateAirConditioner();
+}
+
+func decreaseTemperature() {
+  if (airConditionerTemperature <= 16) return;
+  airConditionerTemperature -= 1;
+  updateAirConditioner();
+}
+
+func cycleFanMode() {
+  fanMode = (fanMode + 1) % 5;
+  updateAirConditioner();
+}
+
+func cycleVaneMode() {
+  vaneMode = (vaneMode + 1) % 7;
+  updateAirConditioner();
+}
+
+// #prefab Aircon:Power [{"t":"p","d":{"a":{"t":"s","script":"// Aircon\\nPower\ntoggleAirConditionerPower();"}}}]
+// #prefab Aircon:Temp + [{"t":"p","d":{"a":{"t":"s","script":"// Aircon\\nTemp +\nincreaseAirConditionerTemperature();"}}}]
+// #prefab Aircon:Temp - [{"t":"p","d":{"a":{"t":"s","script":"// Aircon\\nTemp -\ndecreaseAirConditionerTemperature();"}}}]
+// #prefab Aircon:Fan Mode [{"t":"p","d":{"a":{"t":"s","script":"// Aircon\\nFan\ncycleFanMode();"}}}]
+// #prefab Aircon:Vane [{"t":"p","d":{"a":{"t":"s","script":"// Aircon\\nVane\ncycleVaneMode();"}}}]
