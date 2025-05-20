@@ -276,7 +276,7 @@ func setLayerNoRelease(layerIndex, layerIdEvent) {
 }
 
 func dispatchToLayer(functions) {
-  var f = functions[[[resolveLayerIndex()]]];
+  var f = functions[<resolveLayerIndex()>];
   f();
 }
 
@@ -364,7 +364,7 @@ func activate6NoRelease() {
 }
 
 func activateDynamic() {
-  dispatchToLayer([[[@activate0, @activate1, @activate2, @activate3, @activate4, @activate5, @activate6]]]);
+  dispatchToLayer([<@activate0, @activate1, @activate2, @activate3, @activate4, @activate5, @activate6>]);
 }
 func activateGlobal() {
   if (([[01 01 01 01 00 01 00]][resolveLayerIndex()])) {
@@ -399,7 +399,7 @@ func deactivate6() {
 }
 
 func deactivateDynamic() {
-  dispatchToLayer([[[@deactivate0, 0, @deactivate2, @deactivate3, @deactivate4, 0, 0]]]);
+  dispatchToLayer([<@deactivate0, 0, @deactivate2, @deactivate3, @deactivate4, 0, 0>]);
 }
 func deactivateGlobal() {
 }
@@ -505,7 +505,7 @@ func globalRelease() {
 
 // Global Script: Display Scripts
 func updateDisplay() {
-  dispatchToLayer([[[@drawDisplayAbc, @drawDisplaySymbol, @drawDisplayFunction, @drawDisplayNavigation, @drawBleSummary, @drawDisplayNumpad, @drawDisplaySecurityKey]]]);
+  dispatchToLayer([<@drawDisplayAbc, @drawDisplaySymbol, @drawDisplayFunction, @drawDisplayNavigation, @drawBleSummary, @drawDisplayNumpad, @drawDisplaySecurityKey>]);
 }
 
 func blankDisplay() {
@@ -2902,13 +2902,13 @@ func user1ScriptSetLayer(layerId) {
 func onPress0() {
   globalPress(0);
 
-  dispatchToLayer([[[@onPress0_0, @onPress0_1, 0, 0, @onPress0_4, 0, 0]]]);
+  dispatchToLayer([<@onPress0_0, @onPress0_1, 0, 0, @onPress0_4, 0, 0>]);
 }
 func onRelease0() {
   globalRelease();
 
   handleModTapRelease(@modTapHandler0);
-  dispatchToLayer([[[0, @onRelease0_1, 0, 0, 0, 0, 0]]]);
+  dispatchToLayer([<0, @onRelease0_1, 0, 0, 0, 0, 0>]);
 }
 
 func onPress0_0() {
@@ -2935,13 +2935,13 @@ func onRelease0_4() {
 func onPress1() {
   globalPress(1);
 
-  dispatchToLayer([[[@onPress1_0, @onPress1_1, @onPress1_2, 0, @onPress1_4, 0, 0]]]);
+  dispatchToLayer([<@onPress1_0, @onPress1_1, @onPress1_2, 0, @onPress1_4, 0, 0>]);
 }
 func onRelease1() {
   globalRelease();
 
   handleModTapRelease(@modTapHandler1);
-  dispatchToLayer([[[0, @onRelease1_1, 0, 0, @onRelease1_4, 0, 0]]]);
+  dispatchToLayer([<0, @onRelease1_1, 0, 0, @onRelease1_4, 0, 0>]);
 }
 
 func onPress1_0() {
@@ -2985,13 +2985,13 @@ func onRelease1_4() {
 func onPress2() {
   globalPress(2);
 
-  dispatchToLayer([[[@onPress2_0, @onPress2_1, @onPress2_2, 0, @onPress2_4, 0, 0]]]);
+  dispatchToLayer([<@onPress2_0, @onPress2_1, @onPress2_2, 0, @onPress2_4, 0, 0>]);
 }
 func onRelease2() {
   globalRelease();
 
   handleModTapRelease(@modTapHandler2);
-  dispatchToLayer([[[0, @onRelease2_1, 0, 0, @onRelease2_4, 0, 0]]]);
+  dispatchToLayer([<0, @onRelease2_1, 0, 0, @onRelease2_4, 0, 0>]);
 }
 
 func onPress2_0() {
@@ -3035,13 +3035,13 @@ func onRelease2_4() {
 func onPress3() {
   globalPress(3);
 
-  dispatchToLayer([[[@onPress3_0, @onPress3_1, @onPress3_2, 0, @onPress3_4, 0, 0]]]);
+  dispatchToLayer([<@onPress3_0, @onPress3_1, @onPress3_2, 0, @onPress3_4, 0, 0>]);
 }
 func onRelease3() {
   globalRelease();
 
   handleModTapRelease(@modTapHandler3);
-  dispatchToLayer([[[0, @onRelease3_1, 0, 0, @onRelease3_4, 0, 0]]]);
+  dispatchToLayer([<0, @onRelease3_1, 0, 0, @onRelease3_4, 0, 0>]);
 }
 
 func onPress3_0() {
@@ -3085,13 +3085,13 @@ func onRelease3_4() {
 func onPress4() {
   globalPress(4);
 
-  dispatchToLayer([[[@onPress4_0, @onPress4_1, @onPress4_2, 0, @onPress4_4, 0, 0]]]);
+  dispatchToLayer([<@onPress4_0, @onPress4_1, @onPress4_2, 0, @onPress4_4, 0, 0>]);
 }
 func onRelease4() {
   globalRelease();
 
   handleModTapRelease(@modTapHandler4);
-  dispatchToLayer([[[0, @onRelease4_1, 0, 0, @onRelease4_4, 0, 0]]]);
+  dispatchToLayer([<0, @onRelease4_1, 0, 0, @onRelease4_4, 0, 0>]);
 }
 
 func onPress4_0() {
@@ -3135,13 +3135,13 @@ func onRelease4_4() {
 func onPress5() {
   globalPress(5);
 
-  dispatchToLayer([[[@onPress5_0, @onPress5_1, 0, @onPress5_3, @onPress5_4, 0, 0]]]);
+  dispatchToLayer([<@onPress5_0, @onPress5_1, 0, @onPress5_3, @onPress5_4, 0, 0>]);
 }
 func onRelease5() {
   globalRelease();
 
   handleModTapRelease(@modTapHandler5);
-  dispatchToLayer([[[0, @onRelease5_1, 0, 0, 0, 0, 0]]]);
+  dispatchToLayer([<0, @onRelease5_1, 0, 0, 0, 0, 0>]);
 }
 
 func onPress5_0() {
@@ -3174,13 +3174,13 @@ func onRelease5_4() {
 func onPress6() {
   globalPress(6);
 
-  dispatchToLayer([[[@onPress6_0, @onPress6_1, 0, @onPress6_3, 0, 0, 0]]]);
+  dispatchToLayer([<@onPress6_0, @onPress6_1, 0, @onPress6_3, 0, 0, 0>]);
 }
 func onRelease6() {
   globalRelease();
 
   handleModTapRelease(@modTapHandler6);
-  dispatchToLayer([[[0, @onRelease6_1, 0, 0, 0, 0, 0]]]);
+  dispatchToLayer([<0, @onRelease6_1, 0, 0, 0, 0, 0>]);
 }
 
 func onPress6_0() {
@@ -3205,13 +3205,13 @@ func onRelease6_3() {
 func onPress7() {
   globalPress(7);
 
-  dispatchToLayer([[[@onPress7_0, @onPress7_1, 0, @onPress7_3, 0, @onPress7_5, 0]]]);
+  dispatchToLayer([<@onPress7_0, @onPress7_1, 0, @onPress7_3, 0, @onPress7_5, 0>]);
 }
 func onRelease7() {
   globalRelease();
 
   handleModTapRelease(@modTapHandler7);
-  dispatchToLayer([[[0, @onRelease7_1, 0, 0, 0, @onRelease7_5, 0]]]);
+  dispatchToLayer([<0, @onRelease7_1, 0, 0, 0, @onRelease7_5, 0>]);
 }
 
 func onPress7_0() {
@@ -3243,13 +3243,13 @@ func onRelease7_5() {
 func onPress8() {
   globalPress(8);
 
-  dispatchToLayer([[[@onPress8_0, @onPress8_1, 0, @onPress8_3, 0, @onPress8_5, 0]]]);
+  dispatchToLayer([<@onPress8_0, @onPress8_1, 0, @onPress8_3, 0, @onPress8_5, 0>]);
 }
 func onRelease8() {
   globalRelease();
 
   handleModTapRelease(@modTapHandler8);
-  dispatchToLayer([[[0, @onRelease8_1, 0, 0, 0, @onRelease8_5, 0]]]);
+  dispatchToLayer([<0, @onRelease8_1, 0, 0, 0, @onRelease8_5, 0>]);
 }
 
 func onPress8_0() {
@@ -3281,13 +3281,13 @@ func onRelease8_5() {
 func onPress9() {
   globalPress(9);
 
-  dispatchToLayer([[[@onPress9_0, @onPress9_1, 0, @onPress9_3, 0, @onPress9_5, 0]]]);
+  dispatchToLayer([<@onPress9_0, @onPress9_1, 0, @onPress9_3, 0, @onPress9_5, 0>]);
 }
 func onRelease9() {
   globalRelease();
 
   handleModTapRelease(@modTapHandler9);
-  dispatchToLayer([[[0, @onRelease9_1, 0, 0, 0, @onRelease9_5, 0]]]);
+  dispatchToLayer([<0, @onRelease9_1, 0, 0, 0, @onRelease9_5, 0>]);
 }
 
 func onPress9_0() {
@@ -3319,13 +3319,13 @@ func onRelease9_5() {
 func onPress10() {
   globalPress(10);
 
-  dispatchToLayer([[[@onPress10_0, @onPress10_1, 0, @onPress10_3, 0, @onPress10_5, 0]]]);
+  dispatchToLayer([<@onPress10_0, @onPress10_1, 0, @onPress10_3, 0, @onPress10_5, 0>]);
 }
 func onRelease10() {
   globalRelease();
 
   handleModTapRelease(@modTapHandler10);
-  dispatchToLayer([[[0, @onRelease10_1, 0, 0, 0, @onRelease10_5, 0]]]);
+  dispatchToLayer([<0, @onRelease10_1, 0, 0, 0, @onRelease10_5, 0>]);
 }
 
 func onPress10_0() {
@@ -3357,13 +3357,13 @@ func onRelease10_5() {
 func onPress11() {
   globalPress(11);
 
-  dispatchToLayer([[[@onPress11_0, @onPress11_1, 0, @onPress11_3, @onPress11_4, @onPress11_5, 0]]]);
+  dispatchToLayer([<@onPress11_0, @onPress11_1, 0, @onPress11_3, @onPress11_4, @onPress11_5, 0>]);
 }
 func onRelease11() {
   globalRelease();
 
   handleModTapRelease(@modTapHandler11);
-  dispatchToLayer([[[0, @onRelease11_1, 0, 0, 0, @onRelease11_5, 0]]]);
+  dispatchToLayer([<0, @onRelease11_1, 0, 0, 0, @onRelease11_5, 0>]);
 }
 
 func onPress11_0() {
@@ -3404,13 +3404,13 @@ func onRelease11_5() {
 func onPress12() {
   globalPress(12);
 
-  dispatchToLayer([[[@onPress12_0, @onPress12_1, 0, 0, 0, 0, @onPress12_6]]]);
+  dispatchToLayer([<@onPress12_0, @onPress12_1, 0, 0, 0, 0, @onPress12_6>]);
 }
 func onRelease12() {
   globalRelease();
 
   handleModTapRelease(@modTapHandler12);
-  dispatchToLayer([[[0, @onRelease12_1, 0, 0, 0, 0, 0]]]);
+  dispatchToLayer([<0, @onRelease12_1, 0, 0, 0, 0, 0>]);
 }
 
 func onPress12_0() {
@@ -3440,13 +3440,13 @@ func onRelease12_6() {
 func onPress13() {
   globalPress(13);
 
-  dispatchToLayer([[[@onPress13_0, @onPress13_1, @onPress13_2, @onPress13_3, @onPress13_4, @onPress13_5, 0]]]);
+  dispatchToLayer([<@onPress13_0, @onPress13_1, @onPress13_2, @onPress13_3, @onPress13_4, @onPress13_5, 0>]);
 }
 func onRelease13() {
   globalRelease();
 
   handleModTapRelease(@modTapHandler13);
-  dispatchToLayer([[[0, @onRelease13_1, 0, 0, 0, @onRelease13_5, 0]]]);
+  dispatchToLayer([<0, @onRelease13_1, 0, 0, 0, @onRelease13_5, 0>]);
 }
 
 func onPress13_0() {
@@ -3494,13 +3494,13 @@ func onRelease13_5() {
 func onPress14() {
   globalPress(14);
 
-  dispatchToLayer([[[@onPress14_0, @onPress14_1, @onPress14_2, @onPress14_3, @onPress14_4, @onPress14_5, 0]]]);
+  dispatchToLayer([<@onPress14_0, @onPress14_1, @onPress14_2, @onPress14_3, @onPress14_4, @onPress14_5, 0>]);
 }
 func onRelease14() {
   globalRelease();
 
   handleModTapRelease(@modTapHandler14);
-  dispatchToLayer([[[0, @onRelease14_1, 0, 0, 0, @onRelease14_5, 0]]]);
+  dispatchToLayer([<0, @onRelease14_1, 0, 0, 0, @onRelease14_5, 0>]);
 }
 
 func onPress14_0() {
@@ -3548,13 +3548,13 @@ func onRelease14_5() {
 func onPress15() {
   globalPress(15);
 
-  dispatchToLayer([[[@onPress15_0, @onPress15_1, @onPress15_2, @onPress15_3, @onPress15_4, @onPress15_5, 0]]]);
+  dispatchToLayer([<@onPress15_0, @onPress15_1, @onPress15_2, @onPress15_3, @onPress15_4, @onPress15_5, 0>]);
 }
 func onRelease15() {
   globalRelease();
 
   handleModTapRelease(@modTapHandler15);
-  dispatchToLayer([[[0, @onRelease15_1, 0, 0, 0, @onRelease15_5, 0]]]);
+  dispatchToLayer([<0, @onRelease15_1, 0, 0, 0, @onRelease15_5, 0>]);
 }
 
 func onPress15_0() {
@@ -3602,13 +3602,13 @@ func onRelease15_5() {
 func onPress16() {
   globalPress(16);
 
-  dispatchToLayer([[[@onPress16_0, @onPress16_1, @onPress16_2, @onPress16_3, @onPress16_4, @onPress16_5, 0]]]);
+  dispatchToLayer([<@onPress16_0, @onPress16_1, @onPress16_2, @onPress16_3, @onPress16_4, @onPress16_5, 0>]);
 }
 func onRelease16() {
   globalRelease();
 
   handleModTapRelease(@modTapHandler16);
-  dispatchToLayer([[[0, @onRelease16_1, 0, 0, 0, @onRelease16_5, 0]]]);
+  dispatchToLayer([<0, @onRelease16_1, 0, 0, 0, @onRelease16_5, 0>]);
 }
 
 func onPress16_0() {
@@ -3656,13 +3656,13 @@ func onRelease16_5() {
 func onPress17() {
   globalPress(17);
 
-  dispatchToLayer([[[@onPress17_0, @onPress17_1, 0, @onPress17_3, 0, 0, 0]]]);
+  dispatchToLayer([<@onPress17_0, @onPress17_1, 0, @onPress17_3, 0, 0, 0>]);
 }
 func onRelease17() {
   globalRelease();
 
   handleModTapRelease(@modTapHandler17);
-  dispatchToLayer([[[0, @onRelease17_1, 0, 0, 0, 0, 0]]]);
+  dispatchToLayer([<0, @onRelease17_1, 0, 0, 0, 0, 0>]);
 }
 
 func onPress17_0() {
@@ -3689,13 +3689,13 @@ func onRelease17_3() {
 func onPress18() {
   globalPress(18);
 
-  dispatchToLayer([[[@onPress18_0, @onPress18_1, 0, @onPress18_3, 0, 0, 0]]]);
+  dispatchToLayer([<@onPress18_0, @onPress18_1, 0, @onPress18_3, 0, 0, 0>]);
 }
 func onRelease18() {
   globalRelease();
 
   handleModTapRelease(@modTapHandler18);
-  dispatchToLayer([[[0, @onRelease18_1, 0, 0, 0, 0, 0]]]);
+  dispatchToLayer([<0, @onRelease18_1, 0, 0, 0, 0, 0>]);
 }
 
 func onPress18_0() {
@@ -3722,13 +3722,13 @@ func onRelease18_3() {
 func onPress19() {
   globalPress(19);
 
-  dispatchToLayer([[[@onPress19_0, @onPress19_1, @onPress19_2, @onPress19_3, 0, @onPress19_5, 0]]]);
+  dispatchToLayer([<@onPress19_0, @onPress19_1, @onPress19_2, @onPress19_3, 0, @onPress19_5, 0>]);
 }
 func onRelease19() {
   globalRelease();
 
   handleModTapRelease(@modTapHandler19);
-  dispatchToLayer([[[0, @onRelease19_1, 0, 0, 0, @onRelease19_5, 0]]]);
+  dispatchToLayer([<0, @onRelease19_1, 0, 0, 0, @onRelease19_5, 0>]);
 }
 
 func onPress19_0() {
@@ -3768,13 +3768,13 @@ func onRelease19_5() {
 func onPress20() {
   globalPress(20);
 
-  dispatchToLayer([[[@onPress20_0, @onPress20_1, @onPress20_2, @onPress20_3, 0, @onPress20_5, 0]]]);
+  dispatchToLayer([<@onPress20_0, @onPress20_1, @onPress20_2, @onPress20_3, 0, @onPress20_5, 0>]);
 }
 func onRelease20() {
   globalRelease();
 
   handleModTapRelease(@modTapHandler20);
-  dispatchToLayer([[[0, @onRelease20_1, 0, 0, 0, @onRelease20_5, 0]]]);
+  dispatchToLayer([<0, @onRelease20_1, 0, 0, 0, @onRelease20_5, 0>]);
 }
 
 func onPress20_0() {
@@ -3814,13 +3814,13 @@ func onRelease20_5() {
 func onPress21() {
   globalPress(21);
 
-  dispatchToLayer([[[@onPress21_0, @onPress21_1, @onPress21_2, @onPress21_3, 0, @onPress21_5, 0]]]);
+  dispatchToLayer([<@onPress21_0, @onPress21_1, @onPress21_2, @onPress21_3, 0, @onPress21_5, 0>]);
 }
 func onRelease21() {
   globalRelease();
 
   handleModTapRelease(@modTapHandler21);
-  dispatchToLayer([[[0, @onRelease21_1, 0, 0, 0, @onRelease21_5, 0]]]);
+  dispatchToLayer([<0, @onRelease21_1, 0, 0, 0, @onRelease21_5, 0>]);
 }
 
 func onPress21_0() {
@@ -3860,13 +3860,13 @@ func onRelease21_5() {
 func onPress22() {
   globalPress(22);
 
-  dispatchToLayer([[[@onPress22_0, @onPress22_1, @onPress22_2, @onPress22_3, 0, @onPress22_5, 0]]]);
+  dispatchToLayer([<@onPress22_0, @onPress22_1, @onPress22_2, @onPress22_3, 0, @onPress22_5, 0>]);
 }
 func onRelease22() {
   globalRelease();
 
   handleModTapRelease(@modTapHandler22);
-  dispatchToLayer([[[0, @onRelease22_1, 0, 0, 0, @onRelease22_5, 0]]]);
+  dispatchToLayer([<0, @onRelease22_1, 0, 0, 0, @onRelease22_5, 0>]);
 }
 
 func onPress22_0() {
@@ -3906,13 +3906,13 @@ func onRelease22_5() {
 func onPress23() {
   globalPress(23);
 
-  dispatchToLayer([[[@onPress23_0, @onPress23_1, 0, @onPress23_3, 0, @onPress23_5, 0]]]);
+  dispatchToLayer([<@onPress23_0, @onPress23_1, 0, @onPress23_3, 0, @onPress23_5, 0>]);
 }
 func onRelease23() {
   globalRelease();
 
   handleModTapRelease(@modTapHandler23);
-  dispatchToLayer([[[0, @onRelease23_1, 0, 0, 0, @onRelease23_5, 0]]]);
+  dispatchToLayer([<0, @onRelease23_1, 0, 0, 0, @onRelease23_5, 0>]);
 }
 
 func onPress23_0() {
@@ -3944,7 +3944,7 @@ func onRelease23_5() {
 func onPress24() {
   globalPress(24);
 
-  dispatchToLayer([[[@onPress24_0, 0, 0, 0, 0, 0, @onPress24_6]]]);
+  dispatchToLayer([<@onPress24_0, 0, 0, 0, 0, 0, @onPress24_6>]);
 }
 func onRelease24() {
   globalRelease();
@@ -3970,13 +3970,13 @@ func onRelease24_6() {
 func onPress25() {
   globalPress(25);
 
-  dispatchToLayer([[[@onPress25_0, @onPress25_1, @onPress25_2, 0, @onPress25_4, 0, 0]]]);
+  dispatchToLayer([<@onPress25_0, @onPress25_1, @onPress25_2, 0, @onPress25_4, 0, 0>]);
 }
 func onRelease25() {
   globalRelease();
 
   handleModTapRelease(@modTapHandler25);
-  dispatchToLayer([[[0, @onRelease25_1, 0, 0, 0, 0, 0]]]);
+  dispatchToLayer([<0, @onRelease25_1, 0, 0, 0, 0, 0>]);
 }
 
 func onPress25_0() {
@@ -4010,13 +4010,13 @@ func onRelease25_4() {
 func onPress26() {
   globalPress(26);
 
-  dispatchToLayer([[[@onPress26_0, @onPress26_1, @onPress26_2, 0, @onPress26_4, 0, 0]]]);
+  dispatchToLayer([<@onPress26_0, @onPress26_1, @onPress26_2, 0, @onPress26_4, 0, 0>]);
 }
 func onRelease26() {
   globalRelease();
 
   handleModTapRelease(@modTapHandler26);
-  dispatchToLayer([[[0, @onRelease26_1, 0, 0, 0, 0, 0]]]);
+  dispatchToLayer([<0, @onRelease26_1, 0, 0, 0, 0, 0>]);
 }
 
 func onPress26_0() {
@@ -4052,13 +4052,13 @@ func onRelease26_4() {
 func onPress27() {
   globalPress(27);
 
-  dispatchToLayer([[[@onPress27_0, @onPress27_1, @onPress27_2, 0, @onPress27_4, 0, 0]]]);
+  dispatchToLayer([<@onPress27_0, @onPress27_1, @onPress27_2, 0, @onPress27_4, 0, 0>]);
 }
 func onRelease27() {
   globalRelease();
 
   handleModTapRelease(@modTapHandler27);
-  dispatchToLayer([[[0, @onRelease27_1, 0, 0, 0, 0, 0]]]);
+  dispatchToLayer([<0, @onRelease27_1, 0, 0, 0, 0, 0>]);
 }
 
 func onPress27_0() {
@@ -4092,13 +4092,13 @@ func onRelease27_4() {
 func onPress28() {
   globalPress(28);
 
-  dispatchToLayer([[[@onPress28_0, @onPress28_1, @onPress28_2, 0, 0, 0, 0]]]);
+  dispatchToLayer([<@onPress28_0, @onPress28_1, @onPress28_2, 0, 0, 0, 0>]);
 }
 func onRelease28() {
   globalRelease();
 
   handleModTapRelease(@modTapHandler28);
-  dispatchToLayer([[[0, @onRelease28_1, 0, 0, 0, 0, 0]]]);
+  dispatchToLayer([<0, @onRelease28_1, 0, 0, 0, 0, 0>]);
 }
 
 func onPress28_0() {
@@ -4123,13 +4123,13 @@ func onRelease28_2() {
 func onPress29() {
   globalPress(29);
 
-  dispatchToLayer([[[@onPress29_0, @onPress29_1, 0, 0, 0, 0, 0]]]);
+  dispatchToLayer([<@onPress29_0, @onPress29_1, 0, 0, 0, 0, 0>]);
 }
 func onRelease29() {
   globalRelease();
 
   handleModTapRelease(@modTapHandler29);
-  dispatchToLayer([[[0, @onRelease29_1, 0, 0, 0, 0, 0]]]);
+  dispatchToLayer([<0, @onRelease29_1, 0, 0, 0, 0, 0>]);
 }
 
 func onPress29_0() {
@@ -4150,13 +4150,13 @@ func onRelease29_1() {
 func onPress30() {
   globalPress(30);
 
-  dispatchToLayer([[[@onPress30_0, @onPress30_1, 0, @onPress30_3, 0, 0, 0]]]);
+  dispatchToLayer([<@onPress30_0, @onPress30_1, 0, @onPress30_3, 0, 0, 0>]);
 }
 func onRelease30() {
   globalRelease();
 
   handleModTapRelease(@modTapHandler30);
-  dispatchToLayer([[[0, @onRelease30_1, 0, 0, 0, 0, 0]]]);
+  dispatchToLayer([<0, @onRelease30_1, 0, 0, 0, 0, 0>]);
 }
 
 func onPress30_0() {
@@ -4183,13 +4183,13 @@ func onRelease30_3() {
 func onPress31() {
   globalPress(31);
 
-  dispatchToLayer([[[@onPress31_0, @onPress31_1, 0, 0, 0, @onPress31_5, 0]]]);
+  dispatchToLayer([<@onPress31_0, @onPress31_1, 0, 0, 0, @onPress31_5, 0>]);
 }
 func onRelease31() {
   globalRelease();
 
   handleModTapRelease(@modTapHandler31);
-  dispatchToLayer([[[0, @onRelease31_1, 0, 0, 0, @onRelease31_5, 0]]]);
+  dispatchToLayer([<0, @onRelease31_1, 0, 0, 0, @onRelease31_5, 0>]);
 }
 
 func onPress31_0() {
@@ -4215,13 +4215,13 @@ func onRelease31_5() {
 func onPress32() {
   globalPress(32);
 
-  dispatchToLayer([[[@onPress32_0, @onPress32_1, 0, 0, 0, @onPress32_5, 0]]]);
+  dispatchToLayer([<@onPress32_0, @onPress32_1, 0, 0, 0, @onPress32_5, 0>]);
 }
 func onRelease32() {
   globalRelease();
 
   handleModTapRelease(@modTapHandler32);
-  dispatchToLayer([[[0, @onRelease32_1, 0, 0, 0, @onRelease32_5, 0]]]);
+  dispatchToLayer([<0, @onRelease32_1, 0, 0, 0, @onRelease32_5, 0>]);
 }
 
 func onPress32_0() {
@@ -4249,13 +4249,13 @@ func onRelease32_5() {
 func onPress33() {
   globalPress(33);
 
-  dispatchToLayer([[[@onPress33_0, @onPress33_1, 0, 0, 0, @onPress33_5, 0]]]);
+  dispatchToLayer([<@onPress33_0, @onPress33_1, 0, 0, 0, @onPress33_5, 0>]);
 }
 func onRelease33() {
   globalRelease();
 
   handleModTapRelease(@modTapHandler33);
-  dispatchToLayer([[[0, @onRelease33_1, 0, 0, 0, @onRelease33_5, 0]]]);
+  dispatchToLayer([<0, @onRelease33_1, 0, 0, 0, @onRelease33_5, 0>]);
 }
 
 func onPress33_0() {
@@ -4281,13 +4281,13 @@ func onRelease33_5() {
 func onPress34() {
   globalPress(34);
 
-  dispatchToLayer([[[@onPress34_0, @onPress34_1, 0, 0, 0, @onPress34_5, 0]]]);
+  dispatchToLayer([<@onPress34_0, @onPress34_1, 0, 0, 0, @onPress34_5, 0>]);
 }
 func onRelease34() {
   globalRelease();
 
   handleModTapRelease(@modTapHandler34);
-  dispatchToLayer([[[0, @onRelease34_1, 0, 0, 0, @onRelease34_5, 0]]]);
+  dispatchToLayer([<0, @onRelease34_1, 0, 0, 0, @onRelease34_5, 0>]);
 }
 
 func onPress34_0() {
@@ -4313,13 +4313,13 @@ func onRelease34_5() {
 func onPress35() {
   globalPress(35);
 
-  dispatchToLayer([[[@onPress35_0, @onPress35_1, 0, 0, @onPress35_4, @onPress35_5, @onPress35_6]]]);
+  dispatchToLayer([<@onPress35_0, @onPress35_1, 0, 0, @onPress35_4, @onPress35_5, @onPress35_6>]);
 }
 func onRelease35() {
   globalRelease();
 
   handleModTapRelease(@modTapHandler35);
-  dispatchToLayer([[[0, @onRelease35_1, 0, 0, 0, @onRelease35_5, 0]]]);
+  dispatchToLayer([<0, @onRelease35_1, 0, 0, 0, @onRelease35_5, 0>]);
 }
 
 func onPress35_0() {
@@ -4368,13 +4368,13 @@ func onRelease35_6() {
 func onPress36() {
   globalPress(36);
 
-  dispatchToLayer([[[@onPress36_0, @onPress36_1, 0, 0, 0, 0, 0]]]);
+  dispatchToLayer([<@onPress36_0, @onPress36_1, 0, 0, 0, 0, 0>]);
 }
 func onRelease36() {
   globalRelease();
 
   handleModTapRelease(@modTapHandler36);
-  dispatchToLayer([[[0, @onRelease36_1, 0, 0, 0, 0, 0]]]);
+  dispatchToLayer([<0, @onRelease36_1, 0, 0, 0, 0, 0>]);
 }
 
 func onPress36_0() {
@@ -4393,13 +4393,13 @@ func onRelease36_1() {
 func onPress37() {
   globalPress(37);
 
-  dispatchToLayer([[[@onPress37_0, @onPress37_1, 0, @onPress37_3, 0, 0, 0]]]);
+  dispatchToLayer([<@onPress37_0, @onPress37_1, 0, @onPress37_3, 0, 0, 0>]);
 }
 func onRelease37() {
   globalRelease();
 
   handleModTapRelease(@modTapHandler37);
-  dispatchToLayer([[[0, @onRelease37_1, 0, 0, 0, @onRelease37_5, 0]]]);
+  dispatchToLayer([<0, @onRelease37_1, 0, 0, 0, @onRelease37_5, 0>]);
 }
 
 func onPress37_0() {
@@ -4444,13 +4444,13 @@ func onPress38() {
   globalPress(38);
 
   if (!isInPressAll()) pressTime38 = getTime();
-  dispatchToLayer([[[@onPress38_0, @onPress38_1, 0, 0, 0, 0, 0]]]);
+  dispatchToLayer([<@onPress38_0, @onPress38_1, 0, 0, 0, 0, 0>]);
 }
 func onRelease38() {
   globalRelease();
 
   handleModTapRelease(@modTapHandler38);
-  dispatchToLayer([[[@onRelease38_0, @onRelease38_1, 0, @onRelease38_3, 0, @onRelease38_5, 0]]]);
+  dispatchToLayer([<@onRelease38_0, @onRelease38_1, 0, @onRelease38_3, 0, @onRelease38_5, 0>]);
 }
 
 func onPress38_0() {
@@ -4506,13 +4506,13 @@ func onRelease38_5() {
 func onPress39() {
   globalPress(39);
 
-  dispatchToLayer([[[@onPress39_0, 0, 0, @onPress39_3, 0, @onPress39_5, 0]]]);
+  dispatchToLayer([<@onPress39_0, 0, 0, @onPress39_3, 0, @onPress39_5, 0>]);
 }
 func onRelease39() {
   globalRelease();
 
   handleModTapRelease(@modTapHandler39);
-  dispatchToLayer([[[0, 0, 0, 0, 0, @onRelease39_5, 0]]]);
+  dispatchToLayer([<0, 0, 0, 0, 0, @onRelease39_5, 0>]);
 }
 
 func onPress39_0() {
@@ -4537,12 +4537,12 @@ func onRelease39_5() {
 func onPress40() {
   globalPress(40);
 
-  dispatchToLayer([[[@onPress40_0, 0, @onPress40_2, 0, 0, @onPress40_5, 0]]]);
+  dispatchToLayer([<@onPress40_0, 0, @onPress40_2, 0, 0, @onPress40_5, 0>]);
 }
 func onRelease40() {
   globalRelease();
 
-  dispatchToLayer([[[0, @onRelease40_1, 0, 0, @onRelease40_4, @onRelease40_5, 0]]]);
+  dispatchToLayer([<0, @onRelease40_1, 0, 0, @onRelease40_4, @onRelease40_5, 0>]);
 }
 
 func onPress40_0() {
@@ -4598,13 +4598,13 @@ func onRelease40_5() {
 func onPress41() {
   globalPress(41);
 
-  dispatchToLayer([[[@onPress41_0, @onPress41_1, 0, @onPress41_3, 0, @onPress41_5, 0]]]);
+  dispatchToLayer([<@onPress41_0, @onPress41_1, 0, @onPress41_3, 0, @onPress41_5, 0>]);
 }
 func onRelease41() {
   globalRelease();
 
   handleModTapRelease(@modTapHandler41);
-  dispatchToLayer([[[@onRelease41_0, 0, @onRelease41_2, 0, @onRelease41_4, @onRelease41_5, 0]]]);
+  dispatchToLayer([<@onRelease41_0, 0, @onRelease41_2, 0, @onRelease41_4, @onRelease41_5, 0>]);
 }
 
 func onPress41_0() {

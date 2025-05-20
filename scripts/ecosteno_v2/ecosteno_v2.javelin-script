@@ -11,7 +11,7 @@ func setLayer(layerIndex, layerIdEvent) {
 }
 
 func dispatchToLayer(functions) {
-  var f = functions[[[resolveLayerIndex()]]];
+  var f = functions[<resolveLayerIndex()>];
   f();
 }
 

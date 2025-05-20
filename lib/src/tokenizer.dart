@@ -2,9 +2,9 @@ import 'token.dart';
 
 class Tokenizer {
   Tokenizer(String input, String filename)
-      : _input = input,
-        _length = input.length,
-        _filename = filename;
+    : _input = input,
+      _length = input.length,
+      _filename = filename;
 
   final String _input;
   final int _length;
@@ -292,6 +292,15 @@ class Tokenizer {
               line: _line,
               column: _column,
             );
+          } else if (_offset < _length && _input.codeUnitAt(_offset) == 0x5d) {
+            // ']'
+            ++_offset;
+            ++_column;
+            yield Token(
+              type: TokenType.closeHalfWordList,
+              line: _line,
+              column: _column,
+            );
           } else if (_offset < _length && _input.codeUnitAt(_offset) == 0x3e) {
             ++_offset;
             ++_column;
@@ -345,11 +354,7 @@ class Tokenizer {
           if (_offset < _length && _input.codeUnitAt(_offset) == 0x3f) {
             ++_offset;
             ++_column;
-            yield Token(
-              type: TokenType.fallback,
-              line: _line,
-              column: _column,
-            );
+            yield Token(type: TokenType.fallback, line: _line, column: _column);
           } else {
             yield Token(
               type: TokenType.questionMark,
@@ -360,11 +365,7 @@ class Tokenizer {
           continue;
 
         case 0x40: // '@'
-          yield Token(
-            type: TokenType.at,
-            line: _line,
-            column: _column,
-          );
+          yield Token(type: TokenType.at, line: _line, column: _column);
           continue;
 
         case 0x5e: // '^'
@@ -418,11 +419,7 @@ class Tokenizer {
           continue;
 
         case 0x7e: // '~'
-          yield Token(
-            type: TokenType.bitwiseNot,
-            line: _line,
-            column: _column,
-          );
+          yield Token(type: TokenType.bitwiseNot, line: _line, column: _column);
           continue;
 
         case 0x5b: // '['
@@ -445,6 +442,15 @@ class Tokenizer {
                 stringValue: _parseData(),
               );
             }
+          } else if (_offset < _length && _input.codeUnitAt(_offset) == 0x3c) {
+            // '<'
+            ++_column;
+            ++_offset;
+            yield Token(
+              type: TokenType.openHalfWordList,
+              line: _line,
+              column: _column,
+            );
           } else {
             yield Token(
               type: TokenType.openSquareBracket,
