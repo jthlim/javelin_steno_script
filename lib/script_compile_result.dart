@@ -3,7 +3,6 @@ import 'dart:typed_data';
 import 'package:crclib/catalog.dart';
 import 'package:javelin_steno_script/button_script_in_built_functions.dart';
 import 'package:javelin_steno_script/javelin_steno_script.dart';
-import 'package:javelin_steno_script/src/functions.dart';
 
 class ScriptCompileResult {
   factory ScriptCompileResult.buttonScript({

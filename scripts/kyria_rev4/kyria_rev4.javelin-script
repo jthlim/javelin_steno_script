@@ -477,33 +477,33 @@ func getImageHeight(image) var {
 
 func drawDisplay0(layerImage, drawColor) {
   const SHIFT_IMAGE = [[
-      10 10
-      00 01 80 01 c0 01 e0 01 f0 7f f8 7f fc 7f fe 7f
-      fe 7f fc 7f f8 7f f0 7f e0 01 c0 01 80 01 00 01
+    10 10
+    00 01 80 01 c0 01 e0 01 f0 7f f8 7f fc 7f fe 7f
+    fe 7f fc 7f f8 7f f0 7f e0 01 c0 01 80 01 00 01
   ]];
 
   const CONTROL_IMAGE = [[
-      10 10
-      00 00 00 00 40 00 60 00 30 00 18 00 0c 00 06 00
-      06 00 0c 00 18 00 30 00 60 00 40 00 00 00 00 00
+    10 10
+    00 00 00 00 40 00 60 00 30 00 18 00 0c 00 06 00
+    06 00 0c 00 18 00 30 00 60 00 40 00 00 00 00 00
   ]];
 
   const ALT_IMAGE = [[
-      10 10
-      00 00 00 30 00 30 00 30 00 30 00 38 00 1e 80 07
-      e0 01 78 30 1c 30 0c 30 0c 30 0c 30 0c 30 00 00
+    10 10
+    00 00 00 30 00 30 00 30 00 30 00 38 00 1e 80 07
+    e0 01 78 30 1c 30 0c 30 0c 30 0c 30 0c 30 00 00
   ]];
 
   const COMMAND_IMAGE = [[
-      10 10
-      00 00 3c 3c 7e 7e 66 66 66 66 fe 7f fc 3f 60 06
-      60 06 fc 3f fe 7f 66 66 66 66 7e 7e 3c 3c 00 00
+    10 10
+    00 00 3c 3c 7e 7e 66 66 66 66 fe 7f fc 3f 60 06
+    60 06 fc 3f fe 7f 66 66 66 66 7e 7e 3c 3c 00 00
   ]];
 
   const CAPS_LOCK_IMAGE = [[
-      10 10
-      00 01 80 01 c0 01 e0 01 f0 67 f8 67 fc 67 fe 67
-      fe 67 fc 67 f8 67 f0 67 e0 01 c0 01 80 01 00 01
+    10 10
+    00 01 80 01 c0 01 e0 01 f0 67 f8 67 fc 67 fe 67
+    fe 67 fc 67 f8 67 f0 67 e0 01 c0 01 80 01 00 01
   ]];
 
   setAutoDraw(0, AUTO_DRAW_NONE);
@@ -547,39 +547,39 @@ func drawDisplay0(layerImage, drawColor) {
 
 func drawDisplaySteno() {
   const STENO_IMAGE = /* steno.png */ [[
-      40 40 ff ff ff ff ff 1f 00 00 ff ff ff ff ff ff
-      01 00 ff ff ff ff ff ff 03 00 ff ff ff ff ff ff
-      1f 00 ff ff ff ff ff ff 1f 00 ff ff ff ff ff ff
-      7f 00 ff ff ff ff ff ff 7f 00 ff ff ff ff ff ff
-      ff 01 ff ff ff ff ff ff ff 01 ff ff ff ff ff ff
-      ff 07 ff ff ff ff ff ff ff 07 ff ff ff ff ff ff
-      ff 1f ff ff ff ff ff ff ff 1f ff ff c3 ff 0f ff
-      ff 1f ff ff 81 ff 07 fe ff 3f ff ff 81 ff 07 fe
-      ff 7f ff ff 01 ff 03 fe ff 7f ff ff 01 fe 01 fe
-      ff 7f ff ff 03 fe 01 ff ff 7f ff ff 07 fe 81 ff
-      ff ff ff ff 0f fc c0 ff ff ff ff ff 1f 78 e0 ff
-      ff ff ff ff 1f 78 e0 ff ff ff ff ff 3f 38 f0 ff
-      ff ff ff ff 7f 10 f8 ff ff ff ff ff 7f 00 f8 ff
-      ff ff ff ff ff 00 fc ff ff ff ff ff ff 01 fe ff
-      ff ff ff ff ff 01 fe ff ff ff ff 01 00 00 00 00
-      fe ff ff 01 00 00 00 00 fe ff ff 01 00 00 00 00
-      fe ff ff 01 00 00 00 00 fe ff ff ff ff 01 fe ff
-      ff ff ff ff ff 01 fe ff ff ff ff ff ff 00 fc ff
-      ff ff ff ff 7f 00 f8 ff ff ff ff ff 7f 10 f8 ff
-      ff ff ff ff 3f 38 f0 ff ff ff ff ff 1f 78 e0 ff
-      ff ff ff ff 1f 78 e0 ff ff ff ff ff 0f fc c0 ff
-      ff ff ff ff 07 fe 81 ff ff ff ff ff 03 fe 01 ff
-      ff 7f ff ff 01 fe 01 fe ff 7f ff ff 01 ff 03 fe
-      ff 7f ff ff 81 ff 07 fe ff 7f ff ff 81 ff 07 fe
-      ff 3f ff ff c3 ff 0f ff ff 1f ff ff ff ff ff ff
-      ff 1f ff ff ff ff ff ff ff 1f ff ff ff ff ff ff
-      ff 07 ff ff ff ff ff ff ff 07 ff ff ff ff ff ff
-      ff 01 ff ff ff ff ff ff ff 01 ff ff ff ff ff ff
-      7f 00 ff ff ff ff ff ff 7f 00 ff ff ff ff ff ff
-      1f 00 ff ff ff ff ff ff 1f 00 ff ff ff ff ff ff
-      07 00 ff ff ff ff ff ff 01 00 ff ff ff ff ff 3f
-      00 00 ff ff ff ff ff 0f 00 00 00 00 00 00 00 00
-      00 00
+    40 40 ff ff ff ff ff 1f 00 00 ff ff ff ff ff ff
+    01 00 ff ff ff ff ff ff 03 00 ff ff ff ff ff ff
+    1f 00 ff ff ff ff ff ff 1f 00 ff ff ff ff ff ff
+    7f 00 ff ff ff ff ff ff 7f 00 ff ff ff ff ff ff
+    ff 01 ff ff ff ff ff ff ff 01 ff ff ff ff ff ff
+    ff 07 ff ff ff ff ff ff ff 07 ff ff ff ff ff ff
+    ff 1f ff ff ff ff ff ff ff 1f ff ff c3 ff 0f ff
+    ff 1f ff ff 81 ff 07 fe ff 3f ff ff 81 ff 07 fe
+    ff 7f ff ff 01 ff 03 fe ff 7f ff ff 01 fe 01 fe
+    ff 7f ff ff 03 fe 01 ff ff 7f ff ff 07 fe 81 ff
+    ff ff ff ff 0f fc c0 ff ff ff ff ff 1f 78 e0 ff
+    ff ff ff ff 1f 78 e0 ff ff ff ff ff 3f 38 f0 ff
+    ff ff ff ff 7f 10 f8 ff ff ff ff ff 7f 00 f8 ff
+    ff ff ff ff ff 00 fc ff ff ff ff ff ff 01 fe ff
+    ff ff ff ff ff 01 fe ff ff ff ff 01 00 00 00 00
+    fe ff ff 01 00 00 00 00 fe ff ff 01 00 00 00 00
+    fe ff ff 01 00 00 00 00 fe ff ff ff ff 01 fe ff
+    ff ff ff ff ff 01 fe ff ff ff ff ff ff 00 fc ff
+    ff ff ff ff 7f 00 f8 ff ff ff ff ff 7f 10 f8 ff
+    ff ff ff ff 3f 38 f0 ff ff ff ff ff 1f 78 e0 ff
+    ff ff ff ff 1f 78 e0 ff ff ff ff ff 0f fc c0 ff
+    ff ff ff ff 07 fe 81 ff ff ff ff ff 03 fe 01 ff
+    ff 7f ff ff 01 fe 01 fe ff 7f ff ff 01 ff 03 fe
+    ff 7f ff ff 81 ff 07 fe ff 7f ff ff 81 ff 07 fe
+    ff 3f ff ff c3 ff 0f ff ff 1f ff ff ff ff ff ff
+    ff 1f ff ff ff ff ff ff ff 1f ff ff ff ff ff ff
+    ff 07 ff ff ff ff ff ff ff 07 ff ff ff ff ff ff
+    ff 01 ff ff ff ff ff ff ff 01 ff ff ff ff ff ff
+    7f 00 ff ff ff ff ff ff 7f 00 ff ff ff ff ff ff
+    1f 00 ff ff ff ff ff ff 1f 00 ff ff ff ff ff ff
+    07 00 ff ff ff ff ff ff 01 00 ff ff ff ff ff 3f
+    00 00 ff ff ff ff ff 0f 00 00 00 00 00 00 00 00
+    00 00
   ]];
 
   drawDisplay0(STENO_IMAGE, 0x9af9da);
@@ -604,39 +604,39 @@ func drawDisplaySteno() {
 
 func drawDisplayAbc() {
   const QWERTY_IMAGE = /* qwerty.png */ [[
-      82 1d 00 00 00 00 00 3e 00 00 c0 ff 01 00 e0 ff
-      07 00 f8 ff 0f 00 f8 ff 1f 00 7c 00 1e 00 1c 00
-      38 04 0e 00 38 06 06 00 30 07 06 00 60 03 06 00
-      e0 03 02 00 e0 03 06 00 e0 03 06 00 e0 03 06 00
-      60 03 0e 00 70 07 0e 00 38 0f 3c 00 3c 0e fc 80
-      1f 0e f8 ff 1f 0e f0 ff 0f 0e e0 ff 03 0c 86 ff
-      00 0c 0e 00 00 0c 3e 00 00 0c fe 01 00 0c fe 0f
-      00 0c fe ff 00 0e e6 ff 07 0f 06 ff 3f 00 00 f0
-      7f 00 00 80 7f 00 00 c0 0f 00 00 f8 01 00 00 3f
-      00 00 e0 03 00 00 7c 00 00 00 fe 03 00 00 fe 1f
-      00 00 f0 ff 00 00 80 ff 03 00 00 fe 1f 00 00 f0
-      7f 00 00 80 7f 00 00 c0 1f 00 06 f8 01 00 86 3f
-      00 00 fe 03 00 00 7e 00 00 00 0e 00 00 00 06 00
-      20 00 06 00 20 00 06 00 20 00 0e 00 38 00 fe ff
-      3f 00 fe ff 3f 00 fe ff 3f 00 fe ff 3f 00 06 0c
-      20 00 06 0c 20 00 06 0c 20 00 06 1e 20 00 86 7f
-      20 00 0e 00 30 00 1e 00 30 00 7e 00 38 00 7e 00
-      3e 00 00 80 3f 00 06 80 3f 00 06 00 20 00 06 00
-      20 00 1e 00 38 00 fe ff 3f 00 fe ff 3f 00 fe ff
-      3f 00 fe ff 3f 00 06 18 20 00 06 38 20 00 06 78
-      20 00 06 fc 00 00 0e fc 03 00 be ff 07 00 fc cf
-      0f 00 fc 87 1f 00 f8 03 3f 00 f0 01 3e 00 7e 00
-      38 00 7e 00 38 00 1e 00 30 00 06 00 20 00 06 00
-      20 00 06 00 20 00 06 00 20 00 06 00 20 00 06 00
-      30 00 fe ff 3f 00 fe ff 3f 00 fe ff 3f 00 fe ff
-      3f 00 06 00 30 00 06 00 20 00 06 00 20 00 06 00
-      00 00 06 00 00 00 0e 00 00 00 3e 00 00 00 7e 00
-      00 00 06 00 00 00 0e 00 00 00 1e 00 00 00 7e 00
-      00 00 fe 01 00 00 fe 03 20 00 f6 0f 20 00 c6 3f
-      30 00 80 ff 3f 00 00 fe 3f 00 00 f8 3f 00 00 f8
-      3f 00 00 1c 30 00 06 0f 20 00 c6 03 20 00 fe 00
-      00 00 7e 00 00 00 1e 00 00 00 0e 00 00 00 06 00
-      00 00 06 00 00 00 00 00 00 00
+    82 1d 00 00 00 00 00 3e 00 00 c0 ff 01 00 e0 ff
+    07 00 f8 ff 0f 00 f8 ff 1f 00 7c 00 1e 00 1c 00
+    38 04 0e 00 38 06 06 00 30 07 06 00 60 03 06 00
+    e0 03 02 00 e0 03 06 00 e0 03 06 00 e0 03 06 00
+    60 03 0e 00 70 07 0e 00 38 0f 3c 00 3c 0e fc 80
+    1f 0e f8 ff 1f 0e f0 ff 0f 0e e0 ff 03 0c 86 ff
+    00 0c 0e 00 00 0c 3e 00 00 0c fe 01 00 0c fe 0f
+    00 0c fe ff 00 0e e6 ff 07 0f 06 ff 3f 00 00 f0
+    7f 00 00 80 7f 00 00 c0 0f 00 00 f8 01 00 00 3f
+    00 00 e0 03 00 00 7c 00 00 00 fe 03 00 00 fe 1f
+    00 00 f0 ff 00 00 80 ff 03 00 00 fe 1f 00 00 f0
+    7f 00 00 80 7f 00 00 c0 1f 00 06 f8 01 00 86 3f
+    00 00 fe 03 00 00 7e 00 00 00 0e 00 00 00 06 00
+    20 00 06 00 20 00 06 00 20 00 0e 00 38 00 fe ff
+    3f 00 fe ff 3f 00 fe ff 3f 00 fe ff 3f 00 06 0c
+    20 00 06 0c 20 00 06 0c 20 00 06 1e 20 00 86 7f
+    20 00 0e 00 30 00 1e 00 30 00 7e 00 38 00 7e 00
+    3e 00 00 80 3f 00 06 80 3f 00 06 00 20 00 06 00
+    20 00 1e 00 38 00 fe ff 3f 00 fe ff 3f 00 fe ff
+    3f 00 fe ff 3f 00 06 18 20 00 06 38 20 00 06 78
+    20 00 06 fc 00 00 0e fc 03 00 be ff 07 00 fc cf
+    0f 00 fc 87 1f 00 f8 03 3f 00 f0 01 3e 00 7e 00
+    38 00 7e 00 38 00 1e 00 30 00 06 00 20 00 06 00
+    20 00 06 00 20 00 06 00 20 00 06 00 20 00 06 00
+    30 00 fe ff 3f 00 fe ff 3f 00 fe ff 3f 00 fe ff
+    3f 00 06 00 30 00 06 00 20 00 06 00 20 00 06 00
+    00 00 06 00 00 00 0e 00 00 00 3e 00 00 00 7e 00
+    00 00 06 00 00 00 0e 00 00 00 1e 00 00 00 7e 00
+    00 00 fe 01 00 00 fe 03 20 00 f6 0f 20 00 c6 3f
+    30 00 80 ff 3f 00 00 fe 3f 00 00 f8 3f 00 00 f8
+    3f 00 00 1c 30 00 06 0f 20 00 c6 03 20 00 fe 00
+    00 00 7e 00 00 00 1e 00 00 00 0e 00 00 00 06 00
+    00 00 06 00 00 00 00 00 00 00
   ]];
 
   drawDisplay0(QWERTY_IMAGE, 0xffffff);
@@ -646,39 +646,39 @@ func drawDisplayAbc() {
 
 func drawDisplayFunction() {
   const FUNCTION_IMAGE = /* function.png */ [[
-      40 40 00 fc ff ff ff ff 3f 00 00 ff ff ff ff ff
-      ff 00 c0 ff ff ff ff ff ff 03 e0 ff ff ff ff ff
-      ff 07 f0 07 00 00 00 00 e0 0f f8 01 00 00 00 00
-      80 1f fc 00 00 00 00 00 00 3f 7c 00 00 00 00 00
-      00 3e 3e 00 00 00 00 00 00 7c 1e 00 00 00 00 00
-      00 78 1f 00 00 00 3c 00 00 f8 0f 00 00 00 3c 00
-      00 f0 0f 00 00 00 3c 00 00 f0 0f 00 00 00 3c 00
-      00 f0 0f 00 00 f0 ff ff 3f f0 0f 00 00 f8 ff ff
-      3f f0 0f 00 00 fc ff ff 3f f0 0f 00 00 fc ff ff
-      3f f0 0f 00 00 3c 3c 00 00 f0 0f 00 00 3c 3c 00
-      00 f0 0f 00 00 3c 3c 00 00 f0 0f 00 00 3c 3c 00
-      00 f0 0f 00 00 00 00 00 00 f0 0f 00 00 00 00 00
-      00 f0 0f 00 00 00 fc ff 3f f0 0f 00 00 00 fc ff
-      3f f0 0f 00 00 00 fc ff 3f f0 0f 00 00 00 fc ff
-      3f f0 0f 00 00 00 f0 01 00 f0 0f 00 00 00 f8 00
-      00 f0 0f 00 00 00 7c 00 00 f0 0f 00 00 00 7c 00
-      00 f0 0f 00 00 00 fc 00 00 f0 0f 00 00 00 fc 01
-      00 f0 0f 00 00 00 f8 ff 3f f0 0f 00 00 00 f0 ff
-      3f f0 0f 00 00 00 e0 ff 3f f0 0f 00 00 00 c0 ff
-      3f f0 0f 00 00 00 00 00 00 f0 0f 00 00 00 00 00
-      00 f0 0f 00 00 00 00 00 00 f0 0f 00 00 00 00 00
-      00 f0 0f 00 00 00 00 00 00 f0 0f 00 00 00 00 00
-      00 f0 0f 00 00 00 00 00 00 f0 0f 00 00 00 00 00
-      00 f0 0f 00 00 00 00 00 00 f0 0f 00 00 00 00 00
-      00 f0 0f 00 00 00 00 00 00 f0 0f 00 00 00 00 00
-      00 f0 0f 00 00 00 00 00 00 f0 0f 00 00 00 00 00
-      00 f0 0f 00 00 00 00 00 00 f0 1f 00 00 00 00 00
-      00 f8 1e 00 00 00 00 00 00 78 3e 00 00 00 00 00
-      00 7c 7c 00 00 00 00 00 00 3e fc 00 00 00 00 00
-      00 3f f8 01 00 00 00 00 80 1f f0 07 00 00 00 00
-      e0 0f e0 ff ff ff ff ff ff 07 c0 ff ff ff ff ff
-      ff 03 00 ff ff ff ff ff ff 00 00 fc ff ff ff ff
-      3f 00
+    40 40 00 fc ff ff ff ff 3f 00 00 ff ff ff ff ff
+    ff 00 c0 ff ff ff ff ff ff 03 e0 ff ff ff ff ff
+    ff 07 f0 07 00 00 00 00 e0 0f f8 01 00 00 00 00
+    80 1f fc 00 00 00 00 00 00 3f 7c 00 00 00 00 00
+    00 3e 3e 00 00 00 00 00 00 7c 1e 00 00 00 00 00
+    00 78 1f 00 00 00 3c 00 00 f8 0f 00 00 00 3c 00
+    00 f0 0f 00 00 00 3c 00 00 f0 0f 00 00 00 3c 00
+    00 f0 0f 00 00 f0 ff ff 3f f0 0f 00 00 f8 ff ff
+    3f f0 0f 00 00 fc ff ff 3f f0 0f 00 00 fc ff ff
+    3f f0 0f 00 00 3c 3c 00 00 f0 0f 00 00 3c 3c 00
+    00 f0 0f 00 00 3c 3c 00 00 f0 0f 00 00 3c 3c 00
+    00 f0 0f 00 00 00 00 00 00 f0 0f 00 00 00 00 00
+    00 f0 0f 00 00 00 fc ff 3f f0 0f 00 00 00 fc ff
+    3f f0 0f 00 00 00 fc ff 3f f0 0f 00 00 00 fc ff
+    3f f0 0f 00 00 00 f0 01 00 f0 0f 00 00 00 f8 00
+    00 f0 0f 00 00 00 7c 00 00 f0 0f 00 00 00 7c 00
+    00 f0 0f 00 00 00 fc 00 00 f0 0f 00 00 00 fc 01
+    00 f0 0f 00 00 00 f8 ff 3f f0 0f 00 00 00 f0 ff
+    3f f0 0f 00 00 00 e0 ff 3f f0 0f 00 00 00 c0 ff
+    3f f0 0f 00 00 00 00 00 00 f0 0f 00 00 00 00 00
+    00 f0 0f 00 00 00 00 00 00 f0 0f 00 00 00 00 00
+    00 f0 0f 00 00 00 00 00 00 f0 0f 00 00 00 00 00
+    00 f0 0f 00 00 00 00 00 00 f0 0f 00 00 00 00 00
+    00 f0 0f 00 00 00 00 00 00 f0 0f 00 00 00 00 00
+    00 f0 0f 00 00 00 00 00 00 f0 0f 00 00 00 00 00
+    00 f0 0f 00 00 00 00 00 00 f0 0f 00 00 00 00 00
+    00 f0 0f 00 00 00 00 00 00 f0 1f 00 00 00 00 00
+    00 f8 1e 00 00 00 00 00 00 78 3e 00 00 00 00 00
+    00 7c 7c 00 00 00 00 00 00 3e fc 00 00 00 00 00
+    00 3f f8 01 00 00 00 00 80 1f f0 07 00 00 00 00
+    e0 0f e0 ff ff ff ff ff ff 07 c0 ff ff ff ff ff
+    ff 03 00 ff ff ff ff ff ff 00 00 fc ff ff ff ff
+    3f 00
   ]];
 
   drawDisplay0(FUNCTION_IMAGE, 0x80c0ff);
@@ -688,39 +688,39 @@ func drawDisplayFunction() {
 
 func drawDisplaySymbol() {
   const SYMBOL_IMAGE = /* symbols.png */ [[
-      40 40 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-      00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-      00 00 c0 03 00 00 00 00 00 00 c0 03 00 00 00 00
-      00 00 e0 03 00 00 00 00 00 00 e0 03 00 00 00 00
-      00 00 f0 03 00 00 00 00 00 00 f8 03 00 00 00 00
-      00 00 fc ff ff 0f ff ff cf 03 fc ff ff 0f ff ff
-      cf 03 fc ff ff 0f ff ff cf 03 fc ff ff 0f ff ff
-      cf 03 fc ff ff 0f ff ff cf 03 fc ff ff 0f ff ff
-      cf 03 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-      00 00 00 00 00 00 f0 ff ff 00 00 00 00 00 f8 ff
-      ff 01 00 00 00 00 fc ff ff 03 00 00 00 00 fe ff
-      ff 07 c0 01 80 0f fe ff ff 0f e0 03 c0 0f ff ff
-      ff 0f f0 03 e0 0f 7f 00 c0 0f f8 03 f0 0f 3f 00
-      80 0f fc 01 f8 0f 1f ff 0f 0f fc 00 fc 0f 8f ff
-      1f 0f 7c 00 fe 0f 8f ff 3f 0f 3c 00 7f 0f 8f ff
-      3f 0f 3c 80 3f 0f 8f ff 3f 0f 3c c0 1f 0f 1f ff
-      3f 0f 3c e0 0f 0f 3f 00 3c 0f 7c f0 07 0f 7f 00
-      1e 0f fc fc 03 0f ff ff 8f 0f f8 ff 01 0f fe ff
-      cf 0f f8 ff 00 0f fe ff cf 0f f0 3f 00 0f fc ff
-      c7 0f e0 1f 00 0f f8 ff c3 07 80 0f 00 0f f0 ff
-      c1 03 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-      00 00 c0 01 60 00 00 00 0f 00 f0 03 f0 00 00 00
-      0f 0f f8 03 f0 01 c0 03 ff 0f f8 03 f0 03 c0 e3
-      ff 0f fc 03 f0 07 c0 ff ff 0f fc 01 e0 07 c0 ff
-      ff 0f 7c f0 c0 0f f8 ff ff 00 3c f0 80 0f ff ff
-      0f 00 3c f0 00 0f ff 1f 0f 00 3c f0 00 0f ff 03
-      0f 00 3c f8 00 0f ff 03 0f 0f 7c fc 00 0f cf 03
-      ff 0f fc ff 81 0f c0 e3 ff 0f fc ff 83 0f c0 ff
-      ff 0f f8 ff cf 0f c0 ff ff 0f f8 ff ff 07 f8 ff
-      ff 00 f0 cf ff 03 ff ff 0f 00 c0 87 ff 01 ff 1f
-      0f 00 00 00 fc 00 ff 03 0f 00 00 00 78 00 ff 03
-      0f 00 00 00 00 00 cf 03 00 00 00 00 00 00 c0 03
-      00 00
+    40 40 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    00 00 c0 03 00 00 00 00 00 00 c0 03 00 00 00 00
+    00 00 e0 03 00 00 00 00 00 00 e0 03 00 00 00 00
+    00 00 f0 03 00 00 00 00 00 00 f8 03 00 00 00 00
+    00 00 fc ff ff 0f ff ff cf 03 fc ff ff 0f ff ff
+    cf 03 fc ff ff 0f ff ff cf 03 fc ff ff 0f ff ff
+    cf 03 fc ff ff 0f ff ff cf 03 fc ff ff 0f ff ff
+    cf 03 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    00 00 00 00 00 00 f0 ff ff 00 00 00 00 00 f8 ff
+    ff 01 00 00 00 00 fc ff ff 03 00 00 00 00 fe ff
+    ff 07 c0 01 80 0f fe ff ff 0f e0 03 c0 0f ff ff
+    ff 0f f0 03 e0 0f 7f 00 c0 0f f8 03 f0 0f 3f 00
+    80 0f fc 01 f8 0f 1f ff 0f 0f fc 00 fc 0f 8f ff
+    1f 0f 7c 00 fe 0f 8f ff 3f 0f 3c 00 7f 0f 8f ff
+    3f 0f 3c 80 3f 0f 8f ff 3f 0f 3c c0 1f 0f 1f ff
+    3f 0f 3c e0 0f 0f 3f 00 3c 0f 7c f0 07 0f 7f 00
+    1e 0f fc fc 03 0f ff ff 8f 0f f8 ff 01 0f fe ff
+    cf 0f f8 ff 00 0f fe ff cf 0f f0 3f 00 0f fc ff
+    c7 0f e0 1f 00 0f f8 ff c3 07 80 0f 00 0f f0 ff
+    c1 03 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    00 00 c0 01 60 00 00 00 0f 00 f0 03 f0 00 00 00
+    0f 0f f8 03 f0 01 c0 03 ff 0f f8 03 f0 03 c0 e3
+    ff 0f fc 03 f0 07 c0 ff ff 0f fc 01 e0 07 c0 ff
+    ff 0f 7c f0 c0 0f f8 ff ff 00 3c f0 80 0f ff ff
+    0f 00 3c f0 00 0f ff 1f 0f 00 3c f0 00 0f ff 03
+    0f 00 3c f8 00 0f ff 03 0f 0f 7c fc 00 0f cf 03
+    ff 0f fc ff 81 0f c0 e3 ff 0f fc ff 83 0f c0 ff
+    ff 0f f8 ff cf 0f c0 ff ff 0f f8 ff ff 07 f8 ff
+    ff 00 f0 cf ff 03 ff ff 0f 00 c0 87 ff 01 ff 1f
+    0f 00 00 00 fc 00 ff 03 0f 00 00 00 78 00 ff 03
+    0f 00 00 00 00 00 cf 03 00 00 00 00 00 00 c0 03
+    00 00
   ]];
 
   drawDisplay0(SYMBOL_IMAGE, 0xffffff);
@@ -730,39 +730,39 @@ func drawDisplaySymbol() {
 
 func drawDisplayNavigation() {
   const NAVIGATION_IMAGE = /* navigation.png */ [[
-      40 40 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-      00 00 00 00 00 c0 03 00 00 00 00 00 00 e0 07 00
-      00 00 00 00 00 70 0e 00 00 00 00 00 00 38 1c 00
-      00 00 00 00 00 1c 38 00 00 00 00 00 00 0e 70 00
-      00 00 00 00 00 07 e0 00 00 00 00 00 80 03 c0 01
-      00 00 00 00 c0 01 80 03 00 00 00 00 e0 00 00 07
-      00 00 00 00 f0 0f f0 0f 00 00 00 00 f0 0f f0 0f
-      00 00 00 00 00 0c 30 00 00 00 00 00 00 0c 30 00
-      00 00 00 00 00 0c 30 00 00 00 00 00 00 0c 30 00
-      00 00 00 00 00 0c 30 00 00 00 00 00 00 0c 30 00
-      00 00 00 30 00 0c 30 00 0c 00 00 38 00 0c 30 00
-      1c 00 00 3c 00 fc 3f 00 3c 00 00 3e 00 fc 3f 00
-      7c 00 00 37 00 00 00 00 ec 00 80 33 00 00 00 00
-      cc 01 c0 f1 ff 00 00 ff 8f 03 e0 f0 ff 00 00 ff
-      0f 07 70 00 c0 00 00 03 00 0e 38 00 c0 00 00 03
-      00 1c 1c 00 c0 00 00 03 00 38 0c 00 c0 00 00 03
-      00 30 0c 00 c0 00 00 03 00 30 1c 00 c0 00 00 03
-      00 38 38 00 c0 00 00 03 00 1c 70 00 c0 00 00 03
-      00 0e e0 f0 ff 00 00 ff 0f 07 c0 f1 ff 00 00 ff
-      8f 03 80 33 00 00 00 00 cc 01 00 37 00 00 00 00
-      ec 00 00 3e 00 fc 3f 00 7c 00 00 3c 00 fc 3f 00
-      3c 00 00 38 00 0c 30 00 1c 00 00 30 00 0c 30 00
-      0c 00 00 00 00 0c 30 00 00 00 00 00 00 0c 30 00
-      00 00 00 00 00 0c 30 00 00 00 00 00 00 0c 30 00
-      00 00 00 00 00 0c 30 00 00 00 00 00 00 0c 30 00
-      00 00 00 00 f0 0f f0 0f 00 00 00 00 f0 0f f0 0f
-      00 00 00 00 e0 00 00 07 00 00 00 00 c0 01 80 03
-      00 00 00 00 80 03 c0 01 00 00 00 00 00 07 e0 00
-      00 00 00 00 00 0e 70 00 00 00 00 00 00 1c 38 00
-      00 00 00 00 00 38 1c 00 00 00 00 00 00 70 0e 00
-      00 00 00 00 00 e0 07 00 00 00 00 00 00 c0 03 00
-      00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-      00 00
+    40 40 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    00 00 00 00 00 c0 03 00 00 00 00 00 00 e0 07 00
+    00 00 00 00 00 70 0e 00 00 00 00 00 00 38 1c 00
+    00 00 00 00 00 1c 38 00 00 00 00 00 00 0e 70 00
+    00 00 00 00 00 07 e0 00 00 00 00 00 80 03 c0 01
+    00 00 00 00 c0 01 80 03 00 00 00 00 e0 00 00 07
+    00 00 00 00 f0 0f f0 0f 00 00 00 00 f0 0f f0 0f
+    00 00 00 00 00 0c 30 00 00 00 00 00 00 0c 30 00
+    00 00 00 00 00 0c 30 00 00 00 00 00 00 0c 30 00
+    00 00 00 00 00 0c 30 00 00 00 00 00 00 0c 30 00
+    00 00 00 30 00 0c 30 00 0c 00 00 38 00 0c 30 00
+    1c 00 00 3c 00 fc 3f 00 3c 00 00 3e 00 fc 3f 00
+    7c 00 00 37 00 00 00 00 ec 00 80 33 00 00 00 00
+    cc 01 c0 f1 ff 00 00 ff 8f 03 e0 f0 ff 00 00 ff
+    0f 07 70 00 c0 00 00 03 00 0e 38 00 c0 00 00 03
+    00 1c 1c 00 c0 00 00 03 00 38 0c 00 c0 00 00 03
+    00 30 0c 00 c0 00 00 03 00 30 1c 00 c0 00 00 03
+    00 38 38 00 c0 00 00 03 00 1c 70 00 c0 00 00 03
+    00 0e e0 f0 ff 00 00 ff 0f 07 c0 f1 ff 00 00 ff
+    8f 03 80 33 00 00 00 00 cc 01 00 37 00 00 00 00
+    ec 00 00 3e 00 fc 3f 00 7c 00 00 3c 00 fc 3f 00
+    3c 00 00 38 00 0c 30 00 1c 00 00 30 00 0c 30 00
+    0c 00 00 00 00 0c 30 00 00 00 00 00 00 0c 30 00
+    00 00 00 00 00 0c 30 00 00 00 00 00 00 0c 30 00
+    00 00 00 00 00 0c 30 00 00 00 00 00 00 0c 30 00
+    00 00 00 00 f0 0f f0 0f 00 00 00 00 f0 0f f0 0f
+    00 00 00 00 e0 00 00 07 00 00 00 00 c0 01 80 03
+    00 00 00 00 80 03 c0 01 00 00 00 00 00 07 e0 00
+    00 00 00 00 00 0e 70 00 00 00 00 00 00 1c 38 00
+    00 00 00 00 00 38 1c 00 00 00 00 00 00 70 0e 00
+    00 00 00 00 00 e0 07 00 00 00 00 00 00 c0 03 00
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    00 00
   ]];
 
   drawDisplay0(NAVIGATION_IMAGE, 0xffc0c0);
@@ -772,39 +772,39 @@ func drawDisplayNavigation() {
 
 func drawDisplaySettings() {
   const SETTINGS_IMAGE = /* settings.png */ [[
-      40 40 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-      00 00 00 00 00 f0 0f 00 00 00 00 00 00 f8 1f 00
-      00 00 00 00 00 fc 3f 00 00 00 00 00 00 fc 3f 00
-      00 00 00 00 00 fc 3f 00 00 00 00 00 00 fe 7f 00
-      00 00 00 f0 00 fe 7f 00 0f 00 00 f8 03 fe 7f c0
-      1f 00 00 fc 0f ff ff f0 3f 00 00 fe 9f ff ff f9
-      7f 00 00 ff ff ff ff ff ff 00 00 ff ff ff ff ff
-      ff 00 00 ff ff ff ff ff ff 00 00 ff ff ff ff ff
-      ff 00 00 fe ff ff ff ff 7f 00 00 fc ff ff ff ff
-      7f 00 00 fc ff ff ff ff 3f 00 00 fc ff ff ff ff
-      3f 00 00 f8 ff ff ff ff 1f 00 00 f0 ff ff ff ff
-      0f 00 00 f0 ff 3f fc ff 0f 00 00 f8 ff 0f f0 ff
-      1f 00 00 fc ff 03 c0 ff 3f 00 80 ff ff 01 80 ff
-      ff 01 f0 ff ff 00 00 ff ff 0f f8 ff ff 00 00 ff
-      ff 1f fc ff 7f 00 00 fe ff 3f fc ff 7f 00 00 fe
-      ff 3f fc ff 3f 00 00 fc ff 3f fc ff 3f 00 00 fc
-      ff 3f fc ff 3f 00 00 fc ff 3f fc ff 3f 00 00 fc
-      ff 3f fc ff 7f 00 00 fe ff 3f fc ff 7f 00 00 fe
-      ff 3f f8 ff ff 00 00 ff ff 1f f0 ff ff 00 00 ff
-      ff 0f 80 ff ff 01 80 ff ff 01 00 fc ff 03 c0 ff
-      3f 00 00 f8 ff 0f f0 ff 1f 00 00 f0 ff 3f fc ff
-      0f 00 00 f0 ff ff ff ff 0f 00 00 f8 ff ff ff ff
-      1f 00 00 fc ff ff ff ff 3f 00 00 fc ff ff ff ff
-      3f 00 00 fe ff ff ff ff 7f 00 00 fe ff ff ff ff
-      7f 00 00 ff ff ff ff ff ff 00 00 ff ff ff ff ff
-      ff 00 00 ff ff ff ff ff ff 00 00 ff ff ff ff ff
-      ff 00 00 fe 9f ff ff f9 7f 00 00 fc 0f ff ff f0
-      3f 00 00 f8 03 fe 7f c0 1f 00 00 f0 00 fe 7f 00
-      0f 00 00 00 00 fe 7f 00 00 00 00 00 00 fc 3f 00
-      00 00 00 00 00 fc 3f 00 00 00 00 00 00 fc 3f 00
-      00 00 00 00 00 f8 1f 00 00 00 00 00 00 f0 0f 00
-      00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-      00 00
+    40 40 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    00 00 00 00 00 f0 0f 00 00 00 00 00 00 f8 1f 00
+    00 00 00 00 00 fc 3f 00 00 00 00 00 00 fc 3f 00
+    00 00 00 00 00 fc 3f 00 00 00 00 00 00 fe 7f 00
+    00 00 00 f0 00 fe 7f 00 0f 00 00 f8 03 fe 7f c0
+    1f 00 00 fc 0f ff ff f0 3f 00 00 fe 9f ff ff f9
+    7f 00 00 ff ff ff ff ff ff 00 00 ff ff ff ff ff
+    ff 00 00 ff ff ff ff ff ff 00 00 ff ff ff ff ff
+    ff 00 00 fe ff ff ff ff 7f 00 00 fc ff ff ff ff
+    7f 00 00 fc ff ff ff ff 3f 00 00 fc ff ff ff ff
+    3f 00 00 f8 ff ff ff ff 1f 00 00 f0 ff ff ff ff
+    0f 00 00 f0 ff 3f fc ff 0f 00 00 f8 ff 0f f0 ff
+    1f 00 00 fc ff 03 c0 ff 3f 00 80 ff ff 01 80 ff
+    ff 01 f0 ff ff 00 00 ff ff 0f f8 ff ff 00 00 ff
+    ff 1f fc ff 7f 00 00 fe ff 3f fc ff 7f 00 00 fe
+    ff 3f fc ff 3f 00 00 fc ff 3f fc ff 3f 00 00 fc
+    ff 3f fc ff 3f 00 00 fc ff 3f fc ff 3f 00 00 fc
+    ff 3f fc ff 7f 00 00 fe ff 3f fc ff 7f 00 00 fe
+    ff 3f f8 ff ff 00 00 ff ff 1f f0 ff ff 00 00 ff
+    ff 0f 80 ff ff 01 80 ff ff 01 00 fc ff 03 c0 ff
+    3f 00 00 f8 ff 0f f0 ff 1f 00 00 f0 ff 3f fc ff
+    0f 00 00 f0 ff ff ff ff 0f 00 00 f8 ff ff ff ff
+    1f 00 00 fc ff ff ff ff 3f 00 00 fc ff ff ff ff
+    3f 00 00 fe ff ff ff ff 7f 00 00 fe ff ff ff ff
+    7f 00 00 ff ff ff ff ff ff 00 00 ff ff ff ff ff
+    ff 00 00 ff ff ff ff ff ff 00 00 ff ff ff ff ff
+    ff 00 00 fe 9f ff ff f9 7f 00 00 fc 0f ff ff f0
+    3f 00 00 f8 03 fe 7f c0 1f 00 00 f0 00 fe 7f 00
+    0f 00 00 00 00 fe 7f 00 00 00 00 00 00 fc 3f 00
+    00 00 00 00 00 fc 3f 00 00 00 00 00 00 fc 3f 00
+    00 00 00 00 00 f8 1f 00 00 00 00 00 00 f0 0f 00
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    00 00
   ]];
 
   drawDisplay0(SETTINGS_IMAGE, 0xffc000);
@@ -814,39 +814,39 @@ func drawDisplaySettings() {
 
 func drawDisplayNumpad() {
   const NUMPAD_IMAGE = /* numpad.png */ [[
-      40 40 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-      00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-      00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-      00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-      00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-      00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-      00 00 f8 1f f8 1f f8 1f f8 1f fc 3f fc 3f fc 3f
-      fc 3f fc 3f fc 3f fc 3f fc 3f fc 3f fc 3f fc 3f
-      fc 3f fc 3f fc 3f fc 3f fc 3f fc 3f fc 3f fc 3f
-      fc 3f fc 3f fc 3f fc 3f fc 3f fc 3f fc 3f fc 3f
-      fc 3f fc 3f fc 3f fc 3f fc 3f fc 3f fc 3f fc 3f
-      fc 3f fc 3f fc 3f fc 3f fc 3f f8 1f f8 1f f8 1f
-      fc 3f 00 00 00 00 00 00 fc 3f 00 00 00 00 00 00
-      fc 3f 00 00 00 00 00 00 fc 3f 00 00 00 00 00 00
-      fc 3f f8 1f f8 1f f8 1f fc 3f fc 3f fc 3f fc 3f
-      fc 3f fc 3f fc 3f fc 3f fc 3f fc 3f fc 3f fc 3f
-      fc 3f fc 3f fc 3f fc 3f fc 3f fc 3f fc 3f fc 3f
-      fc 3f fc 3f fc 3f fc 3f fc 3f fc 3f fc 3f fc 3f
-      fc 3f fc 3f fc 3f fc 3f fc 3f fc 3f fc 3f fc 3f
-      fc 3f fc 3f fc 3f fc 3f fc 3f f8 1f f8 1f f8 1f
-      f8 1f 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-      00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-      00 00 f8 1f f8 1f f8 1f f8 1f fc 3f fc 3f fc 3f
-      fc 3f fc 3f fc 3f fc 3f fc 3f fc 3f fc 3f fc 3f
-      fc 3f fc 3f fc 3f fc 3f fc 3f fc 3f fc 3f fc 3f
-      fc 3f fc 3f fc 3f fc 3f fc 3f fc 3f fc 3f fc 3f
-      fc 3f fc 3f fc 3f fc 3f fc 3f fc 3f fc 3f fc 3f
-      fc 3f fc 3f fc 3f fc 3f fc 3f f8 1f f8 1f f8 1f
-      f8 1f 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-      00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-      00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-      00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-      00 00
+    40 40 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    00 00 f8 1f f8 1f f8 1f f8 1f fc 3f fc 3f fc 3f
+    fc 3f fc 3f fc 3f fc 3f fc 3f fc 3f fc 3f fc 3f
+    fc 3f fc 3f fc 3f fc 3f fc 3f fc 3f fc 3f fc 3f
+    fc 3f fc 3f fc 3f fc 3f fc 3f fc 3f fc 3f fc 3f
+    fc 3f fc 3f fc 3f fc 3f fc 3f fc 3f fc 3f fc 3f
+    fc 3f fc 3f fc 3f fc 3f fc 3f f8 1f f8 1f f8 1f
+    fc 3f 00 00 00 00 00 00 fc 3f 00 00 00 00 00 00
+    fc 3f 00 00 00 00 00 00 fc 3f 00 00 00 00 00 00
+    fc 3f f8 1f f8 1f f8 1f fc 3f fc 3f fc 3f fc 3f
+    fc 3f fc 3f fc 3f fc 3f fc 3f fc 3f fc 3f fc 3f
+    fc 3f fc 3f fc 3f fc 3f fc 3f fc 3f fc 3f fc 3f
+    fc 3f fc 3f fc 3f fc 3f fc 3f fc 3f fc 3f fc 3f
+    fc 3f fc 3f fc 3f fc 3f fc 3f fc 3f fc 3f fc 3f
+    fc 3f fc 3f fc 3f fc 3f fc 3f f8 1f f8 1f f8 1f
+    f8 1f 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    00 00 f8 1f f8 1f f8 1f f8 1f fc 3f fc 3f fc 3f
+    fc 3f fc 3f fc 3f fc 3f fc 3f fc 3f fc 3f fc 3f
+    fc 3f fc 3f fc 3f fc 3f fc 3f fc 3f fc 3f fc 3f
+    fc 3f fc 3f fc 3f fc 3f fc 3f fc 3f fc 3f fc 3f
+    fc 3f fc 3f fc 3f fc 3f fc 3f fc 3f fc 3f fc 3f
+    fc 3f fc 3f fc 3f fc 3f fc 3f f8 1f f8 1f f8 1f
+    f8 1f 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    00 00
   ]];
 
   drawDisplay0(NUMPAD_IMAGE, 0xffff00);
@@ -1078,21 +1078,21 @@ const BRIGHTNESS_VALUES = [[ 00 08 10 18 20 28 30 38 40 ]];
 
 func rgbUpdateKeyHueCycle(hShift, sat, spreadMultiplier, value) {
   const HUE_CYCLE_RGB_ORDER = [[
-      00 01 02 03
-      0c 0d 0e 0f 04 05
-      18 19 1a 1b 10 11
-      28 29 1c
-      2a 1d
-      2b 1e
-      2c 1f
+    00 01 02 03
+    0c 0d 0e 0f 04 05
+    18 19 1a 1b 10 11
+    28 29 1c
+    2a 1d
+    2b 1e
+    2c 1f
 
-      2d 20
-      2e 21
-      2f 22
-      31 30 23
-      27 26 25 24 13 12
-      17 16 15 14 07 06
-      0b 0a 09 08
+    2d 20
+    2e 21
+    2f 22
+    31 30 23
+    27 26 25 24 13 12
+    17 16 15 14 07 06
+    0b 0a 09 08
   ]];
 
   for (var i = 0; i < 50; i = i + 1) {
@@ -1107,8 +1107,8 @@ func rgbUpdateKeyHueCycle(hShift, sat, spreadMultiplier, value) {
 
 func rgbUpdateUnderglowHueCycle(hShift, sat, spreadMultiplier, value) {
   const COLOR_OFFSETS = [[
-      02 0b 0d  1d 1e 28
-      06 0f 14  16 1b 24
+    02 0b 0d  1d 1e 28
+    06 0f 14  16 1b 24
   ]];
 
   for (var i = 0; i < 12; i = i + 1) {
@@ -1393,13 +1393,13 @@ func drawGameOfLife() {
 
 func spawnPixelBundle(d) {
   const COLORS = [[
-      ff 00 00
-      00 ff 00
-      00 00 ff
-      ff ff 00
-      ff 00 ff
-      00 ff ff
-      ff ff ff
+    ff 00 00
+    00 ff 00
+    00 00 ff
+    ff ff 00
+    ff 00 ff
+    00 ff ff
+    ff ff ff
   ]];
   var colOffset = (rand() % 7) * 3;
   setDrawColorRgb(d, COLORS[colOffset], COLORS[colOffset+1], COLORS[colOffset+2]);
@@ -1446,92 +1446,92 @@ func tapCapsLock() {
 
 // Layer 05 Script: drawBar
 const SPEED_IMAGE = [[
-    10 10 80 1f e0 3f f0 30 38 30 18 30 1c 30 0c 30
-    0c 36 0c 37 8c 33 dc 31 d8 30 38 30 f0 30 e0 3f
-    80 1f
+  10 10 80 1f e0 3f f0 30 38 30 18 30 1c 30 0c 30
+  0c 36 0c 37 8c 33 dc 31 d8 30 38 30 f0 30 e0 3f
+  80 1f
 ]];
 
 const BRIGHTNESS_IMAGE = [[
-    10 10 80 01 86 61 8e 71 1c 38 d8 1b e0 07 70 0e
-    37 ec 37 ec 70 0e e0 07 d8 1b 1c 38 8e 71 86 61
-    80 01
+  10 10 80 01 86 61 8e 71 1c 38 d8 1b e0 07 70 0e
+  37 ec 37 ec 70 0e e0 07 d8 1b 1c 38 8e 71 86 61
+  80 01
 ]];
 
 const SATURATION_IMAGE = [[
-    10 10 e0 07 f8 1f 3c 3c 0e 70 06 60 07 e0 03 c0
-    03 c0 ff ff ff ff ff ff fe 7f fe 7f fc 3f f8 1f
-    e0 07
+  10 10 e0 07 f8 1f 3c 3c 0e 70 06 60 07 e0 03 c0
+  03 c0 ff ff ff ff ff ff fe 7f fe 7f fc 3f f8 1f
+  e0 07
 ]];
 
 const HUE_SPREAD_IMAGE = [[
-    10 10 e0 07 f8 1f 3c 3c 8e 71 c6 63 e7 e7 83 c1
-    83 c1 ff ff 7f fe 7f fe 1e 78 3e 7c 7c 3e f8 1f
-    e0 07
+  10 10 e0 07 f8 1f 3c 3c 8e 71 c6 63 e7 e7 83 c1
+  83 c1 ff ff 7f fe 7f fe 1e 78 3e 7c 7c 3e f8 1f
+  e0 07
 ]];
 
 const BAR_IMAGES = [[
-    // BAR_000_IMAGE
-    40 08 3c 42 81 81 81 81 81 81 81 81 81 81 81 81
-    81 81 81 81 81 81 81 81 81 81 81 81 81 81 81 81
-    81 81 81 81 81 81 81 81 81 81 81 81 81 81 81 81
-    81 81 81 81 81 81 81 81 81 81 81 81 81 81 81 81
-    42 3c
+  // BAR_000_IMAGE
+  40 08 3c 42 81 81 81 81 81 81 81 81 81 81 81 81
+  81 81 81 81 81 81 81 81 81 81 81 81 81 81 81 81
+  81 81 81 81 81 81 81 81 81 81 81 81 81 81 81 81
+  81 81 81 81 81 81 81 81 81 81 81 81 81 81 81 81
+  42 3c
 
-    // BAR_125_IMAGE
-    40 08 3c 7e ff ff ff ff ff ff 81 81 81 81 81 81
-    81 81 81 81 81 81 81 81 81 81 81 81 81 81 81 81
-    81 81 81 81 81 81 81 81 81 81 81 81 81 81 81 81
-    81 81 81 81 81 81 81 81 81 81 81 81 81 81 81 81
-    42 3c
+  // BAR_125_IMAGE
+  40 08 3c 7e ff ff ff ff ff ff 81 81 81 81 81 81
+  81 81 81 81 81 81 81 81 81 81 81 81 81 81 81 81
+  81 81 81 81 81 81 81 81 81 81 81 81 81 81 81 81
+  81 81 81 81 81 81 81 81 81 81 81 81 81 81 81 81
+  42 3c
 
-    // BAR_250_IMAGE
-    40 08 3c 7e ff ff ff ff ff ff ff ff ff ff ff ff
-    ff ff 81 81 81 81 81 81 81 81 81 81 81 81 81 81
-    81 81 81 81 81 81 81 81 81 81 81 81 81 81 81 81
-    81 81 81 81 81 81 81 81 81 81 81 81 81 81 81 81
-    42 3c
+  // BAR_250_IMAGE
+  40 08 3c 7e ff ff ff ff ff ff ff ff ff ff ff ff
+  ff ff 81 81 81 81 81 81 81 81 81 81 81 81 81 81
+  81 81 81 81 81 81 81 81 81 81 81 81 81 81 81 81
+  81 81 81 81 81 81 81 81 81 81 81 81 81 81 81 81
+  42 3c
 
-    // BAR_375_IMAGE
-    40 08 3c 7e ff ff ff ff ff ff ff ff ff ff ff ff
-    ff ff ff ff ff ff ff ff ff ff 81 81 81 81 81 81
-    81 81 81 81 81 81 81 81 81 81 81 81 81 81 81 81
-    81 81 81 81 81 81 81 81 81 81 81 81 81 81 81 81
-    42 3c
+  // BAR_375_IMAGE
+  40 08 3c 7e ff ff ff ff ff ff ff ff ff ff ff ff
+  ff ff ff ff ff ff ff ff ff ff 81 81 81 81 81 81
+  81 81 81 81 81 81 81 81 81 81 81 81 81 81 81 81
+  81 81 81 81 81 81 81 81 81 81 81 81 81 81 81 81
+  42 3c
 
-    // BAR_500_IMAGE
-    40 08 3c 7e ff ff ff ff ff ff ff ff ff ff ff ff
-    ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
-    ff ff 81 81 81 81 81 81 81 81 81 81 81 81 81 81
-    81 81 81 81 81 81 81 81 81 81 81 81 81 81 81 81
-    42 3c
+  // BAR_500_IMAGE
+  40 08 3c 7e ff ff ff ff ff ff ff ff ff ff ff ff
+  ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+  ff ff 81 81 81 81 81 81 81 81 81 81 81 81 81 81
+  81 81 81 81 81 81 81 81 81 81 81 81 81 81 81 81
+  42 3c
 
-    // BAR_625_IMAGE
-    40 08 3c 7e ff ff ff ff ff ff ff ff ff ff ff ff
-    ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
-    ff ff ff ff ff ff ff ff ff ff 81 81 81 81 81 81
-    81 81 81 81 81 81 81 81 81 81 81 81 81 81 81 81
-    42 3c
+  // BAR_625_IMAGE
+  40 08 3c 7e ff ff ff ff ff ff ff ff ff ff ff ff
+  ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+  ff ff ff ff ff ff ff ff ff ff 81 81 81 81 81 81
+  81 81 81 81 81 81 81 81 81 81 81 81 81 81 81 81
+  42 3c
 
-    // BAR_750_IMAGE
-    40 08 3c 7e ff ff ff ff ff ff ff ff ff ff ff ff
-    ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
-    ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
-    ff ff 81 81 81 81 81 81 81 81 81 81 81 81 81 81
-    42 3c
+  // BAR_750_IMAGE
+  40 08 3c 7e ff ff ff ff ff ff ff ff ff ff ff ff
+  ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+  ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+  ff ff 81 81 81 81 81 81 81 81 81 81 81 81 81 81
+  42 3c
 
-    // BAR_875_IMAGE
-    40 08 3c 7e ff ff ff ff ff ff ff ff ff ff ff ff
-    ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
-    ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
-    ff ff ff ff ff ff ff ff ff ff 81 81 81 81 81 81
-    42 3c
+  // BAR_875_IMAGE
+  40 08 3c 7e ff ff ff ff ff ff ff ff ff ff ff ff
+  ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+  ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+  ff ff ff ff ff ff ff ff ff ff 81 81 81 81 81 81
+  42 3c
 
-    // BAR_1000_IMAGE
-    40 08 3c 7e ff ff ff ff ff ff ff ff ff ff ff ff
-    ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
-    ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
-    ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
-    7e 3c
+  // BAR_1000_IMAGE
+  40 08 3c 7e ff ff ff ff ff ff ff ff ff ff ff ff
+  ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+  ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+  ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+  7e 3c
 ]];
 
 func drawBar(image, value) {
@@ -1586,19 +1586,19 @@ func returnFromMouseLayer() {
 
 func drawDisplayMouse() {
   const MOUSE_IMAGE = /* mouse.png */ [[
-      20 30 00 00 00 00 00 00 00 fe ff ff 7f 00 80 ff
-      ff ff ff 01 c0 01 00 00 80 03 70 00 00 00 00 0e
-      38 00 00 00 00 1c 18 00 00 00 00 18 0c 00 00 00
-      00 30 06 00 00 00 00 60 06 00 00 00 00 60 03 00
-      00 00 00 c0 03 00 00 00 00 c0 03 7c 00 00 00 c0
-      03 ff 01 00 00 c0 83 01 03 00 00 c0 ff 01 fe 01
-      00 c0 ff 01 fe 01 00 c0 83 01 03 00 00 c0 03 ff
-      01 00 00 c0 03 7c 00 00 00 c0 03 00 00 00 00 c0
-      03 00 00 00 00 c0 06 00 00 00 00 60 06 00 00 00
-      00 60 0c 00 00 00 00 30 18 00 00 00 00 18 38 00
-      00 00 00 1c 70 00 00 00 00 0e c0 01 00 00 80 03
-      80 ff ff ff ff 01 00 fe ff ff 7f 00 00 00 00 00
-      00 00
+    20 30 00 00 00 00 00 00 00 fe ff ff 7f 00 80 ff
+    ff ff ff 01 c0 01 00 00 80 03 70 00 00 00 00 0e
+    38 00 00 00 00 1c 18 00 00 00 00 18 0c 00 00 00
+    00 30 06 00 00 00 00 60 06 00 00 00 00 60 03 00
+    00 00 00 c0 03 00 00 00 00 c0 03 7c 00 00 00 c0
+    03 ff 01 00 00 c0 83 01 03 00 00 c0 ff 01 fe 01
+    00 c0 ff 01 fe 01 00 c0 83 01 03 00 00 c0 03 ff
+    01 00 00 c0 03 7c 00 00 00 c0 03 00 00 00 00 c0
+    03 00 00 00 00 c0 06 00 00 00 00 60 06 00 00 00
+    00 60 0c 00 00 00 00 30 18 00 00 00 00 18 38 00
+    00 00 00 1c 70 00 00 00 00 0e c0 01 00 00 80 03
+    80 ff ff ff ff 01 00 fe ff ff 7f 00 00 00 00 00
+    00 00
   ]];
 
   drawDisplay0(MOUSE_IMAGE, 0xffff);
@@ -2325,10 +2325,10 @@ func onRelease14_4() {
 }
 
 func onPress14_6() {
-  pressMouseButton(2 /* "🖱️3" */);
+  pressMouseButton(2 /* "🖱️M" */);
 }
 func onRelease14_6() {
-  releaseMouseButton(2 /* "🖱️3" */);
+  releaseMouseButton(2 /* "🖱️M" */);
 }
 
 func onPress15() {
@@ -2388,10 +2388,10 @@ func onRelease15_5() {
 }
 
 func onPress15_6() {
-  pressMouseButton(1 /* "🖱️2" */);
+  pressMouseButton(1 /* "🖱️R" */);
 }
 func onRelease15_6() {
-  releaseMouseButton(1 /* "🖱️2" */);
+  releaseMouseButton(1 /* "🖱️R" */);
 }
 
 func onPress16() {
@@ -2443,10 +2443,10 @@ func onRelease16_4() {
 }
 
 func onPress16_6() {
-  pressMouseButton(0 /* "🖱️1" */);
+  pressMouseButton(0 /* "🖱️L" */);
 }
 func onRelease16_6() {
-  releaseMouseButton(0 /* "🖱️1" */);
+  releaseMouseButton(0 /* "🖱️L" */);
 }
 
 func onPress17() {

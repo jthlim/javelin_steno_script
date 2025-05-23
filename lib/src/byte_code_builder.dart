@@ -247,10 +247,14 @@ class ScriptByteCodeBuilder {
     final strings = sortedStrings.where((element) => element.startsWith('S'));
 
     // Target duty cycle of 66%.
-    final minimumHashMapSize = strings.length + (strings.length >> 1);
     var hashMapSize = 4;
-    while (hashMapSize < minimumHashMapSize) {
-      hashMapSize <<= 1;
+    if (strings.length < 2) {
+      hashMapSize = [0, 2][strings.length];
+    } else {
+      final minimumHashMapSize = strings.length + (strings.length >> 1);
+      while (hashMapSize < minimumHashMapSize) {
+        hashMapSize <<= 1;
+      }
     }
 
     add16BitValue(hashMapSize);
@@ -284,19 +288,23 @@ extension ByteCodeScriptExtension on ScriptByteCodeBuilder {
   String disassemble(Uint8List byteCode) {
     final buffer = StringBuffer();
 
-    buffer.write('Globals\n');
-    buffer.write('-------\n');
-    module.globals.forEach((globalName, global) {
-      if (reachability.globals.contains(global.index)) {
-        if (global.arraySize != null) {
-          buffer.write('g${global.index}[${global.arraySize}]: $globalName\n');
-        } else {
-          buffer.write('g${global.index}: $globalName\n');
+    if (module.globals.isNotEmpty) {
+      buffer.write('Globals\n');
+      buffer.write('-------\n');
+      module.globals.forEach((globalName, global) {
+        if (reachability.globals.contains(global.index)) {
+          if (global.arraySize != null) {
+            buffer
+                .write('g${global.index}[${global.arraySize}]: $globalName\n');
+          } else {
+            buffer.write('g${global.index}: $globalName\n');
+          }
         }
-      }
-    });
+      });
+      buffer.write('\n');
+    }
 
-    buffer.write('\nOpcodes\n');
+    buffer.write('Opcodes\n');
     buffer.write('-------\n');
     ScriptInstruction? lastInstruction;
     for (final instruction in instructions) {

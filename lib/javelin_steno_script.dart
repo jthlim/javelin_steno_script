@@ -1,5 +1,6 @@
 export 'script_compile_result.dart';
 export 'src/byte_code_builder.dart';
+export 'src/functions.dart';
 export 'src/module.dart';
 export 'src/parser.dart';
 export 'src/string_data.dart';

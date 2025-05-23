@@ -124,5 +124,7 @@ class ButtonScriptInBuiltFunctions {
     InBuiltScriptFunction('stopInfrared', 0, ReturnType.none, 0x72),
     InBuiltScriptFunction('printData', 3, ReturnType.none, 0x73),
     InBuiltScriptFunction('measureTextWidth', 2, ReturnType.value, 0x74),
+    InBuiltScriptFunction('enableScriptRgb', 0, ReturnType.none, 0x75),
+    InBuiltScriptFunction('disableScriptRgb', 0, ReturnType.none, 0x76),
   ];
 }
