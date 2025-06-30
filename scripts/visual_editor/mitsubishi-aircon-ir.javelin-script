@@ -4,6 +4,9 @@ var airConditionerTemperature = 27;
 var isAirConditionerOn = 1;
 var fanMode = 0;
 var vaneMode = 0;
+var airConditionerInfraredDataBuffer = createBuffer(18);
+var airConditionerUpdateTime;
+const airConditionerUpdateInterval = 1000; // Update every second
 
 func drawOutlineRect(d, left, top, right, bottom) {
   drawLine(d, left, top, right, top);
@@ -13,23 +16,33 @@ func drawOutlineRect(d, left, top, right, bottom) {
 }
 
 func getFanModeIcon() var {
-  const FAN_AUTO = [[
-    10 10 e0 03 70 03 18 00 8c 1f c4 31 e4 63 34 46
-    14 cc 1c cc 38 de f2 5b c6 79 04 08 0c 0c 18 06
-    f0 03
-  ]];
-  const FAN1 = [[04 0f 00 78 00 78 00 7c 00 7c]];
-  const FAN2 = [[09 0f 00 78 00 78 00 7c 00 7c 00 00 00 7e 00 7e 00 7f 00 7f]];
-  const FAN3 = [[
-    0e 0f 00 78 00 78 00 7c 00 7c 00 00 00 7e 00 7e
-    00 7f 00 7f 00 00 80 7f 80 7f c0 7f c0 7f
-  ]];
-  const FAN4 = [[
-    13 0f 00 78 00 78 00 7c 00 7c 00 00 00 7e 00 7e
-    00 7f 00 7f 00 00 80 7f 80 7f c0 7f c0 7f 00 00
-    e0 7f e0 7f f0 7f f0 7f
-  ]];
-  const FAN_ICONS = [[[FAN_AUTO, FAN1, FAN2, FAN3, FAN4]]];
+  const FAN_ICONS = [<
+    // AUTO
+    [[
+      10 10 e0 03 70 03 18 00 8c 1f c4 31 e4 63 34 46
+      14 cc 1c cc 38 de f2 5b c6 79 04 08 0c 0c 18 06
+      f0 03
+    ]],
+
+    // FAN1
+    [[04 0f 00 78 00 78 00 7c 00 7c]],
+
+    // FAN2
+    [[09 0f 00 78 00 78 00 7c 00 7c 00 00 00 7e 00 7e 00 7f 00 7f]],
+
+    // FAN3
+    [[
+      0e 0f 00 78 00 78 00 7c 00 7c 00 00 00 7e 00 7e
+      00 7f 00 7f 00 00 80 7f 80 7f c0 7f c0 7f
+    ]],
+
+    // FAN4
+    [[
+      13 0f 00 78 00 78 00 7c 00 7c 00 00 00 7e 00 7e
+      00 7f 00 7f 00 00 80 7f 80 7f c0 7f c0 7f 00 00
+      e0 7f e0 7f f0 7f f0 7f
+    ]]
+  >];
   return FAN_ICONS[[[fanMode]]];
 }
 
@@ -70,8 +83,8 @@ func getVaneModeIcon() var {
     f0 7f
   ]];
 
-  const VANE_ICONS = [[[VANE_AUTO, VANE1, VANE2, VANE3, VANE4, VANE5, VANE_SWING]]];
-  return VANE_ICONS[[[vaneMode]]];
+  const VANE_ICONS = [<VANE_AUTO, VANE1, VANE2, VANE3, VANE4, VANE5, VANE_SWING>];
+  return VANE_ICONS[<vaneMode>];
 }
 
 #option(drawDisplay, "Display", "Air Conditioner", drawAirConditioner)
@@ -79,23 +92,25 @@ func drawAirConditioner() {
   clearDisplay(0);
   setAutoDraw(0, AUTO_DRAW_NONE);
 
+  drawOutlineRect(0, 2, 18, 66, 36);
+
   setDrawColor(0, 1);
-  drawRect(0, 2 + 32*isAirConditionerOn, 22, 34 + 32*isAirConditionerOn, 40);
+  drawRect(0, 2 + 32*isAirConditionerOn, 18, 34 + 32*isAirConditionerOn, 36);
 
   setDrawColor(0, isAirConditionerOn);
-  drawText(0, 18, 35, 0, 1, "Off");
+  drawText(0, 18, 32, 0, 1, "Off");
 
   setDrawColor(0, !isAirConditionerOn);
-  drawText(0, 50, 35, 0, 1, "On");
+  drawText(0, 50, 32, 0, 1, "On");
 
   setDrawColor(0, 1);
-  drawOutlineRect(0, 2, 44, 66, 96);
-  drawText(0, 36, 84, 5, TEXT_ALIGNMENT_MIDDLE, formatString("%d", airConditionerTemperature));
+  drawOutlineRect(0, 2, 40, 66, 96);
+  drawText(0, 36, 82, 5, TEXT_ALIGNMENT_MIDDLE, formatString("%d", airConditionerTemperature));
   const degreesIcon = [[08 08 3c 7e e7 c3 c3 e7 7e 3c]];
-  drawImage(0, 56, 54, degreesIcon);
+  drawImage(0, 56, 52, degreesIcon);
 
   for (var i = 16; i <= airConditionerTemperature; i += 1) {
-    var y = 92 + 48 - 3*i;
+    var y = 90 + 48 - 3*i;
     drawRect(0, 4, y, 12, y+2);
   }
 
@@ -118,48 +133,43 @@ func drawAirConditioner() {
   drawImage(0, 37, 135, getVaneModeIcon());
 }
 
-func reverseBits(v, n) var {
-  var result = 0;
-  for (var i = 0; i < n; i += 1) {
-    result = (result << 1) | (v & 1);
-    v >>>= 1;
-  }
-  return result;
-}
+func sendAirConditionerData() {
+  const MITSUBISHI_CONFIGURATION = [<
+    2,                 // Playback count
+    38000, 33,         // Freq & Duty Cycle
+    0x8001, 34000, 0,  // LSB, 17ms between pulses
+    6632, 3869,        // Header time
+    737, 996,          // Zero bit time
+    737, 2709,         // One bit time
+    737, 0             // Trailer time
+  >];
 
-func updateAirConditioner() {
-  var MITSUBISHI_CONFIGURATION = [[[
-    // Repeat
-    2, 0,
-    17000, 0,
-    1,
-    38000,
-    33,
-    16,
-    0x840, 0x420,
-    0x108, 0x108,
-    0x108, 0x318,
-    0x108, 0
-  ]]];
+  const AIRCON_BASE_DATA = [[ 23 cb 26 01 00 00 18 00 36 00 00 00 00 00 00 00 00 00 ]];
+  const VANE_DATA = [[80 48 50 58 60 68 78]];
 
-  // Hack to get editable buffer. This will change in the future.
-  var airconData = formatString("123456789012345678%Z", 0);
-  const AIRCON_BASE_DATA = [[ c4 d3 64 80 00 00 18 00 6c 00 00 00 00 00 00 00 00 00 ]];
-  const VANE_DATA = [[01 12 0a 1a 06 16 1e]];
-
-  for(var i = 0; i < 18; i += 1) airconData[i] = AIRCON_BASE_DATA[i];
-  airconData[5] = isAirConditionerOn << 2;
-  airconData[7] = reverseBits(airConditionerTemperature - 16, 8);
-  airconData[9] = reverseBits(fanMode, 8) | VANE_DATA[vaneMode];
+  for(var i = 0; i < 18; i += 1) airConditionerInfraredDataBuffer[i] = AIRCON_BASE_DATA[i];
+  airConditionerInfraredDataBuffer[5] = isAirConditionerOn << 5;
+  airConditionerInfraredDataBuffer[7] = airConditionerTemperature - 16;
+  airConditionerInfraredDataBuffer[9] = fanMode | VANE_DATA[vaneMode];
 
   var checksum = 0;
   for (var i = 0; i < 17; i += 1) {
-    checksum += reverseBits(airconData[i], 8);
+    checksum += airConditionerInfraredDataBuffer[i];
   }
-  airconData[17] = reverseBits(checksum, 8);
+  airConditionerInfraredDataBuffer[17] = checksum;
 
-  sendInfraredData(airconData, 144, MITSUBISHI_CONFIGURATION);
+  sendInfraredData(airConditionerInfraredDataBuffer, 144, MITSUBISHI_CONFIGURATION);
+  airConditionerUpdateTime = getTime() + airConditionerUpdateInterval;
+}
+
+func updateAirConditioner() {
   drawAirConditioner();
+  var delay = airConditionerUpdateTime - getTime();
+  if  (delay <= 0 || delay >= airConditionerUpdateInterval) {
+    sendAirConditionerData();
+  } else {
+    startTimer(@sendAirConditionerData, delay, 0, @sendAirConditionerData);
+  }
 }
 
 func toggleAirConditionerPower() {

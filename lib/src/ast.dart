@@ -323,6 +323,118 @@ class ReadHalfWordIndexAstNode extends AstNode {
   final AstNode index;
 }
 
+class WriteHalfWordIndexAstNode extends AstNode {
+  WriteHalfWordIndexAstNode(this.halfWordValue, this.index, this.value);
+
+  @override
+  bool isConstant() => false;
+
+  @override
+  int constantValue() => throw UnsupportedError('Should not be invoked');
+
+  @override
+  bool isPure() => false;
+
+  @override
+  ExecutionValue? evaluate(ExecutionContext context) {
+    context.state = ExecutionState.error;
+    return null;
+  }
+
+  @override
+  void mark(ScriptReachability context) {
+    halfWordValue.mark(context);
+    index.mark(context);
+    value.mark(context);
+  }
+
+  @override
+  void addInstructions(ScriptByteCodeBuilder builder) {
+    halfWordValue.addInstructions(builder);
+    index.addInstructions(builder);
+    value.addInstructions(builder);
+
+    builder.addInstruction(WriteHalfWordIndexInstruction());
+  }
+
+  final AstNode halfWordValue;
+  final AstNode index;
+  final AstNode value;
+}
+
+class ReadWordIndexAstNode extends AstNode {
+  ReadWordIndexAstNode(this.value, this.index);
+
+  // Do NOT mark this as constant, otherwise integer folding instructions
+  // will be attempted.
+  @override
+  bool isConstant() => false;
+
+  @override
+  int constantValue() => throw UnsupportedError('Should not be invoked');
+
+  @override
+  bool isPure() => false;
+
+  @override
+  void mark(ScriptReachability context) {
+    value.mark(context);
+    index.mark(context);
+  }
+
+  @override
+  void addInstructions(ScriptByteCodeBuilder builder) {
+    value.addInstructions(builder);
+    index.addInstructions(builder);
+
+    builder.addInstruction(
+      OperatorInstruction(ScriptOperatorOpcode.readWordIndex),
+    );
+  }
+
+  final AstNode value;
+  final AstNode index;
+}
+
+class WriteWordIndexAstNode extends AstNode {
+  WriteWordIndexAstNode(this.wordValue, this.index, this.value);
+
+  @override
+  bool isConstant() => false;
+
+  @override
+  int constantValue() => throw UnsupportedError('Should not be invoked');
+
+  @override
+  bool isPure() => false;
+
+  @override
+  ExecutionValue? evaluate(ExecutionContext context) {
+    context.state = ExecutionState.error;
+    return null;
+  }
+
+  @override
+  void mark(ScriptReachability context) {
+    wordValue.mark(context);
+    index.mark(context);
+    value.mark(context);
+  }
+
+  @override
+  void addInstructions(ScriptByteCodeBuilder builder) {
+    wordValue.addInstructions(builder);
+    index.addInstructions(builder);
+    value.addInstructions(builder);
+
+    builder.addInstruction(WriteWordIndexInstruction());
+  }
+
+  final AstNode wordValue;
+  final AstNode index;
+  final AstNode value;
+}
+
 class IntValueAstNode extends AstNode {
   IntValueAstNode(this.value);
 

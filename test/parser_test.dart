@@ -1,11 +1,11 @@
-import 'package:javelin_steno_script/button_script_in_built_functions.dart';
+import 'package:javelin_steno_script/button_script_bindings.dart';
 import 'package:javelin_steno_script/javelin_steno_script.dart';
 import 'package:test/test.dart';
 
 void main() {
   group(Parser, () {
     test('should create expected constants', () {
-      final result = ScriptModule(ButtonScriptInBuiltFunctions.functions);
+      final result = ScriptModule(ButtonScriptBindings.functions);
       Parser(
         input: 'const A = 4; const B = A + 1; const C = B - 2;',
         filename: '',
@@ -18,7 +18,7 @@ void main() {
     });
 
     test('should create correct multiply constants', () {
-      final result = ScriptModule(ButtonScriptInBuiltFunctions.functions);
+      final result = ScriptModule(ButtonScriptBindings.functions);
       Parser(
         input: 'const A = 3*4; const B = 2 * A;',
         filename: '',
@@ -30,7 +30,7 @@ void main() {
     });
 
     test('should create correct quotient constants', () {
-      final result = ScriptModule(ButtonScriptInBuiltFunctions.functions);
+      final result = ScriptModule(ButtonScriptBindings.functions);
       Parser(
         input: 'const A = 20 / 3; const B = -5 / 2;',
         filename: '',
@@ -42,7 +42,7 @@ void main() {
     });
 
     test('should create correct remainder constants', () {
-      final result = ScriptModule(ButtonScriptInBuiltFunctions.functions);
+      final result = ScriptModule(ButtonScriptBindings.functions);
       Parser(
         input: 'const A = 20 % 3; const B = -5 % 2;',
         filename: '',

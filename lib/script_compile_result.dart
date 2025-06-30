@@ -1,7 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:crclib/catalog.dart';
-import 'package:javelin_steno_script/button_script_in_built_functions.dart';
+import 'package:javelin_steno_script/button_script_bindings.dart';
 import 'package:javelin_steno_script/javelin_steno_script.dart';
 
 class ScriptCompileResult {
@@ -23,8 +23,8 @@ class ScriptCompileResult {
         if (scriptHeader.isNotEmpty) scriptHeader,
         script,
       ],
-      inBuiltFunctions: ButtonScriptInBuiltFunctions.functions,
-      requiredFunctions: ScriptByteCodeBuilder.createScriptFunctionList(
+      inBuiltFunctions: ButtonScriptBindings.functions,
+      requiredFunctions: ButtonScriptBindings.createRootFunctionList(
         buttonCount: buttonCount,
         encoderCount: encoderCount,
         pointerCount: pointerCount,

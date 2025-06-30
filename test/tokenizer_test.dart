@@ -5,7 +5,8 @@ import 'package:test/test.dart';
 void main() {
   group(Tokenizer, () {
     test('should tokenize simple tokens', () {
-      final result = Tokenizer(',:;< <= = == != > >=?{}()', '').tokenize();
+      final result =
+          Tokenizer(',:;< <= = == != > >=?{}()[<>][{}]', '').tokenize();
 
       expect(
         result.toList().map((token) => token.type),
@@ -25,6 +26,10 @@ void main() {
           TokenType.closeBrace,
           TokenType.openParen,
           TokenType.closeParen,
+          TokenType.openHalfWordList,
+          TokenType.closeHalfWordList,
+          TokenType.openWordList,
+          TokenType.closeWordList,
         ],
       );
     });
@@ -69,7 +74,9 @@ void main() {
       final result = Tokenizer('"\\x23\\xcb\\u1234"', '').tokenize();
       expect(
         result.toList().map((token) => token.stringValue?.codeUnits),
-        const [83 /*S, the string marker*/, 0x23, 0xcb, 0x1234],
+        const [
+          [83 /*S, the string marker*/, 0x23, 0xcb, 0x1234],
+        ],
       );
     });
 

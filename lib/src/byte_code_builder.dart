@@ -33,26 +33,6 @@ class ScriptByteCodeBuilder {
   List<NopInstruction>? breakTargets;
   late Uint8List _headerBytes;
 
-  static List<String> createScriptFunctionList({
-    required int buttonCount,
-    required int encoderCount,
-    required int pointerCount,
-  }) {
-    return [
-      'init',
-      'tick',
-      for (var i = 0; i < buttonCount; ++i) ...[
-        'onPress$i',
-        'onRelease$i',
-      ],
-      for (var i = 0; i < encoderCount; ++i) ...[
-        'onEncoderCW$i',
-        'onEncoderCCW$i',
-      ],
-      for (var i = 0; i < pointerCount; ++i) 'onPointerUpdate$i',
-    ];
-  }
-
   Uint8List createByteCode() {
     _mark();
 

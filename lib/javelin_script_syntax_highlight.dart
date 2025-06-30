@@ -56,7 +56,7 @@ class SyntaxHighlightingRule {
 
     // Operator
     SyntaxHighlightingRule(
-      RegExp(r'[!@*/%+=^&|?:;<>\[\],-]+'),
+      RegExp(r'(?:\[[<{]|[>}]\]|[!@*/%+=^&|?:;<>\[\],-])+'),
       const TextStyle(color: Colors.blueGrey),
       const TextStyle(color: Color(0xFF80DEEA)), // Colors.cyan[200],
     ),

@@ -2,9 +2,9 @@ import 'token.dart';
 
 class Tokenizer {
   Tokenizer(String input, String filename)
-    : _input = input,
-      _length = input.length,
-      _filename = filename;
+      : _input = input,
+        _length = input.length,
+        _filename = filename;
 
   final String _input;
   final int _length;
@@ -26,9 +26,6 @@ class Tokenizer {
           _column = (_column + 1) & -2;
           continue;
 
-        case 0x20: // Space
-          continue;
-
         case 0x0d: // CR
           _column = 0;
           continue;
@@ -36,6 +33,9 @@ class Tokenizer {
         case 0x0a: // LF
           _column = 0;
           ++_line;
+          continue;
+
+        case 0x20: // Space
           continue;
 
         case 0x21: // '!'
@@ -50,6 +50,10 @@ class Tokenizer {
           } else {
             yield Token(type: TokenType.not, line: _line, column: _column);
           }
+          continue;
+
+        case 0x23: // '#'
+          yield Token(type: TokenType.hash, line: _line, column: _column);
           continue;
 
         case 0x25: // '%'
@@ -415,7 +419,22 @@ class Tokenizer {
           continue;
 
         case 0x7d: // '}'
-          yield Token(type: TokenType.closeBrace, line: _line, column: _column);
+          if (_offset < _length && _input.codeUnitAt(_offset) == 0x5d) {
+            // ']'
+            ++_offset;
+            ++_column;
+            yield Token(
+              type: TokenType.closeWordList,
+              line: _line,
+              column: _column,
+            );
+          } else {
+            yield Token(
+              type: TokenType.closeBrace,
+              line: _line,
+              column: _column,
+            );
+          }
           continue;
 
         case 0x7e: // '~'
@@ -448,6 +467,15 @@ class Tokenizer {
             ++_offset;
             yield Token(
               type: TokenType.openHalfWordList,
+              line: _line,
+              column: _column,
+            );
+          } else if (_offset < _length && _input.codeUnitAt(_offset) == 0x7b) {
+            // '{'
+            ++_column;
+            ++_offset;
+            yield Token(
+              type: TokenType.openWordList,
               line: _line,
               column: _column,
             );

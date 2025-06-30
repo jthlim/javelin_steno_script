@@ -913,6 +913,16 @@ final class WriteByteIndexInstruction extends SingleOpcodeInstruction {
   ScriptOpcode get opcode => ScriptOpcode.writeByteIndex;
 }
 
+final class WriteHalfWordIndexInstruction extends SingleOpcodeInstruction {
+  @override
+  ScriptOpcode get opcode => ScriptOpcode.writeHalfWordIndex;
+}
+
+final class WriteWordIndexInstruction extends SingleOpcodeInstruction {
+  @override
+  ScriptOpcode get opcode => ScriptOpcode.writeWordIndex;
+}
+
 final class ReturnInstruction extends SingleOpcodeInstruction {
   @override
   bool get implicitNext => false;

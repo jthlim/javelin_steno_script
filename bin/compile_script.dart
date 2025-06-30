@@ -2,7 +2,7 @@
 
 import 'dart:io';
 
-import 'package:javelin_steno_script/button_script_in_built_functions.dart';
+import 'package:javelin_steno_script/button_script_bindings.dart';
 import 'package:javelin_steno_script/javelin_steno_script.dart';
 
 void main(List<String> arguments) {
@@ -31,7 +31,7 @@ void main(List<String> arguments) {
     return;
   }
 
-  final module = ScriptModule(ButtonScriptInBuiltFunctions.functions);
+  final module = ScriptModule(ButtonScriptBindings.functions);
 
   for (var i = 3; i < arguments.length; ++i) {
     final filename = arguments[i];
@@ -42,7 +42,7 @@ void main(List<String> arguments) {
   final builder = ScriptByteCodeBuilder(
     module: module,
     byteCodeVersion: latestScriptByteCodeVersion,
-    requiredFunctions: ScriptByteCodeBuilder.createScriptFunctionList(
+    requiredFunctions: ButtonScriptBindings.createRootFunctionList(
       buttonCount: buttonCount,
       encoderCount: encoderCount,
       pointerCount: pointerCount,

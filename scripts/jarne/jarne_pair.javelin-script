@@ -127,6 +127,7 @@ func init() {
   setScript(SCRIPT_ID_PAIR_CONNECTION_UPDATE, @onPairConnectionUpdate);
 
   updateBoardPower();
+  drawDisplayOverlay();
 }
 
 func onBatteryUpdate() {

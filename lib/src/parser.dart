@@ -3,6 +3,16 @@ import 'module.dart';
 import 'token.dart';
 import 'tokenizer.dart';
 
+enum _IndexType {
+  none,
+  globalVariableArray,
+  localVariableArray,
+  byte,
+  halfWord,
+  word,
+  ;
+}
+
 class Parser {
   static const maximumGlobalVariableCount = 256;
 
@@ -22,6 +32,7 @@ class Parser {
 
   final Iterator<Token> _tokens;
   final ScriptModule _module;
+  final _namedValues = <String, int>{};
 
   var _currentToken = const Token(type: TokenType.eof, line: 0, column: 0);
   var _hasNextToken = false;
@@ -128,6 +139,9 @@ class Parser {
     _assertToken(TokenType.assign);
     final expression = _parseExpression();
     _assertToken(TokenType.semiColon);
+
+    // Ignore constants named '_'
+    if (name == '_') return;
 
     if (!expression.isConstant() &&
         expression is! StringValueAstNode &&
@@ -362,6 +376,55 @@ class Parser {
         _nextToken();
         return StringValueAstNode(value);
 
+      case TokenType.hash:
+        // Supports:
+        //   #line
+        //   #column
+        //   #next("name")
+        final hashToken = _currentToken;
+        _nextToken();
+        if (_currentToken.type != TokenType.identifier) {
+          throw FormatException(
+            'Expected #line, #column, #start or #next near $_currentToken',
+          );
+        }
+        final name = _currentToken.stringValue!;
+        _nextToken();
+        switch (name) {
+          case 'line':
+            return IntValueAstNode(hashToken.line);
+          case 'column':
+            return IntValueAstNode(hashToken.column);
+          case 'next':
+            _assertToken(TokenType.openParen);
+            final name = _currentToken.stringValue;
+            _assertToken(TokenType.stringValue);
+            _assertToken(TokenType.closeParen);
+            final value = (_namedValues[name!] ?? -1) + 1;
+            _namedValues[name] = value;
+            return IntValueAstNode(value);
+          case 'start':
+            _assertToken(TokenType.openParen);
+            final name = _currentToken.stringValue;
+            _assertToken(TokenType.stringValue);
+            _assertToken(TokenType.comma);
+            final value = _parseExpression();
+            _assertToken(TokenType.closeParen);
+            if (!value.isConstant()) {
+              throw FormatException(
+                'Unable to #start $name with non-constant value',
+              );
+            }
+            final c = value.constantValue();
+            _namedValues[name!] = c;
+            return IntValueAstNode(c);
+          default:
+            break;
+        }
+        throw FormatException(
+          'Expected #line, #column, #start or #next near $_currentToken',
+        );
+
       case TokenType.openHalfWordList:
         _nextToken();
         final list = _parseHalfWordList();
@@ -487,6 +550,11 @@ class Parser {
         final indexExpression = _parseExpression();
         _assertToken(TokenType.closeHalfWordList);
         return ReadHalfWordIndexAstNode(result, indexExpression);
+      case TokenType.openWordList:
+        _nextToken();
+        final indexExpression = _parseExpression();
+        _assertToken(TokenType.closeWordList);
+        return ReadWordIndexAstNode(result, indexExpression);
       default:
         return result;
     }
@@ -832,11 +900,32 @@ class Parser {
 
   AstNode _parseAssignment(String name, {bool requireSemicolon = true}) {
     AstNode? indexExpression;
-    if (_currentToken.type == TokenType.openSquareBracket) {
-      _assertToken(TokenType.openSquareBracket);
-      indexExpression = _parseExpression();
-      _assertToken(TokenType.closeSquareBracket);
+    var indexType = _IndexType.none;
+
+    // Index test
+    switch (_currentToken.type) {
+      case TokenType.openSquareBracket:
+        indexType = _IndexType.byte;
+        _assertToken(TokenType.openSquareBracket);
+        indexExpression = _parseExpression();
+        _assertToken(TokenType.closeSquareBracket);
+        break;
+      case TokenType.openHalfWordList:
+        indexType = _IndexType.halfWord;
+        _assertToken(TokenType.openHalfWordList);
+        indexExpression = _parseExpression();
+        _assertToken(TokenType.closeHalfWordList);
+        break;
+      case TokenType.openWordList:
+        indexType = _IndexType.word;
+        _assertToken(TokenType.openWordList);
+        indexExpression = _parseExpression();
+        _assertToken(TokenType.closeWordList);
+        break;
+      default:
+        break;
     }
+
     final assignType = _currentToken.type;
     switch (assignType) {
       case TokenType.assign:
@@ -863,11 +952,10 @@ class Parser {
       _assertToken(TokenType.semiColon);
     }
 
-    var symbolIsArray = false;
     if (assignType != TokenType.assign) {
       if (indexExpression != null && !indexExpression.isPure()) {
         throw FormatException(
-          'Only pure expressions can be used in compound assignnments near $_currentToken',
+          'Only pure expressions can be used in compound assignments near $_currentToken',
         );
       }
 
@@ -875,13 +963,12 @@ class Parser {
       if (_module.globals.containsKey(name)) {
         final global = _module.globals[name]!;
         if (global.arraySize != null) {
-          symbolIsArray = true;
-          if (indexExpression == null) {
+          if (indexExpression == null || indexType != _IndexType.byte) {
             throw FormatException(
               '$name is an array and requires an index near $_currentToken',
             );
           }
-
+          indexType = _IndexType.globalVariableArray;
           loadValueAstNode = LoadIndexedGlobalValueAstNode(
             LoadGlobalValueArrayAstNode(global),
             indexExpression,
@@ -893,13 +980,12 @@ class Parser {
       } else if (_function!.locals.variables.containsKey(name)) {
         final localVariable = _function!.locals.variables[name]!;
         if (localVariable.arraySize != null) {
-          symbolIsArray = true;
-          if (indexExpression == null) {
+          if (indexExpression == null || indexType != _IndexType.byte) {
             throw FormatException(
               '$name is an array and requires an index near $_currentToken',
             );
           }
-
+          indexType = _IndexType.localVariableArray;
           loadValueAstNode = LoadIndexedLocalValueAstNode(
             LoadLocalValueArrayAstNode(localVariable),
             indexExpression,
@@ -912,11 +998,32 @@ class Parser {
         throw FormatException('Unknown variable $name near $_currentToken');
       }
 
-      if (indexExpression != null && !symbolIsArray) {
-        loadValueAstNode = ReadByteIndexAstNode(
-          loadValueAstNode,
-          indexExpression,
-        );
+      if (indexExpression != null) {
+        switch (indexType) {
+          case _IndexType.globalVariableArray:
+          case _IndexType.localVariableArray:
+            break;
+          case _IndexType.byte:
+            loadValueAstNode = ReadByteIndexAstNode(
+              loadValueAstNode,
+              indexExpression,
+            );
+            break;
+          case _IndexType.halfWord:
+            loadValueAstNode = ReadHalfWordIndexAstNode(
+              loadValueAstNode,
+              indexExpression,
+            );
+            break;
+          case _IndexType.word:
+            loadValueAstNode = ReadWordIndexAstNode(
+              loadValueAstNode,
+              indexExpression,
+            );
+            break;
+          default:
+            throw FormatException('Unable to handle _IndexType.$indexType');
+        }
       }
 
       switch (assignType) {
@@ -979,20 +1086,25 @@ class Parser {
           indexExpression: indexExpression,
           expression: value,
         );
-      } else {
-        if (indexExpression != null) {
-          return WriteByteIndexAstNode(
-            LoadValueAstNode(isGlobal: true, index: global.index),
-            indexExpression,
-            value,
-          );
-        }
+      } else if (indexExpression == null) {
         return StoreValueAstNode(
           isGlobal: true,
           index: global.index,
           expression: value,
           isInitialization: false,
         );
+      } else {
+        final baseValue = LoadValueAstNode(isGlobal: true, index: global.index);
+        switch (indexType) {
+          case _IndexType.byte:
+            return WriteByteIndexAstNode(baseValue, indexExpression, value);
+          case _IndexType.halfWord:
+            return WriteHalfWordIndexAstNode(baseValue, indexExpression, value);
+          case _IndexType.word:
+            return WriteWordIndexAstNode(baseValue, indexExpression, value);
+          default:
+            throw FormatException('Unexpected IndexType.$indexType');
+        }
       }
     } else if (_function!.locals.variables.containsKey(name)) {
       final localVariable = _function!.locals.variables[name]!;
@@ -1007,20 +1119,26 @@ class Parser {
           indexExpression: indexExpression,
           expression: value,
         );
-      } else {
-        if (indexExpression != null) {
-          return WriteByteIndexAstNode(
-            LoadValueAstNode(isGlobal: false, index: localVariable.index),
-            indexExpression,
-            value,
-          );
-        }
+      } else if (indexExpression == null) {
         return StoreValueAstNode(
           isGlobal: false,
           index: localVariable.index,
           expression: value,
           isInitialization: false,
         );
+      } else {
+        final baseValue =
+            LoadValueAstNode(isGlobal: false, index: localVariable.index);
+        switch (indexType) {
+          case _IndexType.byte:
+            return WriteByteIndexAstNode(baseValue, indexExpression, value);
+          case _IndexType.halfWord:
+            return WriteHalfWordIndexAstNode(baseValue, indexExpression, value);
+          case _IndexType.word:
+            return WriteWordIndexAstNode(baseValue, indexExpression, value);
+          default:
+            throw FormatException('Unexpected IndexType.$indexType');
+        }
       }
     } else {
       throw FormatException('Unknown variable $name near $_currentToken');
@@ -1062,6 +1180,8 @@ class Parser {
       case TokenType.bitwiseXorAssign:
       case TokenType.bitwiseOrAssign:
       case TokenType.openSquareBracket:
+      case TokenType.openHalfWordList:
+      case TokenType.openWordList:
         _assertToken(TokenType.identifier);
         return _parseAssignment(name, requireSemicolon: requireSemicolon);
 

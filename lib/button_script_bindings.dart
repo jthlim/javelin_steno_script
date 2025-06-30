@@ -1,6 +1,11 @@
+import 'dart:typed_data';
+
+import 'package:javelin_steno_script/src/byte_code_builder.dart';
+import 'package:javelin_steno_script/src/module.dart';
+
 import 'src/functions.dart';
 
-class ButtonScriptInBuiltFunctions {
+class ButtonScriptBindings {
   static const functions = <InBuiltScriptFunction>[
     InBuiltScriptFunction('pressScanCode', 1, ReturnType.none, 0),
     InBuiltScriptFunction('releaseScanCode', 1, ReturnType.none, 1),
@@ -79,7 +84,7 @@ class ButtonScriptInBuiltFunctions {
     InBuiltScriptFunction('stopSound', 0, ReturnType.none, 0x45),
     InBuiltScriptFunction('playFrequency', 1, ReturnType.none, 0x46),
     InBuiltScriptFunction('playSequence', 1, ReturnType.none, 0x47),
-    InBuiltScriptFunction('playWaveform', 3, ReturnType.none, 0x48),
+    InBuiltScriptFunction('playWaveform', 1, ReturnType.none, 0x48),
     InBuiltScriptFunction('callAllReleaseScripts', 0, ReturnType.none, 0x49),
     InBuiltScriptFunction('isInReleaseAll', 0, ReturnType.boolean, 0x4a),
     InBuiltScriptFunction('getPressCount', 0, ReturnType.value, 0x4b),
@@ -126,5 +131,46 @@ class ButtonScriptInBuiltFunctions {
     InBuiltScriptFunction('measureTextWidth', 2, ReturnType.value, 0x74),
     InBuiltScriptFunction('enableScriptRgb', 0, ReturnType.none, 0x75),
     InBuiltScriptFunction('disableScriptRgb', 0, ReturnType.none, 0x76),
+    InBuiltScriptFunction('sendInfraredSignal', 3, ReturnType.none, 0x77),
+    InBuiltScriptFunction('createBuffer', 1, ReturnType.value, 0x78),
+    InBuiltScriptFunction('sendMidi', 3, ReturnType.none, 0x79),
   ];
+
+  static List<String> createRootFunctionList({
+    required int buttonCount,
+    required int encoderCount,
+    required int pointerCount,
+  }) {
+    return [
+      'init',
+      'tick',
+      for (var i = 0; i < buttonCount; ++i) ...[
+        'onPress$i',
+        'onRelease$i',
+      ],
+      for (var i = 0; i < encoderCount; ++i) ...[
+        'onEncoderCW$i',
+        'onEncoderCCW$i',
+      ],
+      for (var i = 0; i < pointerCount; ++i) 'onPointerUpdate$i',
+    ];
+  }
+}
+
+extension ButtonScriptModule on ScriptModule {
+  Uint8List createByteCode({
+    required int buttonCount,
+    required int encoderCount,
+    required int pointerCount,
+    required int scriptByteCodeVersion,
+  }) =>
+      ScriptByteCodeBuilder(
+        module: this,
+        byteCodeVersion: scriptByteCodeVersion,
+        requiredFunctions: ButtonScriptBindings.createRootFunctionList(
+          buttonCount: buttonCount,
+          encoderCount: encoderCount,
+          pointerCount: pointerCount,
+        ),
+      ).createByteCode();
 }
