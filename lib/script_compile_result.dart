@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:crclib/catalog.dart';
 import 'package:javelin_steno_script/button_script_bindings.dart';
 import 'package:javelin_steno_script/javelin_steno_script.dart';
+import 'package:javelin_steno_script/unicode_script_bindings.dart';
 
 class ScriptCompileResult {
   factory ScriptCompileResult.buttonScript({
@@ -29,6 +30,24 @@ class ScriptCompileResult {
         encoderCount: encoderCount,
         pointerCount: pointerCount,
       ),
+      maximumScriptByteCodeSize: maximumByteCodeSize,
+      byteCodeVersion: byteCodeVersion,
+    );
+  }
+
+  factory ScriptCompileResult.unicodeScript({
+    required String script,
+    required int maximumByteCodeSize,
+    int byteCodeVersion = latestScriptByteCodeVersion,
+  }) {
+    if (script.isEmpty) {
+      return const ScriptCompileResult.empty();
+    }
+
+    return ScriptCompileResult.scripts(
+      scripts: [script],
+      inBuiltFunctions: UnicodeScriptBindings.functions,
+      requiredFunctions: UnicodeScriptBindings.createRootFunctionList(),
       maximumScriptByteCodeSize: maximumByteCodeSize,
       byteCodeVersion: byteCodeVersion,
     );
