@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:image/image.dart' show Pixel;
 import 'package:javelin_steno_script/image_convert.dart';
+import 'package:javelin_steno_script/javelin_script_text.dart';
 
 import 'drop_zone.dart';
 import 'file_helper.dart';
@@ -131,7 +131,7 @@ class JavelinScriptEditorState extends State<JavelinScriptEditor> {
               autofocus: widget.autofocus,
               maxLines: widget.maxLines,
               expands: widget.maxLines == null,
-              style: GoogleFonts.robotoMono(),
+              style: JavelinScriptText.font,
               decoration: InputDecoration(
                 contentPadding: widget.padding,
                 border: InputBorder.none,

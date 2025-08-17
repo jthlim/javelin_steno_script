@@ -14,6 +14,7 @@ class UnicodeScriptBindings {
     InBuiltScriptFunction('flush', 0, ReturnType.none, 4),
     InBuiltScriptFunction('getLedStatus', 1, ReturnType.boolean, 5),
     InBuiltScriptFunction('releaseModifiers', 0, ReturnType.none, 6),
+    InBuiltScriptFunction('sleep', 1, ReturnType.none, 7),
   ];
 
   static List<String> createRootFunctionList() {

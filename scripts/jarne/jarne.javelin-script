@@ -2401,33 +2401,6 @@ func modTapHandler11(action) {
 
 const modTapLayerActivations11 = [[00 01 00 00 01 00 00 00]];
 
-func modTapHandler12(action) {
-  var resolvedLayerIndex = resolveLayerIndex();
-  if (resolvedLayerIndex == 1) {
-    if (action == MODTAP_HANDLER_PRESS_HOLD) {
-      pressScanCodeButton(12, 0, 224 /* "⌃" */, 0);
-
-      return;
-    }
-    if (action == MODTAP_HANDLER_RELEASE_HOLD) {
-      releaseScanCodeButton(224 /* "⌃" */);
-
-      return;
-    }
-    if (action == MODTAP_HANDLER_PRESS_TAP) {
-      pressScanCodeButton(12, 0, 41 /* "⎋" */, 0);
-      return;
-    }
-    if (action == MODTAP_HANDLER_RELEASE_TAP) {
-      releaseScanCodeButton(41 /* "⎋" */);
-      return;
-    }
-    return;
-  }
-}
-
-const modTapLayerActivations12 = [[00 03 00 00 00 00 00 00]];
-
 func modTapHandler13(action) {
   var resolvedLayerIndex = resolveLayerIndex();
   if (resolvedLayerIndex == 1) {
@@ -3912,8 +3885,7 @@ func onPress12() {
 func onRelease12() {
   globalRelease();
 
-  handleModTapRelease(@modTapHandler12);
-  dispatchToLayer([<@onRelease12_0, 0, @onRelease12_2, 0, 0, 0, 0, 0>]);
+  dispatchToLayer([<@onRelease12_0, @onRelease12_1, @onRelease12_2, 0, 0, 0, 0, 0>]);
   // Temp-QWERTY
 
   // Returning here prevents the next sequence, SetLayer, from occurring.
@@ -3932,28 +3904,47 @@ func onRelease12() {
   onRelease12_0();
 }
 
+var pressCount12_0;
+var releaseCount12_0;
 func onPress12_0() {
-  // Auto-Return
-  // Tag this so the global layer can return to steno later
-  wasSteno12 = 1;
-  deactivateGlobal();
-  deactivate0();
-  activate1();
-  activateGlobal();
-  pressScanCodeButton(12, 0, 224 /* "⌃" */, 0);
+  @{
+    // Auto-Return
+    // Tag this so the global layer can return to steno later
+    wasSteno12 = 1;
+    deactivateGlobal();
+    deactivate0();
+    activate1();
+    activateGlobal();
+    pressScanCodeButton(12, 0, 224 /* "⌃" */, 0);
+  }();
+  if (!isInPressAll()) {
+    pressCount12_0 = getPressCount();
+    releaseCount12_0 = getReleaseCount();
+  }
 }
 func onRelease12_0() {
   releaseScanCodeButton(224 /* "⌃" */);
-  if (getTime() - pressTime12 <= 200) {
+  if (getTime() - pressTime12 <= 200 && pressCount12_0 == getPressCount() && releaseCount12_0 + 1 == getReleaseCount()) {
     pressScanCodeButton(12, 0, 41 /* "⎋" */, 1);
     releaseScanCodeButton(41 /* "⎋" */);
   }
 }
 
+var pressCount12_1;
+var releaseCount12_1;
 func onPress12_1() {
-  handleModTapPress(@modTapHandler12, 4, modTapLayerActivations12, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
+  pressScanCodeButton(12, 0, 224 /* "⌃" */, 0);
+  if (!isInPressAll()) {
+    pressCount12_1 = getPressCount();
+    releaseCount12_1 = getReleaseCount();
+  }
 }
 func onRelease12_1() {
+  releaseScanCodeButton(224 /* "⌃" */);
+  if (getTime() - pressTime12 <= 200 && pressCount12_1 == getPressCount() && releaseCount12_1 + 1 == getReleaseCount()) {
+    pressScanCodeButton(12, 0, 41 /* "⎋" */, 1);
+    releaseScanCodeButton(41 /* "⎋" */);
+  }
 }
 
 func onPress12_2() {

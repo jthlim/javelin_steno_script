@@ -134,6 +134,7 @@ class ButtonScriptBindings {
     InBuiltScriptFunction('sendInfraredSignal', 3, ReturnType.none, 0x77),
     InBuiltScriptFunction('createBuffer', 1, ReturnType.value, 0x78),
     InBuiltScriptFunction('sendMidi', 3, ReturnType.none, 0x79),
+    InBuiltScriptFunction('getAssetSize', 1, ReturnType.value, 0x7a),
   ];
 
   static List<String> createRootFunctionList({
