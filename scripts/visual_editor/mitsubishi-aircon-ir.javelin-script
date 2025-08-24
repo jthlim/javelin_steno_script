@@ -141,7 +141,8 @@ func sendAirConditionerData() {
     6632, 3869,        // Header time
     737, 996,          // Zero bit time
     737, 2709,         // One bit time
-    737, 0             // Trailer time
+    737, 0,            // Trailer[0] time
+    0, 0               // Trailer[1] time
   >];
 
   const AIRCON_BASE_DATA = [[ 23 cb 26 01 00 00 18 00 36 00 00 00 00 00 00 00 00 00 ]];
