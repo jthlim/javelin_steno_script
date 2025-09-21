@@ -4,10 +4,10 @@
 const BLINK_TIMER_ID = 0;
 
 var layer;
-func setLayer(layerIndex, layerIdEvent) {
+func setLayer(layerIndex, layerId) {
   releaseAll();
   layer = layerIndex;
-  sendEvent(layerIdEvent);
+  sendEvent(formatString("layer_id: %d", layerId));
 }
 
 var wasSteno;
@@ -22,19 +22,19 @@ func resolveLayerIndex() var {
 }
 
 func activate0() {
-  setLayer(0, "layer_id: 87377230");
+  setLayer(0, 87377230);
 }
 
 func activate1() {
-  setLayer(1, "layer_id: 1128808786");
+  setLayer(1, 1128808786);
 }
 
 func activate2() {
-  setLayer(2, "layer_id: 127179234");
+  setLayer(2, 127179234);
 }
 
 func activate3() {
-  setLayer(3, "layer_id: 131415213");
+  setLayer(3, 131415213);
 }
 
 func activateDynamic() {
@@ -136,13 +136,13 @@ func init() {
   setScript(SCRIPT_ID_STENO_MODE_UPDATE, @updateLeds);
   updateLeds();
 
-  const SCRIPT_ID_USER1 = 11;
-  setScript(SCRIPT_ID_USER1, @user1ScriptSetLayer);
+  const SCRIPT_ID_SET_LAYER = 11;
+  setScript(SCRIPT_ID_SET_LAYER, @toolsSetLayerScript);
   activate0();
   activateGlobal();
 }
 
-func user1ScriptSetLayer(layerId) {
+func toolsSetLayerScript(layerId) {
   var layerActivate = 0;
   if (layerId == 87377230) layerActivate = @activate0;
   if (layerId == 1128808786) layerActivate = @activate1;
@@ -709,10 +709,10 @@ func onRelease18() {
 }
 
 func onPress18_0() {
-  pressStenoKey(11 /* "*2" */);
+  pressStenoKey(12 /* "*3" */);
 }
 func onRelease18_0() {
-  releaseStenoKey(11 /* "*2" */);
+  releaseStenoKey(12 /* "*3" */);
 }
 
 func onPress18_1() {
@@ -1102,10 +1102,10 @@ func onRelease29() {
 }
 
 func onPress29_0() {
-  pressStenoKey(12 /* "*3" */);
+  pressStenoKey(11 /* "*2" */);
 }
 func onRelease29_0() {
-  releaseStenoKey(12 /* "*3" */);
+  releaseStenoKey(11 /* "*2" */);
 }
 
 func onPress29_1() {

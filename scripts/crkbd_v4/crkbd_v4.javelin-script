@@ -10,10 +10,10 @@ var brightness = 3;
 var saturation = 5;
 
 var layer;
-func setLayer(layerIndex, layerIdEvent) {
+func setLayer(layerIndex, layerId) {
   releaseAll();
   layer = layerIndex;
-  sendEvent(layerIdEvent);
+  sendEvent(formatString("layer_id: %d", layerId));
 }
 
 func dispatchToLayer(functions) {
@@ -26,23 +26,23 @@ func resolveLayerIndex() var {
 }
 
 func activate0() {
-  setLayer(0, "layer_id: 87377230");
+  setLayer(0, 87377230);
 }
 
 func activate1() {
-  setLayer(1, "layer_id: 1128808786");
+  setLayer(1, 1128808786);
 }
 
 func activate2() {
-  setLayer(2, "layer_id: 50258991");
+  setLayer(2, 50258991);
 }
 
 func activate3() {
-  setLayer(3, "layer_id: 175277611");
+  setLayer(3, 175277611);
 }
 
 func activate4() {
-  setLayer(4, "layer_id: 122649869");
+  setLayer(4, 122649869);
 }
 
 func activateDynamic() {
@@ -225,13 +225,13 @@ func init() {
   // Global
   rgbUpdate();
   startTimer(TIMER_ID_RGB_UPDATE, 30, 1, @rgbUpdate);
-  const SCRIPT_ID_USER1 = 11;
-  setScript(SCRIPT_ID_USER1, @user1ScriptSetLayer);
+  const SCRIPT_ID_SET_LAYER = 11;
+  setScript(SCRIPT_ID_SET_LAYER, @toolsSetLayerScript);
   activate0();
   activateGlobal();
 }
 
-func user1ScriptSetLayer(layerId) {
+func toolsSetLayerScript(layerId) {
   var layerActivate = 0;
   if (layerId == 87377230) layerActivate = @activate0;
   if (layerId == 1128808786) layerActivate = @activate1;
@@ -472,10 +472,10 @@ func onRelease8() {
 }
 
 func onPress8_0() {
-  pressStenoKey(11 /* "*2" */);
+  pressStenoKey(12 /* "*3" */);
 }
 func onRelease8_0() {
-  releaseStenoKey(11 /* "*2" */);
+  releaseStenoKey(12 /* "*3" */);
 }
 
 func onPress8_1() {
@@ -880,10 +880,10 @@ func onRelease19() {
 }
 
 func onPress19_0() {
-  pressStenoKey(12 /* "*3" */);
+  pressStenoKey(11 /* "*2" */);
 }
 func onRelease19_0() {
-  releaseStenoKey(12 /* "*3" */);
+  releaseStenoKey(11 /* "*2" */);
 }
 
 func onPress19_1() {

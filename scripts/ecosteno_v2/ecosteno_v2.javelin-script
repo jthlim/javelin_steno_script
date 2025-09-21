@@ -4,10 +4,10 @@
 const BLINK_TIMER_ID = 0;
 
 var layer;
-func setLayer(layerIndex, layerIdEvent) {
+func setLayer(layerIndex, layerId) {
   releaseAll();
   layer = layerIndex;
-  sendEvent(layerIdEvent);
+  sendEvent(formatString("layer_id: %d", layerId));
 }
 
 func dispatchToLayer(functions) {
@@ -255,10 +255,10 @@ func onRelease10() {
 }
 
 func onPress10_0() {
-  pressStenoKey(11 /* "*2" */);
+  pressStenoKey(12 /* "*3" */);
 }
 func onRelease10_0() {
-  releaseStenoKey(11 /* "*2" */);
+  releaseStenoKey(12 /* "*3" */);
 }
 
 func onPress11() {
@@ -415,10 +415,10 @@ func onRelease21() {
 }
 
 func onPress21_0() {
-  pressStenoKey(12 /* "*3" */);
+  pressStenoKey(11 /* "*2" */);
 }
 func onRelease21_0() {
-  releaseStenoKey(12 /* "*3" */);
+  releaseStenoKey(11 /* "*2" */);
 }
 
 func onPress22() {

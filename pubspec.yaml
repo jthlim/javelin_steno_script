@@ -1,5 +1,5 @@
 name: javelin_steno_script
-description: A sample command-line application.
+description: JavelinScript compiler for Javelin firmware.
 version: 1.0.0
 publish_to: none
 # homepage: https://www.example.com

@@ -385,15 +385,15 @@ const SETTINGS_IMAGE = [[
 ]];
 
 var layer;
-func setLayer(layerIndex, layerIdEvent) {
+func setLayer(layerIndex, layerId) {
   releaseAll();
   layer = layerIndex;
-  sendEvent(layerIdEvent);
+  sendEvent(formatString("layer_id: %d", layerId));
 }
 
-func setLayerNoRelease(layerIndex, layerIdEvent) {
+func setLayerNoRelease(layerIndex, layerId) {
   layer = layerIndex;
-  sendEvent(layerIdEvent);
+  sendEvent(formatString("layer_id: %d", layerId));
 }
 
 func dispatchToLayer(functions) {
@@ -407,49 +407,49 @@ func resolveLayerIndex() var {
 
 func activate0() {
   clearPendingModTap();
-  setLayer(0, "layer_id: 87377230");
+  setLayer(0, 87377230);
   wordCaps = 0;
 }
 
 func activate0NoRelease() {
   cancelAllStenoKeys();
-  setLayerNoRelease(0, "layer_id: 87377230");
+  setLayerNoRelease(0, 87377230);
   wordCaps = 0;
 }
 
 func activate1() {
   clearPendingModTap();
-  setLayer(1, "layer_id: 1128808786");
+  setLayer(1, 1128808786);
 }
 
 func activate1NoRelease() {
   cancelAllStenoKeys();
-  setLayerNoRelease(1, "layer_id: 1128808786");
+  setLayerNoRelease(1, 1128808786);
 }
 
 func activate2() {
   clearPendingModTap();
-  setLayer(2, "layer_id: 262857896");
+  setLayer(2, 262857896);
 }
 
 func activate2NoRelease() {
   cancelAllStenoKeys();
-  setLayerNoRelease(2, "layer_id: 262857896");
+  setLayerNoRelease(2, 262857896);
 }
 
 func activate3() {
   clearPendingModTap();
-  setLayer(3, "layer_id: 41429312");
+  setLayer(3, 41429312);
 }
 
 func activate3NoRelease() {
   cancelAllStenoKeys();
-  setLayerNoRelease(3, "layer_id: 41429312");
+  setLayerNoRelease(3, 41429312);
 }
 
 func activate4() {
   clearPendingModTap();
-  setLayer(4, "layer_id: 212846523");
+  setLayer(4, 212846523);
   if (isButtonPressed(37)) {
     onPress37();
   }
@@ -457,7 +457,7 @@ func activate4() {
 
 func activate4NoRelease() {
   cancelAllStenoKeys();
-  setLayerNoRelease(4, "layer_id: 212846523");
+  setLayerNoRelease(4, 212846523);
   if (isButtonPressed(37)) {
     onPress37();
   }
@@ -465,32 +465,32 @@ func activate4NoRelease() {
 
 func activate5() {
   clearPendingModTap();
-  setLayer(5, "layer_id: 125635709");
+  setLayer(5, 125635709);
 }
 
 func activate5NoRelease() {
   cancelAllStenoKeys();
-  setLayerNoRelease(5, "layer_id: 125635709");
+  setLayerNoRelease(5, 125635709);
 }
 
 func activate6() {
   clearPendingModTap();
-  setLayer(6, "layer_id: 58064650");
+  setLayer(6, 58064650);
 }
 
 func activate6NoRelease() {
   cancelAllStenoKeys();
-  setLayerNoRelease(6, "layer_id: 58064650");
+  setLayerNoRelease(6, 58064650);
 }
 
 func activate7() {
   clearPendingModTap();
-  setLayer(7, "layer_id: 61572736");
+  setLayer(7, 61572736);
 }
 
 func activate7NoRelease() {
   cancelAllStenoKeys();
-  setLayerNoRelease(7, "layer_id: 61572736");
+  setLayerNoRelease(7, 61572736);
 }
 
 func activateDynamic() {
@@ -755,6 +755,8 @@ func drawDisplaySteno() {
     text = "Gemini";
   } else if(mode == "tx_bolt") {
     text = "TX Bolt";
+  } else if(mode == "passport") {
+    text = "Passport";
   } else if(mode == "procat") {
     text = "ProCAT";
   } else if(mode == "plover_hid") {
@@ -3242,13 +3244,13 @@ func init() {
 
   // FIDO
   setScript(SCRIPT_ID_U2F_STATUS_UPDATE, @onU2fStatusUpdate);
-  const SCRIPT_ID_USER1 = 11;
-  setScript(SCRIPT_ID_USER1, @user1ScriptSetLayer);
+  const SCRIPT_ID_SET_LAYER = 11;
+  setScript(SCRIPT_ID_SET_LAYER, @toolsSetLayerScript);
   activate0();
   activateGlobal();
 }
 
-func user1ScriptSetLayer(layerId) {
+func toolsSetLayerScript(layerId) {
   var layerActivate = 0;
   if (layerId == 87377230) layerActivate = @activate0;
   if (layerId == 1128808786) layerActivate = @activate1;
@@ -3592,10 +3594,10 @@ func onRelease6() {
 }
 
 func onPress6_0() {
-  pressStenoKeyButton(11 /* "*2" */);
+  pressStenoKeyButton(12 /* "*3" */);
 }
 func onRelease6_0() {
-  releaseStenoKey(11 /* "*2" */);
+  releaseStenoKey(12 /* "*3" */);
 }
 
 func onPress6_1() {
@@ -4222,10 +4224,10 @@ func onRelease17() {
 }
 
 func onPress17_0() {
-  pressStenoKeyButton(12 /* "*3" */);
+  pressStenoKeyButton(11 /* "*2" */);
 }
 func onRelease17_0() {
-  releaseStenoKey(12 /* "*3" */);
+  releaseStenoKey(11 /* "*2" */);
 }
 
 func onPress17_1() {
@@ -4630,6 +4632,7 @@ func onPress24_1() {
     releaseCount24_1 = getReleaseCount();
   }
   handleModTapPress(@modTapHandler24, 4, modTapLayerActivations24, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
+  // <font color="#777">Check Caps</font>
   checkWordCapsAndCapsLock();
 }
 func onRelease24_1() {
@@ -5016,6 +5019,7 @@ func onRelease35() {
 func onPress35_1() {
 
   handleModTapPress(@modTapHandler35, 4, modTapLayerActivations35, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
+  // <font color="#777">Check Caps</font>
   checkWordCapsAndCapsLock();
 }
 func onRelease35_1() {
@@ -5138,11 +5142,13 @@ func onRelease37_0() {
 }
 
 func onPress37_1() {
+  // <font color="#648">→ Numpad</font>
   if (isButtonPressed(38)) {
     _action_switchToNumpadLayer();
     return;
   }
   handleModTapPress(@modTapHandler37, 4, modTapLayerActivations37, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
+  // <font color="#777">Check Caps</font>
   checkWordCapsAndCapsLock();
 }
 func onRelease37_1() {
@@ -5203,6 +5209,7 @@ func onRelease38_0() {
 }
 
 func onPress38_1() {
+  // <font color="#648">→ Numpad</font>
   if (isButtonPressed(37)) {
     _action_switchToNumpadLayer();
     return;

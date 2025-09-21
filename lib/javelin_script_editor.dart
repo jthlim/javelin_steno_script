@@ -23,10 +23,11 @@ class JavelinScriptEditor extends StatefulWidget {
     super.key,
     required this.autofocus,
     required this.script,
-    required this.padding,
+    this.padding = EdgeInsets.zero,
     required this.onChanged,
     this.maxLines,
     this.hintText,
+    this.brightness,
   });
 
   final bool autofocus;
@@ -35,6 +36,7 @@ class JavelinScriptEditor extends StatefulWidget {
   final void Function(String s) onChanged;
   final int? maxLines;
   final String? hintText;
+  final Brightness? brightness;
 
   @override
   State<StatefulWidget> createState() => JavelinScriptEditorState();
@@ -48,6 +50,7 @@ class JavelinScriptEditorState extends State<JavelinScriptEditor> {
   @override
   void initState() {
     super.initState();
+    _textEditingController.brightnessOverride = widget.brightness;
     _textEditingController.value = TextEditingValue(
       text: widget.script,
       selection: const TextSelection(baseOffset: 0, extentOffset: 0),

@@ -1,10 +1,10 @@
 
 // Generated from javelin-layout file
 var layer;
-func setLayer(layerIndex, layerIdEvent) {
+func setLayer(layerIndex, layerId) {
   releaseAll();
   layer = layerIndex;
-  sendEvent(layerIdEvent);
+  sendEvent(formatString("layer_id: %d", layerId));
 }
 
 func dispatchToLayer(functions) {

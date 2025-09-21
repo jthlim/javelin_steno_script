@@ -135,10 +135,12 @@ class ButtonScriptBindings {
     InBuiltScriptFunction('createBuffer', 1, ReturnType.value, 0x78),
     InBuiltScriptFunction('sendMidi', 3, ReturnType.none, 0x79),
     InBuiltScriptFunction('getAssetSize', 1, ReturnType.value, 0x7a),
+    InBuiltScriptFunction('getRelyingPartyId', 0, ReturnType.value, 0x7b),
   ];
 
   static List<String> createRootFunctionList({
     required int buttonCount,
+    required int analogInputCount,
     required int encoderCount,
     required int pointerCount,
   }) {
@@ -149,6 +151,7 @@ class ButtonScriptBindings {
         'onPress$i',
         'onRelease$i',
       ],
+      for (var i = 0; i < analogInputCount; ++i) 'onAnalogInput$i',
       for (var i = 0; i < encoderCount; ++i) ...[
         'onEncoderCW$i',
         'onEncoderCCW$i',
@@ -161,6 +164,7 @@ class ButtonScriptBindings {
 extension ButtonScriptModule on ScriptModule {
   Uint8List createByteCode({
     required int buttonCount,
+    required int analogInputCount,
     required int encoderCount,
     required int pointerCount,
     required int scriptByteCodeVersion,
@@ -170,6 +174,7 @@ extension ButtonScriptModule on ScriptModule {
         byteCodeVersion: scriptByteCodeVersion,
         requiredFunctions: ButtonScriptBindings.createRootFunctionList(
           buttonCount: buttonCount,
+          analogInputCount: analogInputCount,
           encoderCount: encoderCount,
           pointerCount: pointerCount,
         ),

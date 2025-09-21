@@ -10,6 +10,7 @@ class ScriptCompileResult {
     required String script,
     required String scriptHeader,
     required int buttonCount,
+    required int analogInputCount,
     required int encoderCount,
     required int pointerCount,
     required int maximumByteCodeSize,
@@ -27,6 +28,7 @@ class ScriptCompileResult {
       inBuiltFunctions: ButtonScriptBindings.functions,
       requiredFunctions: ButtonScriptBindings.createRootFunctionList(
         buttonCount: buttonCount,
+        analogInputCount: analogInputCount,
         encoderCount: encoderCount,
         pointerCount: pointerCount,
       ),

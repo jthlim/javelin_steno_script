@@ -632,10 +632,21 @@ class Parser {
       _nextToken();
       switch (type) {
         case TokenType.plus:
-          termsExpression.terms.add(Term(TermMode.add, _parseFactor()));
+          final factor = _parseFactor();
+          if (factor is NegateAstNode) {
+            termsExpression.terms
+                .add(Term(TermMode.subtract, factor.statement));
+          } else {
+            termsExpression.terms.add(Term(TermMode.add, factor));
+          }
           break;
         case TokenType.minus:
-          termsExpression.terms.add(Term(TermMode.subtract, _parseFactor()));
+          final factor = _parseFactor();
+          if (factor is NegateAstNode) {
+            termsExpression.terms.add(Term(TermMode.add, factor.statement));
+          } else {
+            termsExpression.terms.add(Term(TermMode.subtract, factor));
+          }
           break;
         default:
           throw Exception('Internal error near $_currentToken');

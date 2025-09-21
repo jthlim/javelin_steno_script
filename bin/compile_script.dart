@@ -6,9 +6,9 @@ import 'package:javelin_steno_script/button_script_bindings.dart';
 import 'package:javelin_steno_script/javelin_steno_script.dart';
 
 void main(List<String> arguments) {
-  if (arguments.length < 4) {
+  if (arguments.length < 5) {
     print(
-      'Usage: compile_script <button_count> <encoder_count> <pointer_count> script_file_name1 ...',
+      'Usage: compile_script <button_count> <analog_input_count> <encoder_count> <pointer_count> script_file_name1 ...',
     );
     return;
   }
@@ -19,13 +19,19 @@ void main(List<String> arguments) {
     return;
   }
 
-  final encoderCount = int.tryParse(arguments[1]);
+  final analogInputCount = int.tryParse(arguments[1]);
+  if (analogInputCount == null) {
+    print('Unable to parse analog input count');
+    return;
+  }
+
+  final encoderCount = int.tryParse(arguments[2]);
   if (encoderCount == null) {
     print('Unable to parse encoder count');
     return;
   }
 
-  final pointerCount = int.tryParse(arguments[2]);
+  final pointerCount = int.tryParse(arguments[3]);
   if (pointerCount == null) {
     print('Unable to parse pointer count');
     return;
@@ -33,7 +39,7 @@ void main(List<String> arguments) {
 
   final module = ScriptModule(ButtonScriptBindings.functions);
 
-  for (var i = 3; i < arguments.length; ++i) {
+  for (var i = 4; i < arguments.length; ++i) {
     final filename = arguments[i];
     final source = File(filename).readAsStringSync();
     Parser(input: source, filename: filename, module: module).parse();
@@ -44,6 +50,7 @@ void main(List<String> arguments) {
     byteCodeVersion: latestScriptByteCodeVersion,
     requiredFunctions: ButtonScriptBindings.createRootFunctionList(
       buttonCount: buttonCount,
+      analogInputCount: analogInputCount,
       encoderCount: encoderCount,
       pointerCount: pointerCount,
     ),

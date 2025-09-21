@@ -134,8 +134,12 @@ class SyntaxHighlightingRule {
     required Brightness brightness,
     TextStyle? style,
   }) {
+    final defaultTextColor =
+        brightness == Brightness.light ? Colors.black : Colors.white;
+
     return TextSpan(
-      style: style,
+      style: style?.copyWith(color: defaultTextColor) ??
+          TextStyle(color: defaultTextColor),
       children: colorSpanWithRules(
         brightness: brightness,
         text: text,

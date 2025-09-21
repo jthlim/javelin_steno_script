@@ -3,10 +3,13 @@ import 'package:flutter/material.dart';
 import 'javelin_script_syntax_highlight.dart';
 
 class JavelinScriptTextEditingController extends TextEditingController {
+  JavelinScriptTextEditingController({super.text});
+
   TextSpan? cache;
   var lastText = '';
   TextStyle? lastStyle;
   var lastBrightness = Brightness.light;
+  Brightness? brightnessOverride;
 
   @override
   TextSpan buildTextSpan({
@@ -14,7 +17,7 @@ class JavelinScriptTextEditingController extends TextEditingController {
     TextStyle? style,
     required bool withComposing,
   }) {
-    final brightness = Theme.of(context).brightness;
+    final brightness = brightnessOverride ?? Theme.of(context).brightness;
 
     if (cache == null ||
         brightness != lastBrightness ||

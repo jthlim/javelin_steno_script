@@ -1,10 +1,10 @@
 
 // Generated from javelin-layout file
 var layer;
-func setLayer(layerIndex, layerIdEvent) {
+func setLayer(layerIndex, layerId) {
   releaseAll();
   layer = layerIndex;
-  sendEvent(layerIdEvent);
+  sendEvent(formatString("layer_id: %d", layerId));
 }
 
 func dispatchToLayer(functions) {
@@ -17,23 +17,23 @@ func resolveLayerIndex() var {
 }
 
 func activate0() {
-  setLayer(0, "layer_id: 87377230");
+  setLayer(0, 87377230);
 }
 
 func activate1() {
-  setLayer(1, "layer_id: 1128808786");
+  setLayer(1, 1128808786);
 }
 
 func activate2() {
-  setLayer(2, "layer_id: 148942692");
+  setLayer(2, 148942692);
 }
 
 func activate3() {
-  setLayer(3, "layer_id: 105007919");
+  setLayer(3, 105007919);
 }
 
 func activate4() {
-  setLayer(4, "layer_id: 259868619");
+  setLayer(4, 259868619);
 }
 
 func activateDynamic() {
@@ -167,13 +167,13 @@ func updateStenoMode() {
 }
 
 func init() {
-  const SCRIPT_ID_USER1 = 11;
-  setScript(SCRIPT_ID_USER1, @user1ScriptSetLayer);
+  const SCRIPT_ID_SET_LAYER = 11;
+  setScript(SCRIPT_ID_SET_LAYER, @toolsSetLayerScript);
   activate0();
   activateGlobal();
 }
 
-func user1ScriptSetLayer(layerId) {
+func toolsSetLayerScript(layerId) {
   var layerActivate = 0;
   if (layerId == 87377230) layerActivate = @activate0;
   if (layerId == 1128808786) layerActivate = @activate1;
@@ -391,10 +391,10 @@ func onRelease6() {
 }
 
 func onPress6_0() {
-  pressStenoKey(11 /* "*2" */);
+  pressStenoKey(12 /* "*3" */);
 }
 func onRelease6_0() {
-  releaseStenoKey(11 /* "*2" */);
+  releaseStenoKey(12 /* "*3" */);
 }
 
 func onPress6_1() {
@@ -814,10 +814,10 @@ func onRelease17() {
 }
 
 func onPress17_0() {
-  pressStenoKey(12 /* "*3" */);
+  pressStenoKey(11 /* "*2" */);
 }
 func onRelease17_0() {
-  releaseStenoKey(12 /* "*3" */);
+  releaseStenoKey(11 /* "*2" */);
 }
 
 func onPress17_1() {

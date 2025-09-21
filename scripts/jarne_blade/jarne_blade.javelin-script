@@ -264,15 +264,15 @@ const SETTINGS_IMAGE = [[
 ]];
 
 var layer;
-func setLayer(layerIndex, layerIdEvent) {
+func setLayer(layerIndex, layerId) {
   releaseAll();
   layer = layerIndex;
-  sendEvent(layerIdEvent);
+  sendEvent(formatString("layer_id: %d", layerId));
 }
 
-func setLayerNoRelease(layerIndex, layerIdEvent) {
+func setLayerNoRelease(layerIndex, layerId) {
   layer = layerIndex;
-  sendEvent(layerIdEvent);
+  sendEvent(formatString("layer_id: %d", layerId));
 }
 
 func dispatchToLayer(functions) {
@@ -289,37 +289,37 @@ func resolveLayerIndex() var {
 
 func activate0() {
   clearPendingModTap();
-  setLayer(0, "layer_id: 1128808786");
+  setLayer(0, 1128808786);
 }
 
 func activate0NoRelease() {
   cancelAllStenoKeys();
-  setLayerNoRelease(0, "layer_id: 1128808786");
+  setLayerNoRelease(0, 1128808786);
 }
 
 func activate1() {
   clearPendingModTap();
-  setLayer(1, "layer_id: 262857896");
+  setLayer(1, 262857896);
 }
 
 func activate1NoRelease() {
   cancelAllStenoKeys();
-  setLayerNoRelease(1, "layer_id: 262857896");
+  setLayerNoRelease(1, 262857896);
 }
 
 func activate2() {
   clearPendingModTap();
-  setLayer(2, "layer_id: 41429312");
+  setLayer(2, 41429312);
 }
 
 func activate2NoRelease() {
   cancelAllStenoKeys();
-  setLayerNoRelease(2, "layer_id: 41429312");
+  setLayerNoRelease(2, 41429312);
 }
 
 func activate3() {
   clearPendingModTap();
-  setLayer(3, "layer_id: 212846523");
+  setLayer(3, 212846523);
   if (isButtonPressed(37)) {
     onPress37();
   }
@@ -327,7 +327,7 @@ func activate3() {
 
 func activate3NoRelease() {
   cancelAllStenoKeys();
-  setLayerNoRelease(3, "layer_id: 212846523");
+  setLayerNoRelease(3, 212846523);
   if (isButtonPressed(37)) {
     onPress37();
   }
@@ -335,32 +335,32 @@ func activate3NoRelease() {
 
 func activate4() {
   clearPendingModTap();
-  setLayer(4, "layer_id: 125635709");
+  setLayer(4, 125635709);
 }
 
 func activate4NoRelease() {
   cancelAllStenoKeys();
-  setLayerNoRelease(4, "layer_id: 125635709");
+  setLayerNoRelease(4, 125635709);
 }
 
 func activate5() {
   clearPendingModTap();
-  setLayer(5, "layer_id: 58064650");
+  setLayer(5, 58064650);
 }
 
 func activate5NoRelease() {
   cancelAllStenoKeys();
-  setLayerNoRelease(5, "layer_id: 58064650");
+  setLayerNoRelease(5, 58064650);
 }
 
 func activate6() {
   clearPendingModTap();
-  setLayer(6, "layer_id: 61572736");
+  setLayer(6, 61572736);
 }
 
 func activate6NoRelease() {
   cancelAllStenoKeys();
-  setLayerNoRelease(6, "layer_id: 61572736");
+  setLayerNoRelease(6, 61572736);
 }
 
 func activateDynamic() {
@@ -622,6 +622,8 @@ func drawDisplaySteno() {
     text = "Gemini";
   } else if(mode == "tx_bolt") {
     text = "TX Bolt";
+  } else if(mode == "passport") {
+    text = "Passport";
   } else if(mode == "procat") {
     text = "ProCAT";
   } else if(mode == "plover_hid") {
@@ -2877,13 +2879,13 @@ func init() {
 
   updateScreenSaverTimer();
 
-  const SCRIPT_ID_USER1 = 11;
-  setScript(SCRIPT_ID_USER1, @user1ScriptSetLayer);
+  const SCRIPT_ID_SET_LAYER = 11;
+  setScript(SCRIPT_ID_SET_LAYER, @toolsSetLayerScript);
   activate0();
   activateGlobal();
 }
 
-func user1ScriptSetLayer(layerId) {
+func toolsSetLayerScript(layerId) {
   var layerActivate = 0;
   if (layerId == 1128808786) layerActivate = @activate0;
   if (layerId == 262857896) layerActivate = @activate1;

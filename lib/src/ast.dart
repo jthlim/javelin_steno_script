@@ -791,6 +791,78 @@ class MultiplyAstNode extends BinaryOperatorAstNode {
   }
 
   @override
+  void addInstructions(ScriptByteCodeBuilder builder) {
+    if (statementA.isConstant()) {
+      if (addInstructionsConstantSpecialization(
+        builder,
+        statementA.constantValue(),
+        statementB,
+      )) {
+        return;
+      }
+    } else if (statementB.isConstant()) {
+      if (addInstructionsConstantSpecialization(
+        builder,
+        statementB.constantValue(),
+        statementA,
+      )) {
+        return;
+      }
+    }
+
+    statementA.addInstructions(builder);
+    statementB.addInstructions(builder);
+    builder.addInstruction(OperatorInstruction(opcode));
+  }
+
+  bool addInstructionsConstantSpecialization(
+    ScriptByteCodeBuilder builder,
+    int constant,
+    AstNode other,
+  ) {
+    switch (constant) {
+      case 0:
+        // TODO: Make this consider side effects, not pure-ness.
+        if (!other.isPure()) return false;
+        builder.addInstruction(PushIntValueInstruction(0));
+        return true;
+
+      case 1:
+        other.addInstructions(builder);
+        return true;
+
+      case -1:
+        other.addInstructions(builder);
+        builder
+            .addInstruction(OperatorInstruction(ScriptOperatorOpcode.negative));
+        return true;
+
+      default:
+        if (constant & (constant - 1) != 0) {
+          return false;
+        }
+        final shift = countTrailingZeroBits(constant);
+        other.addInstructions(builder);
+        builder.addInstruction(PushIntValueInstruction(shift));
+        builder.addInstruction(
+          OperatorInstruction(ScriptOperatorOpcode.shiftLeft),
+        );
+        return true;
+    }
+  }
+
+  static int countTrailingZeroBits(int n) {
+    if (n == 0) return 32;
+
+    var count = 0;
+    while ((n & 1) == 0) {
+      n >>= 1;
+      count++;
+    }
+    return count;
+  }
+
+  @override
   ScriptOperatorOpcode get opcode => ScriptOperatorOpcode.multiply;
 }
 
