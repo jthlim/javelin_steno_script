@@ -671,7 +671,10 @@ class InstructionList extends Iterable<ScriptInstruction> {
     }
   }
 
-  static bool hasLoadLocalIndex(ScriptInstruction? instruction, int index) {
+  static bool mustKeepLocalStoreLoadIndex(
+    ScriptInstruction? instruction,
+    int index,
+  ) {
     for (;;) {
       if (instruction == null) {
         return false;
@@ -682,6 +685,26 @@ class InstructionList extends Iterable<ScriptInstruction> {
       if (instruction is LoadLocalValueInstruction &&
           instruction.index == index) {
         return true;
+      }
+      if (instruction is StoreLocalValueInstruction &&
+          instruction.index == index) {
+        // Skip to next Nop or StartFunctionInstruction.
+        instruction = instruction.next;
+        for (;;) {
+          if (instruction == null) {
+            return false;
+          }
+          if (instruction is StartFunctionInstruction) {
+            return false;
+          }
+          if (instruction is NopInstruction &&
+              (instruction.reference?.offset ?? 0) < instruction.offset) {
+            instruction = instruction.next;
+            break;
+          }
+          instruction = instruction.next;
+        }
+        continue;
       }
       instruction = instruction.next;
     }
@@ -733,7 +756,7 @@ class InstructionList extends Iterable<ScriptInstruction> {
 
       // Check if there are any more loads
       final nextNextInstruction = nextInstruction.next;
-      if (hasLoadLocalIndex(nextNextInstruction, instruction.index)) {
+      if (mustKeepLocalStoreLoadIndex(nextNextInstruction, instruction.index)) {
         instruction = nextInstruction;
         continue;
       }
