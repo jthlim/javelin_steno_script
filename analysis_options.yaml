@@ -11,4 +11,4 @@ linter:
     prefer_single_quotes: true
     require_trailing_commas: true
     unnecessary_statements: true
-
+    use_null_aware_elements: true

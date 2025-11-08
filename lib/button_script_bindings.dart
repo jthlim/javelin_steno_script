@@ -136,6 +136,8 @@ class ButtonScriptBindings {
     InBuiltScriptFunction('sendMidi', 3, ReturnType.none, 0x79),
     InBuiltScriptFunction('getAssetSize', 1, ReturnType.value, 0x7a),
     InBuiltScriptFunction('getRelyingPartyId', 0, ReturnType.value, 0x7b),
+    InBuiltScriptFunction('getSignatureAlgorithm', 0, ReturnType.value, 0x7c),
+    InBuiltScriptFunction('setSignatureAlgorithms', 1, ReturnType.none, 0x7d),
   ];
 
   static List<String> createRootFunctionList({

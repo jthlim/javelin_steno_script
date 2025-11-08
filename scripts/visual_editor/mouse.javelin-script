@@ -47,7 +47,7 @@ func mouseRightReleased() {
 
 func mousePressed(mask) {
   mouseMask = mouseMask | mask;
-  startTimer(@updateMouse, 10, 1, @updateMouse);
+  startTimer(@updateMouse, 25, 1, @updateMouse);
   updateMouse();
 }
 
