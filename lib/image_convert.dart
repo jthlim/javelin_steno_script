@@ -280,7 +280,7 @@ class ImageConvert {
       pixels,
       width,
       height,
-      ui.PixelFormat.rgba8888,
+      .rgba8888,
       completer.complete,
     );
     return completer.future;

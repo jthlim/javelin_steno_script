@@ -98,8 +98,10 @@ class JavelinScriptEditorState extends State<JavelinScriptEditor> {
   void _handleDrop(File obj) async {
     final code = await stringForDroppedFile(obj);
     final textEditingValue = _textEditingController.value;
-    _textEditingController.value =
-        textEditingValue.replaced(textEditingValue.selection, code);
+    _textEditingController.value = textEditingValue.replaced(
+      textEditingValue.selection,
+      code,
+    );
   }
 
   @override
@@ -137,7 +139,7 @@ class JavelinScriptEditorState extends State<JavelinScriptEditor> {
               style: JavelinScriptText.font,
               decoration: InputDecoration(
                 contentPadding: widget.padding,
-                border: InputBorder.none,
+                border: .none,
                 hintText: widget.hintText,
               ),
               onChanged: widget.onChanged,

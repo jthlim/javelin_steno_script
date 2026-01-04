@@ -16,8 +16,8 @@ class ScriptLocals {
     Map<String, AstNode>? constants,
     Map<String, ScriptLocalVariable>? variables,
     this.localVariableCount = 0,
-  ])  : constants = constants ?? {},
-        variables = variables ?? {};
+  ]) : constants = constants ?? {},
+       variables = variables ?? {};
 
   final Map<String, AstNode> constants;
   final Map<String, ScriptLocalVariable> variables;
@@ -40,9 +40,7 @@ class ScriptFunction implements ScriptFunctionDefinition {
 
   ExecutionValue? evaluate(ExecutionContext context) {
     statements.evaluate(context);
-    return context.state == ExecutionState.finished
-        ? context.returnValue
-        : null;
+    return context.state == .finished ? context.returnValue : null;
   }
 
   final parameters = <String>{};
@@ -86,8 +84,11 @@ class ScriptFunction implements ScriptFunctionDefinition {
     }
 
     final index = locals.localVariableCount;
-    locals.variables[localName] =
-        ScriptLocalVariable(localName, index, arraySize);
+    locals.variables[localName] = ScriptLocalVariable(
+      localName,
+      index,
+      arraySize,
+    );
 
     locals.localVariableCount += arraySize ?? 1;
     if (locals.localVariableCount > numberOfLocals) {

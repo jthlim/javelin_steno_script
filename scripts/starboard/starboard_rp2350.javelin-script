@@ -35,9 +35,15 @@ func deactivateGlobal() {
 func onStenoModeUpdate() {
   var stenoMode = getParameter("steno_mode");
   if (stenoMode == "embedded") {
-    setGpioPin(25, 1);
-  } else {
-    setGpioPin(25, 0);
+    setRgb(0, 0, 1, 0);
+  } else if (stenoMode == "gemini") {
+    setRgb(0, 1, 0, 0);
+  } else if (stenoMode == "tx_bolt") {
+    setRgb(0, 0, 0, 1);
+  } else if (stenoMode == "procat") {
+    setRgb(0, 1, 1, 0);
+  } else if (stenoMode == "plover_hid") {
+    setRgb(0, 0, 1, 1);
   }
 }
 
@@ -412,7 +418,7 @@ func onPress26_0() {
   if (getParameter("steno_mode") != "embedded") {
     console("set_steno_mode embedded");
   } else {
-    console("set_steno_mode gemini");
+    console("set_steno_mode plover_hid");
   }
   releaseAll();
 }

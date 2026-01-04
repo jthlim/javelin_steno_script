@@ -1,13 +1,6 @@
 import 'module.dart';
 
-enum ExecutionState {
-  running,
-  finished,
-  timeout,
-  error,
-  doBreak,
-  doContinue,
-}
+enum ExecutionState { running, finished, timeout, error, doBreak, doContinue }
 
 class ExecutionValue {
   const ExecutionValue(this.intValue, this.stringValue);
@@ -52,10 +45,10 @@ class ExecutionValue {
 
 class ExecutionContext {
   ExecutionContext(int maximumLocalsCount, this.module)
-      : locals = List.generate(
-          maximumLocalsCount,
-          (_) => const ExecutionValue.int(0),
-        );
+    : locals = List.generate(
+        maximumLocalsCount,
+        (_) => const ExecutionValue.int(0),
+      );
 
   var state = ExecutionState.running;
 

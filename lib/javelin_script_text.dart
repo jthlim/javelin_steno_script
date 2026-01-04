@@ -45,7 +45,7 @@ class _JavelinScriptTextState extends State<JavelinScriptText> {
     return Text.rich(
       _span,
       style: widget.style,
-      textAlign: TextAlign.start,
+      textAlign: .start,
       overflow: widget.overflow,
     );
   }

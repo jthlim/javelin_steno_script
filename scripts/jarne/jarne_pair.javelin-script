@@ -19,6 +19,7 @@ const SCRIPT_ID_KEYBOARD_LED_STATUS_UPDATE = 4;
 const SCRIPT_ID_BLE_ADVERTISING_UPDATE = 5;
 const SCRIPT_ID_BLE_SCANNING_UPDATE = 6;
 const SCRIPT_ID_U2F_STATUS_UPDATE = 7;
+const SCRIPT_ID_BEACON_STARTED = 21;
 
 const TEXT_ALIGNMENT_LEFT = 0;
 const TEXT_ALIGNMENT_MIDDLE = 1;
@@ -125,6 +126,7 @@ func init() {
   setScript(SCRIPT_ID_BATTERY_UPDATE, @onBatteryUpdate);
   setScript(SCRIPT_ID_CONNECTION_UPDATE, @onConnectionUpdate);
   setScript(SCRIPT_ID_PAIR_CONNECTION_UPDATE, @onPairConnectionUpdate);
+  setScript(SCRIPT_ID_BEACON_STARTED, @onBeaconStarted);
 
   updateBoardPower();
   drawDisplayOverlay();
@@ -146,6 +148,44 @@ func onPairConnectionUpdate() {
 
 func onU2fStatusUpdate() {
   updateBoardPower();
+}
+
+func onBeaconStarted() {
+  const LOCATION_IMAGE = [[
+    30 45 00 00 00 00 00 00 00 00 00 00 00 f8 3f 00
+    00 00 00 00 00 80 ff ff 01 00 00 00 00 00 e0 ff
+    ff 07 00 00 00 00 00 f8 ff ff 1f 00 00 00 00 00
+    fc ff ff 7f 00 00 00 00 00 fe ff ff ff 01 00 00
+    00 00 ff ff ff ff 07 00 00 00 80 ff ff ff ff 0f
+    00 00 00 c0 ff ff ff ff 3f 00 00 00 e0 ff ff ff
+    ff ff 00 00 00 f0 ff ff ff ff ff 03 00 00 f0 ff
+    0f f8 ff ff 07 00 00 f8 ff 03 e0 ff ff 1f 00 00
+    f8 ff 00 80 ff ff 7f 00 00 fc 7f 00 00 ff ff ff
+    00 00 fc 3f 00 00 fe ff ff 03 00 fc 1f 00 00 fe
+    ff ff 0f 00 fc 1f 00 00 fc ff ff 3f 00 fe 0f 00
+    00 fc ff ff 7f 00 fe 0f 00 00 f8 ff ff ff 01 fe
+    0f 00 00 f8 ff ff ff 03 fe 0f 00 00 f8 ff ff ff
+    0f fe 0f 00 00 f8 ff ff ff 0f fe 0f 00 00 f8 ff
+    ff ff 0f fe 0f 00 00 f8 ff ff ff 0f fe 0f 00 00
+    f8 ff ff ff 03 fe 0f 00 00 f8 ff ff ff 01 fe 0f
+    00 00 fc ff ff 7f 00 fc 1f 00 00 fc ff ff 3f 00
+    fc 1f 00 00 fe ff ff 0f 00 fc 3f 00 00 fe ff ff
+    03 00 fc 7f 00 00 ff ff ff 00 00 f8 ff 00 80 ff
+    ff 7f 00 00 f8 ff 03 e0 ff ff 1f 00 00 f0 ff 0f
+    f8 ff ff 07 00 00 f0 ff ff ff ff ff 03 00 00 e0
+    ff ff ff ff ff 00 00 00 c0 ff ff ff ff 3f 00 00
+    00 80 ff ff ff ff 0f 00 00 00 00 ff ff ff ff 07
+    00 00 00 00 fe ff ff ff 01 00 00 00 00 fc ff ff
+    7f 00 00 00 00 00 f8 ff ff 1f 00 00 00 00 00 e0
+    ff ff 07 00 00 00 00 00 80 ff ff 01 00 00 00 00
+    00 00 f8 3f 00 00 00 00 00 00 00 00 00 00 00 00
+    00 00
+  ]];
+
+  clearDisplay(1);
+  drawImage(1, 10, 30, LOCATION_IMAGE);
+  drawText(1, DISPLAY_WIDTH/2, DISPLAY_HEIGHT-24, 0, 1, "Double");
+  drawText(1, DISPLAY_WIDTH/2, DISPLAY_HEIGHT-10, 0, 1, "Tap");
 }
 
 func updateBoardPower() {

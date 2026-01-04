@@ -21,10 +21,7 @@ class ScriptCompileResult {
     }
 
     return ScriptCompileResult.scripts(
-      scripts: [
-        if (scriptHeader.isNotEmpty) scriptHeader,
-        script,
-      ],
+      scripts: [if (scriptHeader.isNotEmpty) scriptHeader, script],
       inBuiltFunctions: ButtonScriptBindings.functions,
       requiredFunctions: ButtonScriptBindings.createRootFunctionList(
         buttonCount: buttonCount,
@@ -61,6 +58,7 @@ class ScriptCompileResult {
     required List<String> requiredFunctions,
     int byteCodeVersion = latestScriptByteCodeVersion,
     required int maximumScriptByteCodeSize,
+    bool forceGlobalWrites = false,
   }) {
     if (script.isEmpty) {
       return const ScriptCompileResult.empty();
@@ -72,6 +70,7 @@ class ScriptCompileResult {
       requiredFunctions: requiredFunctions,
       byteCodeVersion: byteCodeVersion,
       maximumScriptByteCodeSize: maximumScriptByteCodeSize,
+      forceGlobalWrites: forceGlobalWrites,
     );
   }
 
@@ -81,6 +80,7 @@ class ScriptCompileResult {
     required List<String> requiredFunctions,
     int byteCodeVersion = latestScriptByteCodeVersion,
     required int maximumScriptByteCodeSize,
+    bool forceGlobalWrites = false,
   }) {
     if (scripts.isEmpty) {
       return const ScriptCompileResult.empty();
@@ -95,6 +95,7 @@ class ScriptCompileResult {
         module: module,
         byteCodeVersion: byteCodeVersion,
         requiredFunctions: requiredFunctions,
+        forceGlobalWrites: forceGlobalWrites,
       );
       final byteCode = builder.createByteCode();
       if (byteCode.length > maximumScriptByteCodeSize) {
@@ -111,31 +112,55 @@ class ScriptCompileResult {
     }
   }
 
-  ScriptCompileResult.ok(
+  const ScriptCompileResult({
+    required this.success,
+    required this.message,
+    required this.size,
+    this.data,
+    this.builder,
+  });
+
+  const ScriptCompileResult.ok(
     this.size,
     Uint8List this.data,
     ScriptByteCodeBuilder this.builder,
-  )   : success = true,
-        message = 'OK, $size bytes';
+  ) : success = true,
+      message = 'OK, $size bytes';
 
   const ScriptCompileResult.failed(this.message)
-      : success = false,
-        size = 0,
-        builder = null,
-        data = null;
+    : success = false,
+      size = 0,
+      builder = null,
+      data = null;
 
   const ScriptCompileResult.empty()
-      : success = false,
-        size = 0,
-        message = 'No script',
-        builder = null,
-        data = null;
+    : success = false,
+      size = 0,
+      message = 'No script',
+      builder = null,
+      data = null;
 
   final bool success;
   final String message;
   final int size;
   final Uint8List? data;
   final ScriptByteCodeBuilder? builder;
+
+  ScriptCompileResult copyWith({
+    bool? success,
+    String? message,
+    int? size,
+    Uint8List? data,
+    ScriptByteCodeBuilder? builder,
+  }) {
+    return ScriptCompileResult(
+      success: success ?? this.success,
+      message: message ?? this.message,
+      size: size ?? this.size,
+      data: data ?? this.data,
+      builder: builder ?? this.builder,
+    );
+  }
 
   int get crc => Crc32().convert(data ?? []).toBigInt().toInt();
 }

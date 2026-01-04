@@ -10,7 +10,6 @@ enum _IndexType {
   byte,
   halfWord,
   word,
-  ;
 }
 
 class Parser {
@@ -25,7 +24,7 @@ class Parser {
   }
 
   Parser.tokenizer(Tokenizer tokenizer, this._module)
-      : _tokens = tokenizer.tokenize().iterator {
+    : _tokens = tokenizer.tokenize().iterator {
     _hasNextToken = _tokens.moveNext();
     _nextToken();
   }
@@ -34,7 +33,7 @@ class Parser {
   final ScriptModule _module;
   final _namedValues = <String, int>{};
 
-  var _currentToken = const Token(type: TokenType.eof, line: 0, column: 0);
+  var _currentToken = const Token(type: .eof, line: 0, column: 0);
   var _hasNextToken = false;
 
   ScriptFunction? _function;
@@ -44,7 +43,7 @@ class Parser {
       _currentToken = _tokens.current;
       _hasNextToken = _tokens.moveNext();
     } else {
-      _currentToken = const Token(type: TokenType.eof, line: 0, column: 0);
+      _currentToken = const Token(type: .eof, line: 0, column: 0);
     }
   }
 
@@ -52,7 +51,7 @@ class Parser {
     if (_hasNextToken) {
       return _tokens.current;
     } else {
-      return const Token(type: TokenType.eof, line: 0, column: 0);
+      return const Token(type: .eof, line: 0, column: 0);
     }
   }
 
@@ -70,7 +69,7 @@ class Parser {
 
   bool _isScopeEnd(TokenType endToken) {
     if (_currentToken.type != endToken) {
-      if (_currentToken.type == TokenType.eof) {
+      if (_currentToken.type == .eof) {
         _assertToken(endToken);
       }
       return false;
@@ -84,17 +83,17 @@ class Parser {
   }
 
   void parseModule() {
-    while (_currentToken.type != TokenType.eof) {
+    while (_currentToken.type != .eof) {
       switch (_currentToken.type) {
-        case TokenType.constKeyword:
+        case .constKeyword:
           _parseConst();
           break;
 
-        case TokenType.varKeyword:
+        case .varKeyword:
           _parseGlobalVar();
           break;
 
-        case TokenType.funcKeyword:
+        case .funcKeyword:
           _parseFunc();
           break;
 
@@ -132,13 +131,13 @@ class Parser {
   }
 
   void _parseConst() {
-    _assertToken(TokenType.constKeyword);
+    _assertToken(.constKeyword);
     final nameToken = _currentToken;
-    _assertToken(TokenType.identifier);
+    _assertToken(.identifier);
     final name = nameToken.stringValue!;
-    _assertToken(TokenType.assign);
+    _assertToken(.assign);
     final expression = _parseExpression();
-    _assertToken(TokenType.semiColon);
+    _assertToken(.semiColon);
 
     // Ignore constants named '_'
     if (name == '_') return;
@@ -162,17 +161,17 @@ class Parser {
   }
 
   void _parseGlobalVar() {
-    _assertToken(TokenType.varKeyword);
+    _assertToken(.varKeyword);
     final nameToken = _currentToken;
-    _assertToken(TokenType.identifier);
+    _assertToken(.identifier);
     final name = nameToken.stringValue!;
 
     int? arraySize;
     AstNode? initializer;
-    if (_currentToken.type == TokenType.openSquareBracket) {
-      _assertToken(TokenType.openSquareBracket);
+    if (_currentToken.type == .openSquareBracket) {
+      _assertToken(.openSquareBracket);
       final arraySizeExpression = _parseExpression();
-      _assertToken(TokenType.closeSquareBracket);
+      _assertToken(.closeSquareBracket);
 
       if (!arraySizeExpression.isConstant()) {
         throw FormatException(
@@ -187,12 +186,12 @@ class Parser {
         );
       }
     } else {
-      if (_currentToken.type == TokenType.assign) {
-        _assertToken(TokenType.assign);
+      if (_currentToken.type == .assign) {
+        _assertToken(.assign);
         initializer = _parseExpression();
       }
     }
-    _assertToken(TokenType.semiColon);
+    _assertToken(.semiColon);
 
     _assertUniqueName(name);
 
@@ -213,11 +212,11 @@ class Parser {
   }
 
   void _parseFunc() {
-    _assertToken(TokenType.funcKeyword);
+    _assertToken(.funcKeyword);
     final nameToken = _currentToken;
-    _assertToken(TokenType.identifier);
+    _assertToken(.identifier);
     final name = nameToken.stringValue!;
-    _assertToken(TokenType.openParen);
+    _assertToken(.openParen);
 
     _assertUniqueName(name);
 
@@ -227,21 +226,21 @@ class Parser {
     final previousFunction = _function;
     _function = function;
 
-    while (!_isScopeEnd(TokenType.closeParen)) {
+    while (!_isScopeEnd(.closeParen)) {
       final parameterName = _currentToken;
-      _assertToken(TokenType.identifier);
+      _assertToken(.identifier);
       function.addParameter(parameterName.stringValue!);
 
-      if (_currentToken.type == TokenType.comma) {
+      if (_currentToken.type == .comma) {
         _nextToken();
-      } else if (_currentToken.type != TokenType.closeParen) {
+      } else if (_currentToken.type != .closeParen) {
         throw FormatException(
           'Unexpected end of parameter list for $nameToken near $_currentToken',
         );
       }
     }
 
-    if (_currentToken.type == TokenType.varKeyword) {
+    if (_currentToken.type == .varKeyword) {
       _nextToken();
       function.hasReturnValue = true;
     }
@@ -259,10 +258,7 @@ class Parser {
       if (localVariable.arraySize != null) {
         return LoadLocalValueArrayAstNode(localVariable);
       }
-      return LoadValueAstNode(
-        isGlobal: false,
-        index: localVariable.index,
-      );
+      return LoadValueAstNode(isGlobal: false, index: localVariable.index);
     }
 
     // Check local constants
@@ -278,10 +274,7 @@ class Parser {
       if (arraySize != null) {
         return LoadGlobalValueArrayAstNode(globalVariable);
       } else {
-        return LoadValueAstNode(
-          isGlobal: true,
-          index: globalVariable.index,
-        );
+        return LoadValueAstNode(isGlobal: true, index: globalVariable.index);
       }
     }
 
@@ -304,17 +297,17 @@ class Parser {
     final previousFunction = _function;
     _function = function;
 
-    if (_currentToken.type == TokenType.openParen) {
-      _assertToken(TokenType.openParen);
+    if (_currentToken.type == .openParen) {
+      _assertToken(.openParen);
 
-      while (!_isScopeEnd(TokenType.closeParen)) {
+      while (!_isScopeEnd(.closeParen)) {
         final parameterName = _currentToken;
-        _assertToken(TokenType.identifier);
+        _assertToken(.identifier);
         function.addParameter(parameterName.stringValue!);
 
-        if (_currentToken.type == TokenType.comma) {
+        if (_currentToken.type == .comma) {
           _nextToken();
-        } else if (_currentToken.type != TokenType.closeParen) {
+        } else if (_currentToken.type != .closeParen) {
           throw FormatException(
             'Unexpected end of parameter list for $name near $_currentToken',
           );
@@ -322,7 +315,7 @@ class Parser {
       }
     }
 
-    if (_currentToken.type == TokenType.varKeyword) {
+    if (_currentToken.type == .varKeyword) {
       _nextToken();
       function.hasReturnValue = true;
     }
@@ -356,7 +349,7 @@ class Parser {
 
   AstNode _parseHalfWordList() {
     final values = [_parseHalfWordValue()];
-    while (_currentToken.type == TokenType.comma) {
+    while (_currentToken.type == .comma) {
       _nextToken();
       values.add(_parseHalfWordValue());
     }
@@ -366,24 +359,24 @@ class Parser {
   AstNode _parsePrimary() {
     // Brackets, constant or function call.
     switch (_currentToken.type) {
-      case TokenType.intValue:
+      case .intValue:
         final value = _currentToken.intValue!;
         _nextToken();
         return IntValueAstNode(value);
 
-      case TokenType.stringValue:
+      case .stringValue:
         final value = _currentToken.stringValue!;
         _nextToken();
         return StringValueAstNode(value);
 
-      case TokenType.hash:
+      case .hash:
         // Supports:
         //   #line
         //   #column
         //   #next("name")
         final hashToken = _currentToken;
         _nextToken();
-        if (_currentToken.type != TokenType.identifier) {
+        if (_currentToken.type != .identifier) {
           throw FormatException(
             'Expected #line, #column, #start or #next near $_currentToken',
           );
@@ -396,20 +389,20 @@ class Parser {
           case 'column':
             return IntValueAstNode(hashToken.column);
           case 'next':
-            _assertToken(TokenType.openParen);
+            _assertToken(.openParen);
             final name = _currentToken.stringValue;
-            _assertToken(TokenType.stringValue);
-            _assertToken(TokenType.closeParen);
+            _assertToken(.stringValue);
+            _assertToken(.closeParen);
             final value = (_namedValues[name!] ?? -1) + 1;
             _namedValues[name] = value;
             return IntValueAstNode(value);
           case 'start':
-            _assertToken(TokenType.openParen);
+            _assertToken(.openParen);
             final name = _currentToken.stringValue;
-            _assertToken(TokenType.stringValue);
-            _assertToken(TokenType.comma);
+            _assertToken(.stringValue);
+            _assertToken(.comma);
             final value = _parseExpression();
-            _assertToken(TokenType.closeParen);
+            _assertToken(.closeParen);
             if (!value.isConstant()) {
               throw FormatException(
                 'Unable to #start $name with non-constant value',
@@ -425,22 +418,22 @@ class Parser {
           'Expected #line, #column, #start or #next near $_currentToken',
         );
 
-      case TokenType.openHalfWordList:
+      case .openHalfWordList:
         _nextToken();
         final list = _parseHalfWordList();
-        _assertToken(TokenType.closeHalfWordList);
+        _assertToken(.closeHalfWordList);
         return list;
 
-      case TokenType.openParen:
+      case .openParen:
         _nextToken();
         final expression = _parseExpression();
-        _assertToken(TokenType.closeParen);
+        _assertToken(.closeParen);
         return expression;
 
-      case TokenType.at:
+      case .at:
         _nextToken();
         switch (_currentToken.type) {
-          case TokenType.identifier:
+          case .identifier:
             final functionNameToken = _currentToken;
             final functionName = _currentToken.stringValue!;
             _nextToken();
@@ -449,9 +442,9 @@ class Parser {
               name: functionName,
             );
 
-          case TokenType.varKeyword:
-          case TokenType.openBrace:
-          case TokenType.openParen:
+          case .varKeyword:
+          case .openBrace:
+          case .openParen:
             final lambdaToken = _currentToken;
             final lambdaName = _parseLambda();
             return PushFunctionAddress(token: lambdaToken, name: lambdaName);
@@ -463,7 +456,7 @@ class Parser {
             );
         }
 
-      case TokenType.identifier:
+      case .identifier:
         // Global, local, constant or function call
         final nameToken = _currentToken;
         final name = _currentToken.stringValue!;
@@ -474,7 +467,7 @@ class Parser {
           return result;
         }
 
-        if (_currentToken.type == TokenType.openParen) {
+        if (_currentToken.type == .openParen) {
           // Function call.
           final parameters = _parseParameterList();
           return CallFunctionAstNode(
@@ -487,7 +480,7 @@ class Parser {
 
         // Unknown identifier!
         // If the next token is a fallback, then use that instead.
-        if (_currentToken.type == TokenType.fallback) {
+        if (_currentToken.type == .fallback) {
           _nextToken();
           return _parseExpression();
         }
@@ -495,15 +488,13 @@ class Parser {
         throw FormatException('Unknown identifier $name near $_currentToken');
 
       default:
-        throw FormatException(
-          'Unexpected primary expression $_currentToken',
-        );
+        throw FormatException('Unexpected primary expression $_currentToken');
     }
   }
 
   AstNode _parseFallback() {
     final result = _parsePrimary();
-    if (_currentToken.type == TokenType.fallback) {
+    if (_currentToken.type == .fallback) {
       _nextToken();
 
       // Discard the expression.
@@ -514,25 +505,25 @@ class Parser {
 
   AstNode _parseSubscript() {
     var result = _parseFallback();
-    if (_currentToken.type == TokenType.openSquareBracket) {
+    if (_currentToken.type == .openSquareBracket) {
       if (result is LoadGlobalValueArrayAstNode) {
         _nextToken();
         final indexExpression = _parseExpression();
-        _assertToken(TokenType.closeSquareBracket);
+        _assertToken(.closeSquareBracket);
         result = LoadIndexedGlobalValueAstNode(result, indexExpression);
       } else if (result is LoadLocalValueArrayAstNode) {
         _nextToken();
         final indexExpression = _parseExpression();
-        _assertToken(TokenType.closeSquareBracket);
+        _assertToken(.closeSquareBracket);
         result = LoadIndexedLocalValueAstNode(result, indexExpression);
       }
     }
 
     switch (_currentToken.type) {
-      case TokenType.openSquareBracket:
+      case .openSquareBracket:
         _nextToken();
         final indexExpression = _parseExpression();
-        _assertToken(TokenType.closeSquareBracket);
+        _assertToken(.closeSquareBracket);
         if (result is StringValueAstNode && indexExpression.isConstant()) {
           final index = indexExpression.constantValue();
           if (index < 0 || index + 1 >= result.value.length) {
@@ -545,15 +536,15 @@ class Parser {
           );
         }
         return ReadByteIndexAstNode(result, indexExpression);
-      case TokenType.openHalfWordList:
+      case .openHalfWordList:
         _nextToken();
         final indexExpression = _parseExpression();
-        _assertToken(TokenType.closeHalfWordList);
+        _assertToken(.closeHalfWordList);
         return ReadHalfWordIndexAstNode(result, indexExpression);
-      case TokenType.openWordList:
+      case .openWordList:
         _nextToken();
         final indexExpression = _parseExpression();
-        _assertToken(TokenType.closeWordList);
+        _assertToken(.closeWordList);
         return ReadWordIndexAstNode(result, indexExpression);
       default:
         return result;
@@ -562,25 +553,27 @@ class Parser {
 
   AstNode _parseCallValueFunction() {
     var result = _parseSubscript();
-    while (_currentToken.type == TokenType.openParen) {
-      result =
-          CallValueAstNode(value: result, parameters: _parseParameterList());
+    while (_currentToken.type == .openParen) {
+      result = CallValueAstNode(
+        value: result,
+        parameters: _parseParameterList(),
+      );
     }
     return result;
   }
 
   AstNode _parseUnary() {
     switch (_currentToken.type) {
-      case TokenType.minus:
+      case .minus:
         _nextToken();
         return NegateAstNode(_parseCallValueFunction());
-      case TokenType.not:
+      case .not:
         _nextToken();
         return NotAstNode(_parseCallValueFunction());
-      case TokenType.bitwiseNot:
+      case .bitwiseNot:
         _nextToken();
         return BitwiseNotAstNode(_parseCallValueFunction());
-      case TokenType.plus:
+      case .plus:
         _nextToken();
         return _parseCallValueFunction();
       default:
@@ -600,13 +593,13 @@ class Parser {
       final type = _currentToken.type;
       _nextToken();
       switch (type) {
-        case TokenType.multiply:
+        case .multiply:
           result = MultiplyAstNode(result, _parseUnary()).simplify();
           break;
-        case TokenType.quotient:
+        case .quotient:
           result = QuotientAstNode(result, _parseUnary()).simplify();
           break;
-        case TokenType.remainder:
+        case .remainder:
           result = RemainderAstNode(result, _parseUnary()).simplify();
           break;
         default:
@@ -625,27 +618,26 @@ class Parser {
     }
 
     final termsExpression = TermsAstNode();
-    termsExpression.terms.add(Term(TermMode.add, factor));
+    termsExpression.terms.add(Term(.add, factor));
 
     while (termTokenTypes.contains(_currentToken.type)) {
       final type = _currentToken.type;
       _nextToken();
       switch (type) {
-        case TokenType.plus:
+        case .plus:
           final factor = _parseFactor();
           if (factor is NegateAstNode) {
-            termsExpression.terms
-                .add(Term(TermMode.subtract, factor.statement));
+            termsExpression.terms.add(Term(.subtract, factor.statement));
           } else {
-            termsExpression.terms.add(Term(TermMode.add, factor));
+            termsExpression.terms.add(Term(.add, factor));
           }
           break;
-        case TokenType.minus:
+        case .minus:
           final factor = _parseFactor();
           if (factor is NegateAstNode) {
-            termsExpression.terms.add(Term(TermMode.add, factor.statement));
+            termsExpression.terms.add(Term(.add, factor.statement));
           } else {
-            termsExpression.terms.add(Term(TermMode.subtract, factor));
+            termsExpression.terms.add(Term(.subtract, factor));
           }
           break;
         default:
@@ -668,14 +660,16 @@ class Parser {
       final type = _currentToken.type;
       _nextToken();
       switch (type) {
-        case TokenType.shiftLeft:
+        case .shiftLeft:
           result = BitShiftLeftAstNode(result, _parseTerm()).simplify();
           break;
-        case TokenType.arithmeticShiftRight:
-          result =
-              ArithmeticBitShiftRightAstNode(result, _parseTerm()).simplify();
+        case .arithmeticShiftRight:
+          result = ArithmeticBitShiftRightAstNode(
+            result,
+            _parseTerm(),
+          ).simplify();
           break;
-        case TokenType.logicalShiftRight:
+        case .logicalShiftRight:
           result = LogicalBitShiftRightAstNode(result, _parseTerm()).simplify();
           break;
         default:
@@ -704,17 +698,17 @@ class Parser {
     final type = _currentToken.type;
     _nextToken();
     switch (type) {
-      case TokenType.equals:
+      case .equals:
         return EqualsAstNode(result, _parseBitShift()).simplify();
-      case TokenType.notEquals:
+      case .notEquals:
         return NotEqualsAstNode(result, _parseBitShift()).simplify();
-      case TokenType.lessThan:
+      case .lessThan:
         return LessThanAstNode(result, _parseBitShift()).simplify();
-      case TokenType.lessThanOrEqualTo:
+      case .lessThanOrEqualTo:
         return LessThanOrEqualToAstNode(result, _parseBitShift()).simplify();
-      case TokenType.greaterThan:
+      case .greaterThan:
         return GreaterThanAstNode(result, _parseBitShift()).simplify();
-      case TokenType.greaterThanOrEqualTo:
+      case .greaterThanOrEqualTo:
         return GreaterThanOrEqualToAstNode(result, _parseBitShift()).simplify();
       default:
         throw Exception('Internal error near $_currentToken');
@@ -733,13 +727,13 @@ class Parser {
       final type = _currentToken.type;
       _nextToken();
       switch (type) {
-        case TokenType.bitwiseAnd:
+        case .bitwiseAnd:
           result = BitwiseAndAstNode(result, _parseComparison()).simplify();
           break;
-        case TokenType.bitwiseOr:
+        case .bitwiseOr:
           result = BitwiseOrAstNode(result, _parseComparison()).simplify();
           break;
-        case TokenType.bitwiseXor:
+        case .bitwiseXor:
           result = BitwiseXorAstNode(result, _parseComparison()).simplify();
           break;
         default:
@@ -751,7 +745,7 @@ class Parser {
 
   AstNode _parseLogicalAnd() {
     var result = _parseBitwise();
-    if (_currentToken.type == TokenType.and) {
+    if (_currentToken.type == .and) {
       _nextToken();
       var rhs = _parseLogicalAnd();
       if (result.isConstant() && rhs.isConstant()) {
@@ -770,7 +764,7 @@ class Parser {
 
   AstNode _parseLogicalOr() {
     var result = _parseLogicalAnd();
-    if (_currentToken.type == TokenType.or) {
+    if (_currentToken.type == .or) {
       _nextToken();
       var rhs = _parseLogicalOr();
       if (result.isConstant() && rhs.isConstant()) {
@@ -789,10 +783,10 @@ class Parser {
 
   AstNode _parseTernary() {
     var result = _parseLogicalOr();
-    if (_currentToken.type == TokenType.questionMark) {
+    if (_currentToken.type == .questionMark) {
       _nextToken();
       var trueExpression = _parseExpression();
-      _assertToken(TokenType.colon);
+      _assertToken(.colon);
       var falseExpression = _parseExpression();
       result = IfStatementAstNode(
         condition: result,
@@ -806,17 +800,17 @@ class Parser {
   AstNode _parseExpression() => _parseTernary();
 
   AstNode _parseIfStatement() {
-    _assertToken(TokenType.ifKeyword);
-    _assertToken(TokenType.openParen);
+    _assertToken(.ifKeyword);
+    _assertToken(.openParen);
     final condition = _parseExpression();
-    _assertToken(TokenType.closeParen);
+    _assertToken(.closeParen);
     final whenTrue = _parseStatement();
 
-    if (_currentToken.type != TokenType.elseKeyword) {
+    if (_currentToken.type != .elseKeyword) {
       return IfStatementAstNode(condition: condition, whenTrue: whenTrue);
     }
     _nextToken();
-    if (_currentToken.type == TokenType.ifKeyword) {
+    if (_currentToken.type == .ifKeyword) {
       return IfStatementAstNode(
         condition: condition,
         whenTrue: whenTrue,
@@ -831,16 +825,16 @@ class Parser {
   }
 
   AstNode _parseLocalVar() {
-    _assertToken(TokenType.varKeyword);
+    _assertToken(.varKeyword);
     final nameToken = _currentToken;
-    _assertToken(TokenType.identifier);
+    _assertToken(.identifier);
     final name = nameToken.stringValue!;
     int? arraySize;
     AstNode? initializer;
-    if (_currentToken.type == TokenType.openSquareBracket) {
-      _assertToken(TokenType.openSquareBracket);
+    if (_currentToken.type == .openSquareBracket) {
+      _assertToken(.openSquareBracket);
       final arraySizeExpression = _parseExpression();
-      _assertToken(TokenType.closeSquareBracket);
+      _assertToken(.closeSquareBracket);
 
       if (!arraySizeExpression.isConstant()) {
         throw FormatException(
@@ -854,11 +848,11 @@ class Parser {
           'Array size must be greater than 0 near $_currentToken',
         );
       }
-    } else if (_currentToken.type == TokenType.assign) {
-      _assertToken(TokenType.assign);
+    } else if (_currentToken.type == .assign) {
+      _assertToken(.assign);
       initializer = _parseExpression();
     }
-    _assertToken(TokenType.semiColon);
+    _assertToken(.semiColon);
 
     _assertUniqueName(name);
 
@@ -876,13 +870,13 @@ class Parser {
   }
 
   void _parseLocalConst() {
-    _assertToken(TokenType.constKeyword);
+    _assertToken(.constKeyword);
     final nameToken = _currentToken;
-    _assertToken(TokenType.identifier);
+    _assertToken(.identifier);
     final name = nameToken.stringValue!;
-    _assertToken(TokenType.assign);
+    _assertToken(.assign);
     final expression = _parseExpression();
-    _assertToken(TokenType.semiColon);
+    _assertToken(.semiColon);
 
     if (!expression.isConstant() &&
         expression is! StringValueAstNode &&
@@ -915,23 +909,23 @@ class Parser {
 
     // Index test
     switch (_currentToken.type) {
-      case TokenType.openSquareBracket:
+      case .openSquareBracket:
         indexType = _IndexType.byte;
-        _assertToken(TokenType.openSquareBracket);
+        _assertToken(.openSquareBracket);
         indexExpression = _parseExpression();
-        _assertToken(TokenType.closeSquareBracket);
+        _assertToken(.closeSquareBracket);
         break;
-      case TokenType.openHalfWordList:
+      case .openHalfWordList:
         indexType = _IndexType.halfWord;
-        _assertToken(TokenType.openHalfWordList);
+        _assertToken(.openHalfWordList);
         indexExpression = _parseExpression();
-        _assertToken(TokenType.closeHalfWordList);
+        _assertToken(.closeHalfWordList);
         break;
-      case TokenType.openWordList:
+      case .openWordList:
         indexType = _IndexType.word;
-        _assertToken(TokenType.openWordList);
+        _assertToken(.openWordList);
         indexExpression = _parseExpression();
-        _assertToken(TokenType.closeWordList);
+        _assertToken(.closeWordList);
         break;
       default:
         break;
@@ -939,18 +933,18 @@ class Parser {
 
     final assignType = _currentToken.type;
     switch (assignType) {
-      case TokenType.assign:
-      case TokenType.addAssign:
-      case TokenType.subtractAssign:
-      case TokenType.multiplyAssign:
-      case TokenType.divideAssign:
-      case TokenType.remainderAssign:
-      case TokenType.shiftLeftAssign:
-      case TokenType.arithmeticShiftRightAssign:
-      case TokenType.logicalShiftRightAssign:
-      case TokenType.bitwiseAndAssign:
-      case TokenType.bitwiseXorAssign:
-      case TokenType.bitwiseOrAssign:
+      case .assign:
+      case .addAssign:
+      case .subtractAssign:
+      case .multiplyAssign:
+      case .divideAssign:
+      case .remainderAssign:
+      case .shiftLeftAssign:
+      case .arithmeticShiftRightAssign:
+      case .logicalShiftRightAssign:
+      case .bitwiseAndAssign:
+      case .bitwiseXorAssign:
+      case .bitwiseOrAssign:
         break;
       default:
         throw FormatException(
@@ -960,10 +954,10 @@ class Parser {
     _nextToken();
     var value = _parseExpression();
     if (requireSemicolon) {
-      _assertToken(TokenType.semiColon);
+      _assertToken(.semiColon);
     }
 
-    if (assignType != TokenType.assign) {
+    if (assignType != .assign) {
       if (indexExpression != null && !indexExpression.isPure()) {
         throw FormatException(
           'Only pure expressions can be used in compound assignments near $_currentToken',
@@ -985,8 +979,10 @@ class Parser {
             indexExpression,
           );
         } else {
-          loadValueAstNode =
-              LoadValueAstNode(isGlobal: true, index: global.index);
+          loadValueAstNode = LoadValueAstNode(
+            isGlobal: true,
+            index: global.index,
+          );
         }
       } else if (_function!.locals.variables.containsKey(name)) {
         final localVariable = _function!.locals.variables[name]!;
@@ -1002,8 +998,10 @@ class Parser {
             indexExpression,
           );
         } else {
-          loadValueAstNode =
-              LoadValueAstNode(isGlobal: false, index: localVariable.index);
+          loadValueAstNode = LoadValueAstNode(
+            isGlobal: false,
+            index: localVariable.index,
+          );
         }
       } else {
         throw FormatException('Unknown variable $name near $_currentToken');
@@ -1038,43 +1036,43 @@ class Parser {
       }
 
       switch (assignType) {
-        case TokenType.addAssign:
+        case .addAssign:
           final termsExpression = TermsAstNode();
-          termsExpression.terms.add(Term(TermMode.add, loadValueAstNode));
-          termsExpression.terms.add(Term(TermMode.add, value));
+          termsExpression.terms.add(Term(.add, loadValueAstNode));
+          termsExpression.terms.add(Term(.add, value));
           value = termsExpression;
           break;
-        case TokenType.subtractAssign:
+        case .subtractAssign:
           final termsExpression = TermsAstNode();
-          termsExpression.terms.add(Term(TermMode.add, loadValueAstNode));
-          termsExpression.terms.add(Term(TermMode.subtract, value));
+          termsExpression.terms.add(Term(.add, loadValueAstNode));
+          termsExpression.terms.add(Term(.subtract, value));
           value = termsExpression;
           break;
-        case TokenType.multiplyAssign:
+        case .multiplyAssign:
           value = MultiplyAstNode(loadValueAstNode, value);
           break;
-        case TokenType.divideAssign:
+        case .divideAssign:
           value = QuotientAstNode(loadValueAstNode, value);
           break;
-        case TokenType.remainderAssign:
+        case .remainderAssign:
           value = RemainderAstNode(loadValueAstNode, value);
           break;
-        case TokenType.shiftLeftAssign:
+        case .shiftLeftAssign:
           value = BitShiftLeftAstNode(loadValueAstNode, value);
           break;
-        case TokenType.arithmeticShiftRightAssign:
+        case .arithmeticShiftRightAssign:
           value = ArithmeticBitShiftRightAstNode(loadValueAstNode, value);
           break;
-        case TokenType.logicalShiftRightAssign:
+        case .logicalShiftRightAssign:
           value = LogicalBitShiftRightAstNode(loadValueAstNode, value);
           break;
-        case TokenType.bitwiseAndAssign:
+        case .bitwiseAndAssign:
           value = BitwiseAndAstNode(loadValueAstNode, value);
           break;
-        case TokenType.bitwiseXorAssign:
+        case .bitwiseXorAssign:
           value = BitwiseXorAstNode(loadValueAstNode, value);
           break;
-        case TokenType.bitwiseOrAssign:
+        case .bitwiseOrAssign:
           value = BitwiseOrAstNode(loadValueAstNode, value);
           break;
         default:
@@ -1138,8 +1136,10 @@ class Parser {
           isInitialization: false,
         );
       } else {
-        final baseValue =
-            LoadValueAstNode(isGlobal: false, index: localVariable.index);
+        final baseValue = LoadValueAstNode(
+          isGlobal: false,
+          index: localVariable.index,
+        );
         switch (indexType) {
           case _IndexType.byte:
             return WriteByteIndexAstNode(baseValue, indexExpression, value);
@@ -1157,14 +1157,14 @@ class Parser {
   }
 
   List<AstNode> _parseParameterList() {
-    _assertToken(TokenType.openParen);
+    _assertToken(.openParen);
     final result = <AstNode>[];
-    while (!_isScopeEnd(TokenType.closeParen)) {
+    while (!_isScopeEnd(.closeParen)) {
       result.add(_parseExpression());
 
-      if (_currentToken.type == TokenType.comma) {
+      if (_currentToken.type == .comma) {
         _nextToken();
-      } else if (_currentToken.type != TokenType.closeParen) {
+      } else if (_currentToken.type != .closeParen) {
         throw FormatException(
           'Unexpected end of parameter list near $_currentToken',
         );
@@ -1178,36 +1178,36 @@ class Parser {
     final name = nameToken.stringValue!;
 
     switch (peekNextToken()?.type) {
-      case TokenType.assign:
-      case TokenType.addAssign:
-      case TokenType.subtractAssign:
-      case TokenType.multiplyAssign:
-      case TokenType.divideAssign:
-      case TokenType.remainderAssign:
-      case TokenType.shiftLeftAssign:
-      case TokenType.arithmeticShiftRightAssign:
-      case TokenType.logicalShiftRightAssign:
-      case TokenType.bitwiseAndAssign:
-      case TokenType.bitwiseXorAssign:
-      case TokenType.bitwiseOrAssign:
-      case TokenType.openSquareBracket:
-      case TokenType.openHalfWordList:
-      case TokenType.openWordList:
-        _assertToken(TokenType.identifier);
+      case .assign:
+      case .addAssign:
+      case .subtractAssign:
+      case .multiplyAssign:
+      case .divideAssign:
+      case .remainderAssign:
+      case .shiftLeftAssign:
+      case .arithmeticShiftRightAssign:
+      case .logicalShiftRightAssign:
+      case .bitwiseAndAssign:
+      case .bitwiseXorAssign:
+      case .bitwiseOrAssign:
+      case .openSquareBracket:
+      case .openHalfWordList:
+      case .openWordList:
+        _assertToken(.identifier);
         return _parseAssignment(name, requireSemicolon: requireSemicolon);
 
-      case TokenType.openParen:
+      case .openParen:
         final isVariable = _parseIdentifier(name) != null;
         if (isVariable) {
           final value = _parseSubscript();
           final parameters = _parseParameterList();
-          _assertToken(TokenType.semiColon);
+          _assertToken(.semiColon);
           return CallValueAstNode(value: value, parameters: parameters);
         }
 
-        _assertToken(TokenType.identifier);
+        _assertToken(.identifier);
         final parameters = _parseParameterList();
-        _assertToken(TokenType.semiColon);
+        _assertToken(.semiColon);
         return CallFunctionAstNode(
           token: nameToken,
           usesValue: false,
@@ -1225,39 +1225,39 @@ class Parser {
   AstNode _parseLambdaCall() {
     final pushFunctionAddress = _parsePrimary();
     final parameters = _parseParameterList();
-    _assertToken(TokenType.semiColon);
+    _assertToken(.semiColon);
     return CallValueAstNode(value: pushFunctionAddress, parameters: parameters);
   }
 
   AstNode _parseReturn() {
-    _assertToken(TokenType.returnKeyword);
+    _assertToken(.returnKeyword);
 
     AstNode? expression;
     if (_function!.hasReturnValue) {
       expression = _parseExpression();
     }
 
-    _assertToken(TokenType.semiColon);
+    _assertToken(.semiColon);
     return ReturnAstNode(expression);
   }
 
   AstNode _parseForStatement() {
     // Start a new scope.
-    _assertToken(TokenType.forKeyword);
-    _assertToken(TokenType.openParen);
+    _assertToken(.forKeyword);
+    _assertToken(.openParen);
 
     _function?.beginLocalScope();
     AstNode? initialization;
 
     switch (_currentToken.type) {
-      case TokenType.varKeyword:
+      case .varKeyword:
         initialization = _parseLocalVar();
         break;
-      case TokenType.identifier:
+      case .identifier:
         initialization = _parseAssignOrFunctionCall();
         break;
-      case TokenType.semiColon:
-        _assertToken(TokenType.semiColon);
+      case .semiColon:
+        _assertToken(.semiColon);
         break;
       default:
         throw FormatException(
@@ -1266,17 +1266,17 @@ class Parser {
     }
 
     AstNode? condition;
-    if (_currentToken.type != TokenType.semiColon) {
+    if (_currentToken.type != .semiColon) {
       condition = _parseExpression();
     }
-    _assertToken(TokenType.semiColon);
+    _assertToken(.semiColon);
 
     AstNode? update;
     switch (_currentToken.type) {
-      case TokenType.identifier:
+      case .identifier:
         update = _parseAssignOrFunctionCall(requireSemicolon: false);
         break;
-      case TokenType.closeParen:
+      case .closeParen:
         break;
       default:
         throw FormatException(
@@ -1284,7 +1284,7 @@ class Parser {
         );
     }
 
-    _assertToken(TokenType.closeParen);
+    _assertToken(.closeParen);
 
     final body = _parseStatement();
 
@@ -1300,13 +1300,13 @@ class Parser {
 
   AstNode _parseWhileStatement() {
     // Start a new scope.
-    _assertToken(TokenType.whileKeyword);
-    _assertToken(TokenType.openParen);
+    _assertToken(.whileKeyword);
+    _assertToken(.openParen);
 
     _function?.beginLocalScope();
 
     final condition = _parseExpression();
-    _assertToken(TokenType.closeParen);
+    _assertToken(.closeParen);
 
     final body = _parseStatement();
 
@@ -1316,59 +1316,59 @@ class Parser {
   }
 
   AstNode _parseDoWhileStatement() {
-    _assertToken(TokenType.doKeyword);
+    _assertToken(.doKeyword);
 
     final body = _parseBlock();
 
-    _assertToken(TokenType.whileKeyword);
-    _assertToken(TokenType.openParen);
+    _assertToken(.whileKeyword);
+    _assertToken(.openParen);
     final condition = _parseExpression();
-    _assertToken(TokenType.closeParen);
-    _assertToken(TokenType.semiColon);
+    _assertToken(.closeParen);
+    _assertToken(.semiColon);
 
     return DoWhileStatementAstNode(condition: condition, body: body);
   }
 
   AstNode _parseContinueStatement() {
-    _assertToken(TokenType.continueKeyword);
-    _assertToken(TokenType.semiColon);
+    _assertToken(.continueKeyword);
+    _assertToken(.semiColon);
 
     return ContinueStatementAstNode();
   }
 
   AstNode _parseBreakStatement() {
-    _assertToken(TokenType.breakKeyword);
-    _assertToken(TokenType.semiColon);
+    _assertToken(.breakKeyword);
+    _assertToken(.semiColon);
 
     return BreakStatementAstNode();
   }
 
   AstNode _parseStatement() {
     switch (_currentToken.type) {
-      case TokenType.constKeyword:
+      case .constKeyword:
         _parseLocalConst();
         return NopAstNode();
-      case TokenType.openBrace:
+      case .openBrace:
         return _parseBlock();
-      case TokenType.ifKeyword:
+      case .ifKeyword:
         return _parseIfStatement();
-      case TokenType.varKeyword:
+      case .varKeyword:
         return _parseLocalVar();
-      case TokenType.identifier:
+      case .identifier:
         return _parseAssignOrFunctionCall();
-      case TokenType.returnKeyword:
+      case .returnKeyword:
         return _parseReturn();
-      case TokenType.forKeyword:
+      case .forKeyword:
         return _parseForStatement();
-      case TokenType.whileKeyword:
+      case .whileKeyword:
         return _parseWhileStatement();
-      case TokenType.doKeyword:
+      case .doKeyword:
         return _parseDoWhileStatement();
-      case TokenType.at:
+      case .at:
         return _parseLambdaCall();
-      case TokenType.continueKeyword:
+      case .continueKeyword:
         return _parseContinueStatement();
-      case TokenType.breakKeyword:
+      case .breakKeyword:
         return _parseBreakStatement();
       default:
         throw FormatException('Expected statement, found $_currentToken');
@@ -1377,10 +1377,10 @@ class Parser {
 
   StatementListAstNode _parseBlock() {
     // Start a new scope.
-    _assertToken(TokenType.openBrace);
+    _assertToken(.openBrace);
     final statements = StatementListAstNode();
     _function?.beginLocalScope();
-    while (!_isScopeEnd(TokenType.closeBrace)) {
+    while (!_isScopeEnd(.closeBrace)) {
       statements.add(_parseStatement());
     }
     _function?.endLocalScope();

@@ -14,7 +14,8 @@ class ScriptByteCodeBuilder {
     required this.module,
     required this.byteCodeVersion,
     required this.requiredFunctions,
-  }) : reachability = ScriptReachability(module);
+    bool forceGlobalWrites = false,
+  }) : reachability = ScriptReachability(module, forceGlobalWrites);
 
   final ScriptModule module;
   final int byteCodeVersion;
@@ -124,9 +125,9 @@ class ScriptByteCodeBuilder {
       // Strings either start with 'S' (string) or 'D' (data).
       final marker = string.codeUnitAt(0);
 
-      if (marker == 0x53 /* 'S' */) {
+      if (marker == 0x53 /* 'S' */ ) {
         offset += utf8.encode(string.substring(1)).length + 1;
-      } else if (marker == 0x44 /* 'D' */) {
+      } else if (marker == 0x44 /* 'D' */ ) {
         offset += string.length - 1;
       } else {
         throw Exception('Internal error: Unhandled string marker');
@@ -171,10 +172,10 @@ class ScriptByteCodeBuilder {
 
       // Strings either start with 'S' (string) or 'D' (data).
       final marker = string.codeUnitAt(0);
-      if (marker == 0x53 /* 'S' */) {
+      if (marker == 0x53 /* 'S' */ ) {
         _bytesBuilder.add(utf8.encode(string.substring(1)));
         _bytesBuilder.addByte(0);
-      } else if (marker == 0x44 /* 'D' */) {
+      } else if (marker == 0x44 /* 'D' */ ) {
         for (final byte in string.codeUnits.skip(1)) {
           _bytesBuilder.addByte(byte);
         }
@@ -274,8 +275,9 @@ extension ByteCodeScriptExtension on ScriptByteCodeBuilder {
       module.globals.forEach((globalName, global) {
         if (reachability.globals.contains(global.index)) {
           if (global.arraySize != null) {
-            buffer
-                .write('g${global.index}[${global.arraySize}]: $globalName\n');
+            buffer.write(
+              'g${global.index}[${global.arraySize}]: $globalName\n',
+            );
           } else {
             buffer.write('g${global.index}: $globalName\n');
           }

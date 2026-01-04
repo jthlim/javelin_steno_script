@@ -14,9 +14,18 @@ class SyntaxHighlightingRule {
   final List<SyntaxHighlightingRule>? nestedRules;
 
   TextStyle textStyle(Brightness brightness) =>
-      brightness == Brightness.light ? lightMode : darkMode;
+      brightness == .light ? lightMode : darkMode;
+
+  static final lineCommentRegExp = RegExp(r'//.*');
 
   static final rules = <SyntaxHighlightingRule>[
+    // Block Comments
+    SyntaxHighlightingRule(
+      RegExp(r'/\*[^]*?(?:\*/|$)'),
+      const TextStyle(color: Colors.green),
+      const TextStyle(color: Colors.green),
+    ),
+
     // Data literals.
     SyntaxHighlightingRule(
       RegExp(r'(?<!\[)\[\[(?!\[).*?\]\]', dotAll: true),
@@ -24,7 +33,7 @@ class SyntaxHighlightingRule {
       const TextStyle(color: Color(0xFFB39DDB)), // purple200
       [
         SyntaxHighlightingRule(
-          RegExp(r'//.*|/\*.*?\*/'),
+          lineCommentRegExp,
           const TextStyle(color: Colors.green),
           const TextStyle(color: Colors.green),
         ),
@@ -33,7 +42,7 @@ class SyntaxHighlightingRule {
 
     // Comments
     SyntaxHighlightingRule(
-      RegExp(r'//.*|/\*.*?\*/'),
+      lineCommentRegExp,
       const TextStyle(color: Colors.green),
       const TextStyle(color: Colors.green),
     ),
@@ -47,9 +56,7 @@ class SyntaxHighlightingRule {
 
     // Keywords
     SyntaxHighlightingRule(
-      RegExp(
-        r'\b(?:func|for|const|var|return|if|else|while|do)\b',
-      ),
+      RegExp(r'\b(?:func|for|const|var|return|if|else|while|do)\b'),
       const TextStyle(color: Color(0xFFAD1457)), // pink800
       const TextStyle(color: Color(0xFFF48FB1)), // pink200
     ),
@@ -110,10 +117,7 @@ class SyntaxHighlightingRule {
           style: rule.textStyle(brightness),
         );
       } else {
-        yield TextSpan(
-          text: match.group(0),
-          style: rule.textStyle(brightness),
-        );
+        yield TextSpan(text: match.group(0), style: rule.textStyle(brightness));
       }
 
       offset = match.end;
@@ -134,11 +138,11 @@ class SyntaxHighlightingRule {
     required Brightness brightness,
     TextStyle? style,
   }) {
-    final defaultTextColor =
-        brightness == Brightness.light ? Colors.black : Colors.white;
+    final defaultTextColor = brightness == .light ? Colors.black : Colors.white;
 
     return TextSpan(
-      style: style?.copyWith(color: defaultTextColor) ??
+      style:
+          style?.copyWith(color: defaultTextColor) ??
           TextStyle(color: defaultTextColor),
       children: colorSpanWithRules(
         brightness: brightness,

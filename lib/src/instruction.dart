@@ -87,11 +87,10 @@ enum ScriptOperatorOpcode {
   readWordIndex(0x16, false),
   increment(0x17, false),
   decrement(0x18, false),
-  readHalfWordIndex(0x19, false),
-  ;
+  readHalfWordIndex(0x19, false);
 
   const ScriptOperatorOpcode(int value, this.isBooleanResult)
-      : value = value + 0x70; // ScriptOpcodeValue.operatorBegin.value
+    : value = value + 0x70; // ScriptOpcodeValue.operatorBegin.value
 
   static const _opposites = {
     equals: notEquals,
@@ -173,7 +172,7 @@ final class LoadLocalValueInstruction extends ScriptInstruction {
   @override
   void addByteCode(ScriptByteCodeBuilder builder) {
     if (byteCodeLength == 2) {
-      builder.addOpcode(ScriptOpcode.loadLocalValue);
+      builder.addOpcode(.loadLocalValue);
       builder.addByte(index);
     } else {
       builder.addByte(ScriptOpcode.loadLocalBegin.value + index);
@@ -201,7 +200,7 @@ final class StoreLocalValueInstruction extends ScriptInstruction {
   @override
   void addByteCode(ScriptByteCodeBuilder builder) {
     if (byteCodeLength == 2) {
-      builder.addOpcode(ScriptOpcode.storeLocalValue);
+      builder.addOpcode(.storeLocalValue);
       builder.addByte(index);
     } else {
       builder.addByte(ScriptOpcode.storeLocalBegin.value + index);
@@ -230,7 +229,7 @@ final class LoadGlobalValueInstruction extends ScriptInstruction {
   @override
   void addByteCode(ScriptByteCodeBuilder builder) {
     if (byteCodeLength == 2) {
-      builder.addOpcode(ScriptOpcode.loadGlobalValue);
+      builder.addOpcode(.loadGlobalValue);
       builder.addByte(index);
     } else {
       builder.addByte(ScriptOpcode.loadGlobalBegin.value + index);
@@ -253,7 +252,7 @@ final class LoadIndexedGlobalValueInstruction extends ScriptInstruction {
 
   @override
   void addByteCode(ScriptByteCodeBuilder builder) {
-    builder.addOpcode(ScriptOpcode.loadGlobalIndex);
+    builder.addOpcode(.loadGlobalIndex);
     builder.addByte(index);
   }
 
@@ -271,7 +270,7 @@ final class LoadIndexedLocalValueInstruction extends ScriptInstruction {
 
   @override
   void addByteCode(ScriptByteCodeBuilder builder) {
-    builder.addOpcode(ScriptOpcode.loadLocalIndex);
+    builder.addOpcode(.loadLocalIndex);
     builder.addByte(index);
   }
 
@@ -294,7 +293,7 @@ final class StoreGlobalValueInstruction extends ScriptInstruction {
   @override
   void addByteCode(ScriptByteCodeBuilder builder) {
     if (byteCodeLength == 2) {
-      builder.addOpcode(ScriptOpcode.storeGlobalValue);
+      builder.addOpcode(.storeGlobalValue);
       builder.addByte(index);
     } else {
       builder.addByte(ScriptOpcode.storeGlobalBegin.value + index);
@@ -317,7 +316,7 @@ final class StoreIndexedGlobalValueInstruction extends ScriptInstruction {
 
   @override
   void addByteCode(ScriptByteCodeBuilder builder) {
-    builder.addOpcode(ScriptOpcode.storeGlobalIndex);
+    builder.addOpcode(.storeGlobalIndex);
     builder.addByte(index);
   }
 
@@ -335,7 +334,7 @@ final class StoreIndexedLocalValueInstruction extends ScriptInstruction {
 
   @override
   void addByteCode(ScriptByteCodeBuilder builder) {
-    builder.addOpcode(ScriptOpcode.storeLocalIndex);
+    builder.addOpcode(.storeLocalIndex);
     builder.addByte(index);
   }
 
@@ -354,20 +353,21 @@ final class CallInBuiltFunctionInstruction extends ScriptInstruction {
 
   @override
   void addByteCode(ScriptByteCodeBuilder builder) {
-    builder.addOpcode(ScriptOpcode.callInternalFunction);
+    builder.addOpcode(.callInternalFunction);
     builder.addByte(function.functionIndex);
   }
 
   final InBuiltScriptFunction function;
 
   @override
-  String toString() => '  call in-built-${function.functionIndex} '
+  String toString() =>
+      '  call in-built-${function.functionIndex} '
       '(${function.functionName})';
 }
 
 sealed class FunctionReferenceScriptInstruction extends ScriptInstruction {
   FunctionReferenceScriptInstruction(this.functionName)
-      : targetName = functionName;
+    : targetName = functionName;
 
   final String functionName;
   String? targetName;
@@ -387,7 +387,7 @@ final class CallFunctionInstruction extends FunctionReferenceScriptInstruction {
     final function = builder.functions[targetName]!;
     final offset = function.offset;
 
-    builder.addOpcode(ScriptOpcode.callFunction);
+    builder.addOpcode(.callFunction);
     builder.addByte(offset);
     builder.addByte(offset >> 8);
   }
@@ -404,7 +404,7 @@ final class CallValueInstruction extends ScriptInstruction {
 
   @override
   void addByteCode(ScriptByteCodeBuilder builder) {
-    builder.addOpcode(ScriptOpcode.callValue);
+    builder.addOpcode(.callValue);
   }
 
   @override
@@ -420,7 +420,7 @@ final class JumpValueInstruction extends ScriptInstruction {
 
   @override
   void addByteCode(ScriptByteCodeBuilder builder) {
-    builder.addOpcode(ScriptOpcode.jumpValue);
+    builder.addOpcode(.jumpValue);
   }
 
   @override
@@ -439,14 +439,14 @@ final class PushFunctionAddressInstruction
     final targetName = this.targetName;
     if (targetName == null) {
       // Push 0.
-      builder.addOpcode(ScriptOpcode.pushConstantBegin);
+      builder.addOpcode(.pushConstantBegin);
       return;
     }
 
     final function = builder.functions[targetName]!;
     final offset = function.offset;
 
-    builder.addOpcode(ScriptOpcode.pushBytes2S);
+    builder.addOpcode(.pushBytes2S);
     builder.addByte(offset);
     builder.addByte(offset >> 8);
   }
@@ -682,7 +682,7 @@ final class PushStringValueInstruction extends ScriptInstruction {
         'Internal error: failed lookup on string value "${formatStringData(value)}"',
       );
     }
-    builder.addOpcode(ScriptOpcode.pushBytes2S);
+    builder.addOpcode(.pushBytes2S);
     builder.addByte(offset);
     builder.addByte(offset >> 8);
   }
@@ -773,7 +773,7 @@ final class PushDataValueInstruction extends ScriptInstruction {
     if (offset == null) {
       throw Exception('Internal error: failed lookup on data value');
     }
-    builder.addOpcode(ScriptOpcode.pushBytes2S);
+    builder.addOpcode(.pushBytes2S);
     builder.addByte(offset);
     builder.addByte(offset >> 8);
   }
@@ -811,23 +811,23 @@ final class PushIntValueInstruction extends ScriptInstruction {
         builder.addByte(ScriptOpcode.pushConstantBegin.value + value);
         break;
       case 2:
-        builder.addOpcode(ScriptOpcode.pushBytes1U);
+        builder.addOpcode(.pushBytes1U);
         final byteValue = value < 0 ? value + 60 : value;
         builder.addByte(byteValue);
         break;
       case 3:
-        builder.addOpcode(ScriptOpcode.pushBytes2S);
+        builder.addOpcode(.pushBytes2S);
         builder.addByte(value);
         builder.addByte(value >> 8);
         break;
       case 4:
-        builder.addOpcode(ScriptOpcode.pushBytes3S);
+        builder.addOpcode(.pushBytes3S);
         builder.addByte(value);
         builder.addByte(value >> 8);
         builder.addByte(value >> 16);
         break;
       case 5:
-        builder.addOpcode(ScriptOpcode.pushBytes4);
+        builder.addOpcode(.pushBytes4);
         builder.addByte(value);
         builder.addByte(value >> 8);
         builder.addByte(value >> 16);
@@ -973,7 +973,7 @@ final class StartFunctionInstruction extends ScriptInstruction {
       return;
     }
 
-    builder.addOpcode(ScriptOpcode.enterFunction);
+    builder.addOpcode(.enterFunction);
     builder.addByte(function.numberOfParameters);
     builder.addByte(function.numberOfLocals - function.numberOfParameters);
   }

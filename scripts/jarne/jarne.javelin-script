@@ -331,6 +331,7 @@ const SCRIPT_ID_BLE_SCANNING_UPDATE = 6;
 const SCRIPT_ID_U2F_STATUS_UPDATE = 7;
 const SCRIPT_ID_STENO_MODE_UPDATE = 9;
 const SCRIPT_ID_BLE_PAIR_COMPLETE = 10;
+const SCRIPT_ID_BEACON_STARTED = 21;
 
 // Layout constants
 
@@ -340,11 +341,15 @@ const HAS_AUDIO = JAVELIN_HAS_AUDIO ?? 0;
 
 func noop() {}
 
-var speed = 1;
-var hueSpread = 4;
-var hueShift = 0;
 var brightness = 4;
+
 var saturation = 5;
+
+var speed = 1;
+
+var hueSpread = 4;
+
+var hueShift = 0;
 
 var keyColorData[42];
 
@@ -884,6 +889,44 @@ func drawDisplayDynamicSteno() {
   }
 }
 
+func onBeaconStarted() {
+  const LOCATION_IMAGE = [[
+    30 45 00 00 00 00 00 00 00 00 00 00 00 f8 3f 00
+    00 00 00 00 00 80 ff ff 01 00 00 00 00 00 e0 ff
+    ff 07 00 00 00 00 00 f8 ff ff 1f 00 00 00 00 00
+    fc ff ff 7f 00 00 00 00 00 fe ff ff ff 01 00 00
+    00 00 ff ff ff ff 07 00 00 00 80 ff ff ff ff 0f
+    00 00 00 c0 ff ff ff ff 3f 00 00 00 e0 ff ff ff
+    ff ff 00 00 00 f0 ff ff ff ff ff 03 00 00 f0 ff
+    0f f8 ff ff 07 00 00 f8 ff 03 e0 ff ff 1f 00 00
+    f8 ff 00 80 ff ff 7f 00 00 fc 7f 00 00 ff ff ff
+    00 00 fc 3f 00 00 fe ff ff 03 00 fc 1f 00 00 fe
+    ff ff 0f 00 fc 1f 00 00 fc ff ff 3f 00 fe 0f 00
+    00 fc ff ff 7f 00 fe 0f 00 00 f8 ff ff ff 01 fe
+    0f 00 00 f8 ff ff ff 03 fe 0f 00 00 f8 ff ff ff
+    0f fe 0f 00 00 f8 ff ff ff 0f fe 0f 00 00 f8 ff
+    ff ff 0f fe 0f 00 00 f8 ff ff ff 0f fe 0f 00 00
+    f8 ff ff ff 03 fe 0f 00 00 f8 ff ff ff 01 fe 0f
+    00 00 fc ff ff 7f 00 fc 1f 00 00 fc ff ff 3f 00
+    fc 1f 00 00 fe ff ff 0f 00 fc 3f 00 00 fe ff ff
+    03 00 fc 7f 00 00 ff ff ff 00 00 f8 ff 00 80 ff
+    ff 7f 00 00 f8 ff 03 e0 ff ff 1f 00 00 f0 ff 0f
+    f8 ff ff 07 00 00 f0 ff ff ff ff ff 03 00 00 e0
+    ff ff ff ff ff 00 00 00 c0 ff ff ff ff 3f 00 00
+    00 80 ff ff ff ff 0f 00 00 00 00 ff ff ff ff 07
+    00 00 00 00 fe ff ff ff 01 00 00 00 00 fc ff ff
+    7f 00 00 00 00 00 f8 ff ff 1f 00 00 00 00 00 e0
+    ff ff 07 00 00 00 00 00 80 ff ff 01 00 00 00 00
+    00 00 f8 3f 00 00 00 00 00 00 00 00 00 00 00 00
+    00 00
+  ]];
+
+  clearDisplay(0);
+  drawImage(0, 10, 30, LOCATION_IMAGE);
+  drawText(0, DISPLAY_WIDTH/2, DISPLAY_HEIGHT-24, 0, 1, "Double");
+  drawText(0, DISPLAY_WIDTH/2, DISPLAY_HEIGHT-10, 0, 1, "Tap");
+}
+
 // Global Script: DrawOverlay Scripts
 func drawDisplayOverlay() {
   const OVERLAY_HEIGHT = 16;
@@ -1315,6 +1358,10 @@ func rgbUpdateBlue() {
 
 func rgbUpdateUnderglowBlue() {
   setUnderglowRgb(0, 0, 128);
+}
+
+func rgbUpdateOff() {
+  setKeyRgb(0, 0, 0);
 }
 
 func rgbUpdateUnderglowOff() {
@@ -3238,6 +3285,7 @@ func init() {
       playSequence([[56 05 5d 05 62 05 5d 05 62 05 00]]);
     });
   }
+  setScript(SCRIPT_ID_BEACON_STARTED, @onBeaconStarted);
 
   updateBoardPower();
   updateScreenSaverTimer();

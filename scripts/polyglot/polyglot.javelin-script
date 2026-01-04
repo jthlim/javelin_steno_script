@@ -160,7 +160,7 @@ func updateStenoMode() {
     if (getParameter("steno_mode") != "embedded") {
       console("set_steno_mode embedded");
     } else {
-      console("set_steno_mode gemini");
+      console("set_steno_mode plover_hid");
     }
     releaseAll();
   }

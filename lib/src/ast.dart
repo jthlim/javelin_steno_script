@@ -8,7 +8,7 @@ import 'module.dart';
 import 'token.dart';
 
 class ScriptReachability {
-  ScriptReachability(this.module);
+  ScriptReachability(this.module, this.forceGlobalWrites);
 
   final ScriptModule module;
 
@@ -16,6 +16,7 @@ class ScriptReachability {
   final functions = <String>{};
   final globals = <int>{};
   final pendingGlobalStatements = <int, List<AstNode>>{};
+  final bool forceGlobalWrites;
 
   // data + lengths
   final data = <AstNode, int>{};
@@ -207,20 +208,20 @@ class ReadByteIndexAstNode extends AstNode {
   ExecutionValue? evaluate(ExecutionContext context) {
     final byteValue = this.byteValue.evaluate(context);
     if (byteValue == null || !byteValue.isString()) {
-      context.state = ExecutionState.error;
+      context.state = .error;
       return null;
     }
 
     final index = this.index.evaluate(context);
     if (index == null || !index.isInt()) {
-      context.state = ExecutionState.error;
+      context.state = .error;
       return null;
     }
 
     final indexValue = index.intValue;
     final stringValue = byteValue.stringValue!;
     if (indexValue < 0 || indexValue >= stringValue.length) {
-      context.state = ExecutionState.error;
+      context.state = .error;
       return null;
     }
     if (indexValue == stringValue.length - 1) {
@@ -241,9 +242,7 @@ class ReadByteIndexAstNode extends AstNode {
     byteValue.addInstructions(builder);
     index.addInstructions(builder);
 
-    builder.addInstruction(
-      OperatorInstruction(ScriptOperatorOpcode.readByteIndex),
-    );
+    builder.addInstruction(OperatorInstruction(.readByteIndex));
   }
 
   final AstNode byteValue;
@@ -264,7 +263,7 @@ class WriteByteIndexAstNode extends AstNode {
 
   @override
   ExecutionValue? evaluate(ExecutionContext context) {
-    context.state = ExecutionState.error;
+    context.state = .error;
     return null;
   }
 
@@ -314,9 +313,7 @@ class ReadHalfWordIndexAstNode extends AstNode {
     value.addInstructions(builder);
     index.addInstructions(builder);
 
-    builder.addInstruction(
-      OperatorInstruction(ScriptOperatorOpcode.readHalfWordIndex),
-    );
+    builder.addInstruction(OperatorInstruction(.readHalfWordIndex));
   }
 
   final AstNode value;
@@ -337,7 +334,7 @@ class WriteHalfWordIndexAstNode extends AstNode {
 
   @override
   ExecutionValue? evaluate(ExecutionContext context) {
-    context.state = ExecutionState.error;
+    context.state = .error;
     return null;
   }
 
@@ -387,9 +384,7 @@ class ReadWordIndexAstNode extends AstNode {
     value.addInstructions(builder);
     index.addInstructions(builder);
 
-    builder.addInstruction(
-      OperatorInstruction(ScriptOperatorOpcode.readWordIndex),
-    );
+    builder.addInstruction(OperatorInstruction(.readWordIndex));
   }
 
   final AstNode value;
@@ -410,7 +405,7 @@ class WriteWordIndexAstNode extends AstNode {
 
   @override
   ExecutionValue? evaluate(ExecutionContext context) {
-    context.state = ExecutionState.error;
+    context.state = .error;
     return null;
   }
 
@@ -478,7 +473,7 @@ abstract class UnaryOperatorAstNode extends AstNode {
   ExecutionValue? evaluate(ExecutionContext context) {
     final value = statement.evaluate(context);
     if (value == null) {
-      context.state = ExecutionState.error;
+      context.state = .error;
       return null;
     }
 
@@ -526,7 +521,7 @@ class NotAstNode extends UnaryOperatorAstNode {
   }
 
   @override
-  ScriptOperatorOpcode get opcode => ScriptOperatorOpcode.not;
+  ScriptOperatorOpcode get opcode => .not;
 }
 
 class NegateAstNode extends UnaryOperatorAstNode {
@@ -542,7 +537,7 @@ class NegateAstNode extends UnaryOperatorAstNode {
   }
 
   @override
-  ScriptOperatorOpcode get opcode => ScriptOperatorOpcode.negative;
+  ScriptOperatorOpcode get opcode => .negative;
 }
 
 class BitwiseNotAstNode extends AstNode {
@@ -561,7 +556,7 @@ class BitwiseNotAstNode extends AstNode {
   ExecutionValue? evaluate(ExecutionContext context) {
     final value = expression.evaluate(context);
     if (value == null || !value.isInt()) {
-      context.state = ExecutionState.error;
+      context.state = .error;
       return null;
     }
 
@@ -575,8 +570,8 @@ class BitwiseNotAstNode extends AstNode {
       return;
     }
     expression.addInstructions(builder);
-    builder.addInstruction(OperatorInstruction(ScriptOperatorOpcode.negative));
-    builder.addInstruction(OperatorInstruction(ScriptOperatorOpcode.decrement));
+    builder.addInstruction(OperatorInstruction(.negative));
+    builder.addInstruction(OperatorInstruction(.decrement));
   }
 
   final AstNode expression;
@@ -595,13 +590,13 @@ abstract class BinaryOperatorAstNode extends AstNode {
   ExecutionValue? evaluate(ExecutionContext context) {
     final a = statementA.evaluate(context);
     if (a == null) {
-      context.state = ExecutionState.error;
+      context.state = .error;
       return null;
     }
 
     final b = statementB.evaluate(context);
     if (b == null) {
-      context.state = ExecutionState.error;
+      context.state = .error;
       return null;
     }
     return evaluateBinaryOp(a, b);
@@ -657,10 +652,10 @@ class TermsAstNode extends AstNode {
       }
       final value = term.statement.constantValue();
       switch (term.mode) {
-        case TermMode.add:
+        case .add:
           result += value;
           break;
-        case TermMode.subtract:
+        case .subtract:
           result -= value;
           break;
       }
@@ -676,17 +671,15 @@ class TermsAstNode extends AstNode {
     ExecutionValue? result = ExecutionValue.zero;
     for (final term in terms) {
       final value = term.statement.evaluate(context);
-      if (value == null ||
-          result == null ||
-          context.state != ExecutionState.running) {
-        context.state = ExecutionState.error;
+      if (value == null || result == null || context.state != .running) {
+        context.state = .error;
         return null;
       }
       switch (term.mode) {
-        case TermMode.add:
+        case .add:
           result = result + value;
           break;
-        case TermMode.subtract:
+        case .subtract:
           result = result - value;
           break;
       }
@@ -710,49 +703,38 @@ class TermsAstNode extends AstNode {
         continue;
       }
       switch (term.mode) {
-        case TermMode.add:
+        case .add:
           term.statement.addInstructions(builder);
           if (isFirst) {
             isFirst = false;
           } else {
-            builder
-                .addInstruction(OperatorInstruction(ScriptOperatorOpcode.add));
+            builder.addInstruction(OperatorInstruction(.add));
           }
           break;
-        case TermMode.subtract:
+        case .subtract:
           if (isFirst) {
             isFirst = false;
             if (constantsSum == 0) {
               term.statement.addInstructions(builder);
-              builder.addInstruction(
-                OperatorInstruction(ScriptOperatorOpcode.negative),
-              );
+              builder.addInstruction(OperatorInstruction(.negative));
             } else {
               builder.addInstruction(PushIntValueInstruction(constantsSum));
               constantsSum = 0;
               term.statement.addInstructions(builder);
-              builder.addInstruction(
-                OperatorInstruction(ScriptOperatorOpcode.subtract),
-              );
+              builder.addInstruction(OperatorInstruction(.subtract));
             }
           } else {
             term.statement.addInstructions(builder);
-            builder.addInstruction(
-              OperatorInstruction(ScriptOperatorOpcode.subtract),
-            );
+            builder.addInstruction(OperatorInstruction(.subtract));
           }
       }
     }
     switch (constantsSum) {
       case 1:
-        builder.addInstruction(
-          OperatorInstruction(ScriptOperatorOpcode.increment),
-        );
+        builder.addInstruction(OperatorInstruction(.increment));
         break;
       case -1:
-        builder.addInstruction(
-          OperatorInstruction(ScriptOperatorOpcode.decrement),
-        );
+        builder.addInstruction(OperatorInstruction(.decrement));
         break;
       case 0:
         break;
@@ -761,12 +743,10 @@ class TermsAstNode extends AstNode {
           // The bytecode format has a bias towards positive numbers,
           // so using a subtract operation can be slightly smaller size.
           builder.addInstruction(PushIntValueInstruction(-constantsSum));
-          builder.addInstruction(
-            OperatorInstruction(ScriptOperatorOpcode.subtract),
-          );
+          builder.addInstruction(OperatorInstruction(.subtract));
         } else {
           builder.addInstruction(PushIntValueInstruction(constantsSum));
-          builder.addInstruction(OperatorInstruction(ScriptOperatorOpcode.add));
+          builder.addInstruction(OperatorInstruction(.add));
         }
         break;
     }
@@ -833,8 +813,7 @@ class MultiplyAstNode extends BinaryOperatorAstNode {
 
       case -1:
         other.addInstructions(builder);
-        builder
-            .addInstruction(OperatorInstruction(ScriptOperatorOpcode.negative));
+        builder.addInstruction(OperatorInstruction(.negative));
         return true;
 
       default:
@@ -844,9 +823,7 @@ class MultiplyAstNode extends BinaryOperatorAstNode {
         final shift = countTrailingZeroBits(constant);
         other.addInstructions(builder);
         builder.addInstruction(PushIntValueInstruction(shift));
-        builder.addInstruction(
-          OperatorInstruction(ScriptOperatorOpcode.shiftLeft),
-        );
+        builder.addInstruction(OperatorInstruction(.shiftLeft));
         return true;
     }
   }
@@ -863,7 +840,7 @@ class MultiplyAstNode extends BinaryOperatorAstNode {
   }
 
   @override
-  ScriptOperatorOpcode get opcode => ScriptOperatorOpcode.multiply;
+  ScriptOperatorOpcode get opcode => .multiply;
 }
 
 class QuotientAstNode extends BinaryOperatorAstNode {
@@ -882,7 +859,7 @@ class QuotientAstNode extends BinaryOperatorAstNode {
   }
 
   @override
-  ScriptOperatorOpcode get opcode => ScriptOperatorOpcode.quotient;
+  ScriptOperatorOpcode get opcode => .quotient;
 }
 
 class RemainderAstNode extends BinaryOperatorAstNode {
@@ -901,7 +878,7 @@ class RemainderAstNode extends BinaryOperatorAstNode {
   }
 
   @override
-  ScriptOperatorOpcode get opcode => ScriptOperatorOpcode.remainder;
+  ScriptOperatorOpcode get opcode => .remainder;
 }
 
 class BitwiseAndAstNode extends BinaryOperatorAstNode {
@@ -920,7 +897,7 @@ class BitwiseAndAstNode extends BinaryOperatorAstNode {
   }
 
   @override
-  ScriptOperatorOpcode get opcode => ScriptOperatorOpcode.bitwiseAnd;
+  ScriptOperatorOpcode get opcode => .bitwiseAnd;
 }
 
 class BitwiseOrAstNode extends BinaryOperatorAstNode {
@@ -939,7 +916,7 @@ class BitwiseOrAstNode extends BinaryOperatorAstNode {
   }
 
   @override
-  ScriptOperatorOpcode get opcode => ScriptOperatorOpcode.bitwiseOr;
+  ScriptOperatorOpcode get opcode => .bitwiseOr;
 }
 
 class BitwiseXorAstNode extends BinaryOperatorAstNode {
@@ -958,7 +935,7 @@ class BitwiseXorAstNode extends BinaryOperatorAstNode {
   }
 
   @override
-  ScriptOperatorOpcode get opcode => ScriptOperatorOpcode.bitwiseXor;
+  ScriptOperatorOpcode get opcode => .bitwiseXor;
 }
 
 class BitShiftLeftAstNode extends BinaryOperatorAstNode {
@@ -977,7 +954,7 @@ class BitShiftLeftAstNode extends BinaryOperatorAstNode {
   }
 
   @override
-  ScriptOperatorOpcode get opcode => ScriptOperatorOpcode.shiftLeft;
+  ScriptOperatorOpcode get opcode => .shiftLeft;
 }
 
 class ArithmeticBitShiftRightAstNode extends BinaryOperatorAstNode {
@@ -996,7 +973,7 @@ class ArithmeticBitShiftRightAstNode extends BinaryOperatorAstNode {
   }
 
   @override
-  ScriptOperatorOpcode get opcode => ScriptOperatorOpcode.arithmeticShiftRight;
+  ScriptOperatorOpcode get opcode => .arithmeticShiftRight;
 }
 
 class LogicalBitShiftRightAstNode extends BinaryOperatorAstNode {
@@ -1015,7 +992,7 @@ class LogicalBitShiftRightAstNode extends BinaryOperatorAstNode {
   }
 
   @override
-  ScriptOperatorOpcode get opcode => ScriptOperatorOpcode.logicalShiftRight;
+  ScriptOperatorOpcode get opcode => .logicalShiftRight;
 }
 
 class LogicalAndAstNode extends BinaryOperatorAstNode {
@@ -1055,7 +1032,7 @@ class LogicalAndAstNode extends BinaryOperatorAstNode {
   }
 
   @override
-  ScriptOperatorOpcode get opcode => ScriptOperatorOpcode.logicalAnd;
+  ScriptOperatorOpcode get opcode => .logicalAnd;
 }
 
 class LogicalOrAstNode extends BinaryOperatorAstNode {
@@ -1095,7 +1072,7 @@ class LogicalOrAstNode extends BinaryOperatorAstNode {
   }
 
   @override
-  ScriptOperatorOpcode get opcode => ScriptOperatorOpcode.logicalOr;
+  ScriptOperatorOpcode get opcode => .logicalOr;
 }
 
 class EqualsAstNode extends BinaryOperatorAstNode {
@@ -1121,17 +1098,17 @@ class EqualsAstNode extends BinaryOperatorAstNode {
   void addInstructions(ScriptByteCodeBuilder builder) {
     if (statementA.isConstant() && statementA.constantValue() == 0) {
       statementB.addInstructions(builder);
-      builder.addInstruction(OperatorInstruction(ScriptOperatorOpcode.not));
+      builder.addInstruction(OperatorInstruction(.not));
     } else if (statementB.isConstant() && statementB.constantValue() == 0) {
       statementA.addInstructions(builder);
-      builder.addInstruction(OperatorInstruction(ScriptOperatorOpcode.not));
+      builder.addInstruction(OperatorInstruction(.not));
     } else {
       super.addInstructions(builder);
     }
   }
 
   @override
-  ScriptOperatorOpcode get opcode => ScriptOperatorOpcode.equals;
+  ScriptOperatorOpcode get opcode => .equals;
 }
 
 class NotEqualsAstNode extends BinaryOperatorAstNode {
@@ -1157,19 +1134,19 @@ class NotEqualsAstNode extends BinaryOperatorAstNode {
   void addInstructions(ScriptByteCodeBuilder builder) {
     if (statementA.isConstant() && statementA.constantValue() == 0) {
       statementB.addInstructions(builder);
-      builder.addInstruction(OperatorInstruction(ScriptOperatorOpcode.not));
-      builder.addInstruction(OperatorInstruction(ScriptOperatorOpcode.not));
+      builder.addInstruction(OperatorInstruction(.not));
+      builder.addInstruction(OperatorInstruction(.not));
     } else if (statementB.isConstant() && statementB.constantValue() == 0) {
       statementA.addInstructions(builder);
-      builder.addInstruction(OperatorInstruction(ScriptOperatorOpcode.not));
-      builder.addInstruction(OperatorInstruction(ScriptOperatorOpcode.not));
+      builder.addInstruction(OperatorInstruction(.not));
+      builder.addInstruction(OperatorInstruction(.not));
     } else {
       super.addInstructions(builder);
     }
   }
 
   @override
-  ScriptOperatorOpcode get opcode => ScriptOperatorOpcode.notEquals;
+  ScriptOperatorOpcode get opcode => .notEquals;
 }
 
 class LessThanAstNode extends BinaryOperatorAstNode {
@@ -1192,7 +1169,7 @@ class LessThanAstNode extends BinaryOperatorAstNode {
   }
 
   @override
-  ScriptOperatorOpcode get opcode => ScriptOperatorOpcode.lessThan;
+  ScriptOperatorOpcode get opcode => .lessThan;
 }
 
 class LessThanOrEqualToAstNode extends BinaryOperatorAstNode {
@@ -1215,7 +1192,7 @@ class LessThanOrEqualToAstNode extends BinaryOperatorAstNode {
   }
 
   @override
-  ScriptOperatorOpcode get opcode => ScriptOperatorOpcode.lessThanOrEqualTo;
+  ScriptOperatorOpcode get opcode => .lessThanOrEqualTo;
 }
 
 class GreaterThanAstNode extends BinaryOperatorAstNode {
@@ -1238,7 +1215,7 @@ class GreaterThanAstNode extends BinaryOperatorAstNode {
   }
 
   @override
-  ScriptOperatorOpcode get opcode => ScriptOperatorOpcode.greaterThan;
+  ScriptOperatorOpcode get opcode => .greaterThan;
 }
 
 class GreaterThanOrEqualToAstNode extends BinaryOperatorAstNode {
@@ -1261,7 +1238,7 @@ class GreaterThanOrEqualToAstNode extends BinaryOperatorAstNode {
   }
 
   @override
-  ScriptOperatorOpcode get opcode => ScriptOperatorOpcode.greaterThanOrEqualTo;
+  ScriptOperatorOpcode get opcode => .greaterThanOrEqualTo;
 }
 
 class NopAstNode extends AstNode {
@@ -1311,17 +1288,19 @@ class ForStatementAstNode extends AstNode {
   @override
   ExecutionValue? evaluate(ExecutionContext context) {
     initialization?.evaluate(context);
-    if (context.state != ExecutionState.running) {
+    if (context.state != .running) {
       return null;
     }
-    for (var loopCount = 0;
-        loopCount < AstNode.maximumEvaluationLoopCount;
-        ++loopCount) {
+    for (
+      var loopCount = 0;
+      loopCount < AstNode.maximumEvaluationLoopCount;
+      ++loopCount
+    ) {
       final condition = this.condition;
       if (condition != null) {
         final conditionValue = condition.evaluate(context);
         if (conditionValue == null) {
-          context.state = ExecutionState.error;
+          context.state = .error;
           return null;
         }
         if (conditionValue.isFalse()) {
@@ -1334,30 +1313,30 @@ class ForStatementAstNode extends AstNode {
         throw UnsupportedError('Internal error');
       }
       switch (context.state) {
-        case ExecutionState.running:
+        case .running:
           break;
-        case ExecutionState.finished:
+        case .finished:
           return null;
-        case ExecutionState.timeout:
+        case .timeout:
           return null;
-        case ExecutionState.error:
+        case .error:
           return null;
-        case ExecutionState.doBreak:
-          context.state = ExecutionState.running;
+        case .doBreak:
+          context.state = .running;
           return null;
-        case ExecutionState.doContinue:
-          context.state = ExecutionState.running;
+        case .doContinue:
+          context.state = .running;
           break;
       }
 
       final updateValue = update?.evaluate(context);
       if (updateValue != null) {
-        context.state = ExecutionState.error;
+        context.state = .error;
         return null;
       }
     }
 
-    context.state = ExecutionState.timeout;
+    context.state = .timeout;
     return null;
   }
 
@@ -1414,7 +1393,7 @@ class ForStatementAstNode extends AstNode {
       final lastInstruction = builder.instructions.last;
       late final JumpInstructionBase jumpToEndInstruction;
       if (lastInstruction is OperatorInstruction &&
-          lastInstruction.operator == ScriptOperatorOpcode.not) {
+          lastInstruction.operator == .not) {
         builder.instructions.removeLast();
         jumpToEndInstruction = JumpIfNotZeroInstruction();
       } else {
@@ -1455,36 +1434,38 @@ class DoWhileStatementAstNode extends AstNode {
 
   @override
   ExecutionValue? evaluate(ExecutionContext context) {
-    if (context.state != ExecutionState.running) {
+    if (context.state != .running) {
       return null;
     }
-    for (var loopCount = 0;
-        loopCount < AstNode.maximumEvaluationLoopCount;
-        ++loopCount) {
+    for (
+      var loopCount = 0;
+      loopCount < AstNode.maximumEvaluationLoopCount;
+      ++loopCount
+    ) {
       final value = body.evaluate(context);
       if (value != null) {
         throw UnsupportedError('Internal error');
       }
       switch (context.state) {
-        case ExecutionState.running:
+        case .running:
           break;
-        case ExecutionState.finished:
+        case .finished:
           return null;
-        case ExecutionState.timeout:
+        case .timeout:
           return null;
-        case ExecutionState.error:
+        case .error:
           return null;
-        case ExecutionState.doBreak:
-          context.state = ExecutionState.running;
+        case .doBreak:
+          context.state = .running;
           return null;
-        case ExecutionState.doContinue:
-          context.state = ExecutionState.running;
+        case .doContinue:
+          context.state = .running;
           break;
       }
 
       final conditionValue = condition.evaluate(context);
       if (conditionValue == null) {
-        context.state = ExecutionState.error;
+        context.state = .error;
         return null;
       }
       if (conditionValue.isFalse()) {
@@ -1492,7 +1473,7 @@ class DoWhileStatementAstNode extends AstNode {
       }
     }
 
-    context.state = ExecutionState.timeout;
+    context.state = .timeout;
     return null;
   }
 
@@ -1531,7 +1512,7 @@ class DoWhileStatementAstNode extends AstNode {
     final lastInstruction = builder.instructions.last;
     late final JumpInstructionBase jumpToEndInstruction;
     if (lastInstruction is OperatorInstruction &&
-        lastInstruction.operator == ScriptOperatorOpcode.not) {
+        lastInstruction.operator == .not) {
       builder.instructions.removeLast();
       jumpToEndInstruction = JumpIfZeroInstruction();
     } else {
@@ -1574,7 +1555,7 @@ class IfStatementAstNode extends AstNode {
   ExecutionValue? evaluate(ExecutionContext context) {
     final conditionValue = condition.evaluate(context);
     if (conditionValue == null) {
-      context.state = ExecutionState.error;
+      context.state = .error;
       return null;
     }
     if (conditionValue.isTrue()) {
@@ -1611,8 +1592,8 @@ class IfStatementAstNode extends AstNode {
   @override
   bool isConstant() => condition.isConstant()
       ? condition.constantValue() != 0
-          ? whenTrue.isConstant()
-          : (whenFalse?.isConstant() ?? false)
+            ? whenTrue.isConstant()
+            : (whenFalse?.isConstant() ?? false)
       : false;
 
   @override
@@ -1649,7 +1630,7 @@ class IfStatementAstNode extends AstNode {
       final lastInstruction = builder.instructions.last;
       late final JumpInstructionBase jumpInstruction;
       if (lastInstruction is OperatorInstruction &&
-          lastInstruction.operator == ScriptOperatorOpcode.not) {
+          lastInstruction.operator == .not) {
         builder.instructions.removeLast();
         jumpInstruction = JumpIfNotZeroInstruction();
       } else {
@@ -1691,7 +1672,7 @@ class BreakStatementAstNode extends AstNode {
 
   @override
   ExecutionValue? evaluate(ExecutionContext context) {
-    context.state = ExecutionState.doBreak;
+    context.state = .doBreak;
     return null;
   }
 
@@ -1719,7 +1700,7 @@ class ContinueStatementAstNode extends AstNode {
 
   @override
   ExecutionValue? evaluate(ExecutionContext context) {
-    context.state = ExecutionState.doContinue;
+    context.state = .doContinue;
     return null;
   }
 
@@ -1769,7 +1750,7 @@ class StatementListAstNode extends AstNode {
       if (value != null) {
         throw UnsupportedError('Internal error');
       }
-      if (context.state != ExecutionState.running) {
+      if (context.state != .running) {
         return null;
       }
     }
@@ -1945,7 +1926,7 @@ class LoadIndexedLocalValueAstNode extends AstNode with IndexedValueMixin {
   ExecutionValue? evaluate(ExecutionContext context) {
     final index = indexExpression.evaluate(context);
     if (index == null || !index.isInt()) {
-      context.state = ExecutionState.error;
+      context.state = .error;
       return null;
     }
     return context.locals[localValue.local.index + index.intValue];
@@ -2237,7 +2218,7 @@ class StoreValueAstNode extends AstNode {
     assert(!isGlobal);
     final value = expression.evaluate(context);
     if (value == null) {
-      context.state = ExecutionState.error;
+      context.state = .error;
       return null;
     }
     context.locals[index] = value;
@@ -2247,6 +2228,9 @@ class StoreValueAstNode extends AstNode {
   @override
   void mark(ScriptReachability context) {
     if (isGlobal) {
+      if (context.forceGlobalWrites) {
+        context.globals.add(index);
+      }
       if (context.globals.contains(index)) {
         expression.mark(context);
       } else {
@@ -2269,8 +2253,9 @@ class StoreValueAstNode extends AstNode {
     if (isGlobal) {
       builder.addInstruction(StoreGlobalValueInstruction(index));
     } else {
-      builder
-          .addInstruction(StoreLocalValueInstruction(index, isInitialization));
+      builder.addInstruction(
+        StoreLocalValueInstruction(index, isInitialization),
+      );
     }
   }
 
@@ -2303,6 +2288,9 @@ class StoreIndexedGlobalValueAstNode extends AstNode with IndexedValueMixin {
 
   @override
   void mark(ScriptReachability context) {
+    if (context.forceGlobalWrites) {
+      context.globals.add(globalValueIndex);
+    }
     if (context.globals.contains(globalValueIndex)) {
       indexExpression.mark(context);
       expression.mark(context);
@@ -2368,12 +2356,12 @@ class StoreIndexedLocalValueAstNode extends AstNode with IndexedValueMixin {
   ExecutionValue? evaluate(ExecutionContext context) {
     final index = indexExpression.evaluate(context);
     if (index == null || !index.isInt()) {
-      context.state = ExecutionState.error;
+      context.state = .error;
       return null;
     }
     final value = expression.evaluate(context);
     if (value == null) {
-      context.state = ExecutionState.error;
+      context.state = .error;
       return null;
     }
     context.locals[localValueIndex + index.intValue] = value;
@@ -2430,17 +2418,17 @@ class ReturnAstNode extends AstNode {
   ExecutionValue? evaluate(ExecutionContext context) {
     final expression = this.expression;
     if (expression == null) {
-      context.state = ExecutionState.finished;
+      context.state = .finished;
       return null;
     }
 
     final value = expression.evaluate(context);
     if (value == null) {
-      context.state = ExecutionState.error;
+      context.state = .error;
       return null;
     }
     context.returnValue = value;
-    context.state = ExecutionState.finished;
+    context.state = .finished;
     return null;
   }
 
