@@ -50,7 +50,7 @@ void main(List<String> arguments) {
     byteCodeVersion: latestScriptByteCodeVersion,
     requiredFunctions: ButtonScriptBindings.createRootFunctionList(
       buttonCount: buttonCount,
-      analogInputCount: analogInputCount,
+      analogDataCount: analogInputCount,
       encoderCount: encoderCount,
       pointerCount: pointerCount,
     ),

@@ -436,6 +436,7 @@ class Tokenizer {
             'func': TokenType.funcKeyword,
             'if': TokenType.ifKeyword,
             'return': TokenType.returnKeyword,
+            'static': TokenType.staticKeyword,
             'var': TokenType.varKeyword,
             'while': TokenType.whileKeyword,
           };

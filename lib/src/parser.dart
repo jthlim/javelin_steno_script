@@ -128,6 +128,11 @@ class Parser {
         '$name already defined as a local constant $_currentToken',
       );
     }
+    if (_function?.locals.aliases.containsKey(name) ?? false) {
+      throw Exception(
+        '$name already defined as an alias to ${_function?.locals.aliases[name]}',
+      );
+    }
   }
 
   void _parseConst() {
@@ -135,6 +140,7 @@ class Parser {
     final nameToken = _currentToken;
     _assertToken(.identifier);
     final name = nameToken.stringValue!;
+    _assertUniqueName(name);
     _assertToken(.assign);
     final expression = _parseExpression();
     _assertToken(.semiColon);
@@ -155,8 +161,6 @@ class Parser {
       return;
     }
 
-    _assertUniqueName(name);
-
     _module.constants[nameToken.stringValue!] = expression;
   }
 
@@ -165,6 +169,7 @@ class Parser {
     final nameToken = _currentToken;
     _assertToken(.identifier);
     final name = nameToken.stringValue!;
+    _assertUniqueName(name);
 
     int? arraySize;
     AstNode? initializer;
@@ -193,8 +198,10 @@ class Parser {
     }
     _assertToken(.semiColon);
 
-    _assertUniqueName(name);
+    _addGlobal(name, arraySize, initializer);
+  }
 
+  void _addGlobal(String name, int? arraySize, AstNode? initializer) {
     final index = _module.globalsUsedCount;
     final globalsUsedCount = arraySize ?? 1;
 
@@ -216,9 +223,8 @@ class Parser {
     final nameToken = _currentToken;
     _assertToken(.identifier);
     final name = nameToken.stringValue!;
-    _assertToken(.openParen);
-
     _assertUniqueName(name);
+    _assertToken(.openParen);
 
     final function = ScriptFunction(name);
     _module.functions[name] = function;
@@ -291,10 +297,15 @@ class Parser {
     final name =
         '\$anonymous_function_${_currentToken.line}_${_currentToken.column}';
 
-    final function = ScriptFunction(name);
-    _module.functions[name] = function;
-
     final previousFunction = _function;
+
+    final function = ScriptFunction(
+      name,
+      constants: _function?.locals.constants,
+      aliases: _function?.locals.aliases,
+    );
+
+    _module.functions[name] = function;
     _function = function;
 
     if (_currentToken.type == .openParen) {
@@ -435,7 +446,8 @@ class Parser {
         switch (_currentToken.type) {
           case .identifier:
             final functionNameToken = _currentToken;
-            final functionName = _currentToken.stringValue!;
+            final rawName = _currentToken.stringValue!;
+            final functionName = _function?.locals.aliases[rawName] ?? rawName;
             _nextToken();
             return PushFunctionAddress(
               token: functionNameToken,
@@ -459,8 +471,10 @@ class Parser {
       case .identifier:
         // Global, local, constant or function call
         final nameToken = _currentToken;
-        final name = _currentToken.stringValue!;
+        final rawName = _currentToken.stringValue!;
         _nextToken();
+
+        final name = _function?.locals.aliases[rawName] ?? rawName;
 
         final result = _parseIdentifier(name);
         if (result != null) {
@@ -824,11 +838,13 @@ class Parser {
     );
   }
 
-  AstNode _parseLocalVar() {
+  AstNode _parseLocalVar({required bool isStatic}) {
     _assertToken(.varKeyword);
     final nameToken = _currentToken;
     _assertToken(.identifier);
     final name = nameToken.stringValue!;
+    _assertUniqueName(name);
+
     int? arraySize;
     AstNode? initializer;
     if (_currentToken.type == .openSquareBracket) {
@@ -854,7 +870,12 @@ class Parser {
     }
     _assertToken(.semiColon);
 
-    _assertUniqueName(name);
+    if (isStatic) {
+      final alias = '\$${name}_${nameToken.line}_${nameToken.column}';
+      _addGlobal(alias, arraySize, initializer);
+      _function!.addAlias(name, alias);
+      return NopAstNode();
+    }
 
     final index = _function!.addLocalVar(name, arraySize);
     if (initializer == null) {
@@ -874,7 +895,17 @@ class Parser {
     final nameToken = _currentToken;
     _assertToken(.identifier);
     final name = nameToken.stringValue!;
+    _assertUniqueName(name);
     _assertToken(.assign);
+
+    if (_function != null && _currentToken.type == .at) {
+      _assertToken(.at);
+      final alias = _parseLambda();
+      _function?.addAlias(name, alias);
+      _assertToken(.semiColon);
+      return;
+    }
+
     final expression = _parseExpression();
     _assertToken(.semiColon);
 
@@ -897,8 +928,6 @@ class Parser {
       // Already defined to same value.
       return;
     }
-
-    _assertUniqueName(name);
 
     _function!.addLocalConstant(name, expression);
   }
@@ -1175,7 +1204,8 @@ class Parser {
 
   AstNode _parseAssignOrFunctionCall({bool requireSemicolon = true}) {
     final nameToken = _currentToken;
-    final name = nameToken.stringValue!;
+    final rawName = nameToken.stringValue!;
+    final name = _function?.locals.aliases[rawName] ?? rawName;
 
     switch (peekNextToken()?.type) {
       case .assign:
@@ -1251,7 +1281,7 @@ class Parser {
 
     switch (_currentToken.type) {
       case .varKeyword:
-        initialization = _parseLocalVar();
+        initialization = _parseLocalVar(isStatic: false);
         break;
       case .identifier:
         initialization = _parseAssignOrFunctionCall();
@@ -1353,13 +1383,16 @@ class Parser {
       case .ifKeyword:
         return _parseIfStatement();
       case .varKeyword:
-        return _parseLocalVar();
+        return _parseLocalVar(isStatic: false);
       case .identifier:
         return _parseAssignOrFunctionCall();
       case .returnKeyword:
         return _parseReturn();
       case .forKeyword:
         return _parseForStatement();
+      case .staticKeyword:
+        _nextToken();
+        return _parseLocalVar(isStatic: true);
       case .whileKeyword:
         return _parseWhileStatement();
       case .doKeyword:

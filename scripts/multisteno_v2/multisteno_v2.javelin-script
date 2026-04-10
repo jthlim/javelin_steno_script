@@ -7,7 +7,7 @@ var layer;
 func setLayer(layerIndex, layerId) {
   releaseAll();
   layer = layerIndex;
-  sendEvent(formatString("layer_id: %d", layerId));
+  sendEvent(formatString("l:%x", layerId));
 }
 
 var wasSteno;
@@ -15,6 +15,21 @@ var wasSteno;
 func dispatchToLayer(functions) {
   var f = functions[<resolveLayerIndex()>];
   f();
+}
+
+func dispatchToLayer1(functions, x) {
+  var f = functions[<resolveLayerIndex()>];
+  f(x);
+}
+
+func dispatchToLayer2(functions, x, y) {
+  var f = functions[<resolveLayerIndex()>];
+  f(x, y);
+}
+
+func dispatchToLayer3(functions, x, y, z) {
+  var f = functions[<resolveLayerIndex()>];
+  f(x, y, z);
 }
 
 func resolveLayerIndex() var {

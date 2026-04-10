@@ -151,7 +151,7 @@
       "patterns": [
         {
           "name": "keyword",
-          "match": "\\b(const|var)\\b"
+          "match": "\\b(const|var|static)\\b"
         },
         {
           "name": "keyword.control",

@@ -10,6 +10,7 @@ enum TokenType {
   varKeyword,
   breakKeyword,
   continueKeyword,
+  staticKeyword,
   questionMark,
   fallback,
   colon,

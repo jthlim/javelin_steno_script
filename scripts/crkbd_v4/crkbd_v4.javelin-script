@@ -13,12 +13,27 @@ var layer;
 func setLayer(layerIndex, layerId) {
   releaseAll();
   layer = layerIndex;
-  sendEvent(formatString("layer_id: %d", layerId));
+  sendEvent(formatString("l:%x", layerId));
 }
 
 func dispatchToLayer(functions) {
   var f = functions[<resolveLayerIndex()>];
   f();
+}
+
+func dispatchToLayer1(functions, x) {
+  var f = functions[<resolveLayerIndex()>];
+  f(x);
+}
+
+func dispatchToLayer2(functions, x, y) {
+  var f = functions[<resolveLayerIndex()>];
+  f(x, y);
+}
+
+func dispatchToLayer3(functions, x, y, z) {
+  var f = functions[<resolveLayerIndex()>];
+  f(x, y, z);
 }
 
 func resolveLayerIndex() var {
@@ -70,44 +85,24 @@ func deactivateDynamic() {}
 func deactivateGlobal() {
 }
 // Global Script: Encoders
-func onEncoderCW0(delta) {
-  printValue("onEncoderCW0", delta);
-  tapScanCode(0xd9);
+func onEncoderInput0(delta) {
+  printValue("onEncoderInput0", delta);
+  tapScanCode(delta > 0 ? 0xd9 : 0xda);
 }
 
-func onEncoderCCW0(delta) {
-  printValue("onEncoderCCW0", delta);
-  tapScanCode(0xda);
+func onEncoderInput1(delta) {
+  printValue("onEncoderInput1", delta);
+  tapScanCode(delta > 0 ? 0xd9 : 0xda);
 }
 
-func onEncoderCW1(delta) {
-  printValue("onEncoderCW1", delta);
-  tapScanCode(0xd9);
+func onEncoderInput2(delta) {
+  printValue("onEncoderInput2", delta);
+  tapScanCode(delta > 0 ? 0xd9 : 0xda);
 }
 
-func onEncoderCCW1(delta) {
-  printValue("onEncoderCCW1", delta);
-  tapScanCode(0xda);
-}
-
-func onEncoderCW2(delta) {
-  printValue("onEncoderCW2", delta);
-  tapScanCode(0xd9);
-}
-
-func onEncoderCCW2(delta) {
-  printValue("onEncoderCCW2", delta);
-  tapScanCode(0xda);
-}
-
-func onEncoderCW3(delta) {
-  printValue("onEncoderCW3", delta);
-  tapScanCode(0xd9);
-}
-
-func onEncoderCCW3(delta) {
-  printValue("onEncoderCCW3", delta);
-  tapScanCode(0xda);
+func onEncoderInput3(delta) {
+  printValue("onEncoderInput3", delta);
+  tapScanCode(delta > 0 ? 0xd9 : 0xda);
 }
 
 // Global Script: RGB

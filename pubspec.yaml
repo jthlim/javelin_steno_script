@@ -22,7 +22,7 @@ dependencies:
     sdk: flutter
   javelin_extensions:
     path: ../javelin_extensions
-  google_fonts: ^6.2.1
+  google_fonts: ^8.0.0
   image: ^4.0.15
   web: ^1.0.0
 

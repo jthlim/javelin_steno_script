@@ -56,7 +56,7 @@ class SyntaxHighlightingRule {
 
     // Keywords
     SyntaxHighlightingRule(
-      RegExp(r'\b(?:func|for|const|var|return|if|else|while|do)\b'),
+      RegExp(r'\b(?:func|for|const|var|return|if|else|while|do|static)\b'),
       const TextStyle(color: Color(0xFFAD1457)), // pink800
       const TextStyle(color: Color(0xFFF48FB1)), // pink200
     ),

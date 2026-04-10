@@ -193,7 +193,13 @@ class InstructionList extends Iterable<ScriptInstruction> {
 
         if (identical(instruction.next?.firstNonNopInstruction, target)) {
           final previous = instruction.previous!;
-          instruction.unlink();
+          // Insert a pop for conditional instructions.
+          if (instruction is! JumpInstruction) {
+            instruction.replaceWith(PopValueInstruction());
+          } else {
+            instruction.unlink();
+          }
+
           instruction = previous.next;
           continue;
         }

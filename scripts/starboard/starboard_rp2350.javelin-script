@@ -4,12 +4,27 @@ var layer;
 func setLayer(layerIndex, layerId) {
   releaseAll();
   layer = layerIndex;
-  sendEvent(formatString("layer_id: %d", layerId));
+  sendEvent(formatString("l:%x", layerId));
 }
 
 func dispatchToLayer(functions) {
   var f = functions[<resolveLayerIndex()>];
   f();
+}
+
+func dispatchToLayer1(functions, x) {
+  var f = functions[<resolveLayerIndex()>];
+  f(x);
+}
+
+func dispatchToLayer2(functions, x, y) {
+  var f = functions[<resolveLayerIndex()>];
+  f(x, y);
+}
+
+func dispatchToLayer3(functions, x, y, z) {
+  var f = functions[<resolveLayerIndex()>];
+  f(x, y, z);
 }
 
 func resolveLayerIndex() var {
@@ -423,4 +438,16 @@ func onPress26_0() {
   releaseAll();
 }
 func onRelease26_0() {
+}
+
+func onPress27() {
+  onPress27_0();
+}
+func onRelease27() {
+}
+
+func onPress27_0() {
+  console("launch_bootloader");
+}
+func onRelease27_0() {
 }

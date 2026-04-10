@@ -138,27 +138,26 @@ class ButtonScriptBindings {
     InBuiltScriptFunction('getRelyingPartyId', 0, ReturnType.value, 0x7b),
     InBuiltScriptFunction('getSignatureAlgorithm', 0, ReturnType.value, 0x7c),
     InBuiltScriptFunction('setSignatureAlgorithms', 1, ReturnType.none, 0x7d),
+    InBuiltScriptFunction('isLocationAdvertising', 0, ReturnType.boolean, 0x7e),
+    InBuiltScriptFunction('setBleSplitRate', 1, ReturnType.none, 0x7f),
+    InBuiltScriptFunction('analogDataInput', 2, ReturnType.none, 0x80),
+    InBuiltScriptFunction('encoderInput', 2, ReturnType.none, 0x81),
+    InBuiltScriptFunction('pointerInput', 4, ReturnType.none, 0x82),
   ];
 
   static List<String> createRootFunctionList({
     required int buttonCount,
-    required int analogInputCount,
+    required int analogDataCount,
     required int encoderCount,
     required int pointerCount,
   }) {
     return [
       'init',
       'tick',
-      for (var i = 0; i < buttonCount; ++i) ...[
-        'onPress$i',
-        'onRelease$i',
-      ],
-      for (var i = 0; i < analogInputCount; ++i) 'onAnalogInput$i',
-      for (var i = 0; i < encoderCount; ++i) ...[
-        'onEncoderCW$i',
-        'onEncoderCCW$i',
-      ],
-      for (var i = 0; i < pointerCount; ++i) 'onPointerUpdate$i',
+      for (var i = 0; i < buttonCount; ++i) ...['onPress$i', 'onRelease$i'],
+      for (var i = 0; i < analogDataCount; ++i) 'onAnalogDataInput$i',
+      for (var i = 0; i < encoderCount; ++i) 'onEncoderInput$i',
+      for (var i = 0; i < pointerCount; ++i) 'onPointerInput$i',
     ];
   }
 }
@@ -170,15 +169,14 @@ extension ButtonScriptModule on ScriptModule {
     required int encoderCount,
     required int pointerCount,
     required int scriptByteCodeVersion,
-  }) =>
-      ScriptByteCodeBuilder(
-        module: this,
-        byteCodeVersion: scriptByteCodeVersion,
-        requiredFunctions: ButtonScriptBindings.createRootFunctionList(
-          buttonCount: buttonCount,
-          analogInputCount: analogInputCount,
-          encoderCount: encoderCount,
-          pointerCount: pointerCount,
-        ),
-      ).createByteCode();
+  }) => ScriptByteCodeBuilder(
+    module: this,
+    byteCodeVersion: scriptByteCodeVersion,
+    requiredFunctions: ButtonScriptBindings.createRootFunctionList(
+      buttonCount: buttonCount,
+      analogDataCount: analogInputCount,
+      encoderCount: encoderCount,
+      pointerCount: pointerCount,
+    ),
+  ).createByteCode();
 }

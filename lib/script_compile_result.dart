@@ -25,7 +25,7 @@ class ScriptCompileResult {
       inBuiltFunctions: ButtonScriptBindings.functions,
       requiredFunctions: ButtonScriptBindings.createRootFunctionList(
         buttonCount: buttonCount,
-        analogInputCount: analogInputCount,
+        analogDataCount: analogInputCount,
         encoderCount: encoderCount,
         pointerCount: pointerCount,
       ),

@@ -29,6 +29,7 @@ abstract class AstNode {
   bool isConstant();
 
   bool isPure();
+  bool hasSideEffects() => !isPure();
   ExecutionValue? evaluate(ExecutionContext context) =>
       throw UnsupportedError('Should not be invoked');
 
@@ -262,6 +263,9 @@ class WriteByteIndexAstNode extends AstNode {
   bool isPure() => false;
 
   @override
+  bool hasSideEffects() => value.hasSideEffects() || index.hasSideEffects();
+
+  @override
   ExecutionValue? evaluate(ExecutionContext context) {
     context.state = .error;
     return null;
@@ -301,6 +305,9 @@ class ReadHalfWordIndexAstNode extends AstNode {
 
   @override
   bool isPure() => false;
+
+  @override
+  bool hasSideEffects() => value.hasSideEffects() || index.hasSideEffects();
 
   @override
   void mark(ScriptReachability context) {
@@ -372,6 +379,9 @@ class ReadWordIndexAstNode extends AstNode {
 
   @override
   bool isPure() => false;
+
+  @override
+  bool hasSideEffects() => value.hasSideEffects() || index.hasSideEffects();
 
   @override
   void mark(ScriptReachability context) {
@@ -759,8 +769,29 @@ class MultiplyAstNode extends BinaryOperatorAstNode {
   MultiplyAstNode(super.statementA, super.statementB);
 
   @override
-  int constantValue() =>
-      statementA.constantValue() * statementB.constantValue();
+  bool isConstant() {
+    if (statementA.isConstant()) {
+      if (statementB.isConstant()) {
+        return true;
+      }
+
+      return statementA.constantValue() == 0 && !statementB.hasSideEffects();
+    }
+
+    return statementB.isConstant() &&
+        statementB.constantValue() == 0 &&
+        !statementA.hasSideEffects();
+  }
+
+  @override
+  int constantValue() {
+    if (statementA.isConstant()) {
+      if (statementB.isConstant()) {
+        return statementA.constantValue() * statementB.constantValue();
+      }
+    }
+    return 0;
+  }
 
   @override
   ExecutionValue? evaluateBinaryOp(ExecutionValue a, ExecutionValue b) {
@@ -802,8 +833,7 @@ class MultiplyAstNode extends BinaryOperatorAstNode {
   ) {
     switch (constant) {
       case 0:
-        // TODO: Make this consider side effects, not pure-ness.
-        if (!other.isPure()) return false;
+        if (other.hasSideEffects()) return false;
         builder.addInstruction(PushIntValueInstruction(0));
         return true;
 
@@ -1624,33 +1654,34 @@ class IfStatementAstNode extends AstNode {
       } else {
         whenFalse?.addInstructions(builder);
       }
+      return;
+    }
+
+    condition.addInstructions(builder);
+
+    final lastInstruction = builder.instructions.last;
+    late final JumpInstructionBase jumpInstruction;
+    if (lastInstruction is OperatorInstruction &&
+        lastInstruction.operator == .not) {
+      builder.instructions.removeLast();
+      jumpInstruction = JumpIfNotZeroInstruction();
     } else {
-      condition.addInstructions(builder);
+      jumpInstruction = JumpIfZeroInstruction();
+    }
+    final elseNop = jumpInstruction.target;
+    builder.addInstruction(jumpInstruction);
 
-      final lastInstruction = builder.instructions.last;
-      late final JumpInstructionBase jumpInstruction;
-      if (lastInstruction is OperatorInstruction &&
-          lastInstruction.operator == .not) {
-        builder.instructions.removeLast();
-        jumpInstruction = JumpIfNotZeroInstruction();
-      } else {
-        jumpInstruction = JumpIfZeroInstruction();
-      }
-      final elseNop = jumpInstruction.target;
+    whenTrue.addInstructions(builder);
+    NopInstruction? endNop;
+    if (!(whenFalse?.isEmpty() ?? true)) {
+      final jumpInstruction = JumpInstruction();
+      endNop = jumpInstruction.target;
       builder.addInstruction(jumpInstruction);
-
-      whenTrue.addInstructions(builder);
-      NopInstruction? endNop;
-      if (whenFalse != null) {
-        final jumpInstruction = JumpInstruction();
-        endNop = jumpInstruction.target;
-        builder.addInstruction(jumpInstruction);
-      }
-      builder.addInstruction(elseNop);
-      whenFalse?.addInstructions(builder);
-      if (endNop != null) {
-        builder.addInstruction(endNop);
-      }
+    }
+    builder.addInstruction(elseNop);
+    whenFalse?.addInstructions(builder);
+    if (endNop != null) {
+      builder.addInstruction(endNop);
     }
   }
 
@@ -1744,6 +1775,9 @@ class StatementListAstNode extends AstNode {
   bool isPure() => statements.every((e) => e.isPure());
 
   @override
+  bool hasSideEffects() => statements.any((e) => e.hasSideEffects());
+
+  @override
   ExecutionValue? evaluate(ExecutionContext context) {
     for (final statement in statements) {
       final value = statement.evaluate(context);
@@ -1791,6 +1825,9 @@ class LoadGlobalValueArrayAstNode extends AstNode {
   bool isPure() => false;
 
   @override
+  bool hasSideEffects() => false;
+
+  @override
   void addInstructions(ScriptByteCodeBuilder builder) {
     throw Exception('Global value array ${global.name} must be indexed');
   }
@@ -1809,6 +1846,9 @@ class LoadLocalValueArrayAstNode extends AstNode {
 
   @override
   bool isPure() => throw UnsupportedError('Should not be invoked');
+
+  @override
+  bool hasSideEffects() => false;
 
   @override
   ExecutionValue? evaluate(ExecutionContext context) {
@@ -1865,6 +1905,9 @@ class LoadIndexedGlobalValueAstNode extends AstNode with IndexedValueMixin {
 
   @override
   bool isPure() => false;
+
+  @override
+  bool hasSideEffects() => indexExpression.hasSideEffects();
 
   @override
   void mark(ScriptReachability context) {
@@ -1971,6 +2014,9 @@ class LoadValueAstNode extends AstNode {
 
   @override
   bool isPure() => !isGlobal;
+
+  @override
+  bool hasSideEffects() => false;
 
   @override
   ExecutionValue? evaluate(ExecutionContext context) {

@@ -55,7 +55,7 @@ String _compileScript(String script) {
     byteCodeVersion: latestScriptByteCodeVersion,
     requiredFunctions: ButtonScriptBindings.createRootFunctionList(
       buttonCount: 0,
-      analogInputCount: 0,
+      analogDataCount: 0,
       encoderCount: 0,
       pointerCount: 0,
     ),

@@ -271,17 +271,32 @@ var layer;
 func setLayer(layerIndex, layerId) {
   releaseAll();
   layer = layerIndex;
-  sendEvent(formatString("layer_id: %d", layerId));
+  sendEvent(formatString("l:%x", layerId));
 }
 
 func setLayerNoRelease(layerIndex, layerId) {
   layer = layerIndex;
-  sendEvent(formatString("layer_id: %d", layerId));
+  sendEvent(formatString("l:%x", layerId));
 }
 
 func dispatchToLayer(functions) {
   var f = functions[<resolveLayerIndex()>];
   f();
+}
+
+func dispatchToLayer1(functions, x) {
+  var f = functions[<resolveLayerIndex()>];
+  f(x);
+}
+
+func dispatchToLayer2(functions, x, y) {
+  var f = functions[<resolveLayerIndex()>];
+  f(x, y);
+}
+
+func dispatchToLayer3(functions, x, y, z) {
+  var f = functions[<resolveLayerIndex()>];
+  f(x, y, z);
 }
 
 func resolveLayerIndex() var {
@@ -1570,14 +1585,14 @@ func rgbUpdateKeyU2fAlertCycle() {
 
 func _action_setFidoLayer() {
   deactivateGlobal();
-  deactivate6();
+  deactivateDynamic();
   activate6();
   activateGlobal();
 }
 
 func _action_switchToNumpadLayer() {
   deactivateGlobal();
-  deactivate0();
+  deactivateDynamic();
   activate5();
   activateGlobal();
 }
@@ -1599,9 +1614,6 @@ const MODTAP_STATE_UNRESOLVED = 0;
 // These values are designed to overlap with HANDLER_RELEASE_TAP and HANDLER_RELEASE_HOLD
 const MODTAP_STATE_RESOLVED_TAP = 1;
 const MODTAP_STATE_RESOLVED_HOLD = 3;
-
-const MODTAP_DEFAULT_MODTAP_HOLD_TIME = 200;
-const MODTAP_DEFAULT_LAYER_HOLD_TIME = 180;
 
 const TIMER_ID_MODTAP = 99;
 
@@ -3174,7 +3186,7 @@ func onRelease0() {
 }
 
 func onPress0_0() {
-  handleModTapPress(@modTapHandler0, 1, modTapLayerActivations0, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
+  handleModTapPress(@modTapHandler0, 1, modTapLayerActivations0, 200);
 }
 func onRelease0_0() {
 }
@@ -3207,7 +3219,7 @@ func onRelease1() {
 }
 
 func onPress1_0() {
-  handleModTapPress(@modTapHandler1, 1, modTapLayerActivations1, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
+  handleModTapPress(@modTapHandler1, 1, modTapLayerActivations1, 200);
 }
 func onRelease1_0() {
 }
@@ -3220,7 +3232,7 @@ func onRelease1_1() {
 }
 
 func onPress1_2() {
-  handleModTapPress(@modTapHandler1, 1, modTapLayerActivations1, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
+  handleModTapPress(@modTapHandler1, 1, modTapLayerActivations1, 200);
 }
 func onRelease1_2() {
 }
@@ -3257,7 +3269,7 @@ func onRelease2() {
 }
 
 func onPress2_0() {
-  handleModTapPress(@modTapHandler2, 1, modTapLayerActivations2, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
+  handleModTapPress(@modTapHandler2, 1, modTapLayerActivations2, 200);
 }
 func onRelease2_0() {
 }
@@ -3270,7 +3282,7 @@ func onRelease2_1() {
 }
 
 func onPress2_2() {
-  handleModTapPress(@modTapHandler2, 1, modTapLayerActivations2, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
+  handleModTapPress(@modTapHandler2, 1, modTapLayerActivations2, 200);
 }
 func onRelease2_2() {
 }
@@ -3307,7 +3319,7 @@ func onRelease3() {
 }
 
 func onPress3_0() {
-  handleModTapPress(@modTapHandler3, 1, modTapLayerActivations3, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
+  handleModTapPress(@modTapHandler3, 1, modTapLayerActivations3, 200);
 }
 func onRelease3_0() {
 }
@@ -3320,7 +3332,7 @@ func onRelease3_1() {
 }
 
 func onPress3_2() {
-  handleModTapPress(@modTapHandler3, 1, modTapLayerActivations3, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
+  handleModTapPress(@modTapHandler3, 1, modTapLayerActivations3, 200);
 }
 func onRelease3_2() {
 }
@@ -3357,7 +3369,7 @@ func onRelease4() {
 }
 
 func onPress4_0() {
-  handleModTapPress(@modTapHandler4, 1, modTapLayerActivations4, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
+  handleModTapPress(@modTapHandler4, 1, modTapLayerActivations4, 200);
 }
 func onRelease4_0() {
 }
@@ -3370,7 +3382,7 @@ func onRelease4_1() {
 }
 
 func onPress4_2() {
-  handleModTapPress(@modTapHandler4, 1, modTapLayerActivations4, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
+  handleModTapPress(@modTapHandler4, 1, modTapLayerActivations4, 200);
 }
 func onRelease4_2() {
 }
@@ -3407,7 +3419,7 @@ func onRelease5() {
 }
 
 func onPress5_0() {
-  handleModTapPress(@modTapHandler5, 1, modTapLayerActivations5, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
+  handleModTapPress(@modTapHandler5, 1, modTapLayerActivations5, 200);
 }
 func onRelease5_0() {
 }
@@ -3420,7 +3432,7 @@ func onRelease5_1() {
 }
 
 func onPress5_3() {
-  handleModTapPress(@modTapHandler5, 1, modTapLayerActivations5, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
+  handleModTapPress(@modTapHandler5, 1, modTapLayerActivations5, 200);
 }
 func onRelease5_3() {
 }
@@ -3446,7 +3458,7 @@ func onRelease6() {
 }
 
 func onPress6_0() {
-  handleModTapPress(@modTapHandler6, 2, modTapLayerActivations6, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
+  handleModTapPress(@modTapHandler6, 2, modTapLayerActivations6, 200);
 }
 func onRelease6_0() {
 }
@@ -3459,7 +3471,7 @@ func onRelease6_1() {
 }
 
 func onPress6_3() {
-  handleModTapPress(@modTapHandler6, 2, modTapLayerActivations6, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
+  handleModTapPress(@modTapHandler6, 2, modTapLayerActivations6, 200);
 }
 func onRelease6_3() {
 }
@@ -3477,7 +3489,7 @@ func onRelease7() {
 }
 
 func onPress7_0() {
-  handleModTapPress(@modTapHandler7, 2, modTapLayerActivations7, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
+  handleModTapPress(@modTapHandler7, 2, modTapLayerActivations7, 200);
 }
 func onRelease7_0() {
 }
@@ -3490,7 +3502,7 @@ func onRelease7_1() {
 }
 
 func onPress7_3() {
-  handleModTapPress(@modTapHandler7, 2, modTapLayerActivations7, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
+  handleModTapPress(@modTapHandler7, 2, modTapLayerActivations7, 200);
 }
 func onRelease7_3() {
 }
@@ -3515,7 +3527,7 @@ func onRelease8() {
 }
 
 func onPress8_0() {
-  handleModTapPress(@modTapHandler8, 2, modTapLayerActivations8, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
+  handleModTapPress(@modTapHandler8, 2, modTapLayerActivations8, 200);
 }
 func onRelease8_0() {
 }
@@ -3528,7 +3540,7 @@ func onRelease8_1() {
 }
 
 func onPress8_3() {
-  handleModTapPress(@modTapHandler8, 2, modTapLayerActivations8, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
+  handleModTapPress(@modTapHandler8, 2, modTapLayerActivations8, 200);
 }
 func onRelease8_3() {
 }
@@ -3565,7 +3577,7 @@ func onRelease9() {
 }
 
 func onPress9_0() {
-  handleModTapPress(@modTapHandler9, 2, modTapLayerActivations9, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
+  handleModTapPress(@modTapHandler9, 2, modTapLayerActivations9, 200);
 }
 func onRelease9_0() {
 }
@@ -3578,7 +3590,7 @@ func onRelease9_1() {
 }
 
 func onPress9_3() {
-  handleModTapPress(@modTapHandler9, 2, modTapLayerActivations9, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
+  handleModTapPress(@modTapHandler9, 2, modTapLayerActivations9, 200);
 }
 func onRelease9_3() {
 }
@@ -3615,7 +3627,7 @@ func onRelease10() {
 }
 
 func onPress10_0() {
-  handleModTapPress(@modTapHandler10, 2, modTapLayerActivations10, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
+  handleModTapPress(@modTapHandler10, 2, modTapLayerActivations10, 200);
 }
 func onRelease10_0() {
 }
@@ -3628,7 +3640,7 @@ func onRelease10_1() {
 }
 
 func onPress10_3() {
-  handleModTapPress(@modTapHandler10, 2, modTapLayerActivations10, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
+  handleModTapPress(@modTapHandler10, 2, modTapLayerActivations10, 200);
 }
 func onRelease10_3() {
 }
@@ -3653,7 +3665,7 @@ func onRelease11() {
 }
 
 func onPress11_0() {
-  handleModTapPress(@modTapHandler11, 2, modTapLayerActivations11, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
+  handleModTapPress(@modTapHandler11, 2, modTapLayerActivations11, 200);
 }
 func onRelease11_0() {
 }
@@ -3668,7 +3680,7 @@ func onRelease11_1() {
 }
 
 func onPress11_3() {
-  handleModTapPress(@modTapHandler11, 2, modTapLayerActivations11, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
+  handleModTapPress(@modTapHandler11, 2, modTapLayerActivations11, 200);
 }
 func onRelease11_3() {
 }
@@ -3700,7 +3712,7 @@ func onRelease12() {
 }
 
 func onPress12_0() {
-  handleModTapPress(@modTapHandler12, 4, modTapLayerActivations12, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
+  handleModTapPress(@modTapHandler12, 4, modTapLayerActivations12, 200);
 }
 func onRelease12_0() {
 }
@@ -3736,7 +3748,7 @@ func onRelease13() {
 }
 
 func onPress13_0() {
-  handleModTapPress(@modTapHandler13, 1, modTapLayerActivations13, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
+  handleModTapPress(@modTapHandler13, 1, modTapLayerActivations13, 200);
 }
 func onRelease13_0() {
 }
@@ -3751,13 +3763,13 @@ func onRelease13_1() {
 }
 
 func onPress13_2() {
-  handleModTapPress(@modTapHandler13, 1, modTapLayerActivations13, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
+  handleModTapPress(@modTapHandler13, 1, modTapLayerActivations13, 200);
 }
 func onRelease13_2() {
 }
 
 func onPress13_3() {
-  handleModTapPress(@modTapHandler13, 1, modTapLayerActivations13, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
+  handleModTapPress(@modTapHandler13, 1, modTapLayerActivations13, 200);
 }
 func onRelease13_3() {
 }
@@ -3790,7 +3802,7 @@ func onRelease14() {
 }
 
 func onPress14_0() {
-  handleModTapPress(@modTapHandler14, 1, modTapLayerActivations14, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
+  handleModTapPress(@modTapHandler14, 1, modTapLayerActivations14, 200);
 }
 func onRelease14_0() {
 }
@@ -3805,13 +3817,13 @@ func onRelease14_1() {
 }
 
 func onPress14_2() {
-  handleModTapPress(@modTapHandler14, 1, modTapLayerActivations14, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
+  handleModTapPress(@modTapHandler14, 1, modTapLayerActivations14, 200);
 }
 func onRelease14_2() {
 }
 
 func onPress14_3() {
-  handleModTapPress(@modTapHandler14, 1, modTapLayerActivations14, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
+  handleModTapPress(@modTapHandler14, 1, modTapLayerActivations14, 200);
 }
 func onRelease14_3() {
 }
@@ -3844,7 +3856,7 @@ func onRelease15() {
 }
 
 func onPress15_0() {
-  handleModTapPress(@modTapHandler15, 1, modTapLayerActivations15, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
+  handleModTapPress(@modTapHandler15, 1, modTapLayerActivations15, 200);
 }
 func onRelease15_0() {
 }
@@ -3859,13 +3871,13 @@ func onRelease15_1() {
 }
 
 func onPress15_2() {
-  handleModTapPress(@modTapHandler15, 1, modTapLayerActivations15, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
+  handleModTapPress(@modTapHandler15, 1, modTapLayerActivations15, 200);
 }
 func onRelease15_2() {
 }
 
 func onPress15_3() {
-  handleModTapPress(@modTapHandler15, 1, modTapLayerActivations15, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
+  handleModTapPress(@modTapHandler15, 1, modTapLayerActivations15, 200);
 }
 func onRelease15_3() {
 }
@@ -3898,7 +3910,7 @@ func onRelease16() {
 }
 
 func onPress16_0() {
-  handleModTapPress(@modTapHandler16, 1, modTapLayerActivations16, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
+  handleModTapPress(@modTapHandler16, 1, modTapLayerActivations16, 200);
 }
 func onRelease16_0() {
 }
@@ -3913,13 +3925,13 @@ func onRelease16_1() {
 }
 
 func onPress16_2() {
-  handleModTapPress(@modTapHandler16, 1, modTapLayerActivations16, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
+  handleModTapPress(@modTapHandler16, 1, modTapLayerActivations16, 200);
 }
 func onRelease16_2() {
 }
 
 func onPress16_3() {
-  handleModTapPress(@modTapHandler16, 1, modTapLayerActivations16, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
+  handleModTapPress(@modTapHandler16, 1, modTapLayerActivations16, 200);
 }
 func onRelease16_3() {
 }
@@ -3952,7 +3964,7 @@ func onRelease17() {
 }
 
 func onPress17_0() {
-  handleModTapPress(@modTapHandler17, 1, modTapLayerActivations17, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
+  handleModTapPress(@modTapHandler17, 1, modTapLayerActivations17, 200);
 }
 func onRelease17_0() {
 }
@@ -3967,7 +3979,7 @@ func onRelease17_1() {
 }
 
 func onPress17_3() {
-  handleModTapPress(@modTapHandler17, 1, modTapLayerActivations17, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
+  handleModTapPress(@modTapHandler17, 1, modTapLayerActivations17, 200);
 }
 func onRelease17_3() {
 }
@@ -3985,7 +3997,7 @@ func onRelease18() {
 }
 
 func onPress18_0() {
-  handleModTapPress(@modTapHandler18, 2, modTapLayerActivations18, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
+  handleModTapPress(@modTapHandler18, 2, modTapLayerActivations18, 200);
 }
 func onRelease18_0() {
 }
@@ -4000,7 +4012,7 @@ func onRelease18_1() {
 }
 
 func onPress18_3() {
-  handleModTapPress(@modTapHandler18, 2, modTapLayerActivations18, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
+  handleModTapPress(@modTapHandler18, 2, modTapLayerActivations18, 200);
 }
 func onRelease18_3() {
 }
@@ -4018,7 +4030,7 @@ func onRelease19() {
 }
 
 func onPress19_0() {
-  handleModTapPress(@modTapHandler19, 2, modTapLayerActivations19, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
+  handleModTapPress(@modTapHandler19, 2, modTapLayerActivations19, 200);
 }
 func onRelease19_0() {
 }
@@ -4033,13 +4045,13 @@ func onRelease19_1() {
 }
 
 func onPress19_2() {
-  handleModTapPress(@modTapHandler19, 2, modTapLayerActivations19, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
+  handleModTapPress(@modTapHandler19, 2, modTapLayerActivations19, 200);
 }
 func onRelease19_2() {
 }
 
 func onPress19_3() {
-  handleModTapPress(@modTapHandler19, 2, modTapLayerActivations19, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
+  handleModTapPress(@modTapHandler19, 2, modTapLayerActivations19, 200);
 }
 func onRelease19_3() {
 }
@@ -4064,7 +4076,7 @@ func onRelease20() {
 }
 
 func onPress20_0() {
-  handleModTapPress(@modTapHandler20, 2, modTapLayerActivations20, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
+  handleModTapPress(@modTapHandler20, 2, modTapLayerActivations20, 200);
 }
 func onRelease20_0() {
 }
@@ -4079,13 +4091,13 @@ func onRelease20_1() {
 }
 
 func onPress20_2() {
-  handleModTapPress(@modTapHandler20, 2, modTapLayerActivations20, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
+  handleModTapPress(@modTapHandler20, 2, modTapLayerActivations20, 200);
 }
 func onRelease20_2() {
 }
 
 func onPress20_3() {
-  handleModTapPress(@modTapHandler20, 2, modTapLayerActivations20, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
+  handleModTapPress(@modTapHandler20, 2, modTapLayerActivations20, 200);
 }
 func onRelease20_3() {
 }
@@ -4122,7 +4134,7 @@ func onRelease21() {
 }
 
 func onPress21_0() {
-  handleModTapPress(@modTapHandler21, 2, modTapLayerActivations21, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
+  handleModTapPress(@modTapHandler21, 2, modTapLayerActivations21, 200);
 }
 func onRelease21_0() {
 }
@@ -4137,13 +4149,13 @@ func onRelease21_1() {
 }
 
 func onPress21_2() {
-  handleModTapPress(@modTapHandler21, 2, modTapLayerActivations21, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
+  handleModTapPress(@modTapHandler21, 2, modTapLayerActivations21, 200);
 }
 func onRelease21_2() {
 }
 
 func onPress21_3() {
-  handleModTapPress(@modTapHandler21, 2, modTapLayerActivations21, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
+  handleModTapPress(@modTapHandler21, 2, modTapLayerActivations21, 200);
 }
 func onRelease21_3() {
 }
@@ -4180,7 +4192,7 @@ func onRelease22() {
 }
 
 func onPress22_0() {
-  handleModTapPress(@modTapHandler22, 2, modTapLayerActivations22, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
+  handleModTapPress(@modTapHandler22, 2, modTapLayerActivations22, 200);
 }
 func onRelease22_0() {
 }
@@ -4195,13 +4207,13 @@ func onRelease22_1() {
 }
 
 func onPress22_2() {
-  handleModTapPress(@modTapHandler22, 2, modTapLayerActivations22, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
+  handleModTapPress(@modTapHandler22, 2, modTapLayerActivations22, 200);
 }
 func onRelease22_2() {
 }
 
 func onPress22_3() {
-  handleModTapPress(@modTapHandler22, 2, modTapLayerActivations22, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
+  handleModTapPress(@modTapHandler22, 2, modTapLayerActivations22, 200);
 }
 func onRelease22_3() {
 }
@@ -4226,7 +4238,7 @@ func onRelease23() {
 }
 
 func onPress23_0() {
-  handleModTapPress(@modTapHandler23, 2, modTapLayerActivations23, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
+  handleModTapPress(@modTapHandler23, 2, modTapLayerActivations23, 200);
 }
 func onRelease23_0() {
 }
@@ -4239,7 +4251,7 @@ func onRelease23_1() {
 }
 
 func onPress23_3() {
-  handleModTapPress(@modTapHandler23, 2, modTapLayerActivations23, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
+  handleModTapPress(@modTapHandler23, 2, modTapLayerActivations23, 200);
 }
 func onRelease23_3() {
 }
@@ -4264,7 +4276,7 @@ func onRelease24() {
 
 func onPress24_0() {
 
-  handleModTapPress(@modTapHandler24, 4, modTapLayerActivations24, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
+  handleModTapPress(@modTapHandler24, 4, modTapLayerActivations24, 200);
   checkWordCapsAndCapsLock();
 }
 func onRelease24_0() {
@@ -4290,7 +4302,7 @@ func onRelease25() {
 }
 
 func onPress25_0() {
-  handleModTapPress(@modTapHandler25, 1, modTapLayerActivations25, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
+  handleModTapPress(@modTapHandler25, 1, modTapLayerActivations25, 200);
 }
 func onRelease25_0() {
 }
@@ -4303,7 +4315,7 @@ func onRelease25_1() {
 }
 
 func onPress25_2() {
-  handleModTapPress(@modTapHandler25, 1, modTapLayerActivations25, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
+  handleModTapPress(@modTapHandler25, 1, modTapLayerActivations25, 200);
 }
 func onRelease25_2() {
 }
@@ -4330,7 +4342,7 @@ func onRelease26() {
 }
 
 func onPress26_0() {
-  handleModTapPress(@modTapHandler26, 1, modTapLayerActivations26, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
+  handleModTapPress(@modTapHandler26, 1, modTapLayerActivations26, 200);
 }
 func onRelease26_0() {
 }
@@ -4345,7 +4357,7 @@ func onRelease26_1() {
 }
 
 func onPress26_2() {
-  handleModTapPress(@modTapHandler26, 1, modTapLayerActivations26, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
+  handleModTapPress(@modTapHandler26, 1, modTapLayerActivations26, 200);
 }
 func onRelease26_2() {
 }
@@ -4372,7 +4384,7 @@ func onRelease27() {
 }
 
 func onPress27_0() {
-  handleModTapPress(@modTapHandler27, 1, modTapLayerActivations27, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
+  handleModTapPress(@modTapHandler27, 1, modTapLayerActivations27, 200);
 }
 func onRelease27_0() {
 }
@@ -4385,7 +4397,7 @@ func onRelease27_1() {
 }
 
 func onPress27_2() {
-  handleModTapPress(@modTapHandler27, 1, modTapLayerActivations27, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
+  handleModTapPress(@modTapHandler27, 1, modTapLayerActivations27, 200);
 }
 func onRelease27_2() {
 }
@@ -4412,7 +4424,7 @@ func onRelease28() {
 }
 
 func onPress28_0() {
-  handleModTapPress(@modTapHandler28, 1, modTapLayerActivations28, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
+  handleModTapPress(@modTapHandler28, 1, modTapLayerActivations28, 200);
 }
 func onRelease28_0() {
 }
@@ -4425,7 +4437,7 @@ func onRelease28_1() {
 }
 
 func onPress28_2() {
-  handleModTapPress(@modTapHandler28, 1, modTapLayerActivations28, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
+  handleModTapPress(@modTapHandler28, 1, modTapLayerActivations28, 200);
 }
 func onRelease28_2() {
 }
@@ -4443,7 +4455,7 @@ func onRelease29() {
 }
 
 func onPress29_0() {
-  handleModTapPress(@modTapHandler29, 1, modTapLayerActivations29, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
+  handleModTapPress(@modTapHandler29, 1, modTapLayerActivations29, 200);
 }
 func onRelease29_0() {
 }
@@ -4470,7 +4482,7 @@ func onRelease30() {
 }
 
 func onPress30_0() {
-  handleModTapPress(@modTapHandler30, 2, modTapLayerActivations30, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
+  handleModTapPress(@modTapHandler30, 2, modTapLayerActivations30, 200);
 }
 func onRelease30_0() {
 }
@@ -4485,7 +4497,7 @@ func onRelease30_1() {
 }
 
 func onPress30_3() {
-  handleModTapPress(@modTapHandler30, 2, modTapLayerActivations30, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
+  handleModTapPress(@modTapHandler30, 2, modTapLayerActivations30, 200);
 }
 func onRelease30_3() {
 }
@@ -4503,7 +4515,7 @@ func onRelease31() {
 }
 
 func onPress31_0() {
-  handleModTapPress(@modTapHandler31, 2, modTapLayerActivations31, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
+  handleModTapPress(@modTapHandler31, 2, modTapLayerActivations31, 200);
 }
 func onRelease31_0() {
 }
@@ -4535,7 +4547,7 @@ func onRelease32() {
 }
 
 func onPress32_0() {
-  handleModTapPress(@modTapHandler32, 2, modTapLayerActivations32, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
+  handleModTapPress(@modTapHandler32, 2, modTapLayerActivations32, 200);
 }
 func onRelease32_0() {
 }
@@ -4569,7 +4581,7 @@ func onRelease33() {
 }
 
 func onPress33_0() {
-  handleModTapPress(@modTapHandler33, 2, modTapLayerActivations33, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
+  handleModTapPress(@modTapHandler33, 2, modTapLayerActivations33, 200);
 }
 func onRelease33_0() {
 }
@@ -4601,7 +4613,7 @@ func onRelease34() {
 }
 
 func onPress34_0() {
-  handleModTapPress(@modTapHandler34, 2, modTapLayerActivations34, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
+  handleModTapPress(@modTapHandler34, 2, modTapLayerActivations34, 200);
 }
 func onRelease34_0() {
 }
@@ -4634,7 +4646,7 @@ func onRelease35() {
 
 func onPress35_0() {
 
-  handleModTapPress(@modTapHandler35, 4, modTapLayerActivations35, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
+  handleModTapPress(@modTapHandler35, 4, modTapLayerActivations35, 200);
   checkWordCapsAndCapsLock();
 }
 func onRelease35_0() {
@@ -4688,7 +4700,7 @@ func onRelease36() {
 }
 
 func onPress36_0() {
-  handleModTapPress(@modTapHandler36, 4, modTapLayerActivations36, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
+  handleModTapPress(@modTapHandler36, 4, modTapLayerActivations36, 200);
 }
 func onRelease36_0() {
 }
@@ -4724,7 +4736,7 @@ func onPress37_0() {
     _action_switchToNumpadLayer();
     return;
   }
-  handleModTapPress(@modTapHandler37, 4, modTapLayerActivations37, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
+  handleModTapPress(@modTapHandler37, 4, modTapLayerActivations37, 200);
   checkWordCapsAndCapsLock();
 }
 func onRelease37_0() {
@@ -4783,7 +4795,7 @@ func onPress38_0() {
     return;
   }
   modTapLayerPossibility[3] = 1;
-  handleModTapPress(@modTapHandler38, 4, modTapLayerActivations38, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
+  handleModTapPress(@modTapHandler38, 4, modTapLayerActivations38, 200);
 }
 func onRelease38_0() {
   modTapLayerPossibility[0] = 0;
@@ -4834,13 +4846,13 @@ func onRelease39() {
 }
 
 func onPress39_0() {
-  handleModTapPress(@modTapHandler39, 8, modTapLayerActivations39, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
+  handleModTapPress(@modTapHandler39, 8, modTapLayerActivations39, 200);
 }
 func onRelease39_0() {
 }
 
 func onPress39_3() {
-  handleModTapPress(@modTapHandler39, 8, modTapLayerActivations39, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
+  handleModTapPress(@modTapHandler39, 8, modTapLayerActivations39, 200);
 }
 func onRelease39_3() {
 }
@@ -4934,7 +4946,7 @@ func onRelease41() {
 
 func onPress41_0() {
   modTapLayerPossibility[2] = 1;
-  handleModTapPress(@modTapHandler41, 16, modTapLayerActivations41, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
+  handleModTapPress(@modTapHandler41, 16, modTapLayerActivations41, 200);
 }
 func onRelease41_0() {
   modTapLayerPossibility[0] = 0;
@@ -4961,7 +4973,7 @@ func onRelease41_2() {
 }
 
 func onPress41_3() {
-  handleModTapPress(@modTapHandler41, 16, modTapLayerActivations41, MODTAP_DEFAULT_MODTAP_HOLD_TIME);
+  handleModTapPress(@modTapHandler41, 16, modTapLayerActivations41, 200);
 }
 func onRelease41_3() {
 }

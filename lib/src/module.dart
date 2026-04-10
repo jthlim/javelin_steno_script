@@ -12,23 +12,34 @@ class ScriptLocalVariable {
 }
 
 class ScriptLocals {
-  ScriptLocals([
+  ScriptLocals({
     Map<String, AstNode>? constants,
     Map<String, ScriptLocalVariable>? variables,
+    Map<String, String>? aliases,
     this.localVariableCount = 0,
-  ]) : constants = constants ?? {},
-       variables = variables ?? {};
+  }) : constants = constants ?? {},
+       variables = variables ?? {},
+       aliases = aliases ?? {};
 
   final Map<String, AstNode> constants;
   final Map<String, ScriptLocalVariable> variables;
+  final Map<String, String> aliases;
   int localVariableCount;
 
-  ScriptLocals clone() =>
-      ScriptLocals({...constants}, {...variables}, localVariableCount);
+  ScriptLocals clone() => ScriptLocals(
+    constants: {...constants},
+    variables: {...variables},
+    aliases: {...aliases},
+    localVariableCount: localVariableCount,
+  );
 }
 
 class ScriptFunction implements ScriptFunctionDefinition {
-  ScriptFunction(this.functionName);
+  ScriptFunction(
+    this.functionName, {
+    Map<String, AstNode>? constants,
+    Map<String, String>? aliases,
+  }) : locals = ScriptLocals(constants: constants, aliases: aliases);
 
   @override
   final String functionName;
@@ -44,7 +55,7 @@ class ScriptFunction implements ScriptFunctionDefinition {
   }
 
   final parameters = <String>{};
-  var locals = ScriptLocals();
+  ScriptLocals locals;
   late final StatementListAstNode statements;
   var hasMarked = false;
   var isLocked = false;
@@ -68,9 +79,18 @@ class ScriptFunction implements ScriptFunctionDefinition {
     addLocalVar(parameterName, null);
   }
 
+  void addAlias(String key, String value) {
+    // Copy on write.
+    if (localsStack.lastOrNull == locals) {
+      locals = locals.clone();
+    }
+
+    locals.aliases[key] = value;
+  }
+
   void addLocalConstant(String constantName, AstNode value) {
     // Copy on write.
-    if (localsStack.isNotEmpty && localsStack.last == locals) {
+    if (localsStack.lastOrNull == locals) {
       locals = locals.clone();
     }
 
@@ -79,7 +99,7 @@ class ScriptFunction implements ScriptFunctionDefinition {
 
   int addLocalVar(String localName, int? arraySize) {
     // Copy on write.
-    if (localsStack.isNotEmpty && localsStack.last == locals) {
+    if (localsStack.lastOrNull == locals) {
       locals = locals.clone();
     }
 
