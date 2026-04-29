@@ -1,3 +1,6 @@
+
+// Generated from javelin-layout file
+// Global
 //---------------------------------------------------------------------------
 // Default Jaffle pair script.
 //---------------------------------------------------------------------------
@@ -118,84 +121,53 @@ const CHARGING_STATUS_IMAGE = [[
 ]];
 
 const TIMER_ID_RGB_UPDATE = 0;
-const TIMER_ID_BLE_RATE = 1;
 
-func init() {
-  if (USE_STATUS_BAR) {
-    setScript(SCRIPT_ID_DISPLAY_OVERLAY, @drawDisplayOverlay);
-  }
-  setScript(SCRIPT_ID_BATTERY_UPDATE, @onBatteryUpdate);
-  setScript(SCRIPT_ID_CONNECTION_UPDATE, @onConnectionUpdate);
-  setScript(SCRIPT_ID_PAIR_CONNECTION_UPDATE, @onPairConnectionUpdate);
-  setScript(SCRIPT_ID_BEACON_STARTED, @onBeaconStarted);
-  setScript(SCRIPT_ID_LOCATION_ADVERTISING_UPDATE, @drawDisplayOverlay);
-
-  updateBoardPower();
-  drawDisplayOverlay();
+var layer;
+func setLayer(layerIndex, layerId) {
+  releaseAll();
+  layer = layerIndex;
+  sendEvent(formatString("l:%x", layerId));
 }
 
-func onBatteryUpdate() {
-  updateBoardPower();
-  redrawDisplayOverlay();
+func dispatchToLayer(functions) {
+  var f = functions[<resolveLayerIndex()>];
+  f();
 }
 
-func onConnectionUpdate() {
-  updateBoardPower();
+func dispatchToLayer1(functions, x) {
+  var f = functions[<resolveLayerIndex()>];
+  f(x);
 }
 
-func onPairConnectionUpdate() {
-  updateBoardPower();
-  redrawDisplayOverlay();
+func dispatchToLayer2(functions, x, y) {
+  var f = functions[<resolveLayerIndex()>];
+  f(x, y);
 }
 
-func onU2fStatusUpdate() {
-  updateBoardPower();
+func dispatchToLayer3(functions, x, y, z) {
+  var f = functions[<resolveLayerIndex()>];
+  f(x, y, z);
 }
 
-func onBeaconStarted() {
-  const LOCATION_IMAGE = [[
-    1c 28 00 00 00 00 00 00 fe 07 00 00 c0 ff 1f 00
-    00 e0 ff 7f 00 00 f0 ff ff 01 00 f8 ff ff 07 00
-    fc ff ff 1f 00 fc 07 ff 3f 00 fc 01 fc ff 00 fe
-    00 f8 ff 03 fe 00 f8 ff 07 7e 00 f0 ff 0f 7e 00
-    f0 ff 3f 7e 00 f0 ff 7f 7e 00 f0 ff 7f 7e 00 f0
-    ff 3f 7e 00 f0 ff 0f fe 00 f8 ff 07 fe 00 f8 ff
-    03 fc 01 fc ff 00 fc 07 ff 3f 00 fc ff ff 1f 00
-    f8 ff ff 07 00 f0 ff ff 01 00 e0 ff 7f 00 00 c0
-    ff 1f 00 00 00 fe 07 00 00 00 00 00 00 00
-  ]];
-
-  clearDisplay(1);
-  drawImage(1, DISPLAY_WIDTH/2-LOCATION_IMAGE[0]/2, 6, LOCATION_IMAGE);
-  drawText(1, DISPLAY_WIDTH/2, DISPLAY_HEIGHT-8, 0, 1, "Double Tap");
+func resolveLayerIndex() var {
+  return 0;
 }
 
-func updateBoardPower() {
-  var activePairConnection = getActivePairConnection();
-  if (activePairConnection == PAIR_CONNECTION_NONE) {
-    updateDisconnectedKeyRgbCycle();
-    startTimer(TIMER_ID_RGB_UPDATE, 32, 1, @updateDisconnectedKeyRgbCycle);
-    setBoardPower(1);
-  } else if (activePairConnection == PAIR_CONNECTION_CABLE) {
-    setBoardPower(isMainPowered() || isPairPowered());
-    stopTimer(TIMER_ID_RGB_UPDATE);
-  } else {
-    setBoardPower(isPairPowered());
-    stopTimer(TIMER_ID_RGB_UPDATE);
-  }
+func activate0() {
 }
 
-const DISCONNECTED_KEY_ORDER = [[ 06 07 08 09 0a 0b 0a 09 08 07 ]];
-func updateDisconnectedKeyRgbCycle() {
-  for (var i = 0; i < 68; i = i + 1) {
-    setRgb(i, 0, 0, 0);
-  }
-
-  var index = getTime() >> 6;
-  var keyId = DISCONNECTED_KEY_ORDER[index % 10];
-  setHsv(keyId, index << 10, 0xf0, 16);
+func activateDynamic() {
+  activate0();
+}
+func activateGlobal() {
+}
+func deactivate0() {
 }
 
+func deactivateDynamic() {}
+func deactivateGlobal() {
+}
+// Global Script: Display Overlay Scripts
 func drawDisplayOverlay() {
   if (!HAS_DISPLAY) return;
 
@@ -206,9 +178,9 @@ func drawDisplayOverlay() {
 
   // Draw paired icon
   drawImage(
-    1,
-    2, 0,
-    PAIR_CONNECTED_STATUS_IMAGES
+      1,
+      2, 0,
+      PAIR_CONNECTED_STATUS_IMAGES
       + PAIR_CONNECTED_STATUS_IMAGE_OFFSETS[getActivePairConnection()]
   );
 
@@ -242,195 +214,382 @@ func redrawDisplayOverlay() {
   drawRect(1, 0, 0, 0, 0);
 }
 
-//---------------------------------------------------------------------------
-
-func onPress0() { }
-func onRelease0() { }
-
-func onPress1() { }
-func onRelease1() { }
-
-func onPress2() { }
-func onRelease2() { }
-
-func onPress3() { }
-func onRelease3() { }
-
-func onPress4() { }
-func onRelease4() { }
-
-func onPress5() { }
-func onRelease5() { }
-
-func onPress6() { }
-func onRelease6() { }
-
-func onPress7() { }
-func onRelease7() { }
-
-func onPress8() { }
-func onRelease8() { }
-
-func onPress9() { }
-func onRelease9() { }
-
-func onPress10() { }
-func onRelease10() { }
-
-func onPress11() { }
-func onRelease11() { }
-
-func onPress12() { }
-func onRelease12() { }
-
-func onPress13() { }
-func onRelease13() { }
-
-func onPress14() { }
-func onRelease14() { }
-
-func onPress15() { }
-func onRelease15() { }
-
-func onPress16() { }
-func onRelease16() { }
-
-func onPress17() { }
-func onRelease17() { }
-
-func onPress18() { }
-func onRelease18() { }
-
-func onPress19() { }
-func onRelease19() { }
-
-func onPress20() { }
-func onRelease20() { }
-
-func onPress21() { }
-func onRelease21() { }
-
-func onPress22() { }
-func onRelease22() { }
-
-func onPress23() { }
-func onRelease23() { }
-
-// 3rd row
-func onPress24() { }
-func onRelease24() { }
-
-func onPress25() { }
-func onRelease25() { }
-
-func onPress26() { }
-func onRelease26() { }
-
-func onPress27() { }
-func onRelease27() { }
-
-func onPress28() { }
-func onRelease28() { }
-
-func onPress29() { }
-func onRelease29() { }
-
-func onPress30() { }
-func onRelease30() { }
-
-func onPress31() { }
-func onRelease31() { }
-
-func onPress32() { }
-func onRelease32() { }
-
-func onPress33() { }
-func onRelease33() { }
-
-func onPress34() { }
-func onRelease34() { }
-
-func onPress35() { }
-func onRelease35() { }
-
-// 4thn row
-func onPress36() { }
-func onRelease36() { }
-
-func onPress37() { }
-func onRelease37() { }
-
-func onPress38() { }
-func onRelease38() { }
-
-func onPress39() { }
-func onRelease39() { }
-
-func onPress40() { }
-func onRelease40() { }
-
-func onPress41() { }
-func onRelease41() { }
-
-func onPress42() { }
-func onRelease42() { }
-
-func onPress43() { }
-func onRelease43() { }
-
-func onPress44() { }
-func onRelease44() { }
-
-func onPress45() { }
-func onRelease45() { }
-
-func onPress46() { }
-func onRelease46() { }
-
-func onPress47() { }
-func onRelease47() { }
-
-// 5th row
-func onPress48() { }
-func onRelease48() { }
-
-func onPress49() { }
-func onRelease49() { }
-
-func onPress50() { }
-func onRelease50() { }
-
-func onPress51() { }
-func onRelease51() { }
-
-func onPress52() { }
-func onRelease52() { }
-
-func onPress53() { }
-func onRelease53() { }
-
-func onPress54() { }
-func onRelease54() { }
-
-func onPress55() { }
-func onRelease55() { }
-
-func onPointerInput0(x, y, z) { }
-
-var lastZ1;
-func onPointerInput1(x, y, z) {
-  if (z == 0) {
-    if (lastZ1 != 0) {
-      startTimer(TIMER_ID_BLE_RATE, 250, 0, @{ setBleSplitRate(0); });
-    }
-  } else {
-    if (lastZ1 == 0) {
-      if (isTimerActive(TIMER_ID_BLE_RATE)) {
-        stopTimer(TIMER_ID_BLE_RATE);
-      } else {
-        setBleSplitRate(1);
-      }
-    }
+// Global Script: RGB Scripts
+const DISCONNECTED_KEY_ORDER = [[ 06 07 08 09 0a 0b 0a 09 08 07 ]];
+func updateDisconnectedKeyRgbCycle() {
+  for (var i = 0; i < 68; i = i + 1) {
+    setRgb(i, 0, 0, 0);
   }
-  lastZ1 = z;
+
+  var index = getTime() >> 6;
+  var keyId = DISCONNECTED_KEY_ORDER[index % 10];
+  setHsv(keyId, index << 10, 0xf0, 16);
+}
+
+// Global Script: onBatteryUpdate
+func onBatteryUpdate() {
+  updateBoardPower();
+  redrawDisplayOverlay();
+}
+
+// Global Script: onBeaconStarted
+func onBeaconStarted() {
+  const LOCATION_IMAGE = [[
+    1c 28 00 00 00 00 00 00 fe 07 00 00 c0 ff 1f 00
+    00 e0 ff 7f 00 00 f0 ff ff 01 00 f8 ff ff 07 00
+    fc ff ff 1f 00 fc 07 ff 3f 00 fc 01 fc ff 00 fe
+    00 f8 ff 03 fe 00 f8 ff 07 7e 00 f0 ff 0f 7e 00
+    f0 ff 3f 7e 00 f0 ff 7f 7e 00 f0 ff 7f 7e 00 f0
+    ff 3f 7e 00 f0 ff 0f fe 00 f8 ff 07 fe 00 f8 ff
+    03 fc 01 fc ff 00 fc 07 ff 3f 00 fc ff ff 1f 00
+    f8 ff ff 07 00 f0 ff ff 01 00 e0 ff 7f 00 00 c0
+    ff 1f 00 00 00 fe 07 00 00 00 00 00 00 00
+  ]];
+
+  clearDisplay(1);
+  drawImage(1, DISPLAY_WIDTH/2-LOCATION_IMAGE[0]/2, 6, LOCATION_IMAGE);
+  drawText(1, DISPLAY_WIDTH/2, DISPLAY_HEIGHT-8, 0, 1, "Double Tap");
+}
+
+// Global Script: onConnectionUpdate
+func onConnectionUpdate() {
+  updateBoardPower();
+}
+
+func onPairConnectionUpdate() {
+  updateBoardPower();
+  redrawDisplayOverlay();
+}
+
+// Global Script: onU2fStatusUpdate
+func onU2fStatusUpdate() {
+  updateBoardPower();
+}
+
+// Global Script: updateBoardPower
+func updateBoardPower() {
+  var activePairConnection = getActivePairConnection();
+  if (activePairConnection == PAIR_CONNECTION_NONE) {
+    updateDisconnectedKeyRgbCycle();
+    startTimer(TIMER_ID_RGB_UPDATE, 32, 1, @updateDisconnectedKeyRgbCycle);
+    setBoardPower(1);
+  } else if (activePairConnection == PAIR_CONNECTION_CABLE) {
+    setBoardPower(isMainPowered() || isPairPowered());
+    stopTimer(TIMER_ID_RGB_UPDATE);
+  } else {
+    setBoardPower(isPairPowered());
+    stopTimer(TIMER_ID_RGB_UPDATE);
+  }
+}
+
+func init() {
+  // Global
+  if (USE_STATUS_BAR) {
+    setScript(SCRIPT_ID_DISPLAY_OVERLAY, @drawDisplayOverlay);
+  }
+  setScript(SCRIPT_ID_BATTERY_UPDATE, @onBatteryUpdate);
+  setScript(SCRIPT_ID_CONNECTION_UPDATE, @onConnectionUpdate);
+  setScript(SCRIPT_ID_PAIR_CONNECTION_UPDATE, @onPairConnectionUpdate);
+  setScript(SCRIPT_ID_BEACON_STARTED, @onBeaconStarted);
+  setScript(SCRIPT_ID_LOCATION_ADVERTISING_UPDATE, @drawDisplayOverlay);
+
+  updateBoardPower();
+  drawDisplayOverlay();
+  activate0();
+}
+
+func onPress0() {
+}
+func onRelease0() {
+}
+
+func onPress1() {
+}
+func onRelease1() {
+}
+
+func onPress2() {
+}
+func onRelease2() {
+}
+
+func onPress3() {
+}
+func onRelease3() {
+}
+
+func onPress4() {
+}
+func onRelease4() {
+}
+
+func onPress5() {
+}
+func onRelease5() {
+}
+
+func onPress6() {
+}
+func onRelease6() {
+}
+
+func onPress7() {
+}
+func onRelease7() {
+}
+
+func onPress8() {
+}
+func onRelease8() {
+}
+
+func onPress9() {
+}
+func onRelease9() {
+}
+
+func onPress10() {
+}
+func onRelease10() {
+}
+
+func onPress11() {
+}
+func onRelease11() {
+}
+
+func onPress12() {
+}
+func onRelease12() {
+}
+
+func onPress13() {
+}
+func onRelease13() {
+}
+
+func onPress14() {
+}
+func onRelease14() {
+}
+
+func onPress15() {
+}
+func onRelease15() {
+}
+
+func onPress16() {
+}
+func onRelease16() {
+}
+
+func onPress17() {
+}
+func onRelease17() {
+}
+
+func onPress18() {
+}
+func onRelease18() {
+}
+
+func onPress19() {
+}
+func onRelease19() {
+}
+
+func onPress20() {
+}
+func onRelease20() {
+}
+
+func onPress21() {
+}
+func onRelease21() {
+}
+
+func onPress22() {
+}
+func onRelease22() {
+}
+
+func onPress23() {
+}
+func onRelease23() {
+}
+
+func onPress24() {
+}
+func onRelease24() {
+}
+
+func onPress25() {
+}
+func onRelease25() {
+}
+
+func onPress26() {
+}
+func onRelease26() {
+}
+
+func onPress27() {
+}
+func onRelease27() {
+}
+
+func onPress28() {
+}
+func onRelease28() {
+}
+
+func onPress29() {
+}
+func onRelease29() {
+}
+
+func onPress30() {
+}
+func onRelease30() {
+}
+
+func onPress31() {
+}
+func onRelease31() {
+}
+
+func onPress32() {
+}
+func onRelease32() {
+}
+
+func onPress33() {
+}
+func onRelease33() {
+}
+
+func onPress34() {
+}
+func onRelease34() {
+}
+
+func onPress35() {
+}
+func onRelease35() {
+}
+
+func onPress36() {
+}
+func onRelease36() {
+}
+
+func onPress37() {
+}
+func onRelease37() {
+}
+
+func onPress38() {
+}
+func onRelease38() {
+}
+
+func onPress39() {
+}
+func onRelease39() {
+}
+
+func onPress40() {
+}
+func onRelease40() {
+}
+
+func onPress41() {
+}
+func onRelease41() {
+}
+
+func onPress42() {
+}
+func onRelease42() {
+}
+
+func onPress43() {
+}
+func onRelease43() {
+}
+
+func onPress44() {
+}
+func onRelease44() {
+}
+
+func onPress45() {
+}
+func onRelease45() {
+}
+
+func onPress46() {
+}
+func onRelease46() {
+}
+
+func onPress47() {
+}
+func onRelease47() {
+}
+
+func onPress48() {
+}
+func onRelease48() {
+}
+
+func onPress49() {
+}
+func onRelease49() {
+}
+
+func onPress50() {
+}
+func onRelease50() {
+}
+
+func onPress51() {
+}
+func onRelease51() {
+}
+
+func onPress52() {
+}
+func onRelease52() {
+}
+
+func onPress53() {
+}
+func onRelease53() {
+}
+
+func onPress54() {
+}
+func onRelease54() {
+}
+
+func onPress55() {
+}
+func onRelease55() {
+}
+
+func onPointerInput0(x, y, z) {
+}
+
+var _lastZ1;
+func onPointerInput1(x, y, z) {
+  if (!z && _lastZ1) {
+    //
+    setBleSplitRate(0);
+  }
+  if (z && !_lastZ1) {
+    //
+    setBleSplitRate(1);
+  }
+  _lastZ1 = z;
 }

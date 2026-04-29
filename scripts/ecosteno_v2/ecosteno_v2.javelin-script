@@ -354,7 +354,7 @@ func onRelease16() {
 
 func onPress16_0() {
   // Toggle\nSteno\nMode
-  // Toggle the steno mode between embedded and Gemini PR when USR is pressed.
+  // Toggle the steno mode between embedded and Plover HID.
   // LED RGB is updated in Global StenoModeUpdate callback.
   if (getParameter("steno_mode") != "embedded") {
     console("set_steno_mode embedded");
