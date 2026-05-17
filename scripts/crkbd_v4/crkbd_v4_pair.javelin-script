@@ -2,35 +2,6 @@
 // Default Corne pair script.
 //---------------------------------------------------------------------------
 
-const CONNECTION_NONE = 0;
-const CONNECTION_BLE = 1;
-const CONNECTION_USB = 2;
-const CONNECTION_USB_PAIR = 3;
-
-const PAIR_CONNECTION_NONE = 0;
-const PAIR_CONNECTION_BLE = 1;
-const PAIR_CONNECTION_CABLE = 2;
-
-const SCRIPT_ID_DISPLAY_OVERLAY = 0;
-const SCRIPT_ID_BATTERY_UPDATE = 1;
-const SCRIPT_ID_CONNECTION_UPDATE = 2;
-const SCRIPT_ID_PAIR_CONNECTION_UPDATE = 3;
-const SCRIPT_ID_KEYBOARD_LED_STATUS_UPDATE = 4;
-const SCRIPT_ID_BLE_ADVERTISING_UPDATE = 5;
-const SCRIPT_ID_BLE_SCANNING_UPDATE = 6;
-const SCRIPT_ID_U2F_STATUS_UPDATE = 7;
-
-const TEXT_ALIGNMENT_LEFT = 0;
-const TEXT_ALIGNMENT_MIDDLE = 1;
-const TEXT_ALIGNMENT_RIGHT = 2;
-
-const FONT_ID_NORMAL = 0;
-const FONT_ID_SMALL_DIGITS = 1;
-const FONT_ID_MEDIUM_DIGITS = 2;
-const FONT_ID_LARGE_DIGITS = 3;
-
-//---------------------------------------------------------------------------
-
 const TIMER_ID_RGB_UPDATE = 0;
 
 func init() {

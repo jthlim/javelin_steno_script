@@ -37,7 +37,7 @@ void main(List<String> arguments) {
     return;
   }
 
-  final module = ScriptModule(ButtonScriptBindings.functions);
+  final module = ButtonScriptModule.create();
 
   for (var i = 4; i < arguments.length; ++i) {
     final filename = arguments[i];

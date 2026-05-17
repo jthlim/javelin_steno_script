@@ -418,9 +418,6 @@ const LED_STATUS_KANA = 4;
 
 //---------------------------------------------------------------------------
 
-const INPUT_HINT_KEYBOARD = 0;
-const INPUT_HINT_STENOGRAPHY = 1;
-
 const SCRIPT_ID_KEYBOARD_LED_STATUS_UPDATE = 4;
 
 //---------------------------------------------------------------------------
@@ -614,8 +611,6 @@ func setLayer(value) {
   releaseAll();
   layer = value;
   sendLayerEvent();
-
-  setInputHint(value == STENO_MASK ? INPUT_HINT_STENOGRAPHY : INPUT_HINT_KEYBOARD);
 }
 
 func isModifierKey(key) var {
@@ -793,17 +788,10 @@ func onPairingHoldTimer() {
 }
 
 func onPress0() {
-  if (layer & STENO_MASK) {
-      setInputHint(INPUT_HINT_KEYBOARD);
-  }
   handlePress(0, SC_TAB, SC_TAB, SC_GRAVE, SC_NONE, SC_NONE, SC_NONE);
 }
 func onRelease0() {
   handleRelease(SC_TAB, SC_TAB, SC_GRAVE, SC_NONE, SC_NONE, SC_NONE);
-
-  if (layer & STENO_MASK) {
-      setInputHint(INPUT_HINT_STENOGRAPHY);
-  }
 }
 
 func onPress1() { handlePress(1, SC_Q, SK_S1 | KEY_STENO, SC_1, SC_F9, SC_NONE, SC_NONE); }

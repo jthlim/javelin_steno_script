@@ -21,7 +21,11 @@ class ScriptCompileResult {
     }
 
     return ScriptCompileResult.scripts(
-      scripts: [if (scriptHeader.isNotEmpty) scriptHeader, script],
+      scripts: [
+        ButtonScriptBindings.constants,
+        if (scriptHeader.isNotEmpty) scriptHeader,
+        script,
+      ],
       inBuiltFunctions: ButtonScriptBindings.functions,
       requiredFunctions: ButtonScriptBindings.createRootFunctionList(
         buttonCount: buttonCount,

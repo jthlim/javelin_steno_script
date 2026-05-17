@@ -140,7 +140,6 @@ class Parser {
     final nameToken = _currentToken;
     _assertToken(.identifier);
     final name = nameToken.stringValue!;
-    _assertUniqueName(name);
     _assertToken(.assign);
     final expression = _parseExpression();
     _assertToken(.semiColon);
@@ -160,6 +159,8 @@ class Parser {
       // Already defined to same value.
       return;
     }
+
+    _assertUniqueName(name);
 
     _module.constants[nameToken.stringValue!] = expression;
   }
@@ -895,7 +896,6 @@ class Parser {
     final nameToken = _currentToken;
     _assertToken(.identifier);
     final name = nameToken.stringValue!;
-    _assertUniqueName(name);
     _assertToken(.assign);
 
     if (_function != null && _currentToken.type == .at) {
@@ -929,6 +929,7 @@ class Parser {
       return;
     }
 
+    _assertUniqueName(name);
     _function!.addLocalConstant(name, expression);
   }
 
