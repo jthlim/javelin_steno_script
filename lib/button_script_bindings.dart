@@ -137,11 +137,13 @@ class ButtonScriptBindings {
     InBuiltScriptFunction('setSignatureAlgorithms', 1, ReturnType.none, 0x7d),
     InBuiltScriptFunction('isLocationAdvertising', 0, ReturnType.boolean, 0x7e),
     InBuiltScriptFunction('setBleSplitRate', 1, ReturnType.none, 0x7f),
-    InBuiltScriptFunction('analogDataInput', 2, ReturnType.none, 0x80),
+    InBuiltScriptFunction('analogInput', 2, ReturnType.none, 0x80),
     InBuiltScriptFunction('encoderInput', 2, ReturnType.none, 0x81),
     InBuiltScriptFunction('pointerInput', 4, ReturnType.none, 0x82),
     InBuiltScriptFunction('formatDateTime', 1, ReturnType.value, 0x83),
     InBuiltScriptFunction('isDateTimeValid', 0, ReturnType.boolean, 0x84),
+    InBuiltScriptFunction('generateTotp', 1, ReturnType.value, 0x85),
+    InBuiltScriptFunction('getTotpPeriod', 1, ReturnType.value, 0x86),
   ];
 
   static const constants = '''
@@ -298,6 +300,7 @@ const SC_CONSUMER_VOLUME_UP = 0xd9;
 const SC_CONSUMER_VOLUME_DOWN = 0xda;
 const SC_CONSUMER_BRIGHTNESS_UP = 0xde;
 const SC_CONSUMER_BRIGHTNESS_DOWN = 0xdf;
+const SC_CONSUMER_FN_GLOBE = 0x1029d;
 const MOUSE_BUTTON_LEFT = 0;
 const MOUSE_BUTTON_RIGHT = 1;
 const MOUSE_BUTTON_MIDDLE = 2;
@@ -441,6 +444,7 @@ const SCRIPT_ID_CONSOLE_ACCESS_REQUESTED = 19;
 const SCRIPT_ID_FLASH_WRITE_ACCESS_REQUESTED = 20;
 const SCRIPT_ID_BEACON_STARTED = 21;
 const SCRIPT_ID_LOCATION_ADVERTISING_UPDATE = 22;
+const SCRIPT_ID_RTC_UPDATE = 23;
 ''';
 
   static List<String> createRootFunctionList({
@@ -453,7 +457,7 @@ const SCRIPT_ID_LOCATION_ADVERTISING_UPDATE = 22;
       'init',
       'tick',
       for (var i = 0; i < buttonCount; ++i) ...['onPress$i', 'onRelease$i'],
-      for (var i = 0; i < analogDataCount; ++i) 'onAnalogDataInput$i',
+      for (var i = 0; i < analogDataCount; ++i) 'onAnalogInput$i',
       for (var i = 0; i < encoderCount; ++i) 'onEncoderInput$i',
       for (var i = 0; i < pointerCount; ++i) 'onPointerInput$i',
     ];
@@ -463,6 +467,12 @@ const SCRIPT_ID_LOCATION_ADVERTISING_UPDATE = 22;
 extension ButtonScriptModule on ScriptModule {
   static ScriptModule create() {
     final module = ScriptModule(ButtonScriptBindings.functions);
+    module.constants.addAll(constantsModule.constants);
+    return module;
+  }
+
+  static ScriptModule constantsModule = () {
+    final module = ScriptModule(ButtonScriptBindings.functions);
     final parser = Parser(
       input: ButtonScriptBindings.constants,
       filename: '<inbuilt>',
@@ -470,7 +480,7 @@ extension ButtonScriptModule on ScriptModule {
     );
     parser.parse();
     return module;
-  }
+  }();
 
   Uint8List createByteCode({
     required int buttonCount,

@@ -2,13 +2,9 @@ import 'module.dart';
 
 enum ExecutionState { running, finished, timeout, error, doBreak, doContinue }
 
-class ExecutionValue {
-  const ExecutionValue(this.intValue, this.stringValue);
-  const ExecutionValue.int(this.intValue) : stringValue = null;
-  const ExecutionValue.string(String this.stringValue) : intValue = 0;
-
-  final int intValue;
-  final String? stringValue;
+class const ExecutionValue(final int intValue, final String? stringValue) {
+  const new int(int intValue) : this(intValue, null);
+  const new string(String stringValue) : this(0, stringValue);
 
   static const zero = ExecutionValue.int(0);
   static const one = ExecutionValue.int(1);
@@ -43,19 +39,16 @@ class ExecutionValue {
   }
 }
 
-class ExecutionContext {
-  ExecutionContext(int maximumLocalsCount, this.module)
-    : locals = List.generate(
-        maximumLocalsCount,
-        (_) => const ExecutionValue.int(0),
-      );
+class ExecutionContext(int maximumLocalsCount, final ScriptModule module) {
+  final List<ExecutionValue> locals = List.generate(
+    maximumLocalsCount,
+    (_) => const ExecutionValue.int(0),
+  );
 
   var state = ExecutionState.running;
 
   var scriptCallDepth = 0;
   ExecutionValue? returnValue;
-  final List<ExecutionValue> locals;
-  final ScriptModule module;
 
   static const maxScriptCallDepth = 8;
 }

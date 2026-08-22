@@ -1,20 +1,15 @@
 import 'package:flutter/material.dart';
 
-class SyntaxHighlightingRule {
-  SyntaxHighlightingRule(
-    this.pattern,
-    this.lightMode,
-    this.darkMode, [
-    this.nestedRules,
-  ]);
-
-  final RegExp pattern;
-  final TextStyle lightMode;
-  final TextStyle darkMode;
-  final List<SyntaxHighlightingRule>? nestedRules;
-
-  TextStyle textStyle(Brightness brightness) =>
-      brightness == .light ? lightMode : darkMode;
+class SyntaxHighlightingRule(
+  final RegExp pattern,
+  final TextStyle lightMode,
+  final TextStyle darkMode, [
+  final List<SyntaxHighlightingRule>? nestedRules,
+]) {
+  TextStyle textStyle(Brightness brightness) => switch (brightness) {
+    .light => lightMode,
+    .dark => darkMode,
+  };
 
   static final lineCommentRegExp = RegExp(r'//.*');
 
@@ -49,7 +44,7 @@ class SyntaxHighlightingRule {
 
     // String literals.
     SyntaxHighlightingRule(
-      RegExp(r'"(?:[^\\"\n]|\\")*"?'),
+      RegExp(r'"(?:\\.|[^\\"\n])*"?'),
       const TextStyle(color: Color(0xFF4527A0)), // purple800
       const TextStyle(color: Color(0xFFB39DDB)), // purple200
     ),
@@ -70,7 +65,7 @@ class SyntaxHighlightingRule {
 
     // Brackets
     SyntaxHighlightingRule(
-      RegExp(r'[{}()]+'),
+      RegExp(r'[{}()][{}()\s]*'),
       const TextStyle(color: Colors.brown),
       const TextStyle(color: Color(0xFFFBC02D)), // Colors.yellow[700]
     ),
@@ -83,50 +78,69 @@ class SyntaxHighlightingRule {
     ),
   ];
 
-  static Iterable<TextSpan> colorSpanWithRules({
+  static bool isAllWhitespace(String s, int start, int end) {
+    for (var i = start; i < end; ++i) {
+      switch (s.codeUnitAt(i)) {
+        case 9: // tab
+        case 0xa: // '\n'
+        case 0xd: // '\r'
+        case 0x20: // space
+          break;
+        default:
+          return false;
+      }
+    }
+    return true;
+  }
+
+  static Iterable<TextSpan> _colorSpanWithRules({
     required String text,
     required List<SyntaxHighlightingRule> rules,
-    required int index,
+    required int ruleIndex,
     required Brightness brightness,
     TextStyle? style,
   }) sync* {
-    if (index >= rules.length) {
+    if (ruleIndex >= rules.length) {
       yield TextSpan(text: text, style: style);
       return;
     }
 
     var offset = 0;
-    final rule = rules[index];
+    final rule = rules[ruleIndex];
     for (final match in rule.pattern.allMatches(text)) {
       if (match.start != offset) {
-        yield* colorSpanWithRules(
-          text: text.substring(offset, match.start),
-          rules: rules,
-          index: index + 1,
-          brightness: brightness,
-          style: style,
-        );
+        if (!isAllWhitespace(text, offset, match.start)) {
+          yield* _colorSpanWithRules(
+            text: text.substring(offset, match.start),
+            rules: rules,
+            ruleIndex: ruleIndex + 1,
+            brightness: brightness,
+            style: style,
+          );
+          offset = match.start;
+        }
       }
       final nestedRules = rule.nestedRules;
+      final subMatch = text.substring(offset, match.end);
       if (nestedRules != null) {
-        yield* colorSpanWithRules(
-          text: match.group(0)!,
+        yield* _colorSpanWithRules(
+          text: subMatch,
           rules: nestedRules,
-          index: 0,
+          ruleIndex: 0,
           brightness: brightness,
           style: rule.textStyle(brightness),
         );
       } else {
-        yield TextSpan(text: match.group(0), style: rule.textStyle(brightness));
+        yield TextSpan(text: subMatch, style: rule.textStyle(brightness));
       }
 
       offset = match.end;
     }
     if (offset != text.length) {
-      yield* colorSpanWithRules(
+      yield* _colorSpanWithRules(
         text: text.substring(offset),
         rules: rules,
-        index: index + 1,
+        ruleIndex: ruleIndex + 1,
         brightness: brightness,
         style: style,
       );
@@ -138,17 +152,20 @@ class SyntaxHighlightingRule {
     required Brightness brightness,
     TextStyle? style,
   }) {
-    final defaultTextColor = brightness == .light ? Colors.black : Colors.white;
+    final defaultTextColor = switch (brightness) {
+      .light => Colors.black,
+      .dark => Colors.white,
+    };
 
     return TextSpan(
       style:
           style?.copyWith(color: defaultTextColor) ??
           TextStyle(color: defaultTextColor),
-      children: colorSpanWithRules(
+      children: _colorSpanWithRules(
         brightness: brightness,
         text: text,
         rules: SyntaxHighlightingRule.rules,
-        index: 0,
+        ruleIndex: 0,
       ).toList(),
     );
   }

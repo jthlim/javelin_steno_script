@@ -7,16 +7,11 @@ import 'instruction.dart';
 import 'module.dart';
 import 'token.dart';
 
-class ScriptReachability {
-  ScriptReachability(this.module, this.forceGlobalWrites);
-
-  final ScriptModule module;
-
+class ScriptReachability(final ScriptModule module, final bool forceGlobalWrites) {
   final strings = <String>{};
   final functions = <String>{};
   final globals = <int>{};
   final pendingGlobalStatements = <int, List<AstNode>>{};
-  final bool forceGlobalWrites;
 
   // data + lengths
   final data = <AstNode, int>{};
@@ -64,9 +59,7 @@ abstract class AstNode {
   static const maximumEvaluationLoopCount = 32;
 }
 
-class StringValueAstNode extends AstNode {
-  StringValueAstNode(this.value);
-
+class StringValueAstNode(final String value) extends AstNode {
   // Do NOT mark this as constant, otherwise integer folding instructions
   // will be attempted.
   @override
@@ -95,13 +88,9 @@ class StringValueAstNode extends AstNode {
     builder.strings.add(value);
     builder.addInstruction(PushStringValueInstruction(value));
   }
-
-  final String value;
 }
 
-class HalfWordListAstNode extends AstNode {
-  HalfWordListAstNode(this.values);
-
+class HalfWordListAstNode(final List<AstNode> values) extends AstNode {
   // Do NOT mark this as constant, otherwise integer folding instructions
   // will be attempted.
   @override
@@ -175,7 +164,6 @@ class HalfWordListAstNode extends AstNode {
   }
 
   late Uint8List bytes;
-  final List<AstNode> values;
 
   @override
   String toString() {
@@ -191,9 +179,8 @@ class HalfWordListAstNode extends AstNode {
   }
 }
 
-class ReadByteIndexAstNode extends AstNode {
-  ReadByteIndexAstNode(this.byteValue, this.index);
-
+class ReadByteIndexAstNode(final AstNode byteValue, final AstNode index)
+    extends AstNode {
   // Do NOT mark this as constant, otherwise integer folding instructions
   // will be attempted.
   @override
@@ -245,14 +232,13 @@ class ReadByteIndexAstNode extends AstNode {
 
     builder.addInstruction(OperatorInstruction(.readByteIndex));
   }
-
-  final AstNode byteValue;
-  final AstNode index;
 }
 
-class WriteByteIndexAstNode extends AstNode {
-  WriteByteIndexAstNode(this.byteValue, this.index, this.value);
-
+class WriteByteIndexAstNode(
+  final AstNode byteValue,
+  final AstNode index,
+  final AstNode value,
+) extends AstNode {
   @override
   bool isConstant() => false;
 
@@ -286,15 +272,10 @@ class WriteByteIndexAstNode extends AstNode {
 
     builder.addInstruction(WriteByteIndexInstruction());
   }
-
-  final AstNode byteValue;
-  final AstNode index;
-  final AstNode value;
 }
 
-class ReadHalfWordIndexAstNode extends AstNode {
-  ReadHalfWordIndexAstNode(this.value, this.index);
-
+class ReadHalfWordIndexAstNode(final AstNode value, final AstNode index)
+    extends AstNode {
   // Do NOT mark this as constant, otherwise integer folding instructions
   // will be attempted.
   @override
@@ -322,14 +303,13 @@ class ReadHalfWordIndexAstNode extends AstNode {
 
     builder.addInstruction(OperatorInstruction(.readHalfWordIndex));
   }
-
-  final AstNode value;
-  final AstNode index;
 }
 
-class WriteHalfWordIndexAstNode extends AstNode {
-  WriteHalfWordIndexAstNode(this.halfWordValue, this.index, this.value);
-
+class WriteHalfWordIndexAstNode(
+  final AstNode halfWordValue,
+  final AstNode index,
+  final AstNode value,
+) extends AstNode {
   @override
   bool isConstant() => false;
 
@@ -360,15 +340,10 @@ class WriteHalfWordIndexAstNode extends AstNode {
 
     builder.addInstruction(WriteHalfWordIndexInstruction());
   }
-
-  final AstNode halfWordValue;
-  final AstNode index;
-  final AstNode value;
 }
 
-class ReadWordIndexAstNode extends AstNode {
-  ReadWordIndexAstNode(this.value, this.index);
-
+class ReadWordIndexAstNode(final AstNode value, final AstNode index)
+    extends AstNode {
   // Do NOT mark this as constant, otherwise integer folding instructions
   // will be attempted.
   @override
@@ -396,14 +371,13 @@ class ReadWordIndexAstNode extends AstNode {
 
     builder.addInstruction(OperatorInstruction(.readWordIndex));
   }
-
-  final AstNode value;
-  final AstNode index;
 }
 
-class WriteWordIndexAstNode extends AstNode {
-  WriteWordIndexAstNode(this.wordValue, this.index, this.value);
-
+class WriteWordIndexAstNode(
+  final AstNode wordValue,
+  final AstNode index,
+  final AstNode value,
+) extends AstNode {
   @override
   bool isConstant() => false;
 
@@ -434,15 +408,9 @@ class WriteWordIndexAstNode extends AstNode {
 
     builder.addInstruction(WriteWordIndexInstruction());
   }
-
-  final AstNode wordValue;
-  final AstNode index;
-  final AstNode value;
 }
 
-class IntValueAstNode extends AstNode {
-  IntValueAstNode(this.value);
-
+class IntValueAstNode(final int value) extends AstNode {
   @override
   bool isConstant() => true;
 
@@ -466,13 +434,9 @@ class IntValueAstNode extends AstNode {
   AstNode simplify() {
     return this;
   }
-
-  final int value;
 }
 
-abstract class UnaryOperatorAstNode extends AstNode {
-  UnaryOperatorAstNode(this.statement);
-
+abstract class UnaryOperatorAstNode(final AstNode statement) extends AstNode {
   @override
   bool isConstant() => statement.isConstant();
 
@@ -511,8 +475,6 @@ abstract class UnaryOperatorAstNode extends AstNode {
   }
 
   ScriptOperatorOpcode get opcode;
-
-  final AstNode statement;
 }
 
 class NotAstNode extends UnaryOperatorAstNode {
@@ -550,9 +512,7 @@ class NegateAstNode extends UnaryOperatorAstNode {
   ScriptOperatorOpcode get opcode => .negative;
 }
 
-class BitwiseNotAstNode extends AstNode {
-  BitwiseNotAstNode(this.expression);
-
+class BitwiseNotAstNode(final AstNode expression) extends AstNode {
   @override
   bool isConstant() => expression.isConstant();
 
@@ -583,13 +543,12 @@ class BitwiseNotAstNode extends AstNode {
     builder.addInstruction(OperatorInstruction(.negative));
     builder.addInstruction(OperatorInstruction(.decrement));
   }
-
-  final AstNode expression;
 }
 
-abstract class BinaryOperatorAstNode extends AstNode {
-  BinaryOperatorAstNode(this.statementA, this.statementB);
-
+abstract class BinaryOperatorAstNode(
+  final AstNode statementA,
+  final AstNode statementB,
+) extends AstNode {
   @override
   bool isConstant() => statementA.isConstant() && statementB.isConstant();
 
@@ -628,19 +587,11 @@ abstract class BinaryOperatorAstNode extends AstNode {
   }
 
   ScriptOperatorOpcode get opcode;
-
-  final AstNode statementA;
-  final AstNode statementB;
 }
 
 enum TermMode { add, subtract }
 
-class Term {
-  const Term(this.mode, this.statement);
-
-  final TermMode mode;
-  final AstNode statement;
-}
+class const Term(final TermMode mode, final AstNode statement);
 
 class TermsAstNode extends AstNode {
   @override
@@ -687,10 +638,10 @@ class TermsAstNode extends AstNode {
       }
       switch (term.mode) {
         case .add:
-          result = result + value;
+          result += value;
           break;
         case .subtract:
-          result = result - value;
+          result -= value;
           break;
       }
     }
@@ -1290,18 +1241,12 @@ class NopAstNode extends AstNode {
   void addInstructions(ScriptByteCodeBuilder builder) {}
 }
 
-class ForStatementAstNode extends AstNode {
-  ForStatementAstNode({
-    this.initialization,
-    required this.condition,
-    this.update,
-    required this.body,
-  });
-
-  final AstNode? initialization;
-  final AstNode? condition;
-  final AstNode? update;
-  final AstNode body;
+class ForStatementAstNode({
+  final AstNode? initialization,
+  required final AstNode? condition,
+  final AstNode? update,
+  required final AstNode body,
+}) extends AstNode {
 
   @override
   bool isConstant() => false;
@@ -1447,11 +1392,10 @@ class ForStatementAstNode extends AstNode {
   }
 }
 
-class DoWhileStatementAstNode extends AstNode {
-  DoWhileStatementAstNode({required this.body, required this.condition});
-
-  final AstNode body;
-  final AstNode condition;
+class DoWhileStatementAstNode({
+  required final AstNode body,
+  required final AstNode condition,
+}) extends AstNode {
 
   @override
   bool isConstant() => false;
@@ -1557,13 +1501,12 @@ class DoWhileStatementAstNode extends AstNode {
   }
 }
 
-class IfStatementAstNode extends AstNode {
-  IfStatementAstNode({
-    required this.condition,
-    required this.whenTrue,
-    this.whenFalse,
-    this.isBooleanExpression = false,
-  });
+class IfStatementAstNode({
+  required final AstNode condition,
+  required final AstNode whenTrue,
+  final AstNode? whenFalse,
+  final bool isBooleanExpression = false,
+}) extends AstNode {
 
   @override
   bool isBoolean() => isBooleanExpression;
@@ -1684,11 +1627,6 @@ class IfStatementAstNode extends AstNode {
       builder.addInstruction(endNop);
     }
   }
-
-  final bool isBooleanExpression;
-  final AstNode condition;
-  final AstNode whenTrue;
-  final AstNode? whenFalse;
 }
 
 class BreakStatementAstNode extends AstNode {
@@ -1812,9 +1750,8 @@ class StatementListAstNode extends AstNode {
   void add(AstNode statement) => statements.add(statement);
 }
 
-class LoadGlobalValueArrayAstNode extends AstNode {
-  LoadGlobalValueArrayAstNode(this.global);
-
+class LoadGlobalValueArrayAstNode(final ScriptGlobal global)
+    extends AstNode {
   @override
   bool isConstant() => false;
 
@@ -1831,13 +1768,10 @@ class LoadGlobalValueArrayAstNode extends AstNode {
   void addInstructions(ScriptByteCodeBuilder builder) {
     throw Exception('Global value array ${global.name} must be indexed');
   }
-
-  final ScriptGlobal global;
 }
 
-class LoadLocalValueArrayAstNode extends AstNode {
-  LoadLocalValueArrayAstNode(this.local);
-
+class LoadLocalValueArrayAstNode(final ScriptLocalVariable local)
+    extends AstNode {
   @override
   bool isConstant() => false;
 
@@ -1859,8 +1793,6 @@ class LoadLocalValueArrayAstNode extends AstNode {
   void addInstructions(ScriptByteCodeBuilder builder) {
     throw Exception('Local value array ${local.name} must be indexed');
   }
-
-  final ScriptLocalVariable local;
 }
 
 mixin IndexedValueMixin {
@@ -1889,8 +1821,11 @@ mixin IndexedValueMixin {
   }
 }
 
-class LoadIndexedGlobalValueAstNode extends AstNode with IndexedValueMixin {
-  LoadIndexedGlobalValueAstNode(this.globalValue, this.indexExpression) {
+class LoadIndexedGlobalValueAstNode(
+  final LoadGlobalValueArrayAstNode globalValue,
+  final AstNode indexExpression,
+) extends AstNode with IndexedValueMixin {
+  this {
     globalIndexOffset = IndexedValueMixin.calculateIndexOffset(
       indexExpression,
       globalValue.global.index,
@@ -1944,12 +1879,13 @@ class LoadIndexedGlobalValueAstNode extends AstNode with IndexedValueMixin {
   }
 
   int globalIndexOffset = 0;
-  final LoadGlobalValueArrayAstNode globalValue;
-  final AstNode indexExpression;
 }
 
-class LoadIndexedLocalValueAstNode extends AstNode with IndexedValueMixin {
-  LoadIndexedLocalValueAstNode(this.localValue, this.indexExpression) {
+class LoadIndexedLocalValueAstNode(
+  final LoadLocalValueArrayAstNode localValue,
+  final AstNode indexExpression,
+) extends AstNode with IndexedValueMixin {
+  this {
     localIndexOffset = IndexedValueMixin.calculateIndexOffset(
       indexExpression,
       localValue.local.index,
@@ -1999,13 +1935,10 @@ class LoadIndexedLocalValueAstNode extends AstNode with IndexedValueMixin {
   }
 
   int localIndexOffset = 0;
-  final LoadLocalValueArrayAstNode localValue;
-  final AstNode indexExpression;
 }
 
-class LoadValueAstNode extends AstNode {
-  LoadValueAstNode({required this.isGlobal, required this.index});
-
+class LoadValueAstNode({required final bool isGlobal, required final int index})
+    extends AstNode {
   @override
   bool isConstant() => false;
 
@@ -2046,19 +1979,14 @@ class LoadValueAstNode extends AstNode {
       builder.addInstruction(LoadLocalValueInstruction(index));
     }
   }
-
-  final bool isGlobal;
-  final int index;
 }
 
-class CallFunctionAstNode extends AstNode {
-  CallFunctionAstNode({
-    required this.token,
-    required this.usesValue,
-    required this.name,
-    required this.parameters,
-  });
-
+class CallFunctionAstNode({
+  required final Token token,
+  required final bool usesValue,
+  required final String name,
+  required final List<AstNode> parameters,
+}) extends AstNode {
   @override
   bool isConstant() => false;
 
@@ -2087,6 +2015,7 @@ class CallFunctionAstNode extends AstNode {
 
     final definition = context.module.functions[name];
     if (definition is! ScriptFunction) return;
+
     if (!definition.isPure()) return;
     if (!definition.hasReturnValue || !usesValue) return;
 
@@ -2192,19 +2121,12 @@ class CallFunctionAstNode extends AstNode {
     }
   }
 
-  final Token token;
-
-  final bool usesValue;
-  final String name;
-  final List<AstNode> parameters;
-
   var hasEvaluated = false;
   ExecutionValue? evaluationResult;
 }
 
-class PushFunctionAddress extends AstNode {
-  PushFunctionAddress({required this.token, required this.name});
-
+class PushFunctionAddress({required final Token token, required final String name})
+    extends AstNode {
   @override
   bool isConstant() => false;
 
@@ -2237,19 +2159,14 @@ class PushFunctionAddress extends AstNode {
     }
     builder.addInstruction(PushFunctionAddressInstruction(name));
   }
-
-  final Token token;
-  final String name;
 }
 
-class StoreValueAstNode extends AstNode {
-  StoreValueAstNode({
-    required this.isGlobal,
-    required this.index,
-    required this.expression,
-    required this.isInitialization,
-  });
-
+class StoreValueAstNode({
+  required final bool isGlobal,
+  required final int index,
+  required final AstNode expression,
+  required final bool isInitialization,
+}) extends AstNode {
   @override
   bool isConstant() => false;
 
@@ -2304,19 +2221,14 @@ class StoreValueAstNode extends AstNode {
       );
     }
   }
-
-  final bool isGlobal;
-  final int index;
-  final AstNode expression;
-  final bool isInitialization;
 }
 
-class StoreIndexedGlobalValueAstNode extends AstNode with IndexedValueMixin {
-  StoreIndexedGlobalValueAstNode({
-    required this.globalValueIndex,
-    required this.indexExpression,
-    required this.expression,
-  }) {
+class StoreIndexedGlobalValueAstNode({
+  required final int globalValueIndex,
+  required final AstNode indexExpression,
+  required final AstNode expression,
+}) extends AstNode with IndexedValueMixin {
+  this {
     globalIndexOffset = IndexedValueMixin.calculateIndexOffset(
       indexExpression,
       globalValueIndex,
@@ -2372,17 +2284,14 @@ class StoreIndexedGlobalValueAstNode extends AstNode with IndexedValueMixin {
   }
 
   int globalIndexOffset = 0;
-  final int globalValueIndex;
-  final AstNode indexExpression;
-  final AstNode expression;
 }
 
-class StoreIndexedLocalValueAstNode extends AstNode with IndexedValueMixin {
-  StoreIndexedLocalValueAstNode({
-    required this.localValueIndex,
-    required this.indexExpression,
-    required this.expression,
-  }) {
+class StoreIndexedLocalValueAstNode({
+  required final int localValueIndex,
+  required final AstNode indexExpression,
+  required final AstNode expression,
+}) extends AstNode with IndexedValueMixin {
+  this {
     localIndexOffset = IndexedValueMixin.calculateIndexOffset(
       indexExpression,
       localValueIndex,
@@ -2440,14 +2349,9 @@ class StoreIndexedLocalValueAstNode extends AstNode with IndexedValueMixin {
   }
 
   int localIndexOffset = 0;
-  final int localValueIndex;
-  final AstNode indexExpression;
-  final AstNode expression;
 }
 
-class ReturnAstNode extends AstNode {
-  ReturnAstNode(this.expression);
-
+class ReturnAstNode(final AstNode? expression) extends AstNode {
   @override
   bool isReturn() => true;
 
@@ -2488,13 +2392,12 @@ class ReturnAstNode extends AstNode {
     expression?.addInstructions(builder);
     builder.addInstruction(ReturnInstruction());
   }
-
-  AstNode? expression;
 }
 
-class CallValueAstNode extends AstNode {
-  CallValueAstNode({required this.value, required this.parameters});
-
+class CallValueAstNode({
+  required final AstNode value,
+  required final List<AstNode> parameters,
+}) extends AstNode {
   @override
   bool isReturn() => false;
 
@@ -2523,7 +2426,4 @@ class CallValueAstNode extends AstNode {
     value.addInstructions(builder);
     builder.addInstruction(CallValueInstruction());
   }
-
-  final AstNode value;
-  final List<AstNode> parameters;
 }

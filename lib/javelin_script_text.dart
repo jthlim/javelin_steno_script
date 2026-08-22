@@ -2,19 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:javelin_steno_script/javelin_script_syntax_highlight.dart';
 
-class JavelinScriptText extends StatefulWidget {
-  JavelinScriptText(
-    this.text, {
-    super.key,
-    TextStyle? style,
-    this.brightness,
-    this.overflow,
-  }) : style = font.merge(style);
-
-  final String text;
-  final TextStyle? style;
-  final Brightness? brightness;
-  final TextOverflow? overflow;
+class JavelinScriptText(
+  final String text, {
+  super.key,
+  TextStyle? style,
+  final Brightness? brightness,
+  final TextOverflow? overflow,
+}) extends StatefulWidget {
+  final TextStyle? style = font.merge(style);
 
   static final font = GoogleFonts.robotoMono();
 
@@ -37,7 +32,7 @@ class _JavelinScriptTextState extends State<JavelinScriptText> {
 
   @override
   Widget build(BuildContext context) {
-    final brightness = widget.brightness ?? Theme.of(context).brightness;
+    final brightness = widget.brightness ?? Theme.brightnessOf(context);
     if (brightness != _brightness) {
       updateSpan(brightness);
     }

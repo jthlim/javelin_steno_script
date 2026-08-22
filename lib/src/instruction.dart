@@ -157,9 +157,8 @@ sealed class ScriptInstruction extends LinkedListEntry<ScriptInstruction> {
   }
 }
 
-final class LoadLocalValueInstruction extends ScriptInstruction {
-  LoadLocalValueInstruction(this.index);
-
+final class LoadLocalValueInstruction(final int index)
+    extends ScriptInstruction {
   @override
   int get byteCodeLength {
     return index >
@@ -179,15 +178,14 @@ final class LoadLocalValueInstruction extends ScriptInstruction {
     }
   }
 
-  final int index;
-
   @override
   String toString() => '  load l$index';
 }
 
-final class StoreLocalValueInstruction extends ScriptInstruction {
-  StoreLocalValueInstruction(this.index, this.isInitialization);
-
+final class StoreLocalValueInstruction(
+  final int index,
+  final bool isInitialization,
+) extends ScriptInstruction {
   @override
   int get byteCodeLength {
     return index >
@@ -207,16 +205,12 @@ final class StoreLocalValueInstruction extends ScriptInstruction {
     }
   }
 
-  final int index;
-  final bool isInitialization;
-
   @override
   String toString() => '  store l$index';
 }
 
-final class LoadGlobalValueInstruction extends ScriptInstruction {
-  LoadGlobalValueInstruction(this.index);
-
+final class LoadGlobalValueInstruction(final int index)
+    extends ScriptInstruction {
   @override
   int get byteCodeLength {
     return index >
@@ -236,17 +230,12 @@ final class LoadGlobalValueInstruction extends ScriptInstruction {
     }
   }
 
-  final int index;
-
   @override
   String toString() => '  load g$index';
 }
 
-final class LoadIndexedGlobalValueInstruction extends ScriptInstruction {
-  LoadIndexedGlobalValueInstruction(this.index);
-
-  final int index;
-
+final class LoadIndexedGlobalValueInstruction(final int index)
+    extends ScriptInstruction {
   @override
   int get byteCodeLength => 2;
 
@@ -260,11 +249,8 @@ final class LoadIndexedGlobalValueInstruction extends ScriptInstruction {
   String toString() => '  load g$index[]';
 }
 
-final class LoadIndexedLocalValueInstruction extends ScriptInstruction {
-  LoadIndexedLocalValueInstruction(this.index);
-
-  final int index;
-
+final class LoadIndexedLocalValueInstruction(final int index)
+    extends ScriptInstruction {
   @override
   int get byteCodeLength => 2;
 
@@ -278,9 +264,8 @@ final class LoadIndexedLocalValueInstruction extends ScriptInstruction {
   String toString() => '  load l$index[]';
 }
 
-final class StoreGlobalValueInstruction extends ScriptInstruction {
-  StoreGlobalValueInstruction(this.index);
-
+final class StoreGlobalValueInstruction(final int index)
+    extends ScriptInstruction {
   @override
   int get byteCodeLength {
     return index >
@@ -300,17 +285,12 @@ final class StoreGlobalValueInstruction extends ScriptInstruction {
     }
   }
 
-  final int index;
-
   @override
   String toString() => '  store g$index';
 }
 
-final class StoreIndexedGlobalValueInstruction extends ScriptInstruction {
-  StoreIndexedGlobalValueInstruction(this.index);
-
-  final int index;
-
+final class StoreIndexedGlobalValueInstruction(final int index)
+    extends ScriptInstruction {
   @override
   int get byteCodeLength => 2;
 
@@ -324,11 +304,8 @@ final class StoreIndexedGlobalValueInstruction extends ScriptInstruction {
   String toString() => '  store g$index[]';
 }
 
-final class StoreIndexedLocalValueInstruction extends ScriptInstruction {
-  StoreIndexedLocalValueInstruction(this.index);
-
-  final int index;
-
+final class StoreIndexedLocalValueInstruction(final int index)
+    extends ScriptInstruction {
   @override
   int get byteCodeLength => 2;
 
@@ -342,9 +319,9 @@ final class StoreIndexedLocalValueInstruction extends ScriptInstruction {
   String toString() => '  store l$index[]';
 }
 
-final class CallInBuiltFunctionInstruction extends ScriptInstruction {
-  CallInBuiltFunctionInstruction(this.function);
-
+final class CallInBuiltFunctionInstruction(
+  final InBuiltScriptFunction function,
+) extends ScriptInstruction {
   @override
   bool get isBooleanResult => function.isBooleanResult;
 
@@ -357,20 +334,15 @@ final class CallInBuiltFunctionInstruction extends ScriptInstruction {
     builder.addByte(function.functionIndex);
   }
 
-  final InBuiltScriptFunction function;
-
   @override
   String toString() =>
       '  call in-built-${function.functionIndex} '
       '(${function.functionName})';
 }
 
-sealed class FunctionReferenceScriptInstruction extends ScriptInstruction {
-  FunctionReferenceScriptInstruction(this.functionName)
-    : targetName = functionName;
-
-  final String functionName;
-  String? targetName;
+sealed class FunctionReferenceScriptInstruction(final String functionName)
+    extends ScriptInstruction {
+  String? targetName = functionName;
 }
 
 final class CallFunctionInstruction extends FunctionReferenceScriptInstruction {
@@ -668,9 +640,8 @@ final class JumpIfNotZeroInstruction extends JumpInstructionBase {
   bool get isConditional => true;
 }
 
-final class PushStringValueInstruction extends ScriptInstruction {
-  PushStringValueInstruction(this.value);
-
+final class PushStringValueInstruction(final String value)
+    extends ScriptInstruction {
   @override
   int get byteCodeLength => 3;
 
@@ -689,18 +660,14 @@ final class PushStringValueInstruction extends ScriptInstruction {
 
   @override
   String toString() => '  push offset-of ${formatStringData(value)}';
-
-  final String value;
 }
 
-final class SetHalfWordFunctionDataValueInstruction
-    extends FunctionReferenceScriptInstruction {
-  SetHalfWordFunctionDataValueInstruction({
-    required String functionName,
-    required this.value,
-    required this.valueOffset,
-  }) : super(functionName);
-
+final class SetHalfWordFunctionDataValueInstruction({
+  required String functionName,
+  required final Uint8List value,
+  required final int valueOffset,
+}) extends FunctionReferenceScriptInstruction {
+  this : super(functionName);
   @override
   int get byteCodeLength => 0;
 
@@ -726,18 +693,13 @@ final class SetHalfWordFunctionDataValueInstruction
   String toString() => functionName == targetName
       ? '  ((set2 offset $valueOffset -> $functionName))'
       : '  ((set2 offset $valueOffset -> $targetName ($functionName)))';
-
-  final Uint8List value;
-  final int valueOffset;
 }
 
-final class SetHalfWordStringValueInstruction extends ScriptInstruction {
-  SetHalfWordStringValueInstruction({
-    required this.stringValue,
-    required this.value,
-    required this.valueOffset,
-  });
-
+final class SetHalfWordStringValueInstruction({
+  required final String stringValue,
+  required final Uint8List value,
+  required final int valueOffset,
+}) extends ScriptInstruction {
   @override
   int get byteCodeLength => 0;
 
@@ -755,15 +717,10 @@ final class SetHalfWordStringValueInstruction extends ScriptInstruction {
   @override
   String toString() =>
       '  ((set2 offset $valueOffset -> "${formatStringData(stringValue)}"))';
-
-  final Uint8List value;
-  final int valueOffset;
-  final String stringValue;
 }
 
-final class PushDataValueInstruction extends ScriptInstruction {
-  PushDataValueInstruction(this.value);
-
+final class PushDataValueInstruction(final AstNode value)
+    extends ScriptInstruction {
   @override
   int get byteCodeLength => 3;
 
@@ -780,13 +737,10 @@ final class PushDataValueInstruction extends ScriptInstruction {
 
   @override
   String toString() => '  push offset-of $value';
-
-  final AstNode value;
 }
 
-final class PushIntValueInstruction extends ScriptInstruction {
-  PushIntValueInstruction(this.value);
-
+final class PushIntValueInstruction(final int value)
+    extends ScriptInstruction {
   @override
   int get byteCodeLength {
     if (0 <= value && value < 60) {
@@ -836,15 +790,12 @@ final class PushIntValueInstruction extends ScriptInstruction {
     }
   }
 
-  final int value;
-
   @override
   String toString() => '  push $value';
 }
 
-final class NopInstruction extends ScriptInstruction {
-  NopInstruction([this.reference]);
-
+final class NopInstruction([final ScriptInstruction? reference])
+    extends ScriptInstruction {
   @override
   int get byteCodeLength => 0;
 
@@ -853,8 +804,6 @@ final class NopInstruction extends ScriptInstruction {
 
   @override
   void addByteCode(ScriptByteCodeBuilder builder) {}
-
-  final ScriptInstruction? reference;
 
   bool isTarget(ScriptInstruction? target) {
     while (target is NopInstruction) {
@@ -868,11 +817,8 @@ final class NopInstruction extends ScriptInstruction {
   String toString() => ' 0x${offset.toRadixString(16)}:';
 }
 
-final class OperatorInstruction extends ScriptInstruction {
-  OperatorInstruction(this.operator);
-
-  final ScriptOperatorOpcode operator;
-
+final class OperatorInstruction(final ScriptOperatorOpcode operator)
+    extends ScriptInstruction {
   @override
   bool get isBooleanResult => operator.isBooleanResult;
 
@@ -947,16 +893,11 @@ final class ReturnIfNotZeroInstruction extends SingleOpcodeInstruction {
   String toString() => '  retnz';
 }
 
-final class StartFunctionInstruction extends ScriptInstruction {
-  StartFunctionInstruction(this.function, this.isLocked, this.isPure);
-
-  final ScriptFunctionDefinition function;
-
-  // Locked functions cannot have their body completely optimized out.
-  final bool isLocked;
-
-  final bool isPure;
-
+final class StartFunctionInstruction(
+  final ScriptFunctionDefinition function,
+  final bool isLocked,
+  final bool isPure,
+) extends ScriptInstruction {
   @override
   bool get hasReference => true;
 
@@ -994,11 +935,7 @@ final class StartFunctionInstruction extends ScriptInstruction {
   }
 }
 
-final class DataInstruction extends ScriptInstruction {
-  DataInstruction(this.data);
-
-  final Uint8List data;
-
+final class DataInstruction(final Uint8List data) extends ScriptInstruction {
   @override
   bool get implicitNext => false;
 

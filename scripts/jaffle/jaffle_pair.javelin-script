@@ -92,10 +92,10 @@ const CHARGING_STATUS_IMAGE = [[
 const TIMER_ID_RGB_UPDATE = 0;
 
 var layer;
-func setLayer(layerIndex, layerId) {
+func setLayer(layerIndex, layerIdEvent) {
   releaseAll();
   layer = layerIndex;
-  sendEvent(formatString("l:%x", layerId));
+  sendEvent(layerIdEvent);
 }
 
 func dispatchToLayer(functions) {

@@ -4,10 +4,10 @@
 const BLINK_TIMER_ID = 0;
 
 var layer;
-func setLayer(layerIndex, layerId) {
+func setLayer(layerIndex, layerIdEvent) {
   releaseAll();
   layer = layerIndex;
-  sendEvent(formatString("l:%x", layerId));
+  sendEvent(layerIdEvent);
 }
 
 var wasSteno;
@@ -37,19 +37,19 @@ func resolveLayerIndex() var {
 }
 
 func activate0() {
-  setLayer(0, 87377230);
+  setLayer(0, "l:535454e");
 }
 
 func activate1() {
-  setLayer(1, 1128808786);
+  setLayer(1, "l:43484152");
 }
 
 func activate2() {
-  setLayer(2, 127179234);
+  setLayer(2, "l:79499e2");
 }
 
 func activate3() {
-  setLayer(3, 131415213);
+  setLayer(3, "l:7d53cad");
 }
 
 func activateDynamic() {

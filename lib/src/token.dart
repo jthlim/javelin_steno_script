@@ -67,21 +67,13 @@ enum TokenType {
   hash,
 }
 
-class Token {
-  const Token({
-    required this.type,
-    required this.line,
-    required this.column,
-    this.intValue,
-    this.stringValue,
-  });
-
-  final TokenType type;
-  final int line;
-  final int column;
-
-  final int? intValue;
-  final String? stringValue;
+class const Token({
+  required final TokenType type,
+  required final int line,
+  required final int column,
+  final int? intValue,
+  final String? stringValue,
+}) {
 
   @override
   int get hashCode =>

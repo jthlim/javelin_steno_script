@@ -9,17 +9,13 @@ import 'instruction_list.dart';
 import 'module.dart';
 import 'string_data.dart';
 
-class ScriptByteCodeBuilder {
-  ScriptByteCodeBuilder({
-    required this.module,
-    required this.byteCodeVersion,
-    required this.requiredFunctions,
-    bool forceGlobalWrites = false,
-  }) : reachability = ScriptReachability(module, forceGlobalWrites);
-
-  final ScriptModule module;
-  final int byteCodeVersion;
-  final List<String> requiredFunctions;
+class ScriptByteCodeBuilder({
+  required final ScriptModule module,
+  required final int byteCodeVersion,
+  required final List<String> requiredFunctions,
+  final bool forceGlobalWrites = false,
+}) {
+  this : reachability = ScriptReachability(module, forceGlobalWrites);
 
   final _bytesBuilder = BytesBuilder();
   final instructions = InstructionList();

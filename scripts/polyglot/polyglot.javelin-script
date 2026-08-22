@@ -1,10 +1,10 @@
 
 // Generated from javelin-layout file
 var layer;
-func setLayer(layerIndex, layerId) {
+func setLayer(layerIndex, layerIdEvent) {
   releaseAll();
   layer = layerIndex;
-  sendEvent(formatString("l:%x", layerId));
+  sendEvent(layerIdEvent);
 }
 
 func dispatchToLayer(functions) {
@@ -32,23 +32,23 @@ func resolveLayerIndex() var {
 }
 
 func activate0() {
-  setLayer(0, 87377230);
+  setLayer(0, "l:535454e");
 }
 
 func activate1() {
-  setLayer(1, 1128808786);
+  setLayer(1, "l:43484152");
 }
 
 func activate2() {
-  setLayer(2, 148942692);
+  setLayer(2, "l:8e0af64");
 }
 
 func activate3() {
-  setLayer(3, 105007919);
+  setLayer(3, "l:6424b2f");
 }
 
 func activate4() {
-  setLayer(4, 259868619);
+  setLayer(4, "l:f7d47cb");
 }
 
 func activateDynamic() {

@@ -4,10 +4,10 @@
 const BLINK_TIMER_ID = 0;
 
 var layer;
-func setLayer(layerIndex, layerId) {
+func setLayer(layerIndex, layerIdEvent) {
   releaseAll();
   layer = layerIndex;
-  sendEvent(formatString("l:%x", layerId));
+  sendEvent(layerIdEvent);
 }
 
 func dispatchToLayer(functions) {

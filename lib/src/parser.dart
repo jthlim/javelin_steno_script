@@ -12,10 +12,10 @@ enum _IndexType {
   word,
 }
 
-class Parser {
+class Parser.tokenizer(Tokenizer tokenizer, final ScriptModule _module) {
   static const maximumGlobalVariableCount = 256;
 
-  factory Parser({
+  factory({
     required String input,
     required String filename,
     required ScriptModule module,
@@ -23,14 +23,12 @@ class Parser {
     return Parser.tokenizer(Tokenizer(input, filename), module);
   }
 
-  Parser.tokenizer(Tokenizer tokenizer, this._module)
-    : _tokens = tokenizer.tokenize().iterator {
+  this : _tokens = tokenizer.tokenize().iterator {
     _hasNextToken = _tokens.moveNext();
     _nextToken();
   }
 
   final Iterator<Token> _tokens;
-  final ScriptModule _module;
   final _namedValues = <String, int>{};
 
   var _currentToken = const Token(type: .eof, line: 0, column: 0);
@@ -1257,6 +1255,14 @@ class Parser {
     final pushFunctionAddress = _parsePrimary();
     final parameters = _parseParameterList();
     _assertToken(.semiColon);
+    if (pushFunctionAddress is PushFunctionAddress) {
+      return CallFunctionAstNode(
+        token: pushFunctionAddress.token,
+        usesValue: false,
+        name: pushFunctionAddress.name,
+        parameters: parameters,
+      );
+    }
     return CallValueAstNode(value: pushFunctionAddress, parameters: parameters);
   }
 

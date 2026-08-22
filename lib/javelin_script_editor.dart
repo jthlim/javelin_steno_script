@@ -18,26 +18,16 @@ class HideScrollbarBehavior extends MaterialScrollBehavior {
   }
 }
 
-class JavelinScriptEditor extends StatefulWidget {
-  const JavelinScriptEditor({
-    super.key,
-    required this.autofocus,
-    required this.script,
-    this.padding = EdgeInsets.zero,
-    required this.onChanged,
-    this.maxLines,
-    this.hintText,
-    this.brightness,
-  });
-
-  final bool autofocus;
-  final String script;
-  final EdgeInsetsGeometry padding;
-  final void Function(String s) onChanged;
-  final int? maxLines;
-  final String? hintText;
-  final Brightness? brightness;
-
+class const JavelinScriptEditor({
+  super.key,
+  required final bool autofocus,
+  required final String script,
+  final EdgeInsetsGeometry padding = EdgeInsets.zero,
+  required final void Function(String s) onChanged,
+  final int? maxLines,
+  final String? hintText,
+  final Brightness? brightness,
+}) extends StatefulWidget {
   @override
   State<StatefulWidget> createState() => JavelinScriptEditorState();
 }

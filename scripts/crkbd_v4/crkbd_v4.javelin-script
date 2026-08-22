@@ -10,10 +10,10 @@ var brightness = 3;
 var saturation = 5;
 
 var layer;
-func setLayer(layerIndex, layerId) {
+func setLayer(layerIndex, layerIdEvent) {
   releaseAll();
   layer = layerIndex;
-  sendEvent(formatString("l:%x", layerId));
+  sendEvent(layerIdEvent);
 }
 
 func dispatchToLayer(functions) {
@@ -41,23 +41,23 @@ func resolveLayerIndex() var {
 }
 
 func activate0() {
-  setLayer(0, 87377230);
+  setLayer(0, "l:535454e");
 }
 
 func activate1() {
-  setLayer(1, 1128808786);
+  setLayer(1, "l:43484152");
 }
 
 func activate2() {
-  setLayer(2, 50258991);
+  setLayer(2, "l:2fee42f");
 }
 
 func activate3() {
-  setLayer(3, 175277611);
+  setLayer(3, "l:a72862b");
 }
 
 func activate4() {
-  setLayer(4, 122649869);
+  setLayer(4, "l:74f7d0d");
 }
 
 func activateDynamic() {

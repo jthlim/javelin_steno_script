@@ -5,7 +5,13 @@ import 'package:javelin_steno_script/button_script_bindings.dart';
 import 'package:javelin_steno_script/javelin_steno_script.dart';
 import 'package:javelin_steno_script/unicode_script_bindings.dart';
 
-class ScriptCompileResult {
+class const ScriptCompileResult({
+  required final bool success,
+  required final String message,
+  required final int size,
+  final Uint8List? data,
+  final ScriptByteCodeBuilder? builder,
+}) {
   factory ScriptCompileResult.buttonScript({
     required String script,
     required String scriptHeader,
@@ -116,39 +122,31 @@ class ScriptCompileResult {
     }
   }
 
-  const ScriptCompileResult({
-    required this.success,
-    required this.message,
-    required this.size,
-    this.data,
-    this.builder,
-  });
+  const new ok(
+    int size,
+    Uint8List data,
+    ScriptByteCodeBuilder builder,
+  ) : this(
+        success: true,
+        message: 'OK, $size bytes',
+        size: size,
+        data: data,
+        builder: builder,
+      );
 
-  const ScriptCompileResult.ok(
-    this.size,
-    Uint8List this.data,
-    ScriptByteCodeBuilder this.builder,
-  ) : success = true,
-      message = 'OK, $size bytes';
+  const new failed(String message)
+    : this(
+        success: false,
+        message: message,
+        size: 0,
+      );
 
-  const ScriptCompileResult.failed(this.message)
-    : success = false,
-      size = 0,
-      builder = null,
-      data = null;
-
-  const ScriptCompileResult.empty()
-    : success = false,
-      size = 0,
-      message = 'No script',
-      builder = null,
-      data = null;
-
-  final bool success;
-  final String message;
-  final int size;
-  final Uint8List? data;
-  final ScriptByteCodeBuilder? builder;
+  const new empty()
+    : this(
+        success: false,
+        message: 'No script',
+        size: 0,
+      );
 
   ScriptCompileResult copyWith({
     bool? success,

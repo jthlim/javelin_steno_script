@@ -44,6 +44,51 @@ tick (0xa):
   ret
 ''');
     });
+
+    test('should skip assignment', () {
+      final compiledCode = _compileScript('''
+var lastButtonIndex;
+var isShowingScreenSaver;
+
+func globalPress(buttonIndex) {
+  lastButtonIndex = buttonIndex;
+  updateScreenSaverTimer();
+}
+
+func updateScreenSaverTimer() {
+  if (isShowingScreenSaver) {
+    isShowingScreenSaver = 0;
+  }
+}
+
+func tick() {
+  globalPress(0);
+}
+
+''');
+      expect(compiledCode, '''
+
+\$byteCodeRoot (0x0):
+  ((set2 offset 6 -> null (init)))
+  ((set2 offset 8 -> tick))
+  data [[4a 53 53 34 1a 00 00 00 15 00]]
+
+globalPress (0xa):
+  enterFunction 1 0
+  jmp updateScreenSaverTimer
+
+updateScreenSaverTimer (0x10):
+  load g1
+  retz
+  push 0
+  store g1
+  ret
+
+tick (0x15):
+  push 0
+  jmp globalPress
+''');
+    });
   });
 }
 

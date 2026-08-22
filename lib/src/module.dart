@@ -3,28 +3,17 @@ import 'executor.dart';
 import 'functions.dart';
 import 'parser.dart';
 
-class ScriptLocalVariable {
-  ScriptLocalVariable(this.name, this.index, [this.arraySize]);
+class ScriptLocalVariable(final String name, final int index, [final int? arraySize]);
 
-  final String name;
-  final int index;
-  final int? arraySize;
-}
-
-class ScriptLocals {
-  ScriptLocals({
-    Map<String, AstNode>? constants,
-    Map<String, ScriptLocalVariable>? variables,
-    Map<String, String>? aliases,
-    this.localVariableCount = 0,
-  }) : constants = constants ?? {},
-       variables = variables ?? {},
-       aliases = aliases ?? {};
-
-  final Map<String, AstNode> constants;
-  final Map<String, ScriptLocalVariable> variables;
-  final Map<String, String> aliases;
-  int localVariableCount;
+class ScriptLocals({
+  Map<String, AstNode>? constants,
+  Map<String, ScriptLocalVariable>? variables,
+  Map<String, String>? aliases,
+  var int localVariableCount = 0,
+}) {
+  final Map<String, AstNode> constants = constants ?? {};
+  final Map<String, ScriptLocalVariable> variables = variables ?? {};
+  final Map<String, String> aliases = aliases ?? {};
 
   ScriptLocals clone() => ScriptLocals(
     constants: {...constants},
@@ -34,15 +23,12 @@ class ScriptLocals {
   );
 }
 
-class ScriptFunction implements ScriptFunctionDefinition {
-  ScriptFunction(
-    this.functionName, {
-    Map<String, AstNode>? constants,
-    Map<String, String>? aliases,
-  }) : locals = ScriptLocals(constants: constants, aliases: aliases);
-
-  @override
-  final String functionName;
+class ScriptFunction(
+  @override final String functionName, {
+  Map<String, AstNode>? constants,
+  Map<String, String>? aliases,
+}) implements ScriptFunctionDefinition {
+  this : locals = ScriptLocals(constants: constants, aliases: aliases);
 
   @override
   bool hasReturnValue = false;
@@ -55,7 +41,7 @@ class ScriptFunction implements ScriptFunctionDefinition {
   }
 
   final parameters = <String>{};
-  ScriptLocals locals;
+  late ScriptLocals locals;
   late final StatementListAstNode statements;
   var hasMarked = false;
   var isLocked = false;
@@ -126,22 +112,15 @@ class ScriptFunction implements ScriptFunctionDefinition {
   }
 }
 
-class ScriptGlobal {
-  ScriptGlobal({
-    required this.name,
-    required this.index,
-    required this.arraySize,
-    required this.initializer,
-  });
+class ScriptGlobal({
+  required final String name,
+  required final int index,
+  required final int? arraySize,
+  required final AstNode? initializer,
+});
 
-  final String name;
-  final int index;
-  final int? arraySize;
-  final AstNode? initializer;
-}
-
-class ScriptModule {
-  ScriptModule(List<InBuiltScriptFunction> builtInFunctions) {
+class ScriptModule(List<InBuiltScriptFunction> builtInFunctions) {
+  this {
     for (final builtInFunction in builtInFunctions) {
       functions[builtInFunction.functionName] = builtInFunction;
     }

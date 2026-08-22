@@ -783,7 +783,8 @@ class InstructionList extends Iterable<ScriptInstruction> {
       instruction != null;
       instruction = instruction.next
     ) {
-      if (instruction is StartFunctionInstruction) {
+      if (instruction is StartFunctionInstruction &&
+          instruction.function.numberOfParameters == 0) {
         final firstInstruction = instruction.next;
         if (firstInstruction is JumpFunctionInstruction) {
           functionTargets[instruction.function.functionName] =

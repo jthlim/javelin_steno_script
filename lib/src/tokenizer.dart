@@ -1,14 +1,7 @@
 import 'token.dart';
 
-class Tokenizer {
-  Tokenizer(String input, String filename)
-    : _input = input,
-      _length = input.length,
-      _filename = filename;
-
-  final String _input;
-  final int _length;
-  final String _filename;
+class Tokenizer(final String _input, final String _filename) {
+  final int _length = _input.length;
 
   var _offset = 0;
   var _line = 1;
@@ -666,21 +659,39 @@ class Tokenizer {
       }
     }
 
-    if (value == 0 && !hasProcessedDigits && (c == 0x58 || c == 0x78)) {
-      // '0x' format.
-      for (;;) {
-        c = _getC();
-        final hexValue = _hexValue(c);
-        if (hexValue == -1) {
-          if (c != -1) --_offset;
-          return Token(
-            type: .intValue,
-            line: line,
-            column: column,
-            intValue: value,
-          );
+    if (value == 0 && !hasProcessedDigits) {
+      if (c == 0x58 || c == 0x78) {
+        // '0x' format.
+        for (;;) {
+          c = _getC();
+          final hexValue = _hexValue(c);
+          if (hexValue == -1) {
+            if (c != -1) --_offset;
+            return Token(
+              type: .intValue,
+              line: line,
+              column: column,
+              intValue: value,
+            );
+          }
+          value = value * 16 + hexValue;
         }
-        value = value * 16 + hexValue;
+      } else if (c == 0x42 || c == 0x62) {
+        // '0b' format.
+        for (;;) {
+          c = _getC();
+          final binaryValue = _binaryValue(c);
+          if (binaryValue == -1) {
+            if (c != -1) --_offset;
+            return Token(
+              type: .intValue,
+              line: line,
+              column: column,
+              intValue: value,
+            );
+          }
+          value = value * 2 + binaryValue;
+        }
       }
     }
 
@@ -708,6 +719,11 @@ class Tokenizer {
     if (0x30 <= c && c <= 0x39) return c - 0x30;
     if (0x41 <= c && c <= 0x46) return c - 0x41 + 10;
     if (0x61 <= c && c <= 0x66) return c - 0x61 + 10;
+    return -1;
+  }
+
+  static int _binaryValue(int c) {
+    if (0x30 <= c && c <= 0x31) return c - 0x30;
     return -1;
   }
 

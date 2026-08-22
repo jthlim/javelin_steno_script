@@ -175,15 +175,15 @@ const SETTINGS_IMAGE = [[
 ]];
 
 var layer;
-func setLayer(layerIndex, layerId) {
+func setLayer(layerIndex, layerIdEvent) {
   releaseAll();
   layer = layerIndex;
-  sendEvent(formatString("l:%x", layerId));
+  sendEvent(layerIdEvent);
 }
 
-func setLayerNoRelease(layerIndex, layerId) {
+func setLayerNoRelease(layerIndex, layerIdEvent) {
   layer = layerIndex;
-  sendEvent(formatString("l:%x", layerId));
+  sendEvent(layerIdEvent);
 }
 
 func dispatchToLayer(functions) {
@@ -212,49 +212,49 @@ func resolveLayerIndex() var {
 
 func activate0() {
   clearPendingModTap();
-  setLayer(0, 87377230);
+  setLayer(0, "l:535454e");
   wordCaps = 0;
 }
 
 func activate0NoRelease() {
   cancelAllStenoKeys();
-  setLayerNoRelease(0, 87377230);
+  setLayerNoRelease(0, "l:535454e");
   wordCaps = 0;
 }
 
 func activate1() {
   clearPendingModTap();
-  setLayer(1, 1128808786);
+  setLayer(1, "l:43484152");
 }
 
 func activate1NoRelease() {
   cancelAllStenoKeys();
-  setLayerNoRelease(1, 1128808786);
+  setLayerNoRelease(1, "l:43484152");
 }
 
 func activate2() {
   clearPendingModTap();
-  setLayer(2, 262857896);
+  setLayer(2, "l:faae4a8");
 }
 
 func activate2NoRelease() {
   cancelAllStenoKeys();
-  setLayerNoRelease(2, 262857896);
+  setLayerNoRelease(2, "l:faae4a8");
 }
 
 func activate3() {
   clearPendingModTap();
-  setLayer(3, 41429312);
+  setLayer(3, "l:2782940");
 }
 
 func activate3NoRelease() {
   cancelAllStenoKeys();
-  setLayerNoRelease(3, 41429312);
+  setLayerNoRelease(3, "l:2782940");
 }
 
 func activate4() {
   clearPendingModTap();
-  setLayer(4, 212846523);
+  setLayer(4, "l:cafc7bb");
   if (isButtonPressed(37)) {
     onPress37();
   }
@@ -262,7 +262,7 @@ func activate4() {
 
 func activate4NoRelease() {
   cancelAllStenoKeys();
-  setLayerNoRelease(4, 212846523);
+  setLayerNoRelease(4, "l:cafc7bb");
   if (isButtonPressed(37)) {
     onPress37();
   }
@@ -270,32 +270,32 @@ func activate4NoRelease() {
 
 func activate5() {
   clearPendingModTap();
-  setLayer(5, 125635709);
+  setLayer(5, "l:77d0c7d");
 }
 
 func activate5NoRelease() {
   cancelAllStenoKeys();
-  setLayerNoRelease(5, 125635709);
+  setLayerNoRelease(5, "l:77d0c7d");
 }
 
 func activate6() {
   clearPendingModTap();
-  setLayer(6, 58064650);
+  setLayer(6, "l:375ff0a");
 }
 
 func activate6NoRelease() {
   cancelAllStenoKeys();
-  setLayerNoRelease(6, 58064650);
+  setLayerNoRelease(6, "l:375ff0a");
 }
 
 func activate7() {
   clearPendingModTap();
-  setLayer(7, 61572736);
+  setLayer(7, "l:3ab8680");
 }
 
 func activate7NoRelease() {
   cancelAllStenoKeys();
-  setLayerNoRelease(7, 61572736);
+  setLayerNoRelease(7, "l:3ab8680");
 }
 
 func activateDynamic() {
@@ -1549,6 +1549,7 @@ func rgbUpdateKeyU2fAlertCycle() {
   var keyId = U2F_KEY_ORDER[index % 22];
   setRgb(keyId, 16, 16, 16);
 
+  setRgb(11, 0, 0, 32);
   setRgb(12, 32, 0, 0);
   setRgb(24, 0, 32, 0);
   setRgb(35, 0, 32, 0);
@@ -3682,7 +3683,7 @@ func onRelease10_6() {
 func onPress11() {
   globalPress(11);
 
-  dispatchToLayer([<@onPress11_0, @onPress11_1, @onPress11_2, 0, @onPress11_4, @onPress11_5, @onPress11_6, 0>]);
+  dispatchToLayer([<@onPress11_0, @onPress11_1, @onPress11_2, 0, @onPress11_4, @onPress11_5, @onPress11_6, @onPress11_7>]);
 }
 func onRelease11() {
   globalRelease();
@@ -3731,6 +3732,15 @@ func onPress11_6() {
 }
 func onRelease11_6() {
   releaseScanCodeButton(42 /* "⌫" */);
+}
+
+func onPress11_7() {
+  deactivateGlobal();
+  deactivate7();
+  activate1();
+  activateGlobal();
+}
+func onRelease11_7() {
 }
 
 var pressTime12;
