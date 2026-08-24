@@ -7,7 +7,10 @@ import 'instruction.dart';
 import 'module.dart';
 import 'token.dart';
 
-class ScriptReachability(final ScriptModule module, final bool forceGlobalWrites) {
+class ScriptReachability(
+  final ScriptModule module,
+  final bool forceGlobalWrites,
+) {
   final strings = <String>{};
   final functions = <String>{};
   final globals = <int>{};
@@ -1025,7 +1028,7 @@ class LogicalOrAstNode extends BinaryOperatorAstNode {
   @override
   bool isConstant() {
     if (statementA.isConstant()) {
-      if (statementA.constantValue() == 1) {
+      if (statementA.constantValue() != 0) {
         return true;
       }
       return statementB.isConstant();
@@ -1035,7 +1038,7 @@ class LogicalOrAstNode extends BinaryOperatorAstNode {
 
   @override
   int constantValue() {
-    if (statementA.constantValue() == 1) {
+    if (statementA.constantValue() != 0) {
       return 1;
     }
     return statementB.constantValue() != 0 ? 1 : 0;
@@ -1247,7 +1250,6 @@ class ForStatementAstNode({
   final AstNode? update,
   required final AstNode body,
 }) extends AstNode {
-
   @override
   bool isConstant() => false;
 
@@ -1396,7 +1398,6 @@ class DoWhileStatementAstNode({
   required final AstNode body,
   required final AstNode condition,
 }) extends AstNode {
-
   @override
   bool isConstant() => false;
 
@@ -1507,7 +1508,6 @@ class IfStatementAstNode({
   final AstNode? whenFalse,
   final bool isBooleanExpression = false,
 }) extends AstNode {
-
   @override
   bool isBoolean() => isBooleanExpression;
 
@@ -1750,8 +1750,7 @@ class StatementListAstNode extends AstNode {
   void add(AstNode statement) => statements.add(statement);
 }
 
-class LoadGlobalValueArrayAstNode(final ScriptGlobal global)
-    extends AstNode {
+class LoadGlobalValueArrayAstNode(final ScriptGlobal global) extends AstNode {
   @override
   bool isConstant() => false;
 
@@ -2125,8 +2124,10 @@ class CallFunctionAstNode({
   ExecutionValue? evaluationResult;
 }
 
-class PushFunctionAddress({required final Token token, required final String name})
-    extends AstNode {
+class PushFunctionAddress({
+  required final Token token,
+  required final String name,
+}) extends AstNode {
   @override
   bool isConstant() => false;
 
