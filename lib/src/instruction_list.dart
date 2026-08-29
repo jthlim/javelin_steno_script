@@ -18,6 +18,9 @@ class InstructionList extends Iterable<ScriptInstruction> {
   @override
   Iterator<ScriptInstruction> get iterator => instructions.iterator;
 
+  @override
+  ScriptInstruction get last => instructions.last;
+
   void optimize({required int byteCodeVersion}) {
     optimizeStoreLoad();
     optimizeTrueFalseJumps();
@@ -192,15 +195,20 @@ class InstructionList extends Iterable<ScriptInstruction> {
         ScriptInstruction? target = instruction.target.firstNonNopInstruction;
 
         if (identical(instruction.next?.firstNonNopInstruction, target)) {
-          final previous = instruction.previous!;
           // Insert a pop for conditional instructions.
           if (instruction is! JumpInstruction) {
-            instruction.replaceWith(PopValueInstruction());
+            final previous = instruction.previous;
+            if (previous is PopRemovable) {
+              previous!.unlink();
+              instruction.unlink();
+            } else {
+              instruction.replaceWith(PopValueInstruction());
+            }
           } else {
             instruction.unlink();
           }
 
-          instruction = previous.next;
+          instruction = target;
           continue;
         }
 
@@ -343,8 +351,14 @@ class InstructionList extends Iterable<ScriptInstruction> {
 
       final next = instruction.target.next;
       if (instruction.isConditional) {
-        instruction.insertAfter(PopValueInstruction());
-        instruction.unlink();
+        final previous = instruction.previous;
+        if (previous is PopRemovable) {
+          previous!.unlink();
+          instruction.unlink();
+        } else {
+          instruction.insertAfter(PopValueInstruction());
+          instruction.unlink();
+        }
       }
       instruction = next;
     }
@@ -815,10 +829,8 @@ class InstructionList extends Iterable<ScriptInstruction> {
   void recurseMarkStartFunctions(
     Map<String, StartFunctionInstruction> startFunctionInstructions,
     Set<StartFunctionInstruction> requiredFunctions,
-    String? name,
+    String name,
   ) {
-    if (name == null) return;
-
     final startInstruction = startFunctionInstructions[name];
     if (startInstruction == null) return;
 
@@ -827,16 +839,20 @@ class InstructionList extends Iterable<ScriptInstruction> {
     requiredFunctions.add(startInstruction);
 
     for (
-      ScriptInstruction? instruction = startInstruction;
+      var instruction = startInstruction.next;
       instruction != null;
       instruction = instruction.next
     ) {
+      if (instruction is StartFunctionInstruction) return;
       if (instruction is FunctionReferenceScriptInstruction) {
-        recurseMarkStartFunctions(
-          startFunctionInstructions,
-          requiredFunctions,
-          instruction.targetName,
-        );
+        final targetName = instruction.targetName;
+        if (targetName != null) {
+          recurseMarkStartFunctions(
+            startFunctionInstructions,
+            requiredFunctions,
+            targetName,
+          );
+        }
       }
     }
   }

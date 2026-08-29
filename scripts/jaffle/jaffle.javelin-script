@@ -538,7 +538,7 @@ func drawDisplaySecurityKey() {
   drawDisplay0(SECURITY_KEY_IMAGE);
   setAutoDraw(1, AUTO_DRAW_WPM);
 
-  drawText(0, JAVELIN_DISPLAY_WIDTH/2, JAVELIN_DISPLAY_HEIGHT - 8, 0, 1, getRelyingPartyId());
+  drawText(0, DISPLAY_WIDTH/2, DISPLAY_HEIGHT - 8, 0, 1, getRelyingPartyId());
 }
 
 func drawDisplayDynamicSteno() {

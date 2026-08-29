@@ -424,6 +424,9 @@ class IntValueAstNode(final int value) extends AstNode {
   bool isPure() => true;
 
   @override
+  bool isBoolean() => value == 0 || value == 1;
+
+  @override
   ExecutionValue? evaluate(ExecutionContext context) {
     return ExecutionValue.int(value);
   }
@@ -1611,20 +1614,21 @@ class IfStatementAstNode({
     } else {
       jumpInstruction = JumpIfZeroInstruction();
     }
+
     final elseNop = jumpInstruction.target;
     builder.addInstruction(jumpInstruction);
-
     whenTrue.addInstructions(builder);
-    NopInstruction? endNop;
-    if (!(whenFalse?.isEmpty() ?? true)) {
+
+    final localWhenFalse = whenFalse;
+    if (localWhenFalse != null) {
       final jumpInstruction = JumpInstruction();
-      endNop = jumpInstruction.target;
+      final endNop = jumpInstruction.target;
       builder.addInstruction(jumpInstruction);
-    }
-    builder.addInstruction(elseNop);
-    whenFalse?.addInstructions(builder);
-    if (endNop != null) {
+      builder.addInstruction(elseNop);
+      localWhenFalse.addInstructions(builder);
       builder.addInstruction(endNop);
+    } else {
+      builder.addInstruction(elseNop);
     }
   }
 }

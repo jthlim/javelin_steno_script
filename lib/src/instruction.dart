@@ -8,6 +8,8 @@ import 'byte_code_builder.dart';
 import 'functions.dart';
 import 'string_data.dart';
 
+import 'package:collection/collection.dart';
+
 enum ScriptOpcode {
   pushConstantBegin(0),
   pushConstantEnd(0x3b),
@@ -107,6 +109,8 @@ enum ScriptOperatorOpcode {
   ScriptOperatorOpcode? get opposite => _opposites[this];
 }
 
+class const PopRemovable();
+
 sealed class ScriptInstruction extends LinkedListEntry<ScriptInstruction> {
   bool get isBooleanResult => false;
   bool get implicitNext => true;
@@ -134,11 +138,8 @@ sealed class ScriptInstruction extends LinkedListEntry<ScriptInstruction> {
     unlink();
   }
 
-  @override
-  int get hashCode => toString().hashCode;
-
-  @override
-  bool operator ==(Object other) => toString() == other.toString();
+  // ignore: unused_element
+  bool get _hasImplementedHashCodeAndEquals;
 
   ScriptInstruction get firstNonNopInstruction {
     var instruction = this;
@@ -158,7 +159,8 @@ sealed class ScriptInstruction extends LinkedListEntry<ScriptInstruction> {
 }
 
 final class LoadLocalValueInstruction(final int index)
-    extends ScriptInstruction {
+    extends ScriptInstruction
+    implements PopRemovable {
   @override
   int get byteCodeLength {
     return index >
@@ -177,6 +179,17 @@ final class LoadLocalValueInstruction(final int index)
       builder.addByte(ScriptOpcode.loadLocalBegin.value + index);
     }
   }
+
+  @override
+  // ignore: unused_element
+  bool get _hasImplementedHashCodeAndEquals => true;
+
+  @override
+  int get hashCode => Object.hash(LoadLocalValueInstruction, index);
+
+  @override
+  bool operator ==(Object other) =>
+      other is LoadLocalValueInstruction && index == other.index;
 
   @override
   String toString() => '  load l$index';
@@ -206,11 +219,23 @@ final class StoreLocalValueInstruction(
   }
 
   @override
+  // ignore: unused_element
+  bool get _hasImplementedHashCodeAndEquals => true;
+
+  @override
+  int get hashCode => Object.hash(StoreLocalValueInstruction, index);
+
+  @override
+  bool operator ==(Object other) =>
+      other is StoreLocalValueInstruction && index == other.index;
+
+  @override
   String toString() => '  store l$index';
 }
 
 final class LoadGlobalValueInstruction(final int index)
-    extends ScriptInstruction {
+    extends ScriptInstruction
+    implements PopRemovable {
   @override
   int get byteCodeLength {
     return index >
@@ -231,6 +256,17 @@ final class LoadGlobalValueInstruction(final int index)
   }
 
   @override
+  // ignore: unused_element
+  bool get _hasImplementedHashCodeAndEquals => true;
+
+  @override
+  int get hashCode => Object.hash(LoadGlobalValueInstruction, index);
+
+  @override
+  bool operator ==(Object other) =>
+      other is LoadGlobalValueInstruction && index == other.index;
+
+  @override
   String toString() => '  load g$index';
 }
 
@@ -246,6 +282,17 @@ final class LoadIndexedGlobalValueInstruction(final int index)
   }
 
   @override
+  // ignore: unused_element
+  bool get _hasImplementedHashCodeAndEquals => true;
+
+  @override
+  int get hashCode => Object.hash(LoadIndexedGlobalValueInstruction, index);
+
+  @override
+  bool operator ==(Object other) =>
+      other is LoadIndexedGlobalValueInstruction && index == other.index;
+
+  @override
   String toString() => '  load g$index[]';
 }
 
@@ -259,6 +306,17 @@ final class LoadIndexedLocalValueInstruction(final int index)
     builder.addOpcode(.loadLocalIndex);
     builder.addByte(index);
   }
+
+  @override
+  // ignore: unused_element
+  bool get _hasImplementedHashCodeAndEquals => true;
+
+  @override
+  int get hashCode => Object.hash(LoadIndexedLocalValueInstruction, index);
+
+  @override
+  bool operator ==(Object other) =>
+      other is LoadIndexedLocalValueInstruction && index == other.index;
 
   @override
   String toString() => '  load l$index[]';
@@ -286,6 +344,17 @@ final class StoreGlobalValueInstruction(final int index)
   }
 
   @override
+  // ignore: unused_element
+  bool get _hasImplementedHashCodeAndEquals => true;
+
+  @override
+  int get hashCode => Object.hash(StoreGlobalValueInstruction, index);
+
+  @override
+  bool operator ==(Object other) =>
+      other is StoreGlobalValueInstruction && index == other.index;
+
+  @override
   String toString() => '  store g$index';
 }
 
@@ -299,6 +368,17 @@ final class StoreIndexedGlobalValueInstruction(final int index)
     builder.addOpcode(.storeGlobalIndex);
     builder.addByte(index);
   }
+
+  @override
+  // ignore: unused_element
+  bool get _hasImplementedHashCodeAndEquals => true;
+
+  @override
+  int get hashCode => Object.hash(StoreIndexedGlobalValueInstruction, index);
+
+  @override
+  bool operator ==(Object other) =>
+      other is StoreIndexedGlobalValueInstruction && index == other.index;
 
   @override
   String toString() => '  store g$index[]';
@@ -316,12 +396,22 @@ final class StoreIndexedLocalValueInstruction(final int index)
   }
 
   @override
+  // ignore: unused_element
+  bool get _hasImplementedHashCodeAndEquals => true;
+
+  @override
+  int get hashCode => Object.hash(StoreIndexedLocalValueInstruction, index);
+
+  @override
+  bool operator ==(Object other) =>
+      other is StoreIndexedLocalValueInstruction && index == other.index;
+
+  @override
   String toString() => '  store l$index[]';
 }
 
-final class CallInBuiltFunctionInstruction(
-  final InBuiltScriptFunction function,
-) extends ScriptInstruction {
+final class CallInBuiltFunctionInstruction(final InBuiltScriptFunction function)
+    extends ScriptInstruction {
   @override
   bool get isBooleanResult => function.isBooleanResult;
 
@@ -335,6 +425,19 @@ final class CallInBuiltFunctionInstruction(
   }
 
   @override
+  // ignore: unused_element
+  bool get _hasImplementedHashCodeAndEquals => true;
+
+  @override
+  int get hashCode =>
+      Object.hash(CallInBuiltFunctionInstruction, function.functionIndex);
+
+  @override
+  bool operator ==(Object other) =>
+      other is CallInBuiltFunctionInstruction &&
+      function.functionIndex == other.function.functionIndex;
+
+  @override
   String toString() =>
       '  call in-built-${function.functionIndex} '
       '(${function.functionName})';
@@ -343,6 +446,19 @@ final class CallInBuiltFunctionInstruction(
 sealed class FunctionReferenceScriptInstruction(final String functionName)
     extends ScriptInstruction {
   String? targetName = functionName;
+
+  @override
+  // ignore: unused_element
+  bool get _hasImplementedHashCodeAndEquals => true;
+
+  @override
+  int get hashCode => Object.hash(runtimeType, targetName);
+
+  @override
+  bool operator ==(Object other) =>
+      other is FunctionReferenceScriptInstruction &&
+      targetName == other.targetName &&
+      runtimeType == other.runtimeType;
 }
 
 final class CallFunctionInstruction extends FunctionReferenceScriptInstruction {
@@ -368,35 +484,6 @@ final class CallFunctionInstruction extends FunctionReferenceScriptInstruction {
   String toString() => functionName == targetName
       ? '  call $functionName'
       : '  call $targetName ($functionName)';
-}
-
-final class CallValueInstruction extends ScriptInstruction {
-  @override
-  int get byteCodeLength => 1;
-
-  @override
-  void addByteCode(ScriptByteCodeBuilder builder) {
-    builder.addOpcode(.callValue);
-  }
-
-  @override
-  String toString() => '  callValue';
-}
-
-final class JumpValueInstruction extends ScriptInstruction {
-  @override
-  int get byteCodeLength => 1;
-
-  @override
-  bool get implicitNext => false;
-
-  @override
-  void addByteCode(ScriptByteCodeBuilder builder) {
-    builder.addOpcode(.jumpValue);
-  }
-
-  @override
-  String toString() => '  jumpValue';
 }
 
 final class PushFunctionAddressInstruction
@@ -465,10 +552,10 @@ final class JumpFunctionInstruction extends JumpFunctionInstructionBase {
   bool get implicitNext => false;
 
   @override
-  ScriptOpcode get opcode => ScriptOpcode.jumpLong;
+  ScriptOpcode get opcode => .jumpLong;
 
   @override
-  ScriptOpcode get returnOpcode => ScriptOpcode.ret;
+  ScriptOpcode get returnOpcode => .ret;
 
   @override
   bool get isConditional => false;
@@ -483,10 +570,10 @@ final class JumpIfZeroFunctionInstruction extends JumpFunctionInstructionBase {
   JumpIfZeroFunctionInstruction(super.functionName);
 
   @override
-  ScriptOpcode get opcode => ScriptOpcode.jumpIfZeroLong;
+  ScriptOpcode get opcode => .jumpIfZeroLong;
 
   @override
-  ScriptOpcode get returnOpcode => ScriptOpcode.retIfZero;
+  ScriptOpcode get returnOpcode => .retIfZero;
 
   @override
   bool get isConditional => true;
@@ -502,10 +589,10 @@ final class JumpIfNotZeroFunctionInstruction
   JumpIfNotZeroFunctionInstruction(super.functionName);
 
   @override
-  ScriptOpcode get opcode => ScriptOpcode.jumpIfNotZeroLong;
+  ScriptOpcode get opcode => .jumpIfNotZeroLong;
 
   @override
-  ScriptOpcode get returnOpcode => ScriptOpcode.retIfNotZero;
+  ScriptOpcode get returnOpcode => .retIfNotZero;
 
   @override
   bool get isConditional => true;
@@ -596,6 +683,19 @@ sealed class JumpInstructionBase extends ScriptInstruction {
   bool get isConditional => false;
 
   late final NopInstruction target;
+
+  @override
+  // ignore: unused_element
+  bool get _hasImplementedHashCodeAndEquals => true;
+
+  @override
+  int get hashCode => Object.hash(runtimeType, target.offset);
+
+  @override
+  bool operator ==(Object other) =>
+      other is JumpInstructionBase &&
+      target.offset == other.target.offset &&
+      runtimeType == other.runtimeType;
 }
 
 final class JumpInstruction extends JumpInstructionBase {
@@ -603,10 +703,10 @@ final class JumpInstruction extends JumpInstructionBase {
   bool get implicitNext => false;
 
   @override
-  ScriptOpcode get shortOpcode => ScriptOpcode.jumpShortBegin;
+  ScriptOpcode get shortOpcode => .jumpShortBegin;
 
   @override
-  ScriptOpcode get longOpcode => ScriptOpcode.jumpLong;
+  ScriptOpcode get longOpcode => .jumpLong;
 
   @override
   String toString() => '  jump 0x${target.offset.toRadixString(16)}';
@@ -614,10 +714,10 @@ final class JumpInstruction extends JumpInstructionBase {
 
 final class JumpIfZeroInstruction extends JumpInstructionBase {
   @override
-  ScriptOpcode get shortOpcode => ScriptOpcode.jumpIfZeroShortBegin;
+  ScriptOpcode get shortOpcode => .jumpIfZeroShortBegin;
 
   @override
-  ScriptOpcode get longOpcode => ScriptOpcode.jumpIfZeroLong;
+  ScriptOpcode get longOpcode => .jumpIfZeroLong;
 
   @override
   String toString() => '  jz 0x${target.offset.toRadixString(16)}';
@@ -628,10 +728,10 @@ final class JumpIfZeroInstruction extends JumpInstructionBase {
 
 final class JumpIfNotZeroInstruction extends JumpInstructionBase {
   @override
-  ScriptOpcode get shortOpcode => ScriptOpcode.jumpIfNotZeroShortBegin;
+  ScriptOpcode get shortOpcode => .jumpIfNotZeroShortBegin;
 
   @override
-  ScriptOpcode get longOpcode => ScriptOpcode.jumpIfNotZeroLong;
+  ScriptOpcode get longOpcode => .jumpIfNotZeroLong;
 
   @override
   String toString() => '  jnz 0x${target.offset.toRadixString(16)}';
@@ -642,6 +742,8 @@ final class JumpIfNotZeroInstruction extends JumpInstructionBase {
 
 final class PushStringValueInstruction(final String value)
     extends ScriptInstruction {
+  final precomputedHashCode = Object.hash(PushStringValueInstruction, value);
+
   @override
   int get byteCodeLength => 3;
 
@@ -657,6 +759,17 @@ final class PushStringValueInstruction(final String value)
     builder.addByte(offset);
     builder.addByte(offset >> 8);
   }
+
+  @override
+  // ignore: unused_element
+  bool get _hasImplementedHashCodeAndEquals => true;
+
+  @override
+  int get hashCode => precomputedHashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      other is PushStringValueInstruction && value == other.value;
 
   @override
   String toString() => '  push offset-of ${formatStringData(value)}';
@@ -700,6 +813,13 @@ final class SetHalfWordStringValueInstruction({
   required final Uint8List value,
   required final int valueOffset,
 }) extends ScriptInstruction {
+  final precomputedHashCode = Object.hash(
+    SetHalfWordStringValueInstruction,
+    stringValue,
+    const ListEquality().hash(value),
+    valueOffset,
+  );
+
   @override
   int get byteCodeLength => 0;
 
@@ -713,6 +833,20 @@ final class SetHalfWordStringValueInstruction({
     value[valueOffset] = offset & 0xff;
     value[valueOffset + 1] = offset >> 8;
   }
+
+  @override
+  // ignore: unused_element
+  bool get _hasImplementedHashCodeAndEquals => true;
+
+  @override
+  int get hashCode => precomputedHashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      other is SetHalfWordStringValueInstruction &&
+      stringValue == other.stringValue &&
+      valueOffset == other.valueOffset &&
+      const ListEquality().equals(value, other.value);
 
   @override
   String toString() =>
@@ -736,11 +870,23 @@ final class PushDataValueInstruction(final AstNode value)
   }
 
   @override
+  // ignore: unused_element
+  bool get _hasImplementedHashCodeAndEquals => true;
+
+  @override
+  int get hashCode => Object.hash(PushDataValueInstruction, value);
+
+  @override
+  bool operator ==(Object other) =>
+      other is PushDataValueInstruction && value == other.value;
+
+  @override
   String toString() => '  push offset-of $value';
 }
 
 final class PushIntValueInstruction(final int value)
-    extends ScriptInstruction {
+    extends ScriptInstruction
+    implements PopRemovable {
   @override
   int get byteCodeLength {
     if (0 <= value && value < 60) {
@@ -791,6 +937,17 @@ final class PushIntValueInstruction(final int value)
   }
 
   @override
+  // ignore: unused_element
+  bool get _hasImplementedHashCodeAndEquals => true;
+
+  @override
+  int get hashCode => Object.hash(PushIntValueInstruction, value);
+
+  @override
+  bool operator ==(Object other) =>
+      other is PushIntValueInstruction && value == other.value;
+
+  @override
   String toString() => '  push $value';
 }
 
@@ -814,6 +971,17 @@ final class NopInstruction([final ScriptInstruction? reference])
   }
 
   @override
+  // ignore: unused_element
+  bool get _hasImplementedHashCodeAndEquals => true;
+
+  @override
+  int get hashCode => Object.hash(NopInstruction, offset);
+
+  @override
+  bool operator ==(Object other) =>
+      other is NopInstruction && offset == other.offset;
+
+  @override
   String toString() => ' 0x${offset.toRadixString(16)}:';
 }
 
@@ -831,6 +999,17 @@ final class OperatorInstruction(final ScriptOperatorOpcode operator)
   }
 
   @override
+  // ignore: unused_element
+  bool get _hasImplementedHashCodeAndEquals => true;
+
+  @override
+  int get hashCode => Object.hash(OperatorInstruction, operator);
+
+  @override
+  bool operator ==(Object other) =>
+      other is OperatorInstruction && operator == other.operator;
+
+  @override
   String toString() => '  ${operator.name}';
 }
 
@@ -844,29 +1023,53 @@ sealed class SingleOpcodeInstruction extends ScriptInstruction {
   }
 
   @override
+  // ignore: unused_element
+  bool get _hasImplementedHashCodeAndEquals => true;
+
+  @override
+  int get hashCode => Object.hash(SingleOpcodeInstruction, opcode);
+
+  @override
+  bool operator ==(Object other) =>
+      other is SingleOpcodeInstruction && opcode == other.opcode;
+
+  @override
   String toString() => '  ${opcode.name}';
 
   ScriptOpcode get opcode;
 }
 
+final class CallValueInstruction extends SingleOpcodeInstruction {
+  @override
+  ScriptOpcode get opcode => .callValue;
+}
+
+final class JumpValueInstruction extends SingleOpcodeInstruction {
+  @override
+  bool get implicitNext => false;
+
+  @override
+  ScriptOpcode get opcode => .jumpValue;
+}
+
 final class PopValueInstruction extends SingleOpcodeInstruction {
   @override
-  ScriptOpcode get opcode => ScriptOpcode.pop;
+  ScriptOpcode get opcode => .pop;
 }
 
 final class WriteByteIndexInstruction extends SingleOpcodeInstruction {
   @override
-  ScriptOpcode get opcode => ScriptOpcode.writeByteIndex;
+  ScriptOpcode get opcode => .writeByteIndex;
 }
 
 final class WriteHalfWordIndexInstruction extends SingleOpcodeInstruction {
   @override
-  ScriptOpcode get opcode => ScriptOpcode.writeHalfWordIndex;
+  ScriptOpcode get opcode => .writeHalfWordIndex;
 }
 
 final class WriteWordIndexInstruction extends SingleOpcodeInstruction {
   @override
-  ScriptOpcode get opcode => ScriptOpcode.writeWordIndex;
+  ScriptOpcode get opcode => .writeWordIndex;
 }
 
 final class ReturnInstruction extends SingleOpcodeInstruction {
@@ -874,12 +1077,12 @@ final class ReturnInstruction extends SingleOpcodeInstruction {
   bool get implicitNext => false;
 
   @override
-  ScriptOpcode get opcode => ScriptOpcode.ret;
+  ScriptOpcode get opcode => .ret;
 }
 
 final class ReturnIfZeroInstruction extends SingleOpcodeInstruction {
   @override
-  ScriptOpcode get opcode => ScriptOpcode.retIfZero;
+  ScriptOpcode get opcode => .retIfZero;
 
   @override
   String toString() => '  retz';
@@ -887,7 +1090,7 @@ final class ReturnIfZeroInstruction extends SingleOpcodeInstruction {
 
 final class ReturnIfNotZeroInstruction extends SingleOpcodeInstruction {
   @override
-  ScriptOpcode get opcode => ScriptOpcode.retIfNotZero;
+  ScriptOpcode get opcode => .retIfNotZero;
 
   @override
   String toString() => '  retnz';
@@ -920,6 +1123,17 @@ final class StartFunctionInstruction(
   }
 
   @override
+  // ignore: unused_element
+  bool get _hasImplementedHashCodeAndEquals => true;
+
+  @override
+  int get hashCode => Object.hash(StartFunctionInstruction, function);
+
+  @override
+  bool operator ==(Object other) =>
+      other is StartFunctionInstruction && function == other.function;
+
+  @override
   String toString() {
     final buffer = StringBuffer();
     buffer.write('\n${function.functionName} (0x${offset.toRadixString(16)}):');
@@ -936,6 +1150,11 @@ final class StartFunctionInstruction(
 }
 
 final class DataInstruction(final Uint8List data) extends ScriptInstruction {
+  final precomputedHashCode = Object.hash(
+    DataInstruction,
+    const ListEquality().hash(data),
+  );
+
   @override
   bool get implicitNext => false;
 
@@ -946,6 +1165,17 @@ final class DataInstruction(final Uint8List data) extends ScriptInstruction {
   void addByteCode(ScriptByteCodeBuilder builder) {
     builder.add(data);
   }
+
+  @override
+  // ignore: unused_element
+  bool get _hasImplementedHashCodeAndEquals => true;
+
+  @override
+  int get hashCode => precomputedHashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      other is DataInstruction && const ListEquality().equals(data, other.data);
 
   @override
   String toString() {

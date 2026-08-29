@@ -26,6 +26,7 @@ dependencies:
     path: ../javelin_extensions
   web: ^1.0.0
   url_launcher: ^6.1.14
+  collection: ^1.19.1
 
 # The following section is specific to Flutter packages.
 flutter:
